@@ -5,7 +5,10 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
