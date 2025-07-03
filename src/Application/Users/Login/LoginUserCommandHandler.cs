@@ -27,7 +27,7 @@ internal sealed class LoginUserCommandHandler(
 
         if (!verified)
         {
-            return Result.Failure<string>(UserErrors.NotFoundByEmail);
+            return Result.Failure<string>(UserErrors.WrongPassword);
         }
 
         string token = tokenProvider.Create(user);

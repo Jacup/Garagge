@@ -13,13 +13,13 @@ services:
     image: postgres:17
     container_name: db
     environment:
-      - POSTGRES_DB=garagge-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_DB: garagge-db
+      POSTGRES_USER: admin0
+      POSTGRES_PASSWORD: passw0rd
     volumes:
-      - ./.containers/db:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
 
   seq:
     image: datalust/seq:2024.3
@@ -28,3 +28,6 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 8081:80
+        
+volumes:
+  db-data:

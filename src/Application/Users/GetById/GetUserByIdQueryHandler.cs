@@ -13,7 +13,7 @@ internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUs
     {
         if (query.UserId != userContext.UserId)
         {
-            return Result.Failure<UserResponse>(UserErrors.Unauthorized());
+            return Result.Failure<UserResponse>(UserErrors.Unauthorized);
         }
 
         UserResponse? user = await context.Users
