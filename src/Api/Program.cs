@@ -22,6 +22,8 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 WebApplication app = builder.Build();
 
+app.Configuration.ValidateJwtSecret(app.Environment);
+
 app.MapEndpoints();
 
 if (app.Environment.IsDevelopment())
