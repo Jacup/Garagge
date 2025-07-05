@@ -1,11 +1,19 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Infrastructure.Tests;
 
 public class ServiceCollectionExtensionsTests
 {
+    private readonly Mock<ILogger> _loggerMock;
+
+    public ServiceCollectionExtensionsTests()
+    {
+        _loggerMock = new Mock<ILogger>();
+    }
+
     [Fact]
     public void ValidateJwtSecret_NullConfiguration_ThrowsArgumentNullException()
     {
@@ -14,7 +22,7 @@ public class ServiceCollectionExtensionsTests
         var envMock = new Mock<IHostEnvironment>();
 
         // Act & Assert
-        Should.Throw<ArgumentNullException>(() => config!.ValidateJwtSecret(envMock.Object));
+        Should.Throw<ArgumentNullException>(() => config!.ValidateJwtSecret(envMock.Object, _loggerMock.Object));
     }
 
     [Fact]
@@ -25,7 +33,7 @@ public class ServiceCollectionExtensionsTests
         IHostEnvironment? env = null;
 
         // Act & Assert
-        Should.Throw<ArgumentNullException>(() => config.ValidateJwtSecret(env!));
+        Should.Throw<ArgumentNullException>(() => config.ValidateJwtSecret(env!, _loggerMock.Object));
     }
 
     [Fact]
@@ -43,7 +51,7 @@ public class ServiceCollectionExtensionsTests
         envMock.Setup(e => e.EnvironmentName).Returns("Development");
 
         // Act & Assert
-        config.ValidateJwtSecret(envMock.Object);
+        config.ValidateJwtSecret(envMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -56,7 +64,7 @@ public class ServiceCollectionExtensionsTests
         envMock.Setup(e => e.EnvironmentName).Returns("Development");
 
         // Act & Assert
-        config.ValidateJwtSecret(envMock.Object);
+        config.ValidateJwtSecret(envMock.Object, _loggerMock.Object);
     }
 
     [Theory]
@@ -71,7 +79,7 @@ public class ServiceCollectionExtensionsTests
         envMock.Setup(e => e.EnvironmentName).Returns(env);
 
         // Act & Assert
-        var ex = Should.Throw<InvalidOperationException>(() => config.ValidateJwtSecret(envMock.Object));
+        var ex = Should.Throw<InvalidOperationException>(() => config.ValidateJwtSecret(envMock.Object, _loggerMock.Object));
 
         ex.Message.ShouldContain("JWT Secret is not configured");
     }

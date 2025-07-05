@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Behaviors;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using SharedKernel;
 
 namespace Application;
 
@@ -8,6 +9,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services.AddSingleton<IResultFactory, ResultFactory>();
+
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);

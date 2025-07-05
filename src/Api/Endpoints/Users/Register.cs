@@ -8,7 +8,7 @@ namespace Api.Endpoints.Users;
 
 internal sealed class Register : IEndpoint
 {
-    public sealed record Request(string Email, string FirstName, string LastName, string Password);
+    private sealed record Request(string Email, string FirstName, string LastName, string Password);
 
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

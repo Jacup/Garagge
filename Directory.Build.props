@@ -5,7 +5,7 @@
 		<Nullable>enable</Nullable>
 
 		<AnalysisLevel>latest</AnalysisLevel>
-		<AnalysisMode>All</AnalysisMode>
+		<AnalysisMode>Default</AnalysisMode>
 	</PropertyGroup>
 
 

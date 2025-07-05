@@ -10,7 +10,7 @@ public static class DependencyInjection
         services.AddSwaggerGen();
 
         // REMARK: If you want to use Controllers, you'll need this.
-        services.AddControllers();
+        //services.AddControllers();
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
