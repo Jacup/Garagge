@@ -1,36 +1,48 @@
-# Clean Architecture Template
+# 🚗 Garagge Web API
 
-What's included in the template?
+Garagge to nowoczesna, modularna aplikacja Web API napisana w .NET 8, służąca do zarządzania pojazdami. Projekt oparty na architekturze Clean Architecture, gotowy do samodzielnego hostowania lub wdrożenia w chmurze jako SaaS.
 
-- SharedKernel project with common Domain-Driven Design abstractions.
-- Domain layer with sample entities.
-- Application layer with abstractions for:
-  - CQRS
-  - Example use cases
-  - Cross-cutting concerns (logging, validation)
-- Infrastructure layer with:
-  - Authentication
-  - Permission authorization
-  - EF Core, PostgreSQL
-  - Serilog
-- Seq for searching and analyzing structured logs
-  - Seq is available at http://localhost:8081 by default
-- Testing projects
-  - Architecture testing
+---
 
-I'm open to hearing your feedback about the template and what you'd like to see in future iterations.
+## ✨ Funkcje
 
-If you're ready to learn more, check out [**Pragmatic Clean Architecture**](https://www.milanjovanovic.tech/pragmatic-clean-architecture?utm_source=ca-template):
+- ✅ Rejestrowanie pojazdów i historii serwisowej  
+- ✅ Obsługa użytkowników i ról (JWT)  
+- ✅ REST API z dokumentacją OpenAPI  
+- ✅ Modułowa architektura (Domain, Application, Infrastructure, API)  
+- ✅ Wsparcie dla środowisk Dev / Staging / Prod  
+- ✅ Gotowe do konteneryzacji z Docker + Docker Compose
 
-- Domain-Driven Design
-- Role-based authorization
-- Permission-based authorization
-- Distributed caching with Redis
-- OpenTelemetry
-- Outbox pattern
-- API Versioning
-- Unit testing
-- Functional testing
-- Integration testing
+---
 
-Stay awesome!
+## 🛠️ Stos technologiczny
+
+- [.NET 8 Web API](https://learn.microsoft.com/en-us/aspnet/core/?view=aspnetcore-8.0)
+- Entity Framework Core  
+- PostgreSQL / SQLite (w zależności od środowiska)  
+- Clean Architecture  
+- JWT + ASP.NET Identity  
+- Serilog + Seq (logowanie)  
+- Docker & Docker Compose  
+
+---
+
+## 🚀 Szybki start
+
+### ✅ Wymagania
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
+- [Docker](https://www.docker.com/) (opcjonalnie)
+- [PostgreSQL](https://www.postgresql.org/) (jeśli nie używasz Dockera)
+
+### 🔧 Uruchomienie lokalne (bez Dockera)
+
+```bash
+# Przygotuj środowisko
+dotnet restore
+
+# Uruchom migracje (jeśli wymagane)
+dotnet ef database update --project Infrastructure
+
+# Uruchom API
+dotnet run --project Api
