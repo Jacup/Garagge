@@ -22,7 +22,8 @@ builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 WebApplication app = builder.Build();
 
-app.Configuration.ValidateJwtSecret(app.Environment);
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+app.Configuration.ValidateJwtSecret(app.Environment, logger);
 
 app.MapEndpoints();
 

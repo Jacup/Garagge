@@ -1,25 +1,41 @@
+name: garagge
+
 services:
   api:
-    image: ${DOCKER_REGISTRY-}webapi
     container_name: api
     build:
       context: .
-      dockerfile: src/Api/Dockerfile
+      dockerfile: ./src/Api/Dockerfile
     ports:
-      - 5000:8080
-      - 5001:8081
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_HTTP_PORT: 8080
+      ASPNETCORE_HTTPS_PORT: 8081
+      # DB_HOST: ${DB_HOST}
+      # DB_PORT: ${DB_PORT}
+      # DB_NAME: ${DB_NAME}
+      # DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db
 
   db:
-    image: postgres:17
     container_name: db
+    image: postgres:17
     environment:
-      POSTGRES_DB: garagge-db
-      POSTGRES_USER: admin0
-      POSTGRES_PASSWORD: passw0rd
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: always
 
   seq:
     image: datalust/seq:2024.3
@@ -28,6 +44,6 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - 8081:80
-        
+
 volumes:
   db-data:
