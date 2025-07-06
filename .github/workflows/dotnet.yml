@@ -49,6 +49,6 @@ jobs:
         with:
           name: build-artifacts
           path: build-artifacts
-  
+
       - name: Run tests
-        run: dotnet test Garagge.sln --configuration Release --no-build --verbosity normal
+        run: dotnet test Garagge.sln --configuration Release --no-build --logger:"console;verbosity=detailed"
