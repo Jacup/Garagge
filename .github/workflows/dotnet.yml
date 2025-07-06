@@ -2,58 +2,28 @@ name: .NET
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: build
+
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Restore
-        run: dotnet restore Garagge.sln
-
-      - name: Build all projects (including tests)
-        run: dotnet build Garagge.sln --configuration Release --no-restore
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            **/bin/Release/net9.0/
-            **/obj/Release/net9.0/
-          retention-days: 1
-
-  test:
-    name: test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-  
+        
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
-  
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: downloaded-artifacts
-
-      - name: Restore build artifacts to proper structure
-        run: |
-          find downloaded-artifacts -type f -exec cp --parents {} . \;
+          dotnet-version: 9.0.x
           
-      - name: Run tests
-        run: dotnet test Garagge.sln --configuration Release --no-build --logger:"console;verbosity=detailed"
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build
+        run: dotnet build --no-restore
+        
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
