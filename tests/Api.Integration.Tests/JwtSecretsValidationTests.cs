@@ -39,16 +39,4 @@ public class JwtSecretsValidationTests
 
         client.ShouldNotBeNull();
     }
-
-    [Fact]
-    public void CreateClient_MissingJwtSecretInDevelopment_DoesNotThrowException()
-    {
-        // Arrange
-        using var factory = new CustomWebApplicationFactory("Development");
-
-        // Act & Assert
-        using var client = factory.CreateClient();
-
-        client.ShouldNotBeNull();
-    }
 }

@@ -53,24 +53,12 @@ public class ServiceCollectionExtensionsTests
         // Act & Assert
         config.ValidateJwtSecret(envMock.Object, _loggerMock.Object);
     }
-
-    [Fact]
-    public void ValidateJwtSecret_MissingSecretOnDev_DoesNotThrow()
-    {
-        // Arrange
-        var config = new ConfigurationBuilder().Build();
-
-        var envMock = new Mock<IHostEnvironment>();
-        envMock.Setup(e => e.EnvironmentName).Returns("Development");
-
-        // Act & Assert
-        config.ValidateJwtSecret(envMock.Object, _loggerMock.Object);
-    }
-
+    
     [Theory]
+    [InlineData("Development")]
     [InlineData("Staging")]
     [InlineData("Production")]
-    public void ValidateJwtSecret_MissingSecretOnNonProd_ThrowsInvalidOperationException(string env)
+    public void ValidateJwtSecret_MissingSecret_ThrowsInvalidOperationException(string env)
     {
         // Arrange
         var config = new ConfigurationBuilder().Build();
