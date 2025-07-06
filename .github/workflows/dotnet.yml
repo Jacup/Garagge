@@ -36,20 +36,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-dotnet@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-
+  
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-      - name: Show downloaded files
-        run: |
-          echo "📂 Lista katalogów i plików:"
-          ls -R .
-
-      - name: Run tests from downloaded binaries
+          path: build-artifacts
+  
+      - name: Run tests
         run: dotnet test Garagge.sln --configuration Release --no-build --verbosity normal
