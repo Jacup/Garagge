@@ -49,7 +49,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
-          path: .
+          path: downloaded-artifacts
 
+      - name: Restore build artifacts to proper structure
+        run: |
+          find downloaded-artifacts -type f -exec cp --parents {} . \;
+          
       - name: Run tests
         run: dotnet test Garagge.sln --configuration Release --no-build --logger:"console;verbosity=detailed"
