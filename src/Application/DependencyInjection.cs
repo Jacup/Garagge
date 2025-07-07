@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Behaviors;
+﻿using Application.Behaviors;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using SharedKernel;
