@@ -22,7 +22,8 @@ services:
       # DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     container_name: db
@@ -35,6 +36,11 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: always
 
   seq:
