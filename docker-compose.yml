@@ -51,5 +51,15 @@ services:
     ports:
       - 8081:80
 
+  garagge-web:
+    container_name: garagge-web
+    build:
+      context: ./garagge-web
+      dockerfile: Dockerfile
+    ports:
+      - "4173:4173"
+    depends_on:
+      - api
+
 volumes:
   db-data:
