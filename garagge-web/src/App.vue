@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import Sidebar from './components/layout/SideBar.vue'
 import MainContent from './components/layout/MainContent.vue'
+import NavBar from './components/layout/NavBar.vue'
 </script>
 
 <template>
   <div class="app-layout">
-    <Sidebar />
+    <NavBar />
     <MainContent />
   </div>
 </template>

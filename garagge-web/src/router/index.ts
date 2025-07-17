@@ -19,6 +19,11 @@ const routes = [
     name: 'Login',
     component: LoginView,
   },
+  {
+    path: '/logout',
+    name: 'Logout',
+    component: LoginView,
+  },
 ]
 
 const router = createRouter({

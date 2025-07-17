@@ -1,20 +1,38 @@
 /* === base.css === */
 
-/* Paleta zmiennych — możesz ją potem rozszerzać */
+/* Główna paleta - Dark Mode */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-black: #181818;
+  /* Brand Colors */
+  --color-accent: #00b7ab; /* Akcent: wybrany element sidebar, przyciski itd. */
+  --color-highlight: #f5fe7f; /* Dodatkowy akcent (np. badge, ikony) */
+  --color-brand-light: #c0f3f4; /* Można użyć na hover, subtelne dekoracje */
 
-  --vt-c-slate-50: #f8fafc;
-  --vt-c-slate-800: #b577c4;
-  --vt-c-slate-900: #0f172a;
+  /* Neutral Colors - Dark Mode */
+  --color-bg: #000000; /* Alias na główne tło */
+  --color-card: #1e1e1e; /* Karty, sidebar, listy - ciemny szary z kontrastem */
+  --color-card-contrast: #2a2a2a; /* Sub-elementy kart (np. nagłówki w card) */
+  --color-border: rgba(255, 255, 255, 0.1); /* Subtelne linie podziału */
 
-  --vt-c-text-light: #0f172a;
-  --vt-c-text-dark: #ffffff;
+  /* Tekst */
+  --color-text: #ffffff; /* Tekst główny */
+  --color-text-muted: #aeb0b4; /* Opisy, etykiety */
 
-  --color-background: var(--vt-c-slate-900);
-  --color-sidebar: var(--vt-c-slate-800);
-  --color-text: var(--vt-c-text-dark);
+  /* Stanowe kolory - przykładowe */
+  --color-success: #00b7ab; /* Lub inny zielony jeśli chcesz odróżnić */
+  --color-warning: #f5fe7f;
+  --color-error: #ff5a5f;
+}
+
+/* White Mode (przykład, do dopracowania później) */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #ffffff;
+    --color-card: #f5f5f5;
+    --color-card-contrast: #e0e0e0;
+    --color-text: #151515;
+    --color-text-muted: rgba(0, 0, 0, 0.6);
+    --color-border: rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Reset */
@@ -28,8 +46,8 @@
 
 body {
   min-height: 100vh;
+  background: var(--color-bg);
   color: var(--color-text);
-  background: var(--color-background);
   font-family:
     Inter,
     -apple-system,
