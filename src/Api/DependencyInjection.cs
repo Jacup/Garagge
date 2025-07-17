@@ -1,4 +1,5 @@
-﻿using Api.Infrastructure;
+﻿using Api.Extensions;
+using Api.Infrastructure;
 
 namespace Api;
 
@@ -16,5 +17,10 @@ public static class DependencyInjection
         services.AddProblemDetails();
 
         return services;
+    }
+    
+    public static IServiceCollection AddWebApi(this IServiceCollection services, IConfiguration configuration)
+    {
+        return services.AddCorsConfiguration(configuration);
     }
 }

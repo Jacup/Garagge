@@ -11,6 +11,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
+builder.Services.AddWebApi(builder.Configuration);
 builder.Services.AddSwaggerGenWithAuth();
 
 builder.Services
@@ -24,6 +25,7 @@ WebApplication app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.Configuration.ValidateJwtSecret(app.Environment, logger);
+app.UseCorsConfiguration();
 
 app.MapEndpoints();
 
