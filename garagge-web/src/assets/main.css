@@ -1,35 +1,32 @@
+/* === main.css === */
+
 @import './base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-}
-
-a,
-.green {
+a {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+  color: var(--color-accent);
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a:hover {
+  opacity: 0.8;
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+.sidebar-item--active {
+  background: var(--color-accent);
+  color: var(--color-black);
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+.card {
+  background: var(--color-card);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.card-header {
+  background: var(--color-card-contrast);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
 }
