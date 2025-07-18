@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
-const searchText = ref("");
-const inputRef = ref<HTMLInputElement | null>(null);
+const searchText = ref('')
+const inputRef = ref<HTMLInputElement | null>(null)
 
 function searchBoxEmpty() {
-  return !searchText.value || searchText.value.trim().length === 0;
+  return !searchText.value || searchText.value.trim().length === 0
 }
 
 function clearInput() {
-  searchText.value = "";
-  inputRef.value?.focus();
+  searchText.value = ''
+  inputRef.value?.focus()
 }
 </script>
 
@@ -48,7 +48,7 @@ function clearInput() {
 }
 
 .material-icons {
-  font-family: "Material Icons";
+  font-family: 'Material Icons';
   font-size: 24px;
   line-height: 1;
   vertical-align: middle;
