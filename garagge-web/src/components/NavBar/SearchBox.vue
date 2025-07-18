@@ -20,7 +20,7 @@ function clearInput() {
       <span class="material-icons">search</span>
     </div>
     <div class="search-input">
-      <input ref="inputRef" type="text" placeholder="Search..." v-model="searchText" />
+      <input ref="inputRef" type="text" placeholder="Search..." v-model="searchText" aria-label="Search" />
     </div>
     <div class="search-clear-wrapper">
       <button v-if="!searchBoxEmpty()" class="search-clear" type="button" @click="clearInput">X</button>
