@@ -1,6 +1,6 @@
 <template>
   <div class="navbar-header">
-    <span class="logo">MyApp</span>
+    <span class="logo">Garagge</span>
   </div>
 </template>
 

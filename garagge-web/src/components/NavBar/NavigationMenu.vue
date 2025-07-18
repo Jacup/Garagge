@@ -1,8 +1,17 @@
-<script lang="ts"></script>
+<script lang="ts" setup>
+import NavItem from './NavItem.vue'
+</script>
 
 <template>
   <nav class="navbar-nav">
-    <RouterLink to="/" class="nav-item">Dashboard</RouterLink>
+    <NavItem icon="dashboard" text="Dashboard" path="/" />
+    <NavItem icon="directions_car" text="Vehicles" path="/vehicles" />
+  </nav>
+  <hr class="nav-separator" />
+  <nav class="navbar-nav">
+    <NavItem icon="help" text="Help" path="/help" />
+    <NavItem icon="report" text="Report" path="/report" />
+    <NavItem icon="settings" text="Settings" path="/settings" />
   </nav>
 </template>
 
@@ -10,16 +19,12 @@
 .navbar-nav {
   display: flex;
   flex-direction: column;
-  margin-top: 2rem;
+  width: 100%;
+  gap: 0.5rem;
 }
 
-.nav-item {
-  color: #cbd5e1; /* slate-300 */
-  text-decoration: none;
-  margin-bottom: 1rem;
-}
-
-.nav-item:hover {
-  color: #fff;
+.nav-separator {
+  border: none;
+  border-top: 1px solid var(--color-border);
 }
 </style>
