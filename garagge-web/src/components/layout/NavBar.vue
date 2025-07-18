@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import AccountMenu from '../NavBar/AccountMenu.vue'
+import NavigationMenu from '../NavBar/NavigationMenu.vue'
 </script>
 
 <template>
@@ -8,13 +9,7 @@ import AccountMenu from '../NavBar/AccountMenu.vue'
     <div class="navbar-header">
       <span class="logo">MyApp</span>
     </div>
-
-    <!-- NAV: Główna nawigacja -->
-    <nav class="navbar-nav">
-      <RouterLink to="/" class="nav-item">Dashboard</RouterLink>
-    </nav>
-
-    <!-- BOTTOM: User info or auth buttons -->
+    <NavigationMenu />
     <AccountMenu />
   </aside>
 </template>
