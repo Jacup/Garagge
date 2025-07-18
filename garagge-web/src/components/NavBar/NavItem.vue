@@ -22,7 +22,7 @@ defineProps<{
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: left;
+  justify-content: flex-start;
   padding: 0.5rem;
   gap: 0.5rem;
   border-radius: 12px;
