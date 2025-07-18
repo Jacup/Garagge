@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import TitleBar from '../NavBar/TitleBar.vue'
 import SearchBox from '../NavBar/SearchBox.vue'
-import AccountMenu from '../NavBar/AccountMenu.vue'
 import NavigationMenu from '../NavBar/NavigationMenu.vue'
+import AccountMenu from '../NavBar/AccountMenu.vue'
 </script>
 
 <template>
@@ -24,6 +24,6 @@ import NavigationMenu from '../NavBar/NavigationMenu.vue'
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 </style>
