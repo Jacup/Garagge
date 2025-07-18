@@ -1,14 +1,14 @@
 <script lang="ts" setup>
+import TitleBar from '../NavBar/TitleBar.vue'
+import SearchBox from '../NavBar/SearchBox.vue'
 import AccountMenu from '../NavBar/AccountMenu.vue'
 import NavigationMenu from '../NavBar/NavigationMenu.vue'
 </script>
 
 <template>
   <aside class="navbar">
-    <!-- TOP: Logo / Brand -->
-    <div class="navbar-header">
-      <span class="logo">MyApp</span>
-    </div>
+    <TitleBar />
+    <SearchBox />
     <NavigationMenu />
     <AccountMenu />
   </aside>
@@ -24,27 +24,6 @@ import NavigationMenu from '../NavBar/NavigationMenu.vue'
   flex-direction: column;
   justify-content: space-between;
   padding: 1rem;
-}
-
-.navbar-header {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #fff;
-}
-
-.navbar-nav {
-  display: flex;
-  flex-direction: column;
-  margin-top: 2rem;
-}
-
-.nav-item {
-  color: #cbd5e1; /* slate-300 */
-  text-decoration: none;
-  margin-bottom: 1rem;
-}
-
-.nav-item:hover {
-  color: #fff;
+  gap: 1rem;
 }
 </style>
