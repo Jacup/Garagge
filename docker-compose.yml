@@ -1,26 +1,25 @@
-name: garagge
-
 services:
-  api:
-    container_name: api
+  server:
+    container_name: server
     build:
       context: .
       dockerfile: ./src/Api/Dockerfile
     ports:
       - "5000:8080"
-      - "5001:8081"
     environment:
-      Jwt__Secret: ${JWT_SECRET}
-      Jwt__Issuer: ${JWT_ISSUER}
-      Jwt__Audience: ${JWT_AUDIENCE}
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      ASPNETCORE_HTTP_PORT: 8080
-      ASPNETCORE_HTTPS_PORT: 8081
-      # DB_HOST: ${DB_HOST}
-      # DB_PORT: ${DB_PORT}
-      # DB_NAME: ${DB_NAME}
-      # DB_USERNAME: ${DB_USERNAME}
+      ASPNETCORE_ENVIRONMENT: Production
+      JWT__SECRET: ${JWT_SECRET}
+      
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+
+      # Optional, uncomment if you want to change variables in .env file
+      #JWT__ISSUER: ${JWT_ISSUER}
+      #JWT__AUDIENCE: ${JWT_AUDIENCE}
+      #DB_HOST: ${DB_HOST}
+      #DB_PORT: ${DB_PORT}
+      #DB_PORT: ${DB_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -29,7 +28,6 @@ services:
     container_name: db
     image: postgres:17
     environment:
-      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -42,24 +40,6 @@ services:
       timeout: 5s
       retries: 5
     restart: always
-
-  seq:
-    image: datalust/seq:2024.3
-    container_name: seq
-    environment:
-      - ACCEPT_EULA=Y
-    ports:
-      - 8081:80
-
-  garagge-web:
-    container_name: garagge-web
-    build:
-      context: ./garagge-web
-      dockerfile: Dockerfile
-    ports:
-      - "4173:4173"
-    depends_on:
-      - api
 
 volumes:
   db-data:

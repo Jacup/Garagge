@@ -17,7 +17,10 @@ public static class ServiceCollectionExtensions
 
         if (string.IsNullOrWhiteSpace(secret))
             throw new InvalidOperationException("JWT Secret is not configured. Please set the environment variable 'JWT__SECRET'.");
-        
+
         if (secret == fallbackSecret)
-            logger.LogWarning("You are using the default JWT secret. This is insecure for production. Set a strong secret using 'JWT__SECRET'.");    }
+            logger.LogWarning("You are using the default JWT secret. This is insecure for production. Set a strong secret using 'JWT__SECRET'.");
+        else
+            logger.LogInformation("Safe secret used.");
+    }
 }

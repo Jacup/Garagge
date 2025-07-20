@@ -13,9 +13,13 @@ public static class CorsExtensions
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins(corsSettings.AllowedOrigins)
-                      .WithMethods(corsSettings.AllowedMethods)
-                      .WithHeaders(corsSettings.AllowedHeaders)
-                      .AllowCredentials();
+                    .WithMethods(corsSettings.AllowedMethods)
+                    .WithHeaders(corsSettings.AllowedHeaders);
+                
+                if (corsSettings.AllowedOrigins.Length != 0)
+                {
+                    policy.AllowCredentials();
+                }
             });
         });
 
