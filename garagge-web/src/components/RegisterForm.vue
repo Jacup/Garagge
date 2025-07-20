@@ -51,8 +51,8 @@ async function onSubmit() {
       lastName: res.lastName,
     })
     router.push('/')
-  } catch (e: any) {
-    error.value = e.message || 'Błąd rejestracji'
+  } catch (e: unknown) {
+    error.value = (e as Error).message || 'Błąd rejestracji'
   } finally {
     loading.value = false
   }
