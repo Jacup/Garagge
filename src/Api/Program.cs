@@ -7,6 +7,8 @@ using Serilog;
 using Api;
 using Api.Extensions;
 
+Console.WriteLine("App starting...");
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
@@ -36,10 +38,7 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 }
 
-app.MapHealthChecks("health", new HealthCheckOptions
-{
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+app.MapHealthChecks("health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
 app.UseRequestContextLogging();
 
@@ -51,12 +50,26 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-// REMARK: If you want to use Controllers, you'll need this.
-//app.MapControllers();
+app.UseStaticFiles();
+
+// SPA fallback: return index.html for unknown routes (only in Production)
+if (app.Environment.IsProduction())
+{
+    app.Use(async (context, next) =>
+    {
+        await next();
+        var path = context.Request.Path.Value ?? string.Empty;
+        if (context.Response.StatusCode == 404 && !path.StartsWith("/api"))
+        {
+            context.Response.StatusCode = 200;
+            await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));
+        }
+    });
+}
 
 await app.RunAsync();
 
-// REMARK: Required for functional and integration tests to work.
+
 namespace Api
 {
     public partial class Program;

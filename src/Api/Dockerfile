@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
+# USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -24,13 +24,30 @@ COPY . .
 WORKDIR "/src/src/Api"
 RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+ARG INCLUDE_FRONTEND=true
+
+# Etap budowania frontu tylko jeśli INCLUDE_FRONTEND=true
+FROM node:20 AS frontend-build
+WORKDIR /src/web
+COPY garagge-web/package*.json ./
+RUN npm install
+COPY garagge-web/ ./
+RUN npm run build
+
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# Finalny obraz bez frontu (dev)
+FROM base AS final-no-frontend
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Api.dll"]
+
+# Finalny obraz z frontem (prod, domyślny)
+FROM base AS final-with-frontend
+WORKDIR /app
+COPY --from=publish /app/publish .
+COPY --from=frontend-build /src/web/dist ./wwwroot
 ENTRYPOINT ["dotnet", "Api.dll"]
