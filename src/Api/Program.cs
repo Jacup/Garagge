@@ -27,7 +27,9 @@ WebApplication app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 app.Configuration.ValidateJwtSecret(app.Environment, logger);
-app.UseCorsConfiguration();
+
+if (EnvironmentExtensions.IsDevelopment())
+    app.UseCorsConfiguration();
 
 app.MapEndpoints();
 
@@ -50,11 +52,11 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.UseStaticFiles();
 
 // SPA fallback: return index.html for unknown routes (only in Production)
 if (app.Environment.IsProduction())
 {
+    app.UseStaticFiles();
     app.Use(async (context, next) =>
     {
         await next();
