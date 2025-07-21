@@ -19,6 +19,8 @@ public static class DependencyInjection
     
     public static IServiceCollection AddWebApi(this IServiceCollection services, IConfiguration configuration)
     {
-        return services.AddCorsConfiguration(configuration);
+        if (EnvironmentExtensions.IsDevelopment())
+            return services.AddCorsConfiguration(configuration);
+        return services;
     }
 }
