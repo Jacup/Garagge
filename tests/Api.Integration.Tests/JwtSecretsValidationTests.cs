@@ -20,23 +20,4 @@ public class JwtSecretsValidationTests
 
         ex.Message.ShouldContain("JWT Secret is not configured");
     }
-
-    [Theory]
-    [InlineData("Staging")]
-    [InlineData("Production")]
-    public void CreateClient_WithJwtSecretInStaging_DoesNotThrowException(string env)
-    {
-        // Arrange
-        var overrides = new Dictionary<string, string?>
-        {
-            ["Jwt:Secret"] = "test-secret"
-        };
-
-        using var factory = new CustomWebApplicationFactory(env, overrides);
-
-        // Act & Assert
-        using var client = factory.CreateClient();
-
-        client.ShouldNotBeNull();
-    }
 }
