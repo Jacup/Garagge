@@ -29,7 +29,7 @@ describe('userApi', () => {
 
       const result = await login('test@example.com', 'password123')
 
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:5000/users/login', {
+      expect(mockFetch).toHaveBeenCalledWith('/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ describe('userApi', () => {
 
       const result = await register('new@example.com', 'Jane', 'Doe', 'password123')
 
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:5000/users/register', {
+      expect(mockFetch).toHaveBeenCalledWith('/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ describe('userApi', () => {
 
       const result = await getUserProfile()
 
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:5000/users/me', {
+      expect(mockFetch).toHaveBeenCalledWith('/users/me', {
         headers: {
           Authorization: 'Bearer test-token',
         },
