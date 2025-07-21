@@ -43,14 +43,7 @@ jobs:
             exit 1
           fi
         shell: bash
-        
-      - name: Set global version in Directory.Build.props from release tag
-        run: |
-          VERSION="${{ github.ref_name }}"
-          props="Directory.Build.props"
-          sed -i "s|<Version>.*</Version>|<Version>${VERSION}</Version>|g" "$props"
-        shell: bash
-          
+
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
@@ -60,6 +53,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
           
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
