@@ -1,8 +1,8 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.Core;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
-using SharedKernel;
 using System.Reflection;
 
 namespace Application.Behaviors;

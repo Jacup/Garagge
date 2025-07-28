@@ -1,5 +1,5 @@
-﻿using MediatR;
-using SharedKernel;
+﻿using Application.Core;
+using MediatR;
 
 namespace Application.Abstractions.Messaging;
 

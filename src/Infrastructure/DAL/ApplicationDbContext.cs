@@ -1,9 +1,10 @@
 ﻿using Application.Abstractions.Data;
-using Domain.Users;
-using Domain.Vehicles;
+using Domain.Abstractions;
+using Domain.Entities;
+using Domain.Entities.Users;
+using Domain.Entities.Vehicles;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
 
 namespace Infrastructure.DAL;
 

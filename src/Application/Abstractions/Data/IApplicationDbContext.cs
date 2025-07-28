@@ -1,5 +1,5 @@
-﻿using Domain.Users;
-using Domain.Vehicles;
+﻿using Domain.Entities.Users;
+using Domain.Entities.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Abstractions.Data;

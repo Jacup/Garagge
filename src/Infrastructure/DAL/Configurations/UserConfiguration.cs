@@ -1,5 +1,4 @@
-﻿using Domain.Users;
-using Domain.Vehicles;
+﻿using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
