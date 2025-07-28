@@ -1,7 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\SharedKernel\SharedKernel.csproj"/>
+        <PackageReference Include="MediatR.Contracts"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName)Tests"/>
+    </ItemGroup>
 </Project>

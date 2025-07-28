@@ -1,4 +1,4 @@
-﻿using SharedKernel;
+﻿using Application.Core;
 
 namespace Api.Infrastructure;
 

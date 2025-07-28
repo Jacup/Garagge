@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Messaging;
-using Domain.Users;
 using Infrastructure.Database;
 using Api;
+using Domain.Entities.Users;
 using Infrastructure.DAL;
 
 namespace ArchitectureTests;

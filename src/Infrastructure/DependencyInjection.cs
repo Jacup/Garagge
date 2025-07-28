@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Application.Abstractions;
+using System.Text;
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Infrastructure.Authentication;
@@ -13,7 +14,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SharedKernel;
 
 namespace Infrastructure;
 

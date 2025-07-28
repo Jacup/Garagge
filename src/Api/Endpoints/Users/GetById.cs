@@ -1,8 +1,8 @@
 ﻿using Api.Infrastructure;
 using Application.Users.GetById;
 using MediatR;
-using SharedKernel;
 using Api.Extensions;
+using Application.Core;
 
 namespace Api.Endpoints.Users;
 

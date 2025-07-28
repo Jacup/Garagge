@@ -2,6 +2,8 @@
 
     <ItemGroup>
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
+        <PackageReference Include="Mapster" />
+        <PackageReference Include="Mapster.DependencyInjection" />
         <PackageReference Include="MediatR"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
@@ -11,11 +13,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Domain\Domain.csproj"/>
-        <ProjectReference Include="..\SharedKernel\SharedKernel.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Application.UnitTests"/>
+        <InternalsVisibleTo Include="$(AssemblyName)Tests" />
     </ItemGroup>
 
 </Project>
