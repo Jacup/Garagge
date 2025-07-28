@@ -2,11 +2,10 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Domain.Entities.Vehicles;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Vehicles.GetByUserId;
+namespace Application.Vehicles.GetMyByUserId;
 
 internal sealed class GetVehiclesByUserIdQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetVehiclesByUserIdQuery, ICollection<VehicleDto>>
 {

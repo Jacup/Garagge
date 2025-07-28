@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Application.Vehicles.CreateMyVehicle;
+namespace Application.Vehicles.CreateMy;
 
 internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<CreateMyVehicleCommand>
 {

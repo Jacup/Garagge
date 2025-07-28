@@ -6,7 +6,7 @@ using Application.Core;
 using Domain.Entities.Vehicles;
 using Mapster;
 
-namespace Application.Vehicles.CreateMyVehicle;
+namespace Application.Vehicles.CreateMy;
 
 internal sealed class CreateMyVehicleCommandHandler(IApplicationDbContext dbContext, IUserContext userContext, IDateTimeProvider dateTimeProvider) : ICommandHandler<CreateMyVehicleCommand, VehicleDto>
 {
