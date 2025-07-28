@@ -5,7 +5,7 @@ using Application.Core;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Vehicles.GetMyById;
+namespace Application.Vehicles.GetMyVehicleById;
 
 internal sealed class GetMyVehicleByIdQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetMyVehicleByIdQuery, VehicleDto>
 {
@@ -16,14 +16,13 @@ internal sealed class GetMyVehicleByIdQueryHandler(IApplicationDbContext context
 
         var vehicle = await context.Vehicles
             .AsNoTracking()
-            .FirstOrDefaultAsync(v =>
-                    v.UserId == request.UserId &&
-                    v.Id == request.VehicleId,
-                cancellationToken: cancellationToken);
+            .Where(v => v.UserId == request.UserId && v.Id == request.VehicleId)
+            .ProjectToType<VehicleDto>()
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle == null)
             return Result.Failure<VehicleDto>(VehicleErrors.NotFound(request.VehicleId));
 
-        return vehicle.Adapt<VehicleDto>();
+        return Result.Success(vehicle);
     }
 }

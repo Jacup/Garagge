@@ -2,7 +2,7 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Core;
 using Application.Vehicles;
-using Application.Vehicles.GetMyById;
+using Application.Vehicles.GetMyVehicleById;
 using Domain.Entities.Vehicles;
 using Moq;
 

@@ -5,8 +5,8 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Vehicles;
 using Application.Vehicles.CreateMy;
-using Application.Vehicles.GetMyById;
-using Application.Vehicles.GetMyByUserId;
+using Application.Vehicles.GetMyVehicleById;
+using Application.Vehicles.GetMyVehicles;
 using Infrastructure.Authentication;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +23,7 @@ public sealed class UserVehiclesController(ISender sender) : ControllerBase
     [HttpGet("my")]
     public async Task<IResult> GetMyVehicles(CancellationToken cancellationToken)
     {
-        var query = new GetVehiclesByUserIdQuery(User.GetUserId());
+        var query = new GetMyVehicles(User.GetUserId());
 
         Result<ICollection<VehicleDto>> result = await sender.Send(query, cancellationToken);
 
