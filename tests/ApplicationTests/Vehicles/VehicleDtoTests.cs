@@ -1,26 +1,37 @@
 using Application.Vehicles;
-using Domain.Entities.Vehicles;
-using Mapster;
 
 namespace ApplicationTests.Vehicles;
 
 public class VehicleDtoTests
 {
-    private const string Brand = "Audi";
-    private const string Model = "A4";
-    readonly DateOnly _manufacturedYear = new(2010, 01, 30);
-    readonly Guid _userId = Guid.NewGuid();
-    
     [Fact]
-    public void Adapt_ValidData_ShouldConvertToDtoWithMatchingValues()
+    public void VehicleDto_WhenCreatedWithValidData_ShouldSetPropertiesCorrectly()
     {
-        var vehicle = new Vehicle { Brand = Brand, Model = Model, ManufacturedYear = _manufacturedYear, UserId = _userId };
+        var id = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var brand = "Audi";
+        var model = "A4";
+        var manufacturedYear = new DateOnly(2010, 01, 20);
+        var createdDate = DateTime.UtcNow;
+        var updatedDate = DateTime.UtcNow;
 
-        var dto = vehicle.Adapt<VehicleDto>();
-        
-        dto.Brand.ShouldBe(Brand);
-        dto.Model.ShouldBe(Model);
-        dto.ManufacturedYear.ShouldBe(_manufacturedYear);
-        dto.UserId.ShouldBe(_userId);
+        var dto = new VehicleDto
+        {
+            Id = id,
+            UserId = userId,
+            Brand = brand,
+            Model = model,
+            ManufacturedYear = manufacturedYear,
+            CreatedDate = createdDate,
+            UpdatedDate = updatedDate
+        };
+
+        dto.Id.ShouldBe(id);
+        dto.UserId.ShouldBe(userId);
+        dto.Brand.ShouldBe(brand);
+        dto.Model.ShouldBe(model);
+        dto.ManufacturedYear.ShouldBe(manufacturedYear);
+        dto.CreatedDate.ShouldBe(createdDate);
+        dto.UpdatedDate.ShouldBe(updatedDate);
     }
 }

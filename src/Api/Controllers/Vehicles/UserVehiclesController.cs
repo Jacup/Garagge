@@ -4,7 +4,7 @@ using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
 using Application.Vehicles;
-using Application.Vehicles.CreateMy;
+using Application.Vehicles.CreateMyVehicle;
 using Application.Vehicles.GetMyVehicleById;
 using Application.Vehicles.GetMyVehicles;
 using Infrastructure.Authentication;

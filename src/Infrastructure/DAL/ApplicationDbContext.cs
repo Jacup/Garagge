@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Data;
+﻿using Application.Abstractions;
+using Application.Abstractions.Data;
 using Domain.Abstractions;
 using Domain.Entities;
 using Domain.Entities.Users;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DAL;
 
-public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IPublisher publisher)
+public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IPublisher publisher, IDateTimeProvider dateTimeProvider)
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<User> Users { get; set; }
@@ -24,6 +25,19 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        var entries = ChangeTracker.Entries<Entity>()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified);
+
+        var now = dateTimeProvider.UtcNow;
+
+        foreach (var entry in entries)
+        {
+            if (entry.State == EntityState.Added)
+                entry.Entity.CreatedDate = now;
+
+            entry.Entity.UpdatedDate = now;
+        }
+        
         // When should you publish domain events?
         //
         // 1. BEFORE calling SaveChangesAsync

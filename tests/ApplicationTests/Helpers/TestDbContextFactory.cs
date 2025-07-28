@@ -1,3 +1,4 @@
+using Application.Abstractions;
 using Infrastructure.DAL;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -13,8 +14,10 @@ public static class TestDbContextFactory
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-
-        var context = new ApplicationDbContext(options, publisherMock.Object);
+        
+        var dateTimeProviderMock = new Mock<IDateTimeProvider>();
+        
+        var context = new ApplicationDbContext(options, publisherMock.Object, dateTimeProviderMock.Object);
         context.Database.EnsureCreated();
 
         return context;
@@ -25,14 +28,14 @@ public static class TestDbContextFactory
         context.Database.EnsureDeleted();
         context.Dispose();
     }
-    
+
     public static ApplicationDbContext SeedDefaultVehicles(this ApplicationDbContext context)
     {
         context.Vehicles.Add(VehicleFactory.CreateDefaultAudi());
         context.Vehicles.Add(VehicleFactory.CreateDefaultBmw());
-        
+
         context.SaveChanges();
-        
+
         return context;
     }
 }
