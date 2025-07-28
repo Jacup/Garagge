@@ -71,7 +71,8 @@ public class PasswordHasherTests
         var hash = _hasher.Hash(password);
 
         // Act
-        var tampered = "0" + hash[1..];
+        // Zamieniamy kilka znaków w hash, by mieć pewność, że jest niepoprawny
+        var tampered = new string(hash.Select((c, i) => i < 6 ? (c == 'A' ? 'B' : 'A') : c).ToArray());
         var result = _hasher.Verify(password, tampered);
 
         // Assert

@@ -117,9 +117,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
 
         var mockedSut = new DeleteMyVehicleByIdCommandHandler(applicationDbContextMock.Object, _userContextMock.Object);
         var request = new DeleteMyVehicleByIdCommand(vehicle.Id);
-        
         var result = await mockedSut.Handle(request, CancellationToken.None);
-        
         result.IsSuccess.ShouldBeFalse();
         result.Error.ShouldBe(VehicleErrors.DeleteFailed(vehicle.Id));
     }

@@ -9,12 +9,12 @@ internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<Create
         RuleFor(c => c.Brand)
             .NotEmpty()
             .MaximumLength(64)
-            .WithMessage("Brand is required.");
+            .WithMessage("Brand is required and must not exceed 64 characters.");
         
         RuleFor(c => c.Model)
             .NotEmpty()
             .MaximumLength(64)
-            .WithMessage("Model is required.");
+            .WithMessage("Model is required and must not exceed 64 characters.");
         
         RuleFor(c => c.ManufacturedYear)
             .NotEmpty()
