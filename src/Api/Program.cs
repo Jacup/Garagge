@@ -22,6 +22,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
+builder.Services.AddControllers();
 
 WebApplication app = builder.Build();
 
@@ -36,7 +37,6 @@ app.MapEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerWithUi();
-
 }
 
 app.ApplyMigrations();
@@ -53,6 +53,7 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.MapControllers();
 
 // SPA fallback: return index.html for unknown routes (only in Production)
 if (app.Environment.IsProduction())
