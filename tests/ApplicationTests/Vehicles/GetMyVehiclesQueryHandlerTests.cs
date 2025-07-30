@@ -29,7 +29,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
     public async Task Handle_UserInRequestIsNotTheSameAsLogged_ShouldReturnUnauthorizedError()
     {
         var loggedUserId = Guid.NewGuid();
-        var request = new GetMyVehicles(Guid.NewGuid());
+        var request = new GetMyVehiclesQuery(Guid.NewGuid());
         
         _userContextMock
             .Setup(o => o.UserId)
@@ -62,7 +62,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         Context.Vehicles.AddRange(vehicle1, vehicle2);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehicles(_loggedUser);
+        var request = new GetMyVehiclesQuery(_loggedUser);
         
         var result = await _sut.Handle(request, CancellationToken.None);
 
@@ -92,7 +92,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         Context.Vehicles.AddRange(vehicle1, vehicle2);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehicles(_loggedUser);
+        var request = new GetMyVehiclesQuery(_loggedUser);
         
         var result = await _sut.Handle(request, CancellationToken.None);
         

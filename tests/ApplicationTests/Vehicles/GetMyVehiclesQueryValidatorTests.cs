@@ -10,7 +10,7 @@ public class GetMyVehiclesQueryValidatorTests
     [Fact]
     public void Validate_WhenUserIdIsEmpty_ShouldHaveError()
     {
-        var query = new GetMyVehicles(Guid.Empty);
+        var query = new GetMyVehiclesQuery(Guid.Empty);
         var result = _validator.TestValidate(query);
         result.ShouldHaveValidationErrorFor(q => q.UserId);
     }
@@ -18,7 +18,7 @@ public class GetMyVehiclesQueryValidatorTests
     [Fact]
     public void Validate_WhenUserIdIsValid_ShouldNotHaveError()
     {
-        var query = new GetMyVehicles(Guid.NewGuid());
+        var query = new GetMyVehiclesQuery(Guid.NewGuid());
         var result = _validator.TestValidate(query);
         result.IsValid.ShouldBeTrue();
     }
