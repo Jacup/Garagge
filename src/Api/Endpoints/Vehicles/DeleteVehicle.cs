@@ -11,7 +11,7 @@ public class DeleteVehicle : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/vehicles/my/{id:guid}", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
+        app.MapDelete("/vehicles/my/{id:guid}", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new DeleteMyVehicleByIdCommand(id);
                 
