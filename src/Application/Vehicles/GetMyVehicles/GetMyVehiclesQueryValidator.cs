@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Application.Vehicles.GetMyVehicles;
 
-internal sealed class GetMyVehiclesQueryValidator : AbstractValidator<GetMyVehicles>
+internal sealed class GetMyVehiclesQueryValidator : AbstractValidator<GetMyVehiclesQuery>
 {
     public GetMyVehiclesQueryValidator()
     {

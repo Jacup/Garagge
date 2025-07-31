@@ -8,13 +8,17 @@ public static class CustomResults
     {
         if (result.IsSuccess)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Cannot create problem result from successful result");
+        }
+
+        if (result.Error is null)
+        {
+            throw new InvalidOperationException("Result error cannot be null");
         }
 
         return Results.Problem(
             title: GetTitle(result.Error),
             detail: GetDetail(result.Error),
-            type: GetType(result.Error.Type),
             statusCode: GetStatusCode(result.Error.Type),
             extensions: GetErrors(result));
 
@@ -37,20 +41,11 @@ public static class CustomResults
             ErrorType.Unauthorized => error.Description,
             _ => "An unexpected error occurred"
         };
-
-        static string GetType(ErrorType errorType) => errorType switch
-        {
-            ErrorType.Validation => "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            ErrorType.Problem => "https://tools.ietf.org/html/rfc7231#section-6.5.1",
-            ErrorType.NotFound => "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-            ErrorType.Conflict => "https://tools.ietf.org/html/rfc7231#section-6.5.8",
-            ErrorType.Unauthorized => "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
-            _ => "https://tools.ietf.org/html/rfc7231#section-6.6.1"
-        };
-
+        
         static int GetStatusCode(ErrorType errorType) => errorType switch
         {
             ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.Problem => StatusCodes.Status400BadRequest,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Conflict => StatusCodes.Status409Conflict,
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
