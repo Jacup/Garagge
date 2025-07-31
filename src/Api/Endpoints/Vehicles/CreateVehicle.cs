@@ -12,7 +12,7 @@ public class CreateVehicle : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/vehicles/my", async (CreateMyVehicleCommand command, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPost("vehicles/my", async (CreateMyVehicleCommand command, ISender sender, CancellationToken cancellationToken) =>
         {
             Result<VehicleDto> result = await sender.Send(command, cancellationToken);
 
