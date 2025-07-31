@@ -14,7 +14,7 @@ public class GetMyVehicleById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("my/{id:guid}", async (Guid id, ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
+        app.MapGet("vehicles/my/{id:guid}", async (Guid id, ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
             {
                 var query = new GetMyVehicleByIdQuery(user.GetUserId(), id);
 

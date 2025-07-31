@@ -8,7 +8,12 @@ public static class CustomResults
     {
         if (result.IsSuccess)
         {
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Cannot create problem result from successful result");
+        }
+
+        if (result.Error is null)
+        {
+            throw new InvalidOperationException("Result error cannot be null");
         }
 
         return Results.Problem(
@@ -40,6 +45,7 @@ public static class CustomResults
         static int GetStatusCode(ErrorType errorType) => errorType switch
         {
             ErrorType.Validation => StatusCodes.Status400BadRequest,
+            ErrorType.Problem => StatusCodes.Status400BadRequest,
             ErrorType.NotFound => StatusCodes.Status404NotFound,
             ErrorType.Conflict => StatusCodes.Status409Conflict,
             ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
