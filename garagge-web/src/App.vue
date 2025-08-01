@@ -13,7 +13,7 @@ import NavBar from './components/layout/NavBar.vue'
 <style scoped>
 .app-layout {
   display: flex;
-  height: 100vh; /* ważne: pełna wysokość */
-  overflow: hidden; /* nie pozwala wyciekać scrollom na X */
+  height: 100vh;
+  overflow: hidden;
 }
 </style>

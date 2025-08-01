@@ -4,13 +4,12 @@
 
 <template>
   <div class="dashboard-view">
-    <h1>Dashboard</h1>
-    <p>Lorem ipsum.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
   </div>
 </template>
 
 <style scoped>
 .dashboard-view {
-  color: #fff; /* np. jasny tekst na ciemnym tle */
+  color: #fff;
 }
 </style>

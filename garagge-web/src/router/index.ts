@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
-
+import VehiclesView from '@/views/VehiclesView.vue'
+import { useUserStore } from '@/stores/userStore'
 const routes = [
   {
     path: '/',
@@ -12,7 +13,8 @@ const routes = [
   {
     path: '/vehicles',
     name: 'Vehicles',
-    component: DashboardView,
+    component: VehiclesView,
+    meta: { requiresAuth: true },
   },
   {
     path: '/register',
@@ -34,6 +36,16 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+
+  if (to.meta.requiresAuth && !userStore.accessToken) {
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router

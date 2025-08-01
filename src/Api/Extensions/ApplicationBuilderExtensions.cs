@@ -9,4 +9,14 @@ public static class ApplicationBuilderExtensions
 
         return app;
     }
+
+    public static IApplicationBuilder UseOpenApi(this WebApplication app, bool useSwaggerWithOpenApi)
+    {
+        app.MapOpenApi();
+
+        if (useSwaggerWithOpenApi)
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1 API"));
+
+        return app;
+    }
 }
