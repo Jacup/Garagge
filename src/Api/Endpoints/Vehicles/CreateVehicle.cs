@@ -16,7 +16,10 @@ public class CreateVehicle : IEndpoint
         {
             Result<VehicleDto> result = await sender.Send(command, cancellationToken);
 
-            return result.Match(Results.Created, CustomResults.Problem);
+            return result.Match(
+                vehicle => Results.Created($"/vehicles/{vehicle.Id}", vehicle),
+                CustomResults.Problem
+            );
         })
             .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.Vehicles);

@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/userStore'
 import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import VehiclesView from '@/views/VehiclesView.vue'
-import { useUserStore } from '@/stores/userStore'
+import AddVehicleView from '@/views/AddVehicleView.vue'
+
 const routes = [
   {
     path: '/',
@@ -14,6 +16,12 @@ const routes = [
     path: '/vehicles',
     name: 'Vehicles',
     component: VehiclesView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/vehicles/add',
+    name: 'AddVehicle',
+    component: AddVehicleView,
     meta: { requiresAuth: true },
   },
   {
