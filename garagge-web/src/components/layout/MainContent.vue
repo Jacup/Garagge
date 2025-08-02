@@ -9,6 +9,8 @@ const pageTitle = computed(() => {
   const titleMap: Record<string, string> = {
     Dashboard: 'Dashboard',
     Vehicles: 'Vehicles',
+    Login: 'Login',
+    Register: 'Register',
   }
 
   return titleMap[route.name as string] || 'Page'

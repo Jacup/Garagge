@@ -9,9 +9,9 @@ import NavItem from './NavItem.vue'
   </nav>
   <hr class="nav-separator" />
   <nav class="navbar-nav">
-    <NavItem icon="help" text="Help" path="/help" />
+    <!-- <NavItem icon="help" text="Help" path="/help" />
     <NavItem icon="report" text="Report" path="/report" />
-    <NavItem icon="settings" text="Settings" path="/settings" />
+    <NavItem icon="settings" text="Settings" path="/settings" /> -->
   </nav>
 </template>
 
