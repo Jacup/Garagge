@@ -46,7 +46,11 @@ const loadVehicles = async () => {
   loading.value = true
   try {
     const data = await getMyVehicles()
-    vehicles.value = data
+    vehicles.value = data.map((v) => ({
+      brand: v.brand,
+      model: v.model,
+      year: typeof v.manufacturedYear === 'number' ? v.manufacturedYear : (v.manufacturedYear ?? 0),
+    }))
     filterVehicles()
   } catch (error) {
     console.error('Błąd podczas ładowania pojazdów:', error)
