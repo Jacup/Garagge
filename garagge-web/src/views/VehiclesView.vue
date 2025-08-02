@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
-import { getMyVehicles } from '@/api/vehiclesApi'
+import { getMyVehicles } from '../api/vehiclesApi'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 
@@ -46,7 +46,11 @@ const loadVehicles = async () => {
   loading.value = true
   try {
     const data = await getMyVehicles()
-    vehicles.value = data
+    vehicles.value = data.map((v) => ({
+      brand: v.brand,
+      model: v.model,
+      year: typeof v.manufacturedYear === 'number' ? v.manufacturedYear : (v.manufacturedYear ?? 0),
+    }))
     filterVehicles()
   } catch (error) {
     console.error('Błąd podczas ładowania pojazdów:', error)
@@ -99,8 +103,8 @@ function updateOptions(opts: TableOptions) {
 .vehicles-view {
   height: 70vh;
 }
-.vehicles-table >>> .v-data-table-header,
-.vehicles-table >>> .v-data-table__th {
+.vehicles-table :deep() .v-data-table-header,
+.vehicles-table :deep() .v-data-table__th {
   background-color: var(--color-card-contrast); /* Twój kolor */
 }
 
