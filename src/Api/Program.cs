@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
 using Api;
 using Api.Extensions;
+using Api.Infrastructure;
 
 Console.WriteLine("App starting...");
 
@@ -18,7 +19,10 @@ builder.Services.AddWebApi(builder.Configuration);
 // Swagger/OpenAPI configuration
 
 // builder.Services.AddSwaggerGenWithAuth();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 
 builder.Services
@@ -40,7 +44,7 @@ app.MapEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseOpenApi(useSwaggerWithOpenApi: true);
+    app.UseOpenApi(useSwaggerWithOpenApi: false);
     // app.UseSwaggerWithUi();
 }
 
