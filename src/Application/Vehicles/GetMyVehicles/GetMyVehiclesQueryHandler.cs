@@ -14,20 +14,20 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
         if (request.UserId != userContext.UserId)
             return Result.Failure<PagedList<VehicleDto>>(VehicleErrors.Unauthorized);
 
-        var vehiclesQuery = context.Vehicles.AsQueryable();
-
-        vehiclesQuery = vehiclesQuery.Where(v => v.UserId == request.UserId);
+        var vehiclesQuery = context.Vehicles.Where(v => v.UserId == request.UserId);
 
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
+            var searchTerm = request.SearchTerm.ToLower();
+            
             vehiclesQuery = vehiclesQuery.Where(v =>
-                v.Brand.Contains(request.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                v.Model.Contains(request.SearchTerm, StringComparison.CurrentCultureIgnoreCase));
+                v.Brand.ToLower().Contains(searchTerm) ||
+                v.Model.ToLower().Contains(searchTerm));
         }
+        
+        vehiclesQuery = vehiclesQuery.OrderBy(v => v.CreatedDate);
 
-        var vehiclesDtoQuery = vehiclesQuery
-            .OrderBy(v => v.CreatedDate)
-            .ProjectToType<VehicleDto>();
+        var vehiclesDtoQuery = vehiclesQuery.ProjectToType<VehicleDto>();
         
         var vehiclesDto = await PagedList<VehicleDto>.CreateAsync(
             vehiclesDtoQuery,

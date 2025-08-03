@@ -3,4 +3,5 @@ using Application.Core;
 
 namespace Application.Vehicles.GetMyVehicles;
 
-public sealed record GetMyVehiclesQuery(Guid UserId, int Page, int PageSize, string? SearchTerm) : IQuery<PagedList<VehicleDto>>;
+public sealed record GetMyVehiclesQuery(Guid UserId, int Page, int PageSize, string? SearchTerm)
+    : IQuery<PagedList<VehicleDto>>;
