@@ -2,6 +2,7 @@
 using Application.Abstractions.Data;
 using Domain.Abstractions;
 using Domain.Entities;
+using Domain.Entities.EnergyEntries;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using MediatR;
@@ -13,7 +14,11 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<User> Users { get; set; }
+    
     public DbSet<Vehicle> Vehicles { get; set; }
+    
+    public DbSet<FuelEntry> FuelEntries { get; set; }
+    public DbSet<ChargingEntry> ChargingEntries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

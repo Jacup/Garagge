@@ -1,6 +1,7 @@
 using Application.Abstractions.Authentication;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,7 +47,8 @@ public static class DatabaseSeeder
                 Brand = "Toyota",
                 Model = "Corolla",
                 ManufacturedYear = 2020,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Hybrid,
             },
             new()
             {
@@ -54,15 +56,17 @@ public static class DatabaseSeeder
                 Brand = "BMW",
                 Model = "X5",
                 ManufacturedYear = 2021,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Gasoline,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Brand = "Volkswagen",
-                Model = "Golf",
+                Model = "e-Golf",
                 ManufacturedYear = 2019,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Electric,
             },
             new()
             {
@@ -70,7 +74,8 @@ public static class DatabaseSeeder
                 Brand = "Audi",
                 Model = "A4",
                 ManufacturedYear = 2022,
-                UserId = users[1].Id
+                UserId = users[1].Id,
+                PowerType = PowerType.Gasoline,
             },
             new()
             {
@@ -78,7 +83,8 @@ public static class DatabaseSeeder
                 Brand = "Mercedes-Benz",
                 Model = "C-Class",
                 ManufacturedYear = 2021,
-                UserId = users[1].Id
+                UserId = users[1].Id,
+                PowerType = PowerType.Hybrid,
             }
         };
 

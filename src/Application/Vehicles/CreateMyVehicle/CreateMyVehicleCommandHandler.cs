@@ -22,7 +22,10 @@ internal sealed class CreateMyVehicleCommandHandler(IApplicationDbContext dbCont
             Id = Guid.NewGuid(),
             Brand = request.Brand,
             Model = request.Model,
+            PowerType = request.PowerType,
             ManufacturedYear = request.ManufacturedYear,
+            Type = request.Type,
+            VIN = request.VIN,
             UserId = userId,
         };
         
