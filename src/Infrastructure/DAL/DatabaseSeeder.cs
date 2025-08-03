@@ -118,7 +118,7 @@ public static class DatabaseSeeder
                 PricePerUnit = 5.50m
             },
 
-            // Charging Entries for the second vehicle (hybrid - charging entries onlyy)
+            // Charging Entries for the second vehicle (hybrid - charging entries only)
             new ChargingEntry
             {
                 Id = Guid.NewGuid(),
