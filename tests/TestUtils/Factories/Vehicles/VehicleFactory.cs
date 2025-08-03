@@ -7,7 +7,7 @@ public static class VehicleFactory
     public static Vehicle Create(
         string brand,
         string model,
-        DateOnly manufacturedYear,
+        int? manufacturedYear,
         Guid userId)
     {
         var vehicle = new Vehicle
@@ -34,7 +34,7 @@ public static class VehicleFactory
         Id = AudiId,
         Brand = "Audi",
         Model = "A4",
-        ManufacturedYear = new DateOnly(2010, 01, 20),
+        ManufacturedYear = 2010,
         UserId = AudiUserId,
     };
 
@@ -43,7 +43,7 @@ public static class VehicleFactory
         Id = Guid.NewGuid(),
         Brand = "BMW",
         Model = "3 Series",
-        ManufacturedYear = new DateOnly(2010, 01, 20),
+        ManufacturedYear = 2010,
         UserId = Guid.NewGuid(),
     };
 }

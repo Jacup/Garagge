@@ -6,7 +6,7 @@ public class VehicleTests
 {
     private const string Brand = "Audi";
     private const string Model = "A4";
-    readonly DateOnly _manufacturedYear = new(2010, 01, 30);
+    readonly int? _manufacturedYear = 2010;
     readonly Guid _userId = Guid.NewGuid();
     
     [Fact]
@@ -21,13 +21,24 @@ public class VehicleTests
     }
     
     [Fact]
+    public void Constructor_ValidPropertiesAndNullManufacturedYear_CreatesVehicleWithCorrectData()
+    {
+        var vehicle = new Vehicle { Brand = Brand, Model = Model, ManufacturedYear = null, UserId = _userId };
+
+        vehicle.Brand.ShouldBe(Brand);
+        vehicle.Model.ShouldBe(Model);
+        vehicle.ManufacturedYear.ShouldBeNull();
+        vehicle.UserId.ShouldBe(_userId);
+    }
+    
+    [Fact]
     public void Setters_PropertiesUpdated_UpdatesUserDataCorrectly()
     {
         var vehicle = new Vehicle { Brand = Brand, Model = Model, ManufacturedYear = _manufacturedYear, UserId = _userId };
 
         const string newVehicleBrand = "BMW";
         const string newVehicleModel = "Series 3";
-        var newVehicleManufacturedYear = new DateOnly(2015, 05, 30);
+        const int newVehicleManufacturedYear = 2015;
         var newVehicleUserId = Guid.AllBitsSet;
         
         vehicle.Brand = newVehicleBrand;
