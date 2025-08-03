@@ -6,7 +6,7 @@ using Application.Vehicles.GetMyVehicleById;
 using Domain.Entities.Vehicles;
 using Moq;
 
-namespace ApplicationTests.Vehicles;
+namespace ApplicationTests.Vehicles.GetMyVehicleById;
 
 public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
 {
@@ -47,7 +47,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = otherUserId
         };
         
@@ -74,7 +74,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = _loggedUser
         };
         
@@ -99,7 +99,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = _loggedUser
         };
         

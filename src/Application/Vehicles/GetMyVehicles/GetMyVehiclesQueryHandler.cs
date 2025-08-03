@@ -3,25 +3,37 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Vehicles.GetMyVehicles;
 
-internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetMyVehiclesQuery, ICollection<VehicleDto>>
+internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, IUserContext userContext)
+    : IQueryHandler<GetMyVehiclesQuery, PagedList<VehicleDto>>
 {
-    public async Task<Result<ICollection<VehicleDto>>> Handle(GetMyVehiclesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedList<VehicleDto>>> Handle(GetMyVehiclesQuery request, CancellationToken cancellationToken)
     {
         if (request.UserId != userContext.UserId)
-            return Result.Failure<ICollection<VehicleDto>>(VehicleErrors.Unauthorized);
+            return Result.Failure<PagedList<VehicleDto>>(VehicleErrors.Unauthorized);
 
-        var vehicles = await context.Vehicles
-            .Where(v => v.UserId == request.UserId)
-            .ProjectToType<VehicleDto>()
-            .ToListAsync(cancellationToken);
+        var vehiclesQuery = context.Vehicles.AsQueryable();
 
-        if (vehicles.Count == 0)
-            return Result.Failure<ICollection<VehicleDto>>(VehicleErrors.NotFoundForUser(request.UserId));
+        vehiclesQuery = vehiclesQuery.Where(v => v.UserId == request.UserId);
 
-        return Result.Success<ICollection<VehicleDto>>(vehicles);
+        if (!string.IsNullOrEmpty(request.SearchTerm))
+        {
+            vehiclesQuery = vehiclesQuery.Where(v =>
+                v.Brand.Contains(request.SearchTerm) ||
+                v.Model.Contains(request.SearchTerm));
+        }
+
+        var vehiclesDtoQuery = vehiclesQuery
+            .OrderBy(v => v.CreatedDate)
+            .ProjectToType<VehicleDto>();
+        
+        var vehiclesDto = await PagedList<VehicleDto>.CreateAsync(
+            vehiclesDtoQuery,
+            request.Page,
+            request.PageSize);
+
+        return Result.Success(vehiclesDto);
     }
 }

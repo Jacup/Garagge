@@ -1,7 +1,7 @@
 using Application.Vehicles.GetMyVehicleById;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Vehicles;
+namespace ApplicationTests.Vehicles.GetMyVehicleById;
 
 public class GetMyVehicleByIdQueryValidatorTests
 {
