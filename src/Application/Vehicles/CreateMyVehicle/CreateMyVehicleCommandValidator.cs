@@ -16,10 +16,12 @@ internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<Create
             .NotEmpty()
             .MaximumLength(64)
             .WithMessage("Model is required and must not exceed 64 characters.");
+
+        const int firstCarManufacturedYear = 1886;
         
         RuleFor(c => c.ManufacturedYear)
-            .GreaterThanOrEqualTo(1886)
+            .GreaterThanOrEqualTo(firstCarManufacturedYear)
             .LessThanOrEqualTo(dateTimeProvider.UtcNow.Year)
-            .WithMessage("Manufactured year must be between 1886 and the current year.");
+            .WithMessage($"Manufactured year must be between {firstCarManufacturedYear} and the current year.");
     }
 }

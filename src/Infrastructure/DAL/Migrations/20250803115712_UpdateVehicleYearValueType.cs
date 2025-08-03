@@ -39,6 +39,7 @@ namespace Infrastructure.DAL.Migrations
                 ALTER TABLE vehicles 
                 ALTER COLUMN manufactured_year 
                 SET NOT NULL;
-            ");        }
+            ");
+        }
     }
 }

@@ -16,7 +16,7 @@ public class GetMyVehicles : IEndpoint
     {
         app.MapGet("vehicles/my", async (
                 string? searchTerm,
-                ClaimsPrincipal? user,
+                ClaimsPrincipal user,
                 ISender sender,
                 CancellationToken cancellationToken,
                 int pageSize = 10, 
