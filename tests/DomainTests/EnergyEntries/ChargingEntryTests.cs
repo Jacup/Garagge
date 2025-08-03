@@ -114,7 +114,8 @@ public class ChargingEntryTests
             Cost = Cost,
             VehicleId = _vehicleId,
             EnergyAmount = EnergyAmount,
-            PricePerUnit = PricePerUnit
+            PricePerUnit = PricePerUnit,
+            Unit = EnergyUnit.kWh
         };
 
         chargingEntry.Unit.ShouldBe(EnergyUnit.kWh);
