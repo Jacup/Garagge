@@ -21,8 +21,8 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
             vehiclesQuery = vehiclesQuery.Where(v =>
-                v.Brand.Contains(request.SearchTerm) ||
-                v.Model.Contains(request.SearchTerm));
+                v.Brand.Contains(request.SearchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                v.Model.Contains(request.SearchTerm, StringComparison.CurrentCultureIgnoreCase));
         }
 
         var vehiclesDtoQuery = vehiclesQuery
