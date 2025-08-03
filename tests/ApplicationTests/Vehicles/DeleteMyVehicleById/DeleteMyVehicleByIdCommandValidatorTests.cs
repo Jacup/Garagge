@@ -1,9 +1,7 @@
 using Application.Vehicles.DeleteMyVehicleById;
 using FluentValidation.TestHelper;
-using Shouldly;
-using Xunit;
 
-namespace ApplicationTests.Vehicles;
+namespace ApplicationTests.Vehicles.DeleteMyVehicleById;
 
 public class DeleteMyVehicleByIdCommandValidatorTests
 {

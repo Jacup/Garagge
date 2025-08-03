@@ -22,7 +22,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
 
         // modelBuilder.HasDefaultSchema(Schemas.Default);
     }
-
+    
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries<Entity>()

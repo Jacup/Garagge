@@ -5,14 +5,12 @@ using Application.Vehicles;
 using Application.Vehicles.CreateMyVehicle;
 using Moq;
 
-namespace ApplicationTests.Vehicles;
+namespace ApplicationTests.Vehicles.CreateMyVehicle;
 
 public class CreateMyVehicleCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly Mock<IUserContext> _userContextMock = new();
-
     private readonly CreateMyVehicleCommandHandler _sut;
-
     private readonly Guid _loggedUser = Guid.NewGuid();
 
     public CreateMyVehicleCommandHandlerTests()
@@ -23,7 +21,7 @@ public class CreateMyVehicleCommandHandlerTests : InMemoryDbTestBase
     [Fact]
     public async Task Handle_UserNotAuthorized_ShouldReturnUnauthorizedError()
     {
-        var request = new CreateMyVehicleCommand(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateOnly>());
+        var request = new CreateMyVehicleCommand(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int?>());
 
         _userContextMock
             .Setup(o => o.UserId)
@@ -40,7 +38,7 @@ public class CreateMyVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         SetupAuthorizedUser();
 
-        var request = new CreateMyVehicleCommand("Audi", "A4", new DateOnly(2010, 01, 20));
+        var request = new CreateMyVehicleCommand("Audi", "A4", 2010);
 
         Context.Vehicles.Count().ShouldBe(0);
 
@@ -58,7 +56,7 @@ public class CreateMyVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         SetupAuthorizedUser();
 
-        var request = new CreateMyVehicleCommand("Audi", "A4", new DateOnly(2010, 01, 20));
+        var request = new CreateMyVehicleCommand("Audi", "A4", 2010);
 
         var applicationDbContextMock = new Mock<IApplicationDbContext>();
         applicationDbContextMock

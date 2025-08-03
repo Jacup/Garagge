@@ -1,10 +1,11 @@
+using Application.Abstractions;
 using FluentValidation;
 
 namespace Application.Vehicles.CreateMyVehicle;
 
 internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<CreateMyVehicleCommand>
 {
-    public CreateMyVehicleCommandValidator()
+    public CreateMyVehicleCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleFor(c => c.Brand)
             .NotEmpty()
@@ -15,10 +16,12 @@ internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<Create
             .NotEmpty()
             .MaximumLength(64)
             .WithMessage("Model is required and must not exceed 64 characters.");
+
+        const int firstCarManufacturedYear = 1886;
         
         RuleFor(c => c.ManufacturedYear)
-            .NotEmpty()
-            .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
-            .WithMessage("Manufactured year can't be in the future.");
+            .GreaterThanOrEqualTo(firstCarManufacturedYear)
+            .LessThanOrEqualTo(dateTimeProvider.UtcNow.Year)
+            .WithMessage($"Manufactured year must be between {firstCarManufacturedYear} and the current year.");
     }
 }

@@ -14,11 +14,17 @@ public class GetMyVehicles : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("vehicles/my", async (ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
+        app.MapGet("vehicles/my", async (
+                string? searchTerm,
+                ClaimsPrincipal user,
+                ISender sender,
+                CancellationToken cancellationToken,
+                int pageSize = 10, 
+                int page = 1) =>
             {
-                var query = new GetMyVehiclesQuery(user.GetUserId());
+                var query = new GetMyVehiclesQuery(user.GetUserId(), page, pageSize, searchTerm);
 
-                Result<ICollection<VehicleDto>> result = await sender.Send(query, cancellationToken);
+                Result<PagedList<VehicleDto>> result = await sender.Send(query, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })

@@ -5,7 +5,7 @@ using Application.Vehicles.DeleteMyVehicleById;
 using Domain.Entities.Vehicles;
 using Moq;
 
-namespace ApplicationTests.Vehicles;
+namespace ApplicationTests.Vehicles.DeleteMyVehicleById;
 
 public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
 {
@@ -59,7 +59,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = requestedId,
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = otherUser
         };
         
@@ -82,7 +82,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = _loggedUser
         };
         
@@ -105,7 +105,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = new DateOnly(2010, 01, 20),
+            ManufacturedYear = 2010,
             UserId = _loggedUser
         };
         Context.Vehicles.Add(vehicle);

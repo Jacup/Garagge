@@ -49,6 +49,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.ApplyMigrations();
+await app.SeedDatabaseAsync();
 
 app.MapHealthChecks("health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
