@@ -2,6 +2,7 @@
 using Application.Behaviors;
 using Application.Core;
 using FluentValidation;
+using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -21,6 +22,9 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
+
+        // Configure Mapster for enum mapping
+        TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
 
         return services;
     }

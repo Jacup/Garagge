@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Application.Vehicles;
 
 public class VehicleDto
@@ -9,7 +11,12 @@ public class VehicleDto
     
     public required string Brand { get; init; }
     public required string Model { get; init; }
+    public required PowerType PowerType { get; init; }
+    
     public int? ManufacturedYear { get; init; }
+    public VehicleType? Type { get; init; }
+    public string? VIN { get; init; }
+    
     
     public required Guid UserId { get; init; }
 }

@@ -4,6 +4,7 @@ using Application.Core;
 using Application.Vehicles;
 using Application.Vehicles.GetMyVehicleById;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Moq;
 
 namespace ApplicationTests.Vehicles.GetMyVehicleById;
@@ -15,7 +16,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
 
     private readonly GetMyVehicleByIdQueryHandler _sut;
 
-    private readonly Guid _loggedUser = Guid.NewGuid();
+    private readonly Guid _loggedUserId = Guid.NewGuid();
     
     public GetMyVehicleByIdQueryHandlerTests()
     {
@@ -25,12 +26,11 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
     [Fact]
     public async Task Handle_UserInRequestIsNotTheSameAsLogged_ShouldReturnUnauthorizedError()
     {
-        var loggedUserId = Guid.NewGuid();
         var request = new GetMyVehicleByIdQuery(Guid.NewGuid(), It.IsAny<Guid>());
         
         _userContextMock
             .Setup(o => o.UserId)
-            .Returns(loggedUserId);
+            .Returns(_loggedUserId);
 
         var result = await _sut.Handle(request, CancellationToken.None);
 
@@ -47,7 +47,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = 2010,
+            PowerType = PowerType.Gasoline,
             UserId = otherUserId
         };
         
@@ -55,7 +55,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUser, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -74,15 +74,16 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
+            PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
-            UserId = _loggedUser
+            UserId = _loggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUser, requestedVehicleId);
+        var request = new GetMyVehicleByIdQuery(_loggedUserId, requestedVehicleId);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -99,27 +100,99 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            ManufacturedYear = 2010,
-            UserId = _loggedUser
+            PowerType = PowerType.Gasoline,
+            UserId = _loggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUser, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldNotBeNull();
         result.Value.ShouldBeOfType<VehicleDto>();
+        result.Value.Brand.ShouldBe("Audi");
+        result.Value.Model.ShouldBe("A4");
+        result.Value.PowerType.ShouldBe(PowerType.Gasoline);
+        result.Value.UserId.ShouldBe(_loggedUserId);
+    }
+
+    [Fact]
+    public async Task Handle_VehicleWithAllOptionalFields_ShouldReturnCompleteDto()
+    {
+        SetupAuthorizedUser();
+        
+        var vehicle = new Vehicle {
+            Brand = "BMW",
+            Model = "X5",
+            PowerType = PowerType.Hybrid,
+            ManufacturedYear = 2020,
+            Type = VehicleType.Car,
+            VIN = "1HGBH41JXMN109186",
+            UserId = _loggedUserId
+        };
+        
+        Context.Vehicles.Add(vehicle);
+        await Context.SaveChangesAsync();
+
+        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        
+        var result = await sut.Handle(request, CancellationToken.None);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldNotBeNull();
+        result.Value.Brand.ShouldBe("BMW");
+        result.Value.Model.ShouldBe("X5");
+        result.Value.PowerType.ShouldBe(PowerType.Hybrid);
+        result.Value.ManufacturedYear.ShouldBe(2020);
+        result.Value.Type.ShouldBe(VehicleType.Car);
+        result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
+        result.Value.UserId.ShouldBe(_loggedUserId);
+    }
+
+    [Fact]
+    public async Task Handle_VehicleWithMinimalData_ShouldReturnDtoWithNullOptionalFields()
+    {
+        SetupAuthorizedUser();
+        
+        var vehicle = new Vehicle {
+            Brand = "Tesla",
+            Model = "Model 3",
+            PowerType = PowerType.Electric,
+            ManufacturedYear = null,
+            Type = null,
+            VIN = null,
+            UserId = _loggedUserId
+        };
+        
+        Context.Vehicles.Add(vehicle);
+        await Context.SaveChangesAsync();
+
+        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        
+        var result = await sut.Handle(request, CancellationToken.None);
+
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ShouldNotBeNull();
+        result.Value.Brand.ShouldBe("Tesla");
+        result.Value.Model.ShouldBe("Model 3");
+        result.Value.PowerType.ShouldBe(PowerType.Electric);
+        result.Value.ManufacturedYear.ShouldBeNull();
+        result.Value.Type.ShouldBeNull();
+        result.Value.VIN.ShouldBeNull();
+        result.Value.UserId.ShouldBe(_loggedUserId);
     }
     
     private void SetupAuthorizedUser()
     {
         _userContextMock
             .Setup(o => o.UserId)
-            .Returns(_loggedUser);
+            .Returns(_loggedUserId);
     }
 }

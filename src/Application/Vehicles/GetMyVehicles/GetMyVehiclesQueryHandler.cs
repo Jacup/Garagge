@@ -2,7 +2,7 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Vehicles.GetMyVehicles;
 
@@ -14,7 +14,9 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
         if (request.UserId != userContext.UserId)
             return Result.Failure<PagedList<VehicleDto>>(VehicleErrors.Unauthorized);
 
-        var vehiclesQuery = context.Vehicles.Where(v => v.UserId == request.UserId);
+        var vehiclesQuery = context.Vehicles
+            .AsNoTracking()
+            .Where(v => v.UserId == request.UserId);
 
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
@@ -27,7 +29,20 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
         
         vehiclesQuery = vehiclesQuery.OrderBy(v => v.CreatedDate);
 
-        var vehiclesDtoQuery = vehiclesQuery.ProjectToType<VehicleDto>();
+        // Explicit Select instead of ProjectToType to avoid Mapster issues with EF Core
+        var vehiclesDtoQuery = vehiclesQuery.Select(v => new VehicleDto
+        {
+            Id = v.Id,
+            CreatedDate = v.CreatedDate,
+            UpdatedDate = v.UpdatedDate,
+            Brand = v.Brand,
+            Model = v.Model,
+            PowerType = v.PowerType,
+            ManufacturedYear = v.ManufacturedYear,
+            Type = v.Type,
+            VIN = v.VIN,
+            UserId = v.UserId
+        });
         
         var vehiclesDto = await PagedList<VehicleDto>.CreateAsync(
             vehiclesDtoQuery,

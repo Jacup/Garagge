@@ -1,6 +1,8 @@
 using Application.Abstractions.Authentication;
+using Domain.Entities.EnergyEntries;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -46,7 +48,8 @@ public static class DatabaseSeeder
                 Brand = "Toyota",
                 Model = "Corolla",
                 ManufacturedYear = 2020,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Hybrid,
             },
             new()
             {
@@ -54,15 +57,17 @@ public static class DatabaseSeeder
                 Brand = "BMW",
                 Model = "X5",
                 ManufacturedYear = 2021,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Gasoline,
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 Brand = "Volkswagen",
-                Model = "Golf",
+                Model = "e-Golf",
                 ManufacturedYear = 2019,
-                UserId = users[0].Id
+                UserId = users[0].Id,
+                PowerType = PowerType.Electric,
             },
             new()
             {
@@ -70,7 +75,8 @@ public static class DatabaseSeeder
                 Brand = "Audi",
                 Model = "A4",
                 ManufacturedYear = 2022,
-                UserId = users[1].Id
+                UserId = users[1].Id,
+                PowerType = PowerType.Gasoline,
             },
             new()
             {
@@ -78,11 +84,95 @@ public static class DatabaseSeeder
                 Brand = "Mercedes-Benz",
                 Model = "C-Class",
                 ManufacturedYear = 2021,
-                UserId = users[1].Id
+                UserId = users[1].Id,
+                PowerType = PowerType.PlugInHybrid,
             }
         };
 
         await context.Vehicles.AddRangeAsync(vehicles);
+        await context.SaveChangesAsync();
+
+        var energyEntries = new List<EnergyEntry>
+        {
+            // Fuel Entries for the first vehicle (gasoline - fuel entries only)
+            new FuelEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[0].Id,
+                Date = new DateOnly(2023, 1, 15),
+                Mileage = 15000,
+                Cost = 50.75m,
+                Volume = 25.5m,
+                Unit = VolumeUnit.Liters,
+                PricePerUnit = 5.50m
+            },
+            new FuelEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[0].Id,
+                Date = new DateOnly(2023, 1, 20),
+                Mileage = 15000,
+                Cost = 50.75m,
+                Volume = 25.5m,
+                Unit = VolumeUnit.Liters,
+                PricePerUnit = 5.50m
+            },
+
+            // Charging Entries for the second vehicle (hybrid - charging entries only)
+            new ChargingEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[2].Id,
+                Date = new DateOnly(2023, 2, 20),
+                Mileage = 30000,
+                Cost = 80.00m,
+                EnergyAmount = 100.0m,
+                Unit = EnergyUnit.kWh,
+                PricePerUnit = 0.80m
+            },
+            new ChargingEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[2].Id,
+                Date = new DateOnly(2023, 2, 25),
+                Mileage = 35000,
+                Cost = 85.00m,
+                EnergyAmount = 80.0m,
+                Unit = EnergyUnit.kWh,
+                PricePerUnit = 0.70m
+            },
+
+            // Mixed Entries for the third vehicle (plugin-hybrid - both entries)
+            new ChargingEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[4].Id,
+                Date = new DateOnly(2023, 2, 25),
+                Mileage = 35000,
+                Cost = 250.00m,
+                EnergyAmount = 80.0m,
+                Unit = EnergyUnit.kWh,
+                PricePerUnit = 0.60m
+            },
+            new FuelEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[4].Id,
+                Date = new DateOnly(2023, 2, 25),
+                Mileage = 35000,
+                Cost = 60.50m,
+                Volume = 50m,
+                Unit = VolumeUnit.Liters,
+                PricePerUnit = 4.50m
+            },
+        };
+
+        IEnumerable<FuelEntry> fuelEntries = energyEntries.Where(e => e is FuelEntry).Cast<FuelEntry>();
+        await context.FuelEntries.AddRangeAsync(fuelEntries);
+
+        IEnumerable<ChargingEntry> chargingEntries = energyEntries.Where(e => e is ChargingEntry).Cast<ChargingEntry>();
+        await context.ChargingEntries.AddRangeAsync(chargingEntries);
+
         await context.SaveChangesAsync();
     }
 }

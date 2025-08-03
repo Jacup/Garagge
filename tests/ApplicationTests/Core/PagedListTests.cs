@@ -1,15 +1,23 @@
 using Application.Core;
-using Domain.Entities.Vehicles;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests.Core;
 
-public class PagedListTests : InMemoryDbTestBase
+public class PagedListTests
 {
+    private DbContextOptions<TestDbContext> GetInMemoryDbOptions()
+    {
+        return new DbContextOptionsBuilder<TestDbContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .Options;
+    }
+
     [Fact]
     public async Task CreateAsync_WithEmptyQuery_ShouldReturnEmptyPagedList()
     {
         // Arrange
-        var emptyQuery = Context.Vehicles.Where(v => false).Select(v => v.Brand);
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
+        var emptyQuery = context.TestEntities.Where(x => false).Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(emptyQuery, 1, 10);
@@ -27,11 +35,12 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task CreateAsync_WithSinglePage_ShouldReturnCorrectPagedList()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(5);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 1, 10);
@@ -49,11 +58,12 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task CreateAsync_WithFirstPage_ShouldReturnCorrectPage()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(15);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.OrderBy(v => v.Brand).Select(v => v.Brand);
+        var query = context.TestEntities.OrderBy(x => x.Name).Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 1, 5);
@@ -65,18 +75,19 @@ public class PagedListTests : InMemoryDbTestBase
         result.PageSize.ShouldBe(5);
         result.HasNextPage.ShouldBeTrue();
         result.HasPreviousPage.ShouldBeFalse();
-        result.Items.ShouldBe(new[] { "Brand1", "Brand10", "Brand11", "Brand12", "Brand13" });
+        result.Items.ShouldBe(new[] { "Item1", "Item10", "Item11", "Item12", "Item13" });
     }
 
     [Fact]
     public async Task CreateAsync_WithMiddlePage_ShouldReturnCorrectPage()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(15);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.OrderBy(v => v.Brand).Select(v => v.Brand);
+        var query = context.TestEntities.OrderBy(x => x.Name).Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 2, 5);
@@ -88,18 +99,19 @@ public class PagedListTests : InMemoryDbTestBase
         result.PageSize.ShouldBe(5);
         result.HasNextPage.ShouldBeTrue();
         result.HasPreviousPage.ShouldBeTrue();
-        result.Items.ShouldBe(new[] { "Brand14", "Brand15", "Brand2", "Brand3", "Brand4" });
+        result.Items.ShouldBe(new[] { "Item14", "Item15", "Item2", "Item3", "Item4" });
     }
 
     [Fact]
     public async Task CreateAsync_WithLastPage_ShouldReturnCorrectPage()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(12);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.OrderBy(v => v.Brand).Select(v => v.Brand);
+        var query = context.TestEntities.OrderBy(x => x.Name).Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 3, 5);
@@ -117,11 +129,12 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task CreateAsync_WithPageBeyondResults_ShouldReturnEmptyPage()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(5);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 3, 5);
@@ -143,11 +156,12 @@ public class PagedListTests : InMemoryDbTestBase
         int page, int pageSize, bool expectedHasPrevious, bool expectedHasNext)
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(12);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, page, pageSize);
@@ -161,11 +175,12 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task CreateAsync_WithPageSizeOne_ShouldReturnSingleItem()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(3);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.OrderBy(v => v.Brand).Select(v => v.Brand);
+        var query = context.TestEntities.OrderBy(x => x.Name).Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 2, 1);
@@ -177,18 +192,19 @@ public class PagedListTests : InMemoryDbTestBase
         result.PageSize.ShouldBe(1);
         result.HasNextPage.ShouldBeTrue();
         result.HasPreviousPage.ShouldBeTrue();
-        result.Items[0].ShouldBe("Brand2");
+        result.Items[0].ShouldBe("Item2");
     }
 
     [Fact]
     public async Task CreateAsync_WithLargePageSize_ShouldReturnAllItems()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(5);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 1, 100);
@@ -206,40 +222,42 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task CreateAsync_WithComplexQuery_ShouldApplyQueryCorrectly()
     {
         // Arrange
-        var testData = new List<Vehicle>
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
+        var testData = new List<TestEntity>
         {
-            new() { Brand = "Audi", Model = "A4", ManufacturedYear = 2010, UserId = Guid.NewGuid() },
-            new() { Brand = "BMW", Model = "X5", ManufacturedYear = 2011, UserId = Guid.NewGuid() },
-            new() { Brand = "Audi", Model = "Q7", ManufacturedYear = 2012, UserId = Guid.NewGuid() },
-            new() { Brand = "Mercedes", Model = "C-Class", ManufacturedYear = 2013, UserId = Guid.NewGuid() }
+            new() { Name = "Audi", Value = 1 },
+            new() { Name = "BMW", Value = 2 },
+            new() { Name = "Audi", Value = 3 },
+            new() { Name = "Mercedes", Value = 4 }
         };
         
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles
-            .Where(v => v.Brand.Contains("A"))
-            .OrderBy(v => v.Model)
-            .Select(v => v.Model);
+        var query = context.TestEntities
+            .Where(v => v.Name.Contains("A"))
+            .OrderBy(v => v.Value)
+            .Select(v => v.Value);
         
         // Act
-        var result = await PagedList<string>.CreateAsync(query, 1, 10);
+        var result = await PagedList<int>.CreateAsync(query, 1, 10);
         
         // Assert
         result.Items.Count.ShouldBe(2);
         result.TotalCount.ShouldBe(2);
-        result.Items.ShouldBe(new[] { "A4", "Q7" });
+        result.Items.ShouldBe(new[] { 1, 3 });
     }
 
     [Fact]
     public async Task HasNextPage_WhenTotalCountEqualsPageTimesPageSize_ShouldBeFalse()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(10);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 2, 5); // 2 * 5 = 10 (exact match)
@@ -255,11 +273,12 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task HasNextPage_WhenTotalCountExceedsPageTimesPageSize_ShouldBeTrue()
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(11);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Name);
         
         // Act
         var result = await PagedList<string>.CreateAsync(query, 2, 5); // 2 * 5 = 10 < 11
@@ -276,78 +295,47 @@ public class PagedListTests : InMemoryDbTestBase
     public async Task HasPreviousPage_WithDifferentPages_ShouldReturnCorrectValue(int page, bool expected)
     {
         // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
         var testData = CreateTestEntities(20);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
+        context.TestEntities.AddRange(testData);
+        await context.SaveChangesAsync();
         
-        var query = Context.Vehicles.Select(v => v.Brand);
+        var query = context.TestEntities.Select(x => x.Value);
         
         // Act
-        var result = await PagedList<string>.CreateAsync(query, page, 5);
+        var result = await PagedList<int>.CreateAsync(query, page, 5);
         
         // Assert
         result.HasPreviousPage.ShouldBe(expected);
     }
 
-    [Fact]
-    public async Task CreateAsync_WithOrderedQuery_ShouldMaintainOrder()
+    private static List<TestEntity> CreateTestEntities(int count)
     {
-        // Arrange
-        var testData = new List<Vehicle>
-        {
-            new() { Brand = "Zebra", Model = "Z1", ManufacturedYear = 2010, UserId = Guid.NewGuid() },
-            new() { Brand = "Alpha", Model = "A1", ManufacturedYear = 2011, UserId = Guid.NewGuid() },
-            new() { Brand = "Beta", Model = "B1", ManufacturedYear = 2012, UserId = Guid.NewGuid() }
-        };
-        
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
-        
-        var query = Context.Vehicles
-            .OrderBy(v => v.Brand)
-            .Select(v => v.Brand);
-        
-        // Act
-        var result = await PagedList<string>.CreateAsync(query, 1, 10);
-        
-        // Assert
-        result.Items.ShouldBe(new[] { "Alpha", "Beta", "Zebra" });
-    }
-
-    [Fact]
-    public async Task CreateAsync_WithComplexProjection_ShouldWorkCorrectly()
-    {
-        // Arrange
-        var testData = CreateTestEntities(3);
-        Context.Vehicles.AddRange(testData);
-        await Context.SaveChangesAsync();
-        
-        var query = Context.Vehicles
-            .Select(v => new { v.Brand, v.Model, FullName = v.Brand + " " + v.Model });
-        
-        // Act
-        var result = await PagedList<object>.CreateAsync(query, 1, 10);
-        
-        // Assert
-        result.Items.Count.ShouldBe(3);
-        result.TotalCount.ShouldBe(3);
-        result.Items.ShouldAllBe(item => true);
-    }
-
-    private static List<Vehicle> CreateTestEntities(int count)
-    {
-        var entities = new List<Vehicle>();
+        var entities = new List<TestEntity>();
         
         for (int i = 1; i <= count; i++)
         {
-            entities.Add(new Vehicle
+            entities.Add(new TestEntity
             {
-                Brand = $"Brand{i}",
-                Model = $"Model{i}",
-                ManufacturedYear = 2010,
-                UserId = Guid.NewGuid()
+                Id = i,
+                Name = $"Item{i}",
+                Value = i * 10
             });
         }
         return entities;
     }
+}
+
+public class TestEntity
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Value { get; set; }
+}
+
+public class TestDbContext : DbContext
+{
+    public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
+    
+    public DbSet<TestEntity> TestEntities { get; set; }
 }

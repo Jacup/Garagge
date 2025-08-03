@@ -17,12 +17,13 @@ internal sealed class GetMyVehicleByIdQueryHandler(IApplicationDbContext context
         var vehicle = await context.Vehicles
             .AsNoTracking()
             .Where(v => v.UserId == request.UserId && v.Id == request.VehicleId)
-            .ProjectToType<VehicleDto>()
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle == null)
             return Result.Failure<VehicleDto>(VehicleErrors.NotFound(request.VehicleId));
 
-        return Result.Success(vehicle);
+        var vehicleDto = vehicle.Adapt<VehicleDto>();
+        
+        return Result.Success(vehicleDto);
     }
 }

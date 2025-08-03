@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Vehicles;
 using Application.Vehicles.DeleteMyVehicleById;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Moq;
 
 namespace ApplicationTests.Vehicles.DeleteMyVehicleById;
@@ -59,6 +60,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = requestedId,
             Brand = "Audi",
             Model = "A4",
+            PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
             UserId = otherUser
         };
@@ -82,6 +84,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
+            PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
             UserId = _loggedUser
         };
@@ -105,6 +108,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
+            PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
             UserId = _loggedUser
         };

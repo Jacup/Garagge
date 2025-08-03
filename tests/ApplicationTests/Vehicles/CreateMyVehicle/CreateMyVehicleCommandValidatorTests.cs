@@ -1,5 +1,6 @@
 using Application.Abstractions;
 using Application.Vehicles.CreateMyVehicle;
+using Domain.Enums;
 using FluentValidation.TestHelper;
 using Moq;
 
@@ -18,14 +19,13 @@ public class CreateMyVehicleCommandValidatorTests
             .Setup(o => o.UtcNow)
             .Returns(new DateTime(2024, 01, 25));
         
-        _validator =  new CreateMyVehicleCommandValidator(_dateTimeProvider.Object);
+        _validator = new CreateMyVehicleCommandValidator(_dateTimeProvider.Object);
     }
-
 
     [Fact]
     public void Validate_WhenBrandIsEmpty_ShouldHaveError()
     {
-        var command = new CreateMyVehicleCommand(String.Empty, "A4", 2010);
+        var command = new CreateMyVehicleCommand(string.Empty, "A4", PowerType.Gasoline, 2010, null, null);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -33,7 +33,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenModelIsEmpty_ShouldHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", String.Empty, 2010);
+        var command = new CreateMyVehicleCommand("Audi", string.Empty, PowerType.Gasoline, 2010, null, null);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
     }
@@ -42,7 +42,7 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenBrandIsTooLong_ShouldHaveError()
     {
         var longBrand = new string('A', 65);
-        var command = new CreateMyVehicleCommand(longBrand, "A4", 2010);
+        var command = new CreateMyVehicleCommand(longBrand, "A4", PowerType.Gasoline, 2010, null, null);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -51,24 +51,93 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenModelIsTooLong_ShouldHaveError()
     {
         var longModel = new string('B', 65);
-        var command = new CreateMyVehicleCommand("Audi", longModel, 2010);
+        var command = new CreateMyVehicleCommand("Audi", longModel, PowerType.Gasoline, 2010, null, null);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
+    }
+
+    [Theory]
+    [InlineData(PowerType.Gasoline)]
+    [InlineData(PowerType.Diesel)]
+    [InlineData(PowerType.Hybrid)]
+    [InlineData(PowerType.PlugInHybrid)]
+    [InlineData(PowerType.Electric)]
+    public void Validate_WhenPowerTypeIsValid_ShouldNotHaveError(PowerType powerType)
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010, null, null);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.PowerType);
     }
 
     [Fact]
     public void Validate_WhenManufacturedYearIsInFuture_ShouldHaveError()
     {
         var futureYear = _dateTimeProvider.Object.UtcNow.AddYears(1).Year;
-        var command = new CreateMyVehicleCommand("Audi", "A4", futureYear);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, futureYear, null, null);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
     }
 
     [Fact]
+    public void Validate_WhenManufacturedYearIsTooOld_ShouldHaveError()
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 1885, null, null);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
+    }
+
+    [Theory]
+    [InlineData(VehicleType.Bus)]
+    [InlineData(VehicleType.Car)]
+    [InlineData(VehicleType.Motorbike)]
+    [InlineData(VehicleType.Truck)]
+    public void Validate_WhenVehicleTypeIsValid_ShouldNotHaveError(VehicleType vehicleType)
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, vehicleType, null);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.Type);
+    }
+
+    [Fact]
+    public void Validate_WhenVINHasCorrectLength_ShouldNotHaveError()
+    {
+        var validVIN = "1HGBH41JXMN109186"; // 17 characters
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, validVIN);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.VIN);
+    }
+
+    [Theory]
+    [InlineData("1HGBH41JXMN10918")] // 16 characters
+    [InlineData("1HGBH41JXMN1091866")] // 18 characters
+    [InlineData("")] // empty
+    public void Validate_WhenVINHasIncorrectLength_ShouldHaveError(string invalidVIN)
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, invalidVIN);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.VIN);
+    }
+
+    [Fact]
+    public void Validate_WhenVINIsNull_ShouldNotHaveError()
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.VIN);
+    }
+
+    [Fact]
     public void Validate_WhenCommandIsValid_ShouldNotHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", 2010);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, VehicleType.Car, "1HGBH41JXMN109186");
+        var result = _validator.TestValidate(command);
+        result.IsValid.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Validate_WhenCommandIsValidWithMinimalData_ShouldNotHaveError()
+    {
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, null, null, null);
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }
