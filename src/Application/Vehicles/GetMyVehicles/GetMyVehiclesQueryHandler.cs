@@ -29,7 +29,6 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
         
         vehiclesQuery = vehiclesQuery.OrderBy(v => v.CreatedDate);
 
-        // Explicit Select instead of ProjectToType to avoid Mapster issues with EF Core
         var vehiclesDtoQuery = vehiclesQuery.Select(v => new VehicleDto
         {
             Id = v.Id,
