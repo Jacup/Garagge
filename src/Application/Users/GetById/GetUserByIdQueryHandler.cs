@@ -2,33 +2,30 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.GetById;
 
-internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetUserByIdQuery, UserResponse>
+internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUserContext userContext) 
+    : IQueryHandler<GetUserByIdQuery, UserDto>
 {
-    public async Task<Result<UserResponse>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
         if (query.UserId != userContext.UserId)
         {
-            return Result.Failure<UserResponse>(UserErrors.Unauthorized);
+            return Result.Failure<UserDto>(UserErrors.Unauthorized);
         }
 
-        UserResponse? user = await context.Users
+        var user = await context.Users
+            .AsNoTracking()
             .Where(u => u.Id == query.UserId)
-            .Select(u => new UserResponse
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email
-            })
+            .ProjectToType<UserDto>()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
         {
-            return Result.Failure<UserResponse>(UserErrors.NotFound(query.UserId));
+            return Result.Failure<UserDto>(UserErrors.NotFound(query.UserId));
         }
 
         return user;

@@ -3,6 +3,7 @@ using Application.Users.GetById;
 using MediatR;
 using Api.Extensions;
 using Application.Core;
+using Application.Users;
 
 namespace Api.Endpoints.Users;
 
@@ -19,6 +20,8 @@ internal sealed class GetById : IEndpoint
             return result.Match(Results.Ok, CustomResults.Problem);
         })
         .HasPermission(Permissions.UsersAccess)
+        .Produces<UserDto>()
+        .Produces(StatusCodes.Status401Unauthorized)
         .WithTags(Tags.Users);
     }
 }
