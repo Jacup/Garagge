@@ -28,6 +28,9 @@ public class GetMyVehicles : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
+            .Produces<PagedList<VehicleDto>>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.Vehicles);
     }

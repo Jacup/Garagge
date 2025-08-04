@@ -22,6 +22,11 @@ public class GetMyVehicleById : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })            
+            .Produces<VehicleDto>()
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.Vehicles);
     }

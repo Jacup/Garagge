@@ -21,7 +21,11 @@ public class CreateVehicle : IEndpoint
                 CustomResults.Problem
             );
         })
-            .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.Vehicles);
+        .Produces<VehicleDto>(StatusCodes.Status201Created)
+        .Produces(StatusCodes.Status400BadRequest)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status500InternalServerError)
+        .HasPermission(Permissions.UsersAccess)
+        .WithTags(Tags.Vehicles);
     }
 }

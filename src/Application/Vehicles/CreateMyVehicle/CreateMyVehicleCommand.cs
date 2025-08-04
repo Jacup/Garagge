@@ -7,7 +7,7 @@ public sealed record CreateMyVehicleCommand(
     string Brand,
     string Model,
     PowerType PowerType,
-    int? ManufacturedYear,
-    VehicleType? Type,
-    string? VIN)
+    int? ManufacturedYear = null,
+    VehicleType? Type = null,
+    string? VIN = null)
     : ICommand<VehicleDto>;

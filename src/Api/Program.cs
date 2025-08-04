@@ -7,6 +7,7 @@ using Serilog;
 using Api;
 using Api.Extensions;
 using Api.Infrastructure;
+using System.Text.Json.Serialization;
 
 Console.WriteLine("App starting...");
 
@@ -15,6 +16,12 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddWebApi(builder.Configuration);
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // Swagger/OpenAPI configuration
 

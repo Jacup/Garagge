@@ -9,7 +9,7 @@ interface VehicleApiResponse {
   updatedDate: string
   brand: string
   model: string
-  manufacturedYear: string // datetime from API
+  manufacturedYear: string
   userId: string
 }
 

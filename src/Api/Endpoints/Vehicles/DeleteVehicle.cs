@@ -15,10 +15,15 @@ public class DeleteVehicle : IEndpoint
             {
                 var command = new DeleteMyVehicleByIdCommand(id);
                 
-                Result<bool> result = await sender.Send(command, cancellationToken);
+                Result result = await sender.Send(command, cancellationToken);
 
                 return result.Match(Results.NoContent, CustomResults.Problem);
             })
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.Vehicles);
     }
