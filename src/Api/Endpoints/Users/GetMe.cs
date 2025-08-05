@@ -3,6 +3,7 @@ using Application.Users.GetById;
 using MediatR;
 using Api.Extensions;
 using Application.Core;
+using Application.Users;
 using Infrastructure.Authentication;
 using System.Security.Claims;
 
@@ -16,11 +17,14 @@ internal sealed class GetMe : IEndpoint
             {
                 var query = new GetUserByIdQuery(user.GetUserId());
                 
-                Result<UserResponse> result = await sender.Send(query, cancellationToken);
+                Result<UserDto> result = await sender.Send(query, cancellationToken);
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .HasPermission(Permissions.UsersAccess)
+            .Produces<UserDto>()
+            .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status404NotFound)
             .WithTags(Tags.Users);
     }
 }

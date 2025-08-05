@@ -9,13 +9,11 @@ namespace ApplicationTests.Vehicles.GetMyVehicles;
 
 public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
 {
-    private readonly Mock<IUserContext> _userContextMock = new();
     private readonly GetMyVehiclesQueryHandler _sut;
-    private readonly Guid _loggedUser = Guid.NewGuid();
     
     public GetMyVehiclesQueryHandlerTests()
     {
-        _sut = new GetMyVehiclesQueryHandler(Context, _userContextMock.Object);
+        _sut = new GetMyVehiclesQueryHandler(Context, UserContextMock.Object);
     }
 
     [Fact]
@@ -26,7 +24,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         var differentUserId = Guid.NewGuid();
         var request = new GetMyVehiclesQuery(differentUserId, 1, 10, null);
         
-        _userContextMock
+        UserContextMock
             .Setup(x => x.UserId)
             .Returns(loggedUserId);
 
@@ -62,7 +60,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         Context.Vehicles.AddRange(vehicle1, vehicle2);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -86,20 +84,20 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             Model = "A4",
             PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         var vehicle2 = new Vehicle {
             Brand = "BMW",
             Model = "3 Series",
             PowerType = PowerType.Diesel,
             ManufacturedYear = 2011,
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.AddRange(vehicle1, vehicle2);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -112,7 +110,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         result.Value.PageSize.ShouldBe(10);
         result.Value.HasNextPage.ShouldBeFalse();
         result.Value.HasPreviousPage.ShouldBeFalse();
-        result.Value.Items.ShouldAllBe(v => v.UserId == _loggedUser);
+        result.Value.Items.ShouldAllBe(v => v.UserId == LoggedUserId);
     }
 
     [Fact]
@@ -121,11 +119,11 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         
-        var vehicles = CreateTestVehicles(5, _loggedUser);
+        var vehicles = CreateTestVehicles(5, LoggedUserId);
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 2, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 2, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -146,11 +144,11 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         
-        var vehicles = CreateTestVehicles(5, _loggedUser);
+        var vehicles = CreateTestVehicles(5, LoggedUserId);
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 2, 2, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 2, 2, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -171,11 +169,11 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         
-        var vehicles = CreateTestVehicles(5, _loggedUser);
+        var vehicles = CreateTestVehicles(5, LoggedUserId);
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 3, 2, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 3, 2, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -198,15 +196,15 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = _loggedUser },
-            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = _loggedUser },
-            new() { Brand = "Audi", Model = "Q7", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = _loggedUser }
+            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "Q7", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, "Audi");
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, "Audi");
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -226,15 +224,15 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = _loggedUser },
-            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = _loggedUser },
-            new() { Brand = "Mercedes", Model = "A4", PowerType = PowerType.Electric, ManufacturedYear = 2012, UserId = _loggedUser }
+            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Mercedes", Model = "A4", PowerType = PowerType.Electric, ManufacturedYear = 2012, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, "A4");
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, "A4");
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -252,11 +250,11 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         
-        var vehicles = CreateTestVehicles(3, _loggedUser);
+        var vehicles = CreateTestVehicles(3, LoggedUserId);
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, "NonExistentBrand");
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, "NonExistentBrand");
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -275,16 +273,16 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A1", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = _loggedUser },
-            new() { Brand = "Audi", Model = "A2", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = _loggedUser },
-            new() { Brand = "Audi", Model = "A3", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = _loggedUser },
-            new() { Brand = "BMW", Model = "X1", PowerType = PowerType.Electric, ManufacturedYear = 2013, UserId = _loggedUser }
+            new() { Brand = "Audi", Model = "A1", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A2", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A3", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X1", PowerType = PowerType.Electric, ManufacturedYear = 2013, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 2, "Audi");
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 2, "Audi");
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -309,7 +307,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             Model = "A4", 
             PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010, 
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         var laterVehicle = new Vehicle 
         { 
@@ -317,7 +315,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             Model = "X5", 
             PowerType = PowerType.Diesel,
             ManufacturedYear = 2011, 
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         
         // Add in reverse order to test sorting
@@ -327,7 +325,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         Context.Vehicles.Add(earlierVehicle);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -347,15 +345,15 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Tesla", Model = "Model 3", PowerType = PowerType.Electric, ManufacturedYear = 2020, UserId = _loggedUser },
-            new() { Brand = "Toyota", Model = "Prius", PowerType = PowerType.Hybrid, ManufacturedYear = 2019, UserId = _loggedUser },
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2018, UserId = _loggedUser }
+            new() { Brand = "Tesla", Model = "Model 3", PowerType = PowerType.Electric, ManufacturedYear = 2020, UserId = LoggedUserId },
+            new() { Brand = "Toyota", Model = "Prius", PowerType = PowerType.Hybrid, ManufacturedYear = 2019, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2018, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -382,13 +380,13 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020, 
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var request = new GetMyVehiclesQuery(_loggedUser, 1, 10, null);
+        var request = new GetMyVehiclesQuery(LoggedUserId, 1, 10, null);
         
         // Act
         var result = await _sut.Handle(request, CancellationToken.None);
@@ -403,13 +401,6 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         returnedVehicle.ManufacturedYear.ShouldBe(2020);
         returnedVehicle.Type.ShouldBe(VehicleType.Car);
         returnedVehicle.VIN.ShouldBe("1HGBH41JXMN109186");
-    }
-    
-    private void SetupAuthorizedUser()
-    {
-        _userContextMock
-            .Setup(x => x.UserId)
-            .Returns(_loggedUser);
     }
 
     private static List<Vehicle> CreateTestVehicles(int count, Guid userId)
