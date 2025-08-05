@@ -12,15 +12,12 @@ namespace ApplicationTests.Vehicles.GetMyVehicleById;
 public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
 {
     private readonly Mock<IApplicationDbContext> _applicationDbContextMock = new();
-    private readonly Mock<IUserContext> _userContextMock = new();
 
     private readonly GetMyVehicleByIdQueryHandler _sut;
-
-    private readonly Guid _loggedUserId = Guid.NewGuid();
     
     public GetMyVehicleByIdQueryHandlerTests()
     {
-        _sut = new GetMyVehicleByIdQueryHandler(_applicationDbContextMock.Object, _userContextMock.Object);
+        _sut = new GetMyVehicleByIdQueryHandler(_applicationDbContextMock.Object, UserContextMock.Object);
     }
 
     [Fact]
@@ -28,9 +25,9 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
     {
         var request = new GetMyVehicleByIdQuery(Guid.NewGuid(), It.IsAny<Guid>());
         
-        _userContextMock
+        UserContextMock
             .Setup(o => o.UserId)
-            .Returns(_loggedUserId);
+            .Returns(LoggedUserId);
 
         var result = await _sut.Handle(request, CancellationToken.None);
 
@@ -54,8 +51,8 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -76,14 +73,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             Model = "A4",
             PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
-            UserId = _loggedUserId
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUserId, requestedVehicleId);
+        var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(LoggedUserId, requestedVehicleId);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -101,14 +98,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             Brand = "Audi",
             Model = "A4",
             PowerType = PowerType.Gasoline,
-            UserId = _loggedUserId
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -118,7 +115,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
         result.Value.PowerType.ShouldBe(PowerType.Gasoline);
-        result.Value.UserId.ShouldBe(_loggedUserId);
+        result.Value.UserId.ShouldBe(LoggedUserId);
     }
 
     [Fact]
@@ -133,14 +130,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
-            UserId = _loggedUserId
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -152,7 +149,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBe(2020);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
-        result.Value.UserId.ShouldBe(_loggedUserId);
+        result.Value.UserId.ShouldBe(LoggedUserId);
     }
 
     [Fact]
@@ -167,14 +164,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = null,
             Type = null,
             VIN = null,
-            UserId = _loggedUserId
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
-        var sut = new GetMyVehicleByIdQueryHandler(Context, _userContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(_loggedUserId, vehicle.Id);
+        var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
+        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -186,13 +183,8 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();
-        result.Value.UserId.ShouldBe(_loggedUserId);
+        result.Value.UserId.ShouldBe(LoggedUserId);
     }
     
-    private void SetupAuthorizedUser()
-    {
-        _userContextMock
-            .Setup(o => o.UserId)
-            .Returns(_loggedUserId);
-    }
+
 }

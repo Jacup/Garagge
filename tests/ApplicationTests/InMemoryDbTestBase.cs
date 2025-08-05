@@ -1,3 +1,4 @@
+using Application.Abstractions.Authentication;
 using ApplicationTests.Helpers;
 using Infrastructure.DAL;
 using MediatR;
@@ -9,7 +10,10 @@ public abstract class InMemoryDbTestBase : IDisposable
 {
     protected readonly ApplicationDbContext Context;
     protected readonly Mock<IPublisher> PublisherMock;
+    protected readonly Mock<IUserContext> UserContextMock = new();
 
+    protected readonly Guid LoggedUserId = Guid.NewGuid();
+    
     protected InMemoryDbTestBase()
     {
         PublisherMock = new Mock<IPublisher>();
@@ -19,5 +23,12 @@ public abstract class InMemoryDbTestBase : IDisposable
     public void Dispose()
     {
         TestDbContextFactory.Destroy(Context);
+    }
+    
+    protected void SetupAuthorizedUser()
+    {
+        UserContextMock
+            .Setup(o => o.UserId)
+            .Returns(LoggedUserId);
     }
 }

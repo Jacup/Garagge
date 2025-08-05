@@ -10,20 +10,17 @@ namespace ApplicationTests.Vehicles.DeleteMyVehicleById;
 
 public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
 {
-    private readonly Mock<IUserContext> _userContextMock = new();
-    private readonly Guid _loggedUser = Guid.NewGuid();
-    
     private readonly DeleteMyVehicleByIdCommandHandler _sut;
 
     public DeleteMyVehicleByIdCommandHandlerTests()
     {
-        _sut = new DeleteMyVehicleByIdCommandHandler(Context, _userContextMock.Object);
+        _sut = new DeleteMyVehicleByIdCommandHandler(Context, UserContextMock.Object);
     }
 
     [Fact]
     public async Task Handle_UserNotAuthorized_ShouldReturnUnauthorizedError()
     {
-        _userContextMock
+        UserContextMock
             .Setup(o => o.UserId)
             .Returns(Guid.Empty);
         
@@ -86,7 +83,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Model = "A4",
             PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         
         Context.Vehicles.Add(vehicle);
@@ -104,13 +101,14 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
     public async Task Handle_ExceptionOnDb_ShouldReturnFailure()
     {
         SetupAuthorizedUser();
+        
         var vehicle = new Vehicle {
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
             PowerType = PowerType.Gasoline,
             ManufacturedYear = 2010,
-            UserId = _loggedUser
+            UserId = LoggedUserId
         };
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
@@ -119,15 +117,11 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
         applicationDbContextMock.Setup(o => o.Vehicles).Returns(Context.Vehicles);
         applicationDbContextMock.Setup(o => o.SaveChangesAsync(It.IsAny<CancellationToken>())).Throws(new Exception("Database error"));
 
-        var mockedSut = new DeleteMyVehicleByIdCommandHandler(applicationDbContextMock.Object, _userContextMock.Object);
+        var mockedSut = new DeleteMyVehicleByIdCommandHandler(applicationDbContextMock.Object, UserContextMock.Object);
         var request = new DeleteMyVehicleByIdCommand(vehicle.Id);
+        
         var result = await mockedSut.Handle(request, CancellationToken.None);
         result.IsSuccess.ShouldBeFalse();
         result.Error.ShouldBe(VehicleErrors.DeleteFailed(vehicle.Id));
-    }
-
-    private void SetupAuthorizedUser()
-    {
-        _userContextMock.Setup(o => o.UserId).Returns(_loggedUser);
     }
 }

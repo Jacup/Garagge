@@ -2,33 +2,29 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.GetByEmail;
 
-internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetUserByEmailQuery, UserResponse>
+internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, IUserContext userContext) : IQueryHandler<GetUserByEmailQuery, UserDto>
 {
-    public async Task<Result<UserResponse>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
+    public async Task<Result<UserDto>> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
     {
-        UserResponse? user = await context.Users
+        var user = await context.Users
+            .AsNoTracking()
             .Where(u => u.Email == query.Email)
-            .Select(u => new UserResponse
-            {
-                Id = u.Id,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Email = u.Email
-            })
+            .ProjectToType<UserDto>()
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
         {
-            return Result.Failure<UserResponse>(UserErrors.NotFoundByEmail);
+            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
         }
 
         if (user.Id != userContext.UserId)
         {
-            return Result.Failure<UserResponse>(UserErrors.Unauthorized);
+            return Result.Failure<UserDto>(UserErrors.Unauthorized);
         }
 
         return user;
