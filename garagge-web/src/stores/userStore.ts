@@ -1,60 +1,62 @@
+// src/stores/userStore.ts
 import { defineStore } from 'pinia'
-import { getUserProfile } from '@/api/userApi'
+import type { UserDto } from '@/api/apiV1.schemas'
+import { getUsers } from '@/api/generated/users/users'
+
+const { getUsersMe } = getUsers()
+
+type StoredUser = {
+  userId: string
+  email: string
+  firstName: string
+  lastName: string
+} | null
+
+interface UserState {
+  accessToken: string
+  user: StoredUser
+}
+
+const USER_STORAGE_KEY = 'app_user'
+const TOKEN_STORAGE_KEY = 'app_token'
 
 export const useUserStore = defineStore('user', {
-  state: () => ({
-    accessToken: localStorage.getItem('accessToken') || ('' as string),
-    userId: localStorage.getItem('userId') || ('' as string),
-    email: localStorage.getItem('email') || ('' as string),
-    firstName: localStorage.getItem('firstName') || ('' as string),
-    lastName: localStorage.getItem('lastName') || ('' as string),
+  state: (): UserState => ({
+    accessToken: localStorage.getItem(TOKEN_STORAGE_KEY) || '',
+    user: JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null'),
   }),
-
   actions: {
     setToken(accessToken: string) {
       this.accessToken = accessToken
-      localStorage.setItem('accessToken', accessToken)
+      localStorage.setItem(TOKEN_STORAGE_KEY, accessToken)
     },
-
     clearToken() {
       this.accessToken = ''
-      this.userId = ''
-      this.email = ''
-      this.firstName = ''
-      this.lastName = ''
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('userId')
-      localStorage.removeItem('email')
-      localStorage.removeItem('firstName')
-      localStorage.removeItem('lastName')
+      this.user = null
+      localStorage.removeItem(TOKEN_STORAGE_KEY)
+      localStorage.removeItem(USER_STORAGE_KEY)
     },
-
-    setProfile(data: { userId: string; email: string; firstName: string; lastName: string }) {
-      this.userId = data.userId
-      this.email = data.email
-      this.firstName = data.firstName
-      this.lastName = data.lastName
-      // Zapisz również dane profilu w localStorage, aby były trwałe
-      localStorage.setItem('userId', data.userId)
-      localStorage.setItem('email', data.email)
-      localStorage.setItem('firstName', data.firstName)
-      localStorage.setItem('lastName', data.lastName)
+    setProfile(user: UserDto) {
+      this.user = {
+        userId: user.id ?? '',
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      }
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(this.user))
     },
     async initializeStore() {
-      // Stan jest już ustawiony na podstawie localStorage w 'state',
-      // ale możesz tutaj dodać logikę weryfikacji tokenu np. z API
-      const storedToken = localStorage.getItem('accessToken')
-      if (storedToken && !this.accessToken) {
-        this.accessToken = storedToken
-        const profile = await getUserProfile()
-        if (profile != null) {
-          this.setProfile({
-            userId: profile.userId,
-            email: profile.email,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-          })
+      const token = localStorage.getItem(TOKEN_STORAGE_KEY)
+      if (!token) return
+      if (!this.accessToken) this.accessToken = token
+
+      try {
+        const res = await getUsersMe()
+        if (res.data) {
+          this.setProfile(res.data)
         }
+      } catch (err) {
+        this.clearToken()
       }
     },
   },
