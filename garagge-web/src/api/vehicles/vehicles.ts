@@ -4,55 +4,38 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import * as axios from 'axios';
-import type {
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import * as axios from 'axios'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import type {
-  CreateMyVehicleCommand,
-  GetVehiclesMyParams,
-  PagedListOfVehicleDto,
-  VehicleDto
-} from '../apiV1.schemas';
+import type { CreateMyVehicleCommand, GetVehiclesMyParams, PagedListOfVehicleDto, VehicleDto } from '../apiV1.schemas'
 
-
-
-
-  export const getVehicles = () => {
-const postVehiclesMy = <TData = AxiosResponse<VehicleDto>>(
-    createMyVehicleCommand: CreateMyVehicleCommand, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.post(
-      `/vehicles/my`,
-      createMyVehicleCommand,options
-    );
+export const getVehicles = () => {
+  const postVehiclesMy = <TData = AxiosResponse<VehicleDto>>(
+    createMyVehicleCommand: CreateMyVehicleCommand,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(`/vehicles/my`, createMyVehicleCommand, options)
   }
-const getVehiclesMy = <TData = AxiosResponse<PagedListOfVehicleDto>>(
-    params?: GetVehiclesMyParams, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.get(
-      `/vehicles/my`,{
-    ...options,
-        params: {...params, ...options?.params},}
-    );
+  const getVehiclesMy = <TData = AxiosResponse<PagedListOfVehicleDto>>(
+    params?: GetVehiclesMyParams,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.get(`/vehicles/my`, {
+      ...options,
+      params: { ...params, ...options?.params },
+    })
   }
-const deleteVehiclesMyId = <TData = AxiosResponse<null>>(
-    id: string, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.delete(
-      `/vehicles/my/${id}`,options
-    ).then((res) => {if (res.data === "") res.data = null; return res as TData;});
+  const deleteVehiclesMyId = <TData = AxiosResponse<null>>(id: string, options?: AxiosRequestConfig): Promise<TData> => {
+    return axios.default.delete(`/vehicles/my/${id}`, options).then((res) => {
+      if (res.data === '') res.data = null
+      return res as TData
+    })
   }
-const getVehiclesMyId = <TData = AxiosResponse<VehicleDto>>(
-    id: string, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.get(
-      `/vehicles/my/${id}`,options
-    );
+  const getVehiclesMyId = <TData = AxiosResponse<VehicleDto>>(id: string, options?: AxiosRequestConfig): Promise<TData> => {
+    return axios.default.get(`/vehicles/my/${id}`, options)
   }
-return {postVehiclesMy,getVehiclesMy,deleteVehiclesMyId,getVehiclesMyId}};
+  return { postVehiclesMy, getVehiclesMy, deleteVehiclesMyId, getVehiclesMyId }
+}
 export type PostVehiclesMyResult = AxiosResponse<VehicleDto>
 export type GetVehiclesMyResult = AxiosResponse<PagedListOfVehicleDto>
 export type DeleteVehiclesMyIdResult = AxiosResponse<null>

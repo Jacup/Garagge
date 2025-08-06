@@ -2,14 +2,16 @@
 import { ref, reactive, inject, onMounted, onUnmounted } from 'vue'
 import VehicleInformationCard from '@/components/vehicles/VehicleInformationCard.vue'
 import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
-import { addNewVehicle } from '@/api/vehiclesApi'
+import { getVehicles } from '@/api/generated/vehicles/vehicles'
+import type { CreateMyVehicleCommand, PowerType, NullableOfVehicleType2 } from '@/api/generated/apiV1.schemas'
 
-import type { Vehicle } from '@/types/vehicle'
-
-const vehicle = reactive<Vehicle>({
+const vehicle = reactive<CreateMyVehicleCommand>({
   brand: '',
   model: '',
+  powerType: 'Gasoline' as PowerType,
   manufacturedYear: new Date().getFullYear(),
+  type: null as NullableOfVehicleType2,
+  vin: null,
 })
 
 const uploadedFiles = ref<File[]>([])
@@ -17,7 +19,8 @@ const uploadedFiles = ref<File[]>([])
 async function save() {
   console.log('Vehicle data:', vehicle)
   console.log('Uploaded files:', uploadedFiles.value)
-  await addNewVehicle(vehicle)
+  const vehiclesApi = getVehicles()
+  await vehiclesApi.postVehiclesMy(vehicle)
 }
 
 // Inject header actions
