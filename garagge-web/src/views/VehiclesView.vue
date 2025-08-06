@@ -1,82 +1,68 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
-import { getMyVehicles } from '../api/vehiclesApi'
+import type { VehicleDto } from '@/api/apiV1.schemas'
+import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 
-// Interfejs dla pojazdu
-interface Vehicle {
-  brand: string
-  model: string
-  year: number
-}
+const { getVehiclesMy } = getVehicles()
 
-// Stan dla tabeli
-const vehicles = ref<Vehicle[]>([])
-const filteredVehicles = ref<Vehicle[]>([])
-const loading = ref(false)
-const totalItems = ref(0)
-const itemsPerPage = ref(10)
 const page = ref(1)
+const itemsPerPage = ref(10)
 const search = ref('')
+const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
+const serverItems = ref([] as VehicleDto[])
+const loading = ref(true)
+const totalItems = ref(0)
 
-// Definicja kolumn tabeli
 const headers = [
-  { title: 'Brand', key: 'brand', sortable: true },
-  { title: 'Model', key: 'model', sortable: true },
-  { title: 'Year', key: 'year', sortable: true },
+  { title: 'Brand', key: 'brand', sortable: false },
+  { title: 'Model', key: 'model', sortable: false },
+  { title: 'Power Type', key: 'powerType', sortable: false },
+  { title: 'Year', key: 'manufacturedYear', sortable: false },
+  { title: 'Type', key: 'type', sortable: false },
+  { title: 'VIN', key: 'vin', sortable: false },
 ]
 
-// Funkcja filtrowania pojazdów
-const filterVehicles = () => {
-  let items = vehicles.value
-  if (search.value) {
-    const s = search.value.toLowerCase()
-    items = items.filter((v) => v.brand.toLowerCase().includes(s) || v.model.toLowerCase().includes(s) || String(v.year).includes(s))
-  }
-  totalItems.value = items.length
-  // paginacja
-  const start = (page.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  filteredVehicles.value = items.slice(start, end)
+let debounceTimeout: ReturnType<typeof setTimeout> | null = null
+
+function onSearchChange() {
+  if (debounceTimeout) clearTimeout(debounceTimeout)
+  debounceTimeout = setTimeout(() => {
+    page.value = 1
+    loadItems()
+  }, 500)
 }
 
-// Funkcja ładowania danych
-const loadVehicles = async () => {
+watch(search, onSearchChange)
+
+function onTableOptionsChange(options: { page: number; itemsPerPage: number }) {
+  page.value = options.page
+  itemsPerPage.value = options.itemsPerPage
+  loadItems()
+}
+
+onMounted(() => {
+  loadItems()
+})
+
+async function loadItems() {
   loading.value = true
   try {
-    const data = await getMyVehicles()
-    vehicles.value = data.map((v) => ({
-      brand: v.brand,
-      model: v.model,
-      year: typeof v.manufacturedYear === 'number' ? v.manufacturedYear : (v.manufacturedYear ?? 0),
-    }))
-    filterVehicles()
+    const res = await getVehiclesMy({
+      page: page.value,
+      pageSize: itemsPerPage.value,
+      searchTerm: search.value || undefined,
+    })
+    serverItems.value = res.data.items ?? []
+    totalItems.value = res.data.totalCount ?? 0
   } catch (error) {
-    console.error('Błąd podczas ładowania pojazdów:', error)
-    vehicles.value = []
-    filterVehicles()
+    console.error('Fetching data failed: ', error)
+    serverItems.value = []
+    totalItems.value = 0
   } finally {
     loading.value = false
   }
-}
-
-// Obserwowanie zmian w filtrach i paginacji
-watch([search, page, itemsPerPage], filterVehicles)
-
-// Ładowanie danych przy inicjalizacji
-onMounted(() => {
-  loadVehicles()
-})
-
-interface TableOptions {
-  page: number
-  itemsPerPage: number
-}
-
-function updateOptions(opts: TableOptions) {
-  page.value = opts.page
-  itemsPerPage.value = opts.itemsPerPage
 }
 </script>
 
@@ -87,14 +73,15 @@ function updateOptions(opts: TableOptions) {
       <ActionItems />
     </div>
     <v-data-table-server
-      class="vehicles-table"
+      v-model:items-per-page="itemsPerPage"
       :headers="headers"
-      :items="filteredVehicles"
+      :items="serverItems"
       :items-length="totalItems"
       :loading="loading"
-      item-value="brand"
-      v-model:items-per-page="itemsPerPage"
-      @update:options="updateOptions"
+      item-value="id"
+      :page="page"
+      :sort-by="sortBy"
+      @update:options="onTableOptionsChange"
     />
   </div>
 </template>
@@ -105,7 +92,7 @@ function updateOptions(opts: TableOptions) {
 }
 .vehicles-table :deep() .v-data-table-header,
 .vehicles-table :deep() .v-data-table__th {
-  background-color: var(--color-card-contrast); /* Twój kolor */
+  background-color: var(--color-card-contrast);
 }
 
 .vehicles-topbar {

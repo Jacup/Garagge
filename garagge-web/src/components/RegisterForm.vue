@@ -1,32 +1,10 @@
-<template>
-  <form class="register-form" @submit.prevent="onSubmit">
-    <h2>Rejestracja</h2>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input v-model="email" id="email" type="email" required />
-    </div>
-    <div class="form-group">
-      <label for="firstName">Imię</label>
-      <input v-model="firstName" id="firstName" type="text" required />
-    </div>
-    <div class="form-group">
-      <label for="lastName">Nazwisko</label>
-      <input v-model="lastName" id="lastName" type="text" required />
-    </div>
-    <div class="form-group">
-      <label for="password">Hasło</label>
-      <input v-model="password" id="password" type="password" required />
-    </div>
-    <button type="submit" :disabled="loading">Zarejestruj</button>
-    <div v-if="error" class="error">{{ error }}</div>
-  </form>
-</template>
-
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { register } from '@/api/userApi'
-import { useUserStore } from '@/stores/userStore'
 import { useRouter } from 'vue-router'
+import { getUsers } from '@/api/generated/users/users'
+import { useUserStore } from '@/stores/userStore'
+
+const { postUsersRegister, postUsersLogin, getUsersMe } = getUsers()
 
 const email = ref('')
 const firstName = ref('')
@@ -40,24 +18,77 @@ const router = useRouter()
 async function onSubmit() {
   error.value = ''
   loading.value = true
+
   try {
-    const res = await register(email.value, firstName.value, lastName.value, password.value)
-    // Załóżmy, że backend zwraca token i dane użytkownika
-    userStore.setToken(res.accessToken)
-    userStore.setProfile({
-      userId: res.userId,
-      email: res.email,
-      firstName: res.firstName,
-      lastName: res.lastName,
+    const registerRes = await postUsersRegister({
+      email: email.value,
+      firstName: firstName.value,
+      lastName: lastName.value,
+      password: password.value,
     })
+
+    if (registerRes.status === 409) {
+      error.value = 'Email already exists.'
+      loading.value = false
+      return
+    }
+    if (registerRes.status >= 400) {
+      error.value = 'Registration failed: ' + (registerRes.statusText || 'Unknown error')
+      loading.value = false
+      return
+    }
+
+    const loginRes = await postUsersLogin({
+      email: email.value,
+      password: password.value,
+    })
+
+    if (loginRes.status !== 200 || !loginRes.data?.accessToken) {
+      error.value = 'Login failed: ' + (loginRes.statusText || 'Unknown error')
+      loading.value = false
+      return
+    }
+    userStore.setToken(loginRes.data.accessToken)
+
+    const profileRes = await getUsersMe()
+    if (profileRes.status !== 200 || !profileRes.data) {
+      error.value = 'Failed to fetch profile: ' + (profileRes.statusText || 'Unknown error')
+      loading.value = false
+      return
+    }
+    userStore.setProfile(profileRes.data)
     router.push('/')
   } catch (e: unknown) {
-    error.value = (e as Error).message || 'Błąd rejestracji'
+    error.value = e instanceof Error ? e.message : 'An error occurred during registration'
   } finally {
     loading.value = false
   }
 }
 </script>
+
+<template>
+  <form class="register-form" @submit.prevent="onSubmit">
+    <h2>Register</h2>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input v-model="email" id="email" type="email" required />
+    </div>
+    <div class="form-group">
+      <label for="firstName">First name</label>
+      <input v-model="firstName" id="firstName" type="text" required />
+    </div>
+    <div class="form-group">
+      <label for="lastName">Last name</label>
+      <input v-model="lastName" id="lastName" type="text" required />
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input v-model="password" id="password" type="password" required />
+    </div>
+    <button type="submit" :disabled="loading">Zarejestruj</button>
+    <div v-if="error" class="error">{{ error }}</div>
+  </form>
+</template>
 
 <style scoped>
 .register-form {

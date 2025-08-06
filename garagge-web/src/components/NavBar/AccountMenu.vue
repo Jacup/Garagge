@@ -24,7 +24,7 @@ const toggleMenu = () => {
 
     <div class="avatar"></div>
     <div class="user-details">
-      <span class="username">{{ userStore.firstName }} {{ userStore.lastName }}</span>
+      <span class="username">{{ userStore.user?.firstName }} {{ userStore.user?.lastName }}</span>
       <span class="userrole">Admin</span>
     </div>
     <span class="expand">⋮</span>

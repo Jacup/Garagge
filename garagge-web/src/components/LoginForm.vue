@@ -1,3 +1,45 @@
+<script lang="ts" setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+import { getUsers } from '@/api/generated/users/users'
+import { useUserStore } from '@/stores/userStore'
+
+const email = ref('')
+const password = ref('')
+const error = ref('')
+const loading = ref(false)
+const userStore = useUserStore()
+const router = useRouter()
+
+const { postUsersLogin, getUsersMe } = getUsers()
+
+async function onSubmit() {
+  error.value = ''
+  loading.value = true
+  try {
+    const loginRes = await postUsersLogin({ email: email.value, password: password.value })
+
+    if (!loginRes.data.accessToken) {
+      throw new Error('Missing access token in login response')
+    }
+
+    userStore.setToken(loginRes.data.accessToken)
+
+    const profileRes = await getUsersMe()
+    if (!profileRes.data) {
+      throw new Error('Failed to fetch user profile')
+    }
+    userStore.setProfile(profileRes.data)
+    router.push('/')
+  } catch (e: unknown) {
+    error.value = e instanceof Error ? e.message : 'Login failed'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+
 <template>
   <form class="login-form" @submit.prevent="onSubmit">
     <h2>Logowanie</h2>
@@ -13,46 +55,6 @@
     <div v-if="error" class="error">{{ error }}</div>
   </form>
 </template>
-
-<script lang="ts" setup>
-import { ref } from 'vue'
-import { login, getUserProfile } from '@/api/userApi'
-import { useUserStore } from '@/stores/userStore'
-import { useRouter } from 'vue-router'
-
-const email = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
-const userStore = useUserStore()
-const router = useRouter()
-
-async function onSubmit() {
-  error.value = ''
-  loading.value = true
-  try {
-    const res = await login(email.value, password.value)
-    console.log('login response', res)
-    if (!res.accessToken) {
-      throw new Error('Brak tokena w odpowiedzi backendu')
-    }
-    userStore.setToken(res.accessToken)
-    // Pobierz profil użytkownika po zalogowaniu
-    const profile = await getUserProfile()
-    userStore.setProfile({
-      userId: profile.userId || profile.sub || '',
-      email: profile.email,
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-    })
-    router.push('/')
-  } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'Błąd logowania'
-  } finally {
-    loading.value = false
-  }
-}
-</script>
 
 <style scoped>
 .login-form {

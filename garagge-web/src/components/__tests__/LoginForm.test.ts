@@ -12,9 +12,13 @@ vi.mock('vue-router', () => ({
 }))
 
 // Mock API
-vi.mock('@/api/userApi', () => ({
-  login: vi.fn(),
-  getUserProfile: vi.fn()
+vi.mock('@/api/generated/users/users', () => ({
+  getUsers: vi.fn(() => ({
+    getUsersUserId: vi.fn(),
+    getUsersMe: vi.fn(),
+    postUsersLogin: vi.fn(),
+    postUsersRegister: vi.fn(),
+  }))
 }))
 
 describe('LoginForm', () => {
@@ -58,8 +62,15 @@ describe('LoginForm', () => {
   })
 
   it('displays error message when login fails', async () => {
-    const { login } = await import('@/api/userApi')
-    vi.mocked(login).mockRejectedValue(new Error('Invalid credentials'))
+    const { getUsers } = await import('@/api/generated/users/users')
+    const mockGetUsers = vi.mocked(getUsers)
+    const mockPostUsersLogin = vi.fn().mockRejectedValue(new Error('Invalid credentials'))
+    mockGetUsers.mockReturnValue({
+      getUsersUserId: vi.fn(),
+      getUsersMe: vi.fn(),
+      postUsersLogin: mockPostUsersLogin,
+      postUsersRegister: vi.fn(),
+    })
 
     const wrapper = mount(LoginForm)
 

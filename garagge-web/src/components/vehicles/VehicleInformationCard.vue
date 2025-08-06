@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import type { Vehicle } from '@/types/vehicle'
+import type { CreateMyVehicleCommand, PowerType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
-  vehicle: Vehicle
+  vehicle: CreateMyVehicleCommand
 }>()
 
 defineEmits<{
   save: []
-  'update:vehicle': [vehicle: Vehicle]
+  'update:vehicle': [vehicle: CreateMyVehicleCommand]
 }>()
 
 const rules = {
@@ -15,7 +15,23 @@ const rules = {
   counter: (value: string) => value.length <= 64 || 'Max 64 characters',
   yearMin: (value: number | null) => (value && value >= 1886) || 'Year must be >= 1886',
   yearMax: (value: number | null) => (value && value <= new Date().getFullYear()) || `Year cannot be in the future`,
+  vinLength: (value: string | null) => value === null || value === '' || value.length === 17 || 'VIN must be exactly 17 characters',
 }
+
+const powerTypeOptions: { label: string; value: PowerType }[] = [
+  { label: 'Gasoline', value: 'Gasoline' },
+  { label: 'Diesel', value: 'Diesel' },
+  { label: 'Hybrid', value: 'Hybrid' },
+  { label: 'PlugInHybrid', value: 'PlugInHybrid' },
+  { label: 'Electric', value: 'Electric' },
+]
+
+const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
+  { label: 'Bus', value: 'Bus' },
+  { label: 'Car', value: 'Car' },
+  { label: 'Motorbike', value: 'Motorbike' },
+  { label: 'Truck', value: 'Truck' },
+]
 </script>
 
 <template>
@@ -58,6 +74,39 @@ const rules = {
         :min="1886"
         :max="2100"
         required
+      ></v-text-field>
+
+      <v-select
+        :model-value="vehicle.powerType"
+        @update:model-value="$emit('update:vehicle', { ...vehicle, powerType: $event })"
+        :items="powerTypeOptions"
+        :rules="[rules.required]"
+        item-title="label"
+        item-value="value"
+        clearable
+        label="Power Type"
+        variant="outlined"
+        required
+      ></v-select>
+
+      <v-select
+        :model-value="vehicle.type"
+        @update:model-value="$emit('update:vehicle', { ...vehicle, type: $event })"
+        :items="typeOptions"
+        item-title="label"
+        item-value="value"
+        clearable
+        label="Vehicle Type"
+        variant="outlined"
+      ></v-select>
+
+      <v-text-field
+        :model-value="vehicle.vin ?? ''"
+        @update:model-value="$emit('update:vehicle', { ...vehicle, vin: $event || null })"
+        :rules="[rules.vinLength]"
+        variant="outlined"
+        label="VIN"
+        placeholder="WVWZZZ6RZHU000000"
       ></v-text-field>
     </v-form>
   </v-card>
