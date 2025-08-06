@@ -31,7 +31,7 @@ axiosClient.interceptors.response.use(
   },
 )
 
-export const axiosInstance = <T = any>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
+export const axiosInstance = <T = unknown>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> => {
   return axiosClient.request<T>(config)
 }
 

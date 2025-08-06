@@ -55,7 +55,7 @@ export const useUserStore = defineStore('user', {
         if (res.data) {
           this.setProfile(res.data)
         }
-      } catch (err) {
+      } catch {
         this.clearToken()
       }
     },

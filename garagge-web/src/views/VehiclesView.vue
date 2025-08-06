@@ -36,7 +36,7 @@ function onSearchChange() {
 
 watch(search, onSearchChange)
 
-function onTableOptionsChange(options: any) {
+function onTableOptionsChange(options: { page: number; itemsPerPage: number }) {
   page.value = options.page
   itemsPerPage.value = options.itemsPerPage
   loadItems()

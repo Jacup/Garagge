@@ -135,7 +135,7 @@ describe('useUserStore', () => {
     const mockGetUsersMe = vi.fn().mockRejectedValue(new Error('Unauthorized'))
 
     const { getUsers } = await import('@/api/generated/users/users')
-    ;(getUsers as any).mockReturnValue({
+    ;(getUsers as ReturnType<typeof vi.fn>).mockReturnValue({
       getUsersMe: mockGetUsersMe,
     })
 
