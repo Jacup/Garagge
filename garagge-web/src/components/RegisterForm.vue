@@ -85,7 +85,7 @@ async function onSubmit() {
       <label for="password">Password</label>
       <input v-model="password" id="password" type="password" required />
     </div>
-    <button type="submit" :disabled="loading">Register</button>
+    <button type="submit" :disabled="loading">Zarejestruj</button>
     <div v-if="error" class="error">{{ error }}</div>
   </form>
 </template>

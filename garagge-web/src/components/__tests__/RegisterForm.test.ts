@@ -12,8 +12,13 @@ vi.mock('vue-router', () => ({
 }))
 
 // Mock API
-vi.mock('@/api/userApi', () => ({
-  register: vi.fn()
+vi.mock('@/api/generated/users/users', () => ({
+  getUsers: vi.fn(() => ({
+    getUsersUserId: vi.fn(),
+    getUsersMe: vi.fn(),
+    postUsersLogin: vi.fn(),
+    postUsersRegister: vi.fn(),
+  }))
 }))
 
 describe('RegisterForm', () => {
@@ -25,7 +30,7 @@ describe('RegisterForm', () => {
   it('renders registration form with all fields', () => {
     const wrapper = mount(RegisterForm)
 
-    expect(wrapper.find('h2').text()).toBe('Rejestracja')
+    expect(wrapper.find('h2').text()).toBe('Register')
     expect(wrapper.find('#email').exists()).toBe(true)
     expect(wrapper.find('#firstName').exists()).toBe(true)
     expect(wrapper.find('#lastName').exists()).toBe(true)
@@ -66,8 +71,15 @@ describe('RegisterForm', () => {
   })
 
   it('displays error message when error occurs', async () => {
-    const { register } = await import('@/api/userApi')
-    vi.mocked(register).mockRejectedValue(new Error('Registration failed'))
+    const { getUsers } = await import('@/api/generated/users/users')
+    const mockGetUsers = vi.mocked(getUsers)
+    const mockPostUsersRegister = vi.fn().mockRejectedValue(new Error('Registration failed'))
+    mockGetUsers.mockReturnValue({
+      getUsersUserId: vi.fn(),
+      getUsersMe: vi.fn(),
+      postUsersLogin: vi.fn(),
+      postUsersRegister: mockPostUsersRegister,
+    })
 
     const wrapper = mount(RegisterForm)
 
