@@ -14,7 +14,8 @@
     - [Configuration](#configuration)
     - [Usage](#usage)
   - [Development](#development)
-    - [Environment Setup](#environment-setup)
+    - [Prerequisites for Development](#prerequisites-for-development)
+    - [Setup](#setup)
     - [Frontend Development](#frontend-development)
     - [Backend Development](#backend-development)
     - [Full Stack Development](#full-stack-development)
@@ -76,15 +77,24 @@ All other settings have sensible defaults and work out of the box.
 
 The application provides flexible development environment setup with Docker Compose support. You can run different parts of the stack based on your development needs.
 
-### Environment Setup
+### Prerequisites for Development
 
-1. Copy and configure environment variables:
+- .NET 8.0 SDK
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- **Recommended IDEs**:
+  - **Backend**: JetBrains Rider or Visual Studio
+  - **Frontend**: VS Code
+
+### Setup
+
+1. Clone the repository:
 ```bash
-# Root .env file contains database and JWT configuration
-cp .env.example .env  # Edit database credentials and JWT secret
+git clone https://github.com/Jacup/Garagge.git
+cd Garagge
 ```
 
-2. The application uses PostgreSQL database and Seq for logging, both can be run via Docker Compose.
+2. The `.env` file is included in the repository with working defaults for development.
 
 ### Frontend Development
 
