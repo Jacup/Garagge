@@ -4,35 +4,55 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { LoginUserCommand, LoginUserResponse, RegisterUserCommand, UserDto } from '../apiV1.schemas'
+import type {
+  LoginUserCommand,
+  LoginUserResponse,
+  RegisterUserCommand,
+  UserDto
+} from '../apiV1.schemas';
 
-import { axiosInstance } from '../../axios-instance'
+import { axiosInstance } from '../../axios-instance';
 
-export const getUsers = () => {
-  const getUsersUserId = (userId: string) => {
-    return axiosInstance<UserDto>({ url: `/users/${userId}`, method: 'GET' })
-  }
-  const getUsersMe = () => {
-    return axiosInstance<UserDto>({ url: `/users/me`, method: 'GET' })
-  }
-  const postUsersLogin = (loginUserCommand: LoginUserCommand) => {
-    return axiosInstance<LoginUserResponse>({
-      url: `/users/login`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: loginUserCommand,
-    })
-  }
-  const postUsersRegister = (registerUserCommand: RegisterUserCommand) => {
-    return axiosInstance<string>({
-      url: `/users/register`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: registerUserCommand,
-    })
-  }
-  return { getUsersUserId, getUsersMe, postUsersLogin, postUsersRegister }
-}
+
+
+  export const getUsers = () => {
+const getUsersUserId = (
+    userId: string,
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/users/${userId}`, method: 'GET'
+    },
+      );
+    }
+  const getUsersMe = (
+    
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/users/me`, method: 'GET'
+    },
+      );
+    }
+  const postUsersLogin = (
+    loginUserCommand: LoginUserCommand,
+ ) => {
+      return axiosInstance<LoginUserResponse>(
+      {url: `/users/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: loginUserCommand
+    },
+      );
+    }
+  const postUsersRegister = (
+    registerUserCommand: RegisterUserCommand,
+ ) => {
+      return axiosInstance<string>(
+      {url: `/users/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: registerUserCommand
+    },
+      );
+    }
+  return {getUsersUserId,getUsersMe,postUsersLogin,postUsersRegister}};
 export type GetUsersUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getUsersUserId']>>>
 export type GetUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getUsersMe']>>>
 export type PostUsersLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['postUsersLogin']>>>

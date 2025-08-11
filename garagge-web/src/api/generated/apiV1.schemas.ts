@@ -5,75 +5,87 @@
  * OpenAPI spec version: 1.0.0
  */
 export interface CreateMyVehicleCommand {
-  brand: string
-  model: string
-  powerType: PowerType
+  brand: string;
+  model: string;
+  powerType: PowerType;
   /** @nullable */
-  manufacturedYear?: number | null
-  type?: NullableOfVehicleType2
+  manufacturedYear?: number | null;
+  type?: NullableOfVehicleType2;
   /** @nullable */
-  vin?: string | null
+  vin?: string | null;
+}
+
+export interface EditMyVehicleRequest {
+  brand: string;
+  model: string;
+  powerType: PowerType;
+  /** @nullable */
+  manufacturedYear?: number | null;
+  type?: NullableOfVehicleType2;
+  /** @nullable */
+  vin?: string | null;
 }
 
 export interface LoginUserCommand {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export interface LoginUserResponse {
-  accessToken: string
+  accessToken: string;
 }
 
 /**
  * @nullable
  */
-export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null
+export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
 /**
  * @nullable
  */
-export type NullableOfVehicleType2 = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null
+export type NullableOfVehicleType2 = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
 export interface PagedListOfVehicleDto {
   /** @nullable */
-  items?: VehicleDto[] | null
-  page?: number
-  pageSize?: number
-  totalCount?: number
-  hasNextPage?: boolean
-  hasPreviousPage?: boolean
+  items?: VehicleDto[] | null;
+  page?: number;
+  pageSize?: number;
+  totalCount?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
 }
 
-export type PowerType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric'
+export type PowerType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric';
 export interface RegisterUserCommand {
-  email: string
-  firstName: string
-  lastName: string
-  password: string
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
 }
 
 export interface UserDto {
-  id?: string
-  email: string
-  firstName: string
-  lastName: string
+  id?: string;
+  email: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface VehicleDto {
-  id?: string
-  createdDate?: string
-  updatedDate?: string
-  brand: string
-  model: string
-  powerType: PowerType
+  id?: string;
+  createdDate?: string;
+  updatedDate?: string;
+  brand: string;
+  model: string;
+  powerType: PowerType;
   /** @nullable */
-  manufacturedYear?: number | null
-  type?: NullableOfVehicleType
+  manufacturedYear?: number | null;
+  type?: NullableOfVehicleType;
   /** @nullable */
-  vin?: string | null
-  userId: string
+  vin?: string | null;
+  userId: string;
 }
 
 export type GetVehiclesMyParams = {
-  searchTerm?: string
-  pageSize?: number
-  page?: number
-}
+searchTerm?: string;
+pageSize?: number;
+page?: number;
+};
+

@@ -41,7 +41,8 @@ public class CreateMyVehicleCommandHandlerTests
             VehicleType.Car, 
             "1HGBH41JXMN109186");
 
-        _dbContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
         // Act
@@ -66,12 +67,10 @@ public class CreateMyVehicleCommandHandlerTests
         var command = new CreateMyVehicleCommand(
             "BMW", 
             "X3", 
-            PowerType.Diesel, 
-            null, 
-            null, 
-            null);
+            PowerType.Diesel);
 
-        _dbContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
         // Act
@@ -93,9 +92,11 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
         
-        _userContextMock.Setup(x => x.UserId).Returns(Guid.Empty);
+        _userContextMock
+            .Setup(x => x.UserId)
+            .Returns(Guid.Empty);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -109,9 +110,10 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_WhenSaveChangesFails_ReturnsCreateFailedError()
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
 
-        _dbContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception("Database error"));
 
         // Act
@@ -126,7 +128,7 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_ValidCommand_CallsAddAsyncOnVehiclesDbSet()
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
 
         _dbContextMock
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -150,7 +152,7 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_ValidCommand_CallsSaveChangesAsync()
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
 
         _dbContextMock
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -172,7 +174,7 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_WithDifferentPowerTypes_CreatesVehicleWithCorrectPowerType(PowerType powerType)
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010);
 
         _dbContextMock
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -190,7 +192,7 @@ public class CreateMyVehicleCommandHandlerTests
     public async Task Handle_ValidCommand_GeneratesNewGuidForVehicleId()
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, null);
+        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
 
         _dbContextMock
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
