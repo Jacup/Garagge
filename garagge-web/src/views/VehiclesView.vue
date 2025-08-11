@@ -70,7 +70,11 @@ async function loadItems() {
 
 async function remove(id: string | undefined) {
   const res = await deleteVehiclesMyId(id ?? '')
-  res.status === 204 ? loadItems() : console.error('Failed to delete vehicle:', res)
+  if (res.status === 204) {
+    loadItems()
+  } else {
+    console.error('Failed to delete vehicle:', res)
+  }
 }
 
 function edit(id: string | undefined) {
@@ -98,7 +102,7 @@ function edit(id: string | undefined) {
       show-select
       @update:options="onTableOptionsChange"
     >
-      <template v-slot:item.actions="{ item }">
+      <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex ga-2 justify-end">
           <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
           <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
