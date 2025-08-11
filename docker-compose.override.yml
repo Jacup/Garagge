@@ -1,7 +1,7 @@
 services:
   server:
     build:
-      context: .
+      context: ./server
       dockerfile: ./src/Api/Dockerfile
       target: final-no-frontend
     environment:
