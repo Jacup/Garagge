@@ -12,6 +12,10 @@ public static class VehicleErrors
         "Vehicles.CreateFailed",
         "Failed to create vehicle");    
     
+    public static Error EditFailed(Guid vehicleId) => Error.Failure(
+        "Vehicles.EditFailed",
+        $"Failed to edit vehicle with Id = '{vehicleId}'");
+    
     public static Error DeleteFailed(Guid vehicleId) => Error.Failure(
         "Vehicles.DeleteFailed",
         $"Failed to delete vehicle with Id = '{vehicleId}'");

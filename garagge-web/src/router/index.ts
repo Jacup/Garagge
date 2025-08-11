@@ -4,7 +4,7 @@ import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import VehiclesView from '@/views/VehiclesView.vue'
-import AddVehicleView from '@/views/AddVehicleView.vue'
+import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
 
 const routes = [
   {
@@ -21,8 +21,15 @@ const routes = [
   {
     path: '/vehicles/add',
     name: 'AddVehicle',
-    component: AddVehicleView,
+    component: ModifyVehicleView,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/vehicles/edit/:id',
+    name: 'EditVehicle',
+    component: ModifyVehicleView,
+    meta: { requiresAuth: true },
+    props: true,
   },
   {
     path: '/register',

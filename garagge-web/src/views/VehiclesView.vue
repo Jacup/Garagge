@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import type { VehicleDto } from '@/api/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 
-const { getVehiclesMy } = getVehicles()
+const { getVehiclesMy, deleteVehiclesMyId } = getVehicles()
+const router = useRouter()
 
 const page = ref(1)
 const itemsPerPage = ref(10)
@@ -22,6 +24,7 @@ const headers = [
   { title: 'Year', key: 'manufacturedYear', sortable: false },
   { title: 'Type', key: 'type', sortable: false },
   { title: 'VIN', key: 'vin', sortable: false },
+  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
 ]
 
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
@@ -64,6 +67,21 @@ async function loadItems() {
     loading.value = false
   }
 }
+
+async function remove(id: string | undefined) {
+  const res = await deleteVehiclesMyId(id ?? '')
+  if (res.status === 204) {
+    loadItems()
+  } else {
+    console.error('Failed to delete vehicle:', res)
+  }
+}
+
+function edit(id: string | undefined) {
+  if (id) {
+    router.push(`/vehicles/edit/${id}`)
+  }
+}
 </script>
 
 <template>
@@ -81,8 +99,16 @@ async function loadItems() {
       item-value="id"
       :page="page"
       :sort-by="sortBy"
+      show-select
       @update:options="onTableOptionsChange"
-    />
+    >
+      <template v-slot:[`item.actions`]="{ item }">
+        <div class="d-flex ga-2 justify-end">
+          <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
+          <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
+        </div>
+      </template>
+    </v-data-table-server>
   </div>
 </template>
 
