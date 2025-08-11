@@ -1,0 +1,34 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "api": "StartDebugging",
+        "db": "StartWithoutDebugging",
+        "seq": "StartWithoutDebugging",
+        "web": "StartWithoutDebugging"
+      }
+    },
+    "compose-db": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "api": "DoNotStart",
+        "db": "StartWithoutDebugging",
+        "seq": "DoNotStart",
+        "web": "DoNotStart"
+      }
+    },
+    "compose-dep": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "api": "DoNotStart",
+        "db": "StartWithoutDebugging",
+        "seq": "StartWithoutDebugging",
+        "web": "DoNotStart"
+      }
+    }
+  }
+}

@@ -121,7 +121,7 @@ docker-compose up db seq garagge-web
 
 # Run backend in your IDE (Visual Studio/Rider/VS Code)
 # or via dotnet CLI:
-cd src/Api
+cd server/src/Api
 dotnet run
 ```
 
@@ -134,7 +134,7 @@ For working on both frontend and backend simultaneously:
 docker-compose up db seq
 
 # Run backend locally
-cd src/Api
+cd server/src/Api
 dotnet run
 
 # In separate terminal, run frontend locally
@@ -157,6 +157,7 @@ cd garagge-web
 npm run generate:api
 
 # Run backend tests
+cd server
 dotnet test
 
 # Run frontend tests

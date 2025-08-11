@@ -19,13 +19,13 @@ jobs:
           dotnet-version: 9.0.x
           
       - name: Restore dependencies
-        run: dotnet restore Garagge.sln
+        run: dotnet restore server/Garagge.sln
         
       - name: Build
-        run: dotnet build Garagge.sln --no-restore --configuration Release
+        run: dotnet build server/Garagge.sln --no-restore --configuration Release
         
       - name: Test
-        run: dotnet test Garagge.sln --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage"
+        run: dotnet test server/Garagge.sln --no-build --verbosity normal --configuration Release --collect:"XPlat Code Coverage"
         
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
