@@ -6,7 +6,6 @@ using Application.Vehicles;
 using Application.Vehicles.EditMyVehicle;
 using Domain.Enums;
 using MediatR;
-using System.Security.Claims;
 
 namespace Api.Endpoints.Vehicles;
 
@@ -16,7 +15,7 @@ public class EditMyVehicle : IEndpoint
     {
         app.MapPut(
                 "vehicles/my/edit/{id:guid}",
-                async (Guid id, EditMyVehicleRequest request, ClaimsPrincipal user, ISender sender, CancellationToken cancellationToken) =>
+                async (Guid id, EditMyVehicleRequest request, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new EditMyVehicleCommand
                     (
