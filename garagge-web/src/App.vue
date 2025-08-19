@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import AppNavigation from './components/layout/AppNavigation.vue'
-
+import AppBar from './components/layout/AppBar.vue'
 const { name } = useDisplay()
 const drawer = ref(false)
 
@@ -13,17 +13,23 @@ const isMobile = computed(() => ['sm', 'xs'].includes(name.value))
 
 <template>
   <v-app>
-    <v-navigation-drawer v-if="isDesktop" permanent :width="240"> </v-navigation-drawer>
+    <v-navigation-drawer v-if="isDesktop" permanent :width="240">
+      <AppNavigation @navigate="drawer = false" />
+    </v-navigation-drawer>
 
-    <v-navigation-drawer v-else-if="isTablet" rail permanent :width="72"> </v-navigation-drawer>
+    <v-navigation-drawer v-else-if="isTablet" rail permanent :width="72">
+      <AppNavigation :is-rail="true" @navigate="drawer = false" />
+    </v-navigation-drawer>
 
-    <v-navigation-drawer v-else v-model="drawer" temporary> </v-navigation-drawer>
+    <v-navigation-drawer v-else v-model="drawer" temporary>
+      <AppNavigation @navigate="drawer = false" />
+    </v-navigation-drawer>
 
-    <v-app-bar title="Application bar"></v-app-bar>
+    <AppBar :is-mobile="isMobile" @update:drawer="drawer = !drawer" />
 
-    <v-main class="d-flex align-center justify-center" height="300">
+    <v-main>
       <v-container>
-        <v-sheet color="surface-light" height="200" rounded="lg" width="100%"></v-sheet>
+        <router-view />
       </v-container>
     </v-main>
   </v-app>
@@ -32,6 +38,7 @@ const isMobile = computed(() => ['sm', 'xs'].includes(name.value))
 <style scoped>
 .app-layout {
   display: flex;
+  flex-direction: row;
   height: 100vh;
   overflow: hidden;
 }

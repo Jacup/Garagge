@@ -1,145 +1,49 @@
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/userStore'
-import { ref, computed } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
 const router = useRouter()
 const isLoggedIn = computed(() => !!userStore.accessToken)
-const isOpen = ref(false)
 
 const handleLogout = () => {
   userStore.clearToken()
   router.push('/')
 }
-
-const toggleMenu = () => {
-  isOpen.value = !isOpen.value
-}
 </script>
 
 <template>
-  <div v-if="isLoggedIn" class="auth-info" @click.stop="toggleMenu">
-    <!-- TODO: delete IF statement - navbar wont be visible if not logged in. -->
+  <v-menu location="bottom end" transition="fade-transition" offset="4">
+    <template #activator="{ props }">
+      <v-btn v-bind="props" icon size="36" class="rounded-circle">
+        <v-avatar color="surface-variant" size="36">
+          <span class="text-h6">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
+        </v-avatar>
+      </v-btn>
+    </template>
 
-    <div class="avatar"></div>
-    <div class="user-details">
-      <span class="username">{{ userStore.user?.firstName }} {{ userStore.user?.lastName }}</span>
-      <span class="userrole">Admin</span>
-    </div>
-    <span class="expand">⋮</span>
+    <v-card class="mx-auto" max-width="300">
+      <template v-slot:prepend>
+        <v-avatar color="surface-variant" size="40">
+          <span class="text-h5">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
+        </v-avatar>
+      </template>
+      <template v-slot:title> {{ userStore.user?.firstName }} {{ userStore.user?.lastName }} </template>
+      <template v-slot:subtitle>{{ userStore.user?.email }}</template>
 
-    <div v-if="isOpen" class="auth-dropdown">
-      <RouterLink to="/profile" class="dropdown-item">Profil</RouterLink>
-      <RouterLink to="/" class="dropdown-item" @click.prevent="handleLogout">Wyloguj</RouterLink>
-    </div>
-  </div>
-  <div v-else class="auth-buttons">
-    <RouterLink to="/login" class="auth-btn">Zaloguj</RouterLink>
-    <RouterLink to="/register" class="auth-btn">Zarejestruj</RouterLink>
-  </div>
+      <v-list density="comfortable">
+        <v-list-item v-if="isLoggedIn" prepend-icon="mdi-account" to="/profile" title="Profile" />
+        <v-list-item v-if="isLoggedIn" prepend-icon="mdi-cog" to="/settings" title="Settings" />
+      </v-list>
+      <v-card-actions>
+        <v-btn variant="tonal" block @click="handleLogout">
+          <v-icon left>mdi-logout</v-icon>
+          Logout
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-menu>
 </template>
 
-<style scoped>
-.auth-info {
-  margin-top: auto;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background-color: var(--color-card-contrast);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.avatar {
-  width: 48px;
-  height: 48px;
-  background-color: #81868d;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.username {
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-.userrole {
-  color: var(--color-text-muted);
-  font-size: 0.8rem;
-}
-
-.expand {
-  margin-left: auto;
-  margin-right: 0.5rem;
-  color: var(--color-text-muted);
-  font-size: 1.5rem;
-}
-
-.auth-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.auth-btn {
-  background: #334155;
-  color: #cbd5e1;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.auth-btn:hover {
-  background: #475569;
-  color: #fff;
-}
-
-.auth-info {
-  position: relative; /* Ważne! */
-}
-
-.auth-dropdown {
-  position: absolute;
-  bottom: 100%;
-  right: 0;
-  width: 100%;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 0.5rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  margin-bottom: 0.5rem;
-}
-
-.dropdown-item {
-  padding: 0.5rem 1rem;
-  color: var(--color-text);
-  text-decoration: none;
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.dropdown-item:hover {
-  background: var(--color-card-contrast);
-}
-</style>
+<style scoped></style>
