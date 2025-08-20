@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/userStore'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-const props = defineProps<{
+const { isMobile } = defineProps<{
   isMobile: boolean
 }>()
 
@@ -26,13 +26,14 @@ const goToRegister = () => router.push('/register')
     <v-app-bar-title>Application bar</v-app-bar-title>
     <v-spacer />
 
-    <template v-if="isLoggedIn">
-      <AccountMenu />
-    </template>
-
-    <template v-else>
-      <v-btn variant="text" @click="goToLogin"> Login </v-btn>
-      <v-btn variant="tonal" @click="goToRegister"> Register </v-btn>
+    <template v-slot:append>
+      <template v-if="isLoggedIn">
+        <AccountMenu />
+      </template>
+      <template v-else>
+        <v-btn variant="text" @click="goToLogin">Login</v-btn>
+        <v-btn variant="tonal" @click="goToRegister">Register</v-btn>
+      </template>
     </template>
   </v-app-bar>
 </template>

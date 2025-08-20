@@ -15,10 +15,10 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  garagge-web:
-    container_name: garagge-web
+  web:
+    container_name: web
     build:
-      context: ./garagge-web
+      context: ./web
       dockerfile: Dockerfile
     ports:
       - "4173:4173"

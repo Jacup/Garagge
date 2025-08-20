@@ -22,9 +22,9 @@ ARG INCLUDE_FRONTEND=true
 
 FROM node:20 AS frontend-build
 WORKDIR /src/web
-COPY garagge-web/package*.json ./
+COPY web/package*.json ./
 RUN npm install
-COPY garagge-web/ ./
+COPY web/ ./
 RUN npm run build
 
 FROM build AS publish

@@ -105,7 +105,7 @@ When working primarily on the frontend, run the backend via Docker Compose and f
 docker-compose up server db seq
 
 # In separate terminal, start frontend locally
-cd garagge-web
+cd web
 npm install
 npm run dev
 ```
@@ -117,7 +117,7 @@ When working primarily on the backend, run the frontend in Docker to test your A
 
 ```bash
 # Start only dependencies (Database + Seq + Frontend)
-docker-compose up db seq garagge-web
+docker-compose up db seq web
 
 # Run backend in your IDE (Visual Studio/Rider/VS Code)
 # or via dotnet CLI:
@@ -138,7 +138,7 @@ cd server/src/Api
 dotnet run
 
 # In separate terminal, run frontend locally
-cd garagge-web
+cd web
 npm run dev
 ```
 
@@ -152,8 +152,8 @@ npm run dev
 ### Useful Commands
 
 ```bash
-# Generate API client for frontend (see garagge-web/src/api/README.md for details)
-cd garagge-web
+# Generate API client for frontend (see web/src/api/README.md for details)
+cd web
 npm run generate:api
 
 # Run backend tests
@@ -161,15 +161,15 @@ cd server
 dotnet test
 
 # Run frontend tests
-cd garagge-web
+cd web
 npm run test
 
 # Format frontend code
-cd garagge-web
+cd web
 npm run format
 ```
 
-For detailed API client documentation, see [garagge-web/src/api/README.md](garagge-web/src/api/README.md).
+For detailed API client documentation, see [web/src/api/README.md](web/src/api/README.md).
 
 
 ## Screenshots

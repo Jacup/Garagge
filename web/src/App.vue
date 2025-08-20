@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import AppNavigation from './components/layout/AppNavigation.vue'
 import AppBar from './components/layout/AppBar.vue'
+
 const { name } = useDisplay()
 const drawer = ref(false)
 
@@ -34,12 +35,4 @@ const isMobile = computed(() => ['sm', 'xs'].includes(name.value))
     </v-main>
   </v-app>
 </template>
-
-<style scoped>
-.app-layout {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  overflow: hidden;
-}
-</style>
+<style scoped></style>

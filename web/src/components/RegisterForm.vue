@@ -67,72 +67,79 @@ async function onSubmit() {
 </script>
 
 <template>
-  <form class="register-form" @submit.prevent="onSubmit">
-    <h2>Register</h2>
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input v-model="email" id="email" type="email" required />
-    </div>
-    <div class="form-group">
-      <label for="firstName">First name</label>
-      <input v-model="firstName" id="firstName" type="text" required />
-    </div>
-    <div class="form-group">
-      <label for="lastName">Last name</label>
-      <input v-model="lastName" id="lastName" type="text" required />
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input v-model="password" id="password" type="password" required />
-    </div>
-    <button type="submit" :disabled="loading">Zarejestruj</button>
-    <div v-if="error" class="error">{{ error }}</div>
-  </form>
+  <div class="auth-form">
+    <v-card>
+      <v-card-title class="text-h5 text-center mb-4">
+        Rejestracja
+      </v-card-title>
+
+      <v-form @submit.prevent="onSubmit">
+        <v-text-field
+          v-model="email"
+          label="Email"
+          type="email"
+          variant="outlined"
+          required
+          class="form-field"
+          :disabled="loading"
+        />
+
+        <v-text-field
+          v-model="firstName"
+          label="Imię"
+          type="text"
+          variant="outlined"
+          required
+          class="form-field"
+          :disabled="loading"
+        />
+
+        <v-text-field
+          v-model="lastName"
+          label="Nazwisko"
+          type="text"
+          variant="outlined"
+          required
+          class="form-field"
+          :disabled="loading"
+        />
+
+        <v-text-field
+          v-model="password"
+          label="Hasło"
+          type="password"
+          variant="outlined"
+          required
+          class="form-field"
+          :disabled="loading"
+        />
+
+        <v-btn
+          type="submit"
+          color="primary"
+          variant="elevated"
+          block
+          size="large"
+          class="mt-4"
+          :loading="loading"
+          :disabled="loading"
+        >
+          Zarejestruj
+        </v-btn>
+
+        <v-alert
+          v-if="error"
+          type="error"
+          variant="tonal"
+          class="mt-4"
+        >
+          {{ error }}
+        </v-alert>
+      </v-form>
+    </v-card>
+  </div>
 </template>
 
 <style scoped>
-.register-form {
-  max-width: 350px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #1e293b;
-  border-radius: 8px;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-.form-group {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-}
-label {
-  margin-bottom: 0.25rem;
-}
-input {
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #334155;
-  background: #0f172a;
-  color: #fff;
-}
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: #334155;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-.error {
-  color: #f87171;
-  margin-top: 1rem;
-  text-align: center;
-}
+/* Wszystkie style są teraz globalne w main.css lub pochodzą z Vuetify theme */
 </style>
