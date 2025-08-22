@@ -143,13 +143,13 @@ useHotkey('escape', () => {
 }
 
 .hotkey-key {
-  background-color: rgba(var(--v-theme-on-surface), 0.1);
-  border: 1px solid rgba(var(--v-theme-on-surface), 0.2);
+  background-color: rgb(var(--md-sys-color-surface-container));
+  border: 1px solid rgb(var(--md-sys-color-outline-variant));
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 0.75rem;
   font-family: monospace;
-  color: rgba(var(--v-theme-on-surface), 0.7);
+  color: rgb(var(--md-sys-color-on-surface-variant));
   min-width: 20px;
   text-align: center;
   line-height: 1.2;
@@ -175,7 +175,7 @@ useHotkey('escape', () => {
   width: 90vw;
   max-width: 600px;
   max-height: 70vh;
-  background: rgb(var(--v-theme-surface));
+  background: rgb(var(--md-sys-color-surface));
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   overflow: hidden;
@@ -193,7 +193,7 @@ useHotkey('escape', () => {
 }
 
 .search-input-modal {
-  border-bottom: 1px solid rgba(var(--v-theme-outline), 0.2);
+  border-bottom: 1px solid rgb(var(--md-sys-color-outline-variant));
 }
 
 .search-input-modal :deep(.v-field) {

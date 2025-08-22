@@ -5,6 +5,7 @@ import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import VehiclesView from '@/views/VehiclesView.vue'
 import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
+import ComponentGalleryView from '@/views/ComponentGalleryView.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     component: ModifyVehicleView,
     meta: { requiresAuth: true },
     props: true,
+  },
+  {
+    path: '/components',
+    name: 'ComponentGallery',
+    component: ComponentGalleryView,
   },
   {
     path: '/register',
