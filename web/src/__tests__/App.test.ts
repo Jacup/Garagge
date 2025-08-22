@@ -7,29 +7,27 @@ import App from '../App.vue'
 // Mock components
 vi.mock('../components/layout/MainContent.vue', () => ({
   default: {
-    template: '<div data-testid="main-content">Main Content</div>'
-  }
+    template: '<div data-testid="main-content">Main Content</div>',
+  },
 }))
 
 vi.mock('../components/layout/NavBar.vue', () => ({
   default: {
-    template: '<div data-testid="navbar">NavBar</div>'
-  }
+    template: '<div data-testid="navbar">NavBar</div>',
+  },
 }))
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    { path: '/', component: { template: '<div>Home</div>' } }
-  ]
+  routes: [{ path: '/', component: { template: '<div>Home</div>' } }],
 })
 
 describe('App', () => {
   it('renders main layout components', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [createPinia(), router]
-      }
+        plugins: [createPinia(), router],
+      },
     })
 
     expect(wrapper.find('[data-testid="navbar"]').exists()).toBe(true)
@@ -39,8 +37,8 @@ describe('App', () => {
   it('has correct CSS classes for layout', () => {
     const wrapper = mount(App, {
       global: {
-        plugins: [createPinia(), router]
-      }
+        plugins: [createPinia(), router],
+      },
     })
 
     expect(wrapper.find('.app-layout').exists()).toBe(true)

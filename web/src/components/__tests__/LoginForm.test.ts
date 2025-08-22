@@ -7,8 +7,8 @@ import LoginForm from '../LoginForm.vue'
 const mockPush = vi.fn()
 vi.mock('vue-router', () => ({
   useRouter: () => ({
-    push: mockPush
-  })
+    push: mockPush,
+  }),
 }))
 
 // Mock API
@@ -18,7 +18,7 @@ vi.mock('@/api/generated/users/users', () => ({
     getUsersMe: vi.fn(),
     postUsersLogin: vi.fn(),
     postUsersRegister: vi.fn(),
-  }))
+  })),
 }))
 
 describe('LoginForm', () => {

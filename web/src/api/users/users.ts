@@ -4,56 +4,35 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import * as axios from 'axios';
-import type {
-  AxiosRequestConfig,
-  AxiosResponse
-} from 'axios';
+import * as axios from 'axios'
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
 
-import type {
-  LoginUserCommand,
-  LoginUserResponse,
-  RegisterUserCommand,
-  UserDto
-} from '../apiV1.schemas';
+import type { LoginUserCommand, LoginUserResponse, RegisterUserCommand, UserDto } from '../apiV1.schemas'
 
-
-
-
-  export const getUsers = () => {
-const getUsersUserId = <TData = AxiosResponse<UserDto>>(
-    userId: string, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.get(
-      `/users/${userId}`,options
-    );
+export const getUsers = () => {
+  const getUsersUserId = <TData = AxiosResponse<UserDto>>(userId: string, options?: AxiosRequestConfig): Promise<TData> => {
+    return axios.default.get(`/users/${userId}`, options)
   }
-const getUsersMe = <TData = AxiosResponse<UserDto>>(
-     options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.get(
-      `/users/me`,options
-    );
+  const getUsersMe = <TData = AxiosResponse<UserDto>>(options?: AxiosRequestConfig): Promise<TData> => {
+    return axios.default.get(`/users/me`, options)
   }
-const postUsersLogin = <TData = AxiosResponse<LoginUserResponse>>(
-    loginUserCommand: LoginUserCommand, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.post(
-      `/users/login`,
-      loginUserCommand,options
-    );
+  const postUsersLogin = <TData = AxiosResponse<LoginUserResponse>>(
+    loginUserCommand: LoginUserCommand,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(`/users/login`, loginUserCommand, options)
   }
-const postUsersRegister = <TData = AxiosResponse<string>>(
-    registerUserCommand: RegisterUserCommand, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.default.post(
-      `/users/register`,
-      registerUserCommand,{
-        responseType: 'text',
-    ...options,}
-    );
+  const postUsersRegister = <TData = AxiosResponse<string>>(
+    registerUserCommand: RegisterUserCommand,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(`/users/register`, registerUserCommand, {
+      responseType: 'text',
+      ...options,
+    })
   }
-return {getUsersUserId,getUsersMe,postUsersLogin,postUsersRegister}};
+  return { getUsersUserId, getUsersMe, postUsersLogin, postUsersRegister }
+}
 export type GetUsersUserIdResult = AxiosResponse<UserDto>
 export type GetUsersMeResult = AxiosResponse<UserDto>
 export type PostUsersLoginResult = AxiosResponse<LoginUserResponse>

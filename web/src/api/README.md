@@ -5,10 +5,12 @@ This project uses [Orval](https://orval.dev/) to automatically generate a TypeSc
 ## Configuration
 
 ### Configuration files:
+
 - `orval.config.ts` – main Orval configuration
 - `src/api/axios-instance.ts` – custom axios instance with interceptors
 
 ### Environments:
+
 - **Development**: `http://localhost:5000/openapi/v1.json`
 - **Production**: use the `OPENAPI_INPUT` environment variable
 
@@ -38,7 +40,7 @@ const vehicles = await getMyVehicles()
 const newVehicle = await addNewVehicle({
   brand: 'Toyota',
   model: 'Corolla',
-  manufacturedYear: 2023
+  manufacturedYear: 2023,
 })
 ```
 
@@ -65,6 +67,7 @@ src/api/generated/
 ## CI/CD
 
 In CI environments, set the environment variable:
+
 ```bash
 export OPENAPI_INPUT=https://your-api.com/openapi/v1.json
 ```

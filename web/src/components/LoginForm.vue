@@ -43,50 +43,18 @@ async function onSubmit() {
 <template>
   <div class="auth-form">
     <v-card>
-      <v-card-title class="text-h5 text-center mb-4">
-        Logowanie
-      </v-card-title>
+      <v-card-title class="text-h5 text-center mb-4"> Logowanie </v-card-title>
 
       <v-form @submit.prevent="onSubmit">
-        <v-text-field
-          v-model="email"
-          label="Email"
-          type="email"
-          variant="outlined"
-          required
-          class="form-field"
-          :disabled="loading"
-        />
+        <v-text-field v-model="email" label="Email" type="email" variant="outlined" required class="form-field" :disabled="loading" />
 
-        <v-text-field
-          v-model="password"
-          label="Hasło"
-          type="password"
-          variant="outlined"
-          required
-          class="form-field"
-          :disabled="loading"
-        />
+        <v-text-field v-model="password" label="Hasło" type="password" variant="outlined" required class="form-field" :disabled="loading" />
 
-        <v-btn
-          type="submit"
-          color="primary"
-          variant="elevated"
-          block
-          size="large"
-          class="mt-4"
-          :loading="loading"
-          :disabled="loading"
-        >
+        <v-btn type="submit" color="primary" variant="elevated" block size="large" class="mt-4" :loading="loading" :disabled="loading">
           Zaloguj
         </v-btn>
 
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          class="mt-4"
-        >
+        <v-alert v-if="error" type="error" variant="tonal" class="mt-4">
           {{ error }}
         </v-alert>
       </v-form>

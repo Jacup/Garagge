@@ -76,13 +76,7 @@ useHotkey('escape', () => {
     </template>
   </v-btn>
 
-  <v-overlay
-    v-model="isOverlayOpen"
-    class="search-overlay"
-    role="dialog"
-    aria-labelledby="search-modal-title"
-    aria-modal="true"
-  >
+  <v-overlay v-model="isOverlayOpen" class="search-overlay" role="dialog" aria-labelledby="search-modal-title" aria-modal="true">
     <div class="search-modal">
       <h2 id="search-modal-title" class="sr-only">Search</h2>
       <v-text-field

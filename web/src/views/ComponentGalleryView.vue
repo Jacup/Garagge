@@ -26,25 +26,25 @@ const tableHeaders = [
   { title: 'Name', key: 'name' },
   { title: 'Role', key: 'role' },
   { title: 'Status', key: 'status' },
-  { title: 'Actions', key: 'actions', sortable: false }
+  { title: 'Actions', key: 'actions', sortable: false },
 ]
 
 const tableData = [
   { name: 'John Doe', role: 'Admin', status: 'Active' },
   { name: 'Jane Smith', role: 'User', status: 'Inactive' },
-  { name: 'Bob Johnson', role: 'Editor', status: 'Active' }
+  { name: 'Bob Johnson', role: 'Editor', status: 'Active' },
 ]
 
 const breadcrumbs = [
   { title: 'Home', href: '/' },
   { title: 'Components', href: '/components' },
-  { title: 'Gallery', href: '/gallery' }
+  { title: 'Gallery', href: '/gallery' },
 ]
 
 const expansionItems = [
   { title: 'Expansion Panel 1', text: 'Content for panel 1' },
   { title: 'Expansion Panel 2', text: 'Content for panel 2' },
-  { title: 'Expansion Panel 3', text: 'Content for panel 3' }
+  { title: 'Expansion Panel 3', text: 'Content for panel 3' },
 ]
 </script>
 
@@ -126,50 +126,13 @@ const expansionItems = [
           <!-- Text Inputs -->
           <v-col cols="12" md="6">
             <component-demo-card title="Text Fields">
-              <v-text-field
-                v-model="textInput"
-                label="Standard"
-                class="mb-3"
-              />
-              <v-text-field
-                v-model="textInput"
-                label="Outlined"
-                variant="outlined"
-                class="mb-3"
-              />
-              <v-text-field
-                v-model="textInput"
-                label="Filled"
-                variant="filled"
-                class="mb-3"
-              />
-              <v-text-field
-                v-model="textInput"
-                label="Solo"
-                variant="solo"
-                class="mb-3"
-              />
-              <v-text-field
-                v-model="password"
-                label="Password"
-                type="password"
-                variant="outlined"
-                class="mb-3"
-              />
-              <v-text-field
-                v-model="email"
-                label="Email"
-                type="email"
-                variant="outlined"
-                prepend-inner-icon="mdi-email"
-                class="mb-3"
-              />
-              <v-textarea
-                v-model="textarea"
-                label="Textarea"
-                variant="outlined"
-                rows="3"
-              />
+              <v-text-field v-model="textInput" label="Standard" class="mb-3" />
+              <v-text-field v-model="textInput" label="Outlined" variant="outlined" class="mb-3" />
+              <v-text-field v-model="textInput" label="Filled" variant="filled" class="mb-3" />
+              <v-text-field v-model="textInput" label="Solo" variant="solo" class="mb-3" />
+              <v-text-field v-model="password" label="Password" type="password" variant="outlined" class="mb-3" />
+              <v-text-field v-model="email" label="Email" type="email" variant="outlined" prepend-inner-icon="mdi-email" class="mb-3" />
+              <v-textarea v-model="textarea" label="Textarea" variant="outlined" rows="3" />
             </component-demo-card>
           </v-col>
 
@@ -189,21 +152,9 @@ const expansionItems = [
               <!-- Checkboxes -->
               <div class="mb-4">
                 <h4 class="mb-2">Checkboxes</h4>
-                <v-checkbox
-                  v-model="selectedCheckbox"
-                  label="Option 1"
-                  value="option1"
-                />
-                <v-checkbox
-                  v-model="selectedCheckbox"
-                  label="Option 2"
-                  value="option2"
-                />
-                <v-checkbox
-                  v-model="selectedCheckbox"
-                  label="Option 3"
-                  value="option3"
-                />
+                <v-checkbox v-model="selectedCheckbox" label="Option 1" value="option1" />
+                <v-checkbox v-model="selectedCheckbox" label="Option 2" value="option2" />
+                <v-checkbox v-model="selectedCheckbox" label="Option 3" value="option3" />
               </div>
 
               <!-- Switches -->
@@ -217,13 +168,7 @@ const expansionItems = [
               <!-- Slider -->
               <div class="mb-4">
                 <h4 class="mb-2">Slider</h4>
-                <v-slider
-                  v-model="sliderValue"
-                  :min="0"
-                  :max="100"
-                  step="1"
-                  thumb-label
-                />
+                <v-slider v-model="sliderValue" :min="0" :max="100" step="1" thumb-label />
               </div>
 
               <!-- Rating -->
@@ -266,11 +211,7 @@ const expansionItems = [
                 class="mb-3"
               />
 
-              <v-file-input
-                label="File input"
-                variant="outlined"
-                prepend-icon="mdi-paperclip"
-              />
+              <v-file-input label="File input" variant="outlined" prepend-icon="mdi-paperclip" />
             </component-demo-card>
           </v-col>
 
@@ -324,24 +265,24 @@ const expansionItems = [
           <!-- Cards -->
           <v-col cols="12" md="4">
             <!-- <component-demo-card title="Basic Cards"> -->
-              <v-card class="mb-3" variant="tonal">
-                <v-card-title>Simple Card</v-card-title>
-                <v-card-text>This is a basic card with some content.</v-card-text>
-                <v-card-actions>
-                  <v-btn>Action</v-btn>
-                  <v-btn variant="text">Cancel</v-btn>
-                </v-card-actions>
-              </v-card>
+            <v-card class="mb-3" variant="tonal">
+              <v-card-title>Simple Card</v-card-title>
+              <v-card-text>This is a basic card with some content.</v-card-text>
+              <v-card-actions>
+                <v-btn>Action</v-btn>
+                <v-btn variant="text">Cancel</v-btn>
+              </v-card-actions>
+            </v-card>
 
-              <v-card class="mb-3" variant="outlined">
-                <v-card-title>Outlined Card</v-card-title>
-                <v-card-text>Card with outlined variant.</v-card-text>
-              </v-card>
+            <v-card class="mb-3" variant="outlined">
+              <v-card-title>Outlined Card</v-card-title>
+              <v-card-text>Card with outlined variant.</v-card-text>
+            </v-card>
 
-              <v-card >
-                <v-card-title>EMPTY CARD</v-card-title>
-                <v-card-text>Card without any changes.</v-card-text>
-              </v-card>
+            <v-card>
+              <v-card-title>EMPTY CARD</v-card-title>
+              <v-card-text>Card without any changes.</v-card-text>
+            </v-card>
             <!-- </component-demo-card> -->
           </v-col>
 
@@ -349,16 +290,10 @@ const expansionItems = [
           <v-col cols="12" md="4">
             <component-demo-card title="Rich Cards">
               <v-card>
-                <v-img
-                  src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-                  height="200"
-                  cover
-                />
+                <v-img src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg" height="200" cover />
                 <v-card-title>Card with Image</v-card-title>
                 <v-card-subtitle>Subtitle here</v-card-subtitle>
-                <v-card-text>
-                  Beautiful card with an image header and rich content.
-                </v-card-text>
+                <v-card-text> Beautiful card with an image header and rich content. </v-card-text>
                 <v-card-actions>
                   <v-btn color="primary">Learn More</v-btn>
                   <v-spacer />
@@ -397,16 +332,9 @@ const expansionItems = [
           <!-- Tables -->
           <v-col cols="12" md="8">
             <component-demo-card title="Data Table">
-              <v-data-table
-                :headers="tableHeaders"
-                :items="tableData"
-                class="elevation-1"
-              >
+              <v-data-table :headers="tableHeaders" :items="tableData" class="elevation-1">
                 <template v-slot:[`item.status`]="{ item }">
-                  <v-chip
-                    :color="item.status === 'Active' ? 'success' : 'warning'"
-                    size="small"
-                  >
+                  <v-chip :color="item.status === 'Active' ? 'success' : 'warning'" size="small">
                     {{ item.status }}
                   </v-chip>
                 </template>
@@ -422,27 +350,14 @@ const expansionItems = [
           <v-col cols="12" md="4">
             <component-demo-card title="Lists">
               <v-list>
-                <v-list-item
-                  v-for="item in menuItems"
-                  :key="item.value"
-                  :prepend-icon="item.icon"
-                  :title="item.title"
-                />
+                <v-list-item v-for="item in menuItems" :key="item.value" :prepend-icon="item.icon" :title="item.title" />
               </v-list>
 
               <v-divider class="my-3" />
 
               <v-list>
-                <v-list-item
-                  prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-                  title="John Doe"
-                  subtitle="Software Engineer"
-                />
-                <v-list-item
-                  prepend-avatar="https://cdn.vuetifyjs.com/images/lisa.jpg"
-                  title="Lisa Smith"
-                  subtitle="Product Manager"
-                />
+                <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg" title="John Doe" subtitle="Software Engineer" />
+                <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/lisa.jpg" title="Lisa Smith" subtitle="Product Manager" />
               </v-list>
             </component-demo-card>
           </v-col>
@@ -460,14 +375,8 @@ const expansionItems = [
               <v-alert type="warning" class="mb-3">Warning alert</v-alert>
               <v-alert type="error" class="mb-3">Error alert</v-alert>
 
-              <v-banner
-                lines="two"
-                icon="mdi-information"
-                class="mb-3"
-              >
-                <v-banner-text>
-                  This is a banner with some important information that spans multiple lines.
-                </v-banner-text>
+              <v-banner lines="two" icon="mdi-information" class="mb-3">
+                <v-banner-text> This is a banner with some important information that spans multiple lines. </v-banner-text>
                 <template v-slot:actions>
                   <v-btn>Action</v-btn>
                 </template>
@@ -518,12 +427,7 @@ const expansionItems = [
           <v-col cols="12" md="6">
             <component-demo-card title="Expansion Panels">
               <v-expansion-panels>
-                <v-expansion-panel
-                  v-for="item in expansionItems"
-                  :key="item.title"
-                  :title="item.title"
-                  :text="item.text"
-                />
+                <v-expansion-panel v-for="item in expansionItems" :key="item.title" :title="item.title" :text="item.text" />
               </v-expansion-panels>
             </component-demo-card>
           </v-col>
@@ -532,10 +436,7 @@ const expansionItems = [
           <v-col cols="12" md="6">
             <component-demo-card title="Timeline">
               <v-timeline>
-                <v-timeline-item
-                  icon="mdi-star"
-                  dot-color="success"
-                >
+                <v-timeline-item icon="mdi-star" dot-color="success">
                   <template v-slot:opposite>
                     <span class="text-caption">09:30</span>
                   </template>
@@ -545,10 +446,7 @@ const expansionItems = [
                   </div>
                 </v-timeline-item>
 
-                <v-timeline-item
-                  icon="mdi-account-multiple"
-                  dot-color="primary"
-                >
+                <v-timeline-item icon="mdi-account-multiple" dot-color="primary">
                   <template v-slot:opposite>
                     <span class="text-caption">10:15</span>
                   </template>
@@ -558,10 +456,7 @@ const expansionItems = [
                   </div>
                 </v-timeline-item>
 
-                <v-timeline-item
-                  icon="mdi-check"
-                  dot-color="warning"
-                >
+                <v-timeline-item icon="mdi-check" dot-color="warning">
                   <template v-slot:opposite>
                     <span class="text-caption">14:30</span>
                   </template>
@@ -586,16 +481,16 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="primary" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-primary">
-                      <strong>Primary</strong><br>
+                      <strong>Primary</strong><br />
                       Main brand color
                     </v-card-text>
                   </v-card>
                 </v-col>
-                
+
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="primary-container" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-primary-container">
-                      <strong>Primary Container</strong><br>
+                      <strong>Primary Container</strong><br />
                       Lower emphasis
                     </v-card-text>
                   </v-card>
@@ -605,16 +500,16 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="secondary" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-secondary">
-                      <strong>Secondary</strong><br>
+                      <strong>Secondary</strong><br />
                       Accent color
                     </v-card-text>
                   </v-card>
                 </v-col>
-                
+
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="secondary-container" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-secondary-container">
-                      <strong>Secondary Container</strong><br>
+                      <strong>Secondary Container</strong><br />
                       Lower emphasis
                     </v-card-text>
                   </v-card>
@@ -624,7 +519,7 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="surface-container" variant="flat" class="pa-4 text-center">
                     <v-card-text>
-                      <strong>Surface Container</strong><br>
+                      <strong>Surface Container</strong><br />
                       Default container
                     </v-card-text>
                   </v-card>
@@ -633,7 +528,7 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="surface-container-high" variant="flat" class="pa-4 text-center">
                     <v-card-text>
-                      <strong>Surface High</strong><br>
+                      <strong>Surface High</strong><br />
                       Higher emphasis
                     </v-card-text>
                   </v-card>
@@ -642,7 +537,7 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="surface-variant" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-surface-variant">
-                      <strong>Surface Variant</strong><br>
+                      <strong>Surface Variant</strong><br />
                       Alternative surface
                     </v-card-text>
                   </v-card>
@@ -651,7 +546,7 @@ const expansionItems = [
                 <v-col cols="12" sm="6" md="3">
                   <v-card color="tertiary-container" variant="flat" class="pa-4 text-center">
                     <v-card-text class="text-on-tertiary-container">
-                      <strong>Tertiary Container</strong><br>
+                      <strong>Tertiary Container</strong><br />
                       Third accent color
                     </v-card-text>
                   </v-card>

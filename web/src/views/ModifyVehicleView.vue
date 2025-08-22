@@ -4,7 +4,13 @@ import { useRoute, useRouter } from 'vue-router'
 import VehicleInformationCard from '@/components/vehicles/VehicleInformationCard.vue'
 import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import type { CreateMyVehicleCommand, EditMyVehicleRequest, PowerType, NullableOfVehicleType2, VehicleDto } from '@/api/generated/apiV1.schemas'
+import type {
+  CreateMyVehicleCommand,
+  EditMyVehicleRequest,
+  PowerType,
+  NullableOfVehicleType2,
+  VehicleDto,
+} from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
 const router = useRouter()
