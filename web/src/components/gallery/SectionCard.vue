@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <v-card class="mb-6" variant="outlined">
+  <v-card class="mb-6" variant="elevated" color="surface-container">
     <v-card-title class="d-flex align-center">
       <span class="text-h5">{{ title }}</span>
       <v-spacer />
@@ -15,10 +15,3 @@ defineProps<{
     </v-card-text>
   </v-card>
 </template>
-
-<style scoped>
-.v-card-title {
-  background-color: rgb(var(--md-sys-color-surface-container));
-  color: rgb(var(--md-sys-color-on-surface));
-}
-</style>

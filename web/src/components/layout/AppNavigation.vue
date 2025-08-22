@@ -11,6 +11,7 @@ const mainNav = [
   { title: 'Dashboard', icon: 'mdi-view-dashboard', link: '/' },
   { title: 'Vehicles', icon: 'mdi-car-side', link: '/vehicles' },
   { title: 'Components', icon: 'mdi-palette', link: '/components' },
+  { title: 'Cards', icon: 'mdi-card', link: '/cards' },
 ]
 const systemNav = [
   { title: 'Settings', icon: 'mdi-cog', link: '/settings' },

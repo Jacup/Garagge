@@ -1,11 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useAppTheme, type ThemeVariant } from '@/composables/useTheme'
 import SectionCard from '@/components/gallery/SectionCard.vue'
 import ComponentDemoCard from '@/components/gallery/ComponentDemoCard.vue'
-
-// Theme management
-const { currentTheme, isDark, isHighContrast, setTheme, availableThemes } = useAppTheme()
 
 // Component demo states
 const textInput = ref('Sample text')
@@ -54,30 +50,6 @@ const expansionItems = [
 
 <template>
   <div class="component-gallery">
-    <!-- Theme Selector Header -->
-    <v-app-bar color="surface-container" class="mb-4">
-      <v-app-bar-title>🎨 Vuetify Components Gallery</v-app-bar-title>
-      <v-spacer />
-
-      <v-select
-        v-model="currentTheme"
-        :items="availableThemes"
-        label="Theme"
-        variant="outlined"
-        density="compact"
-        style="max-width: 200px"
-        @update:model-value="setTheme($event as ThemeVariant)"
-      />
-
-      <v-chip
-        :color="isDark ? 'primary' : 'secondary'"
-        class="ml-2"
-      >
-        {{ isDark ? '🌙 Dark' : '☀️ Light' }}
-        {{ isHighContrast ? ' (HC)' : '' }}
-      </v-chip>
-    </v-app-bar>
-
     <v-container fluid>
       <!-- Buttons Section -->
       <section-card title="🔘 Buttons">
@@ -351,8 +323,8 @@ const expansionItems = [
         <v-row>
           <!-- Cards -->
           <v-col cols="12" md="4">
-            <component-demo-card title="Basic Cards">
-              <v-card class="mb-3">
+            <!-- <component-demo-card title="Basic Cards"> -->
+              <v-card class="mb-3" variant="tonal">
                 <v-card-title>Simple Card</v-card-title>
                 <v-card-text>This is a basic card with some content.</v-card-text>
                 <v-card-actions>
@@ -366,11 +338,11 @@ const expansionItems = [
                 <v-card-text>Card with outlined variant.</v-card-text>
               </v-card>
 
-              <v-card variant="tonal">
-                <v-card-title>Tonal Card</v-card-title>
-                <v-card-text>Card with tonal variant.</v-card-text>
+              <v-card >
+                <v-card-title>EMPTY CARD</v-card-title>
+                <v-card-text>Card without any changes.</v-card-text>
               </v-card>
-            </component-demo-card>
+            <!-- </component-demo-card> -->
           </v-col>
 
           <!-- Complex Cards -->
@@ -605,27 +577,86 @@ const expansionItems = [
       </section-card>
 
       <!-- Custom CSS Variables Demo -->
-      <section-card title="🎨 CSS Variables Demo">
+      <section-card title="🎨 Theme Colors Demo">
         <v-row>
           <v-col cols="12">
-            <component-demo-card title="Custom Styled Elements">
-              <div class="custom-elements-demo">
-                <div class="custom-card">
-                  <h3>Custom Card with CSS Variables</h3>
-                  <p>This card uses Material Design 3 CSS variables for styling:</p>
-                  <ul>
-                    <li><code>background-color: rgb(var(--md-sys-color-surface-container))</code></li>
-                    <li><code>color: rgb(var(--md-sys-color-on-surface))</code></li>
-                    <li><code>border: 1px solid rgb(var(--md-sys-color-outline-variant))</code></li>
-                  </ul>
-                </div>
+            <component-demo-card title="Color Variants with Vuetify Only">
+              <v-row dense>
+                <!-- Primary colors -->
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="primary" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-primary">
+                      <strong>Primary</strong><br>
+                      Main brand color
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="primary-container" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-primary-container">
+                      <strong>Primary Container</strong><br>
+                      Lower emphasis
+                    </v-card-text>
+                  </v-card>
+                </v-col>
 
-                <div class="custom-button-group">
-                  <button class="custom-button primary">Primary Button</button>
-                  <button class="custom-button secondary">Secondary Button</button>
-                  <button class="custom-button surface">Surface Button</button>
-                </div>
-              </div>
+                <!-- Secondary colors -->
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="secondary" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-secondary">
+                      <strong>Secondary</strong><br>
+                      Accent color
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+                
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="secondary-container" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-secondary-container">
+                      <strong>Secondary Container</strong><br>
+                      Lower emphasis
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+
+                <!-- Surface variants -->
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="surface-container" variant="flat" class="pa-4 text-center">
+                    <v-card-text>
+                      <strong>Surface Container</strong><br>
+                      Default container
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="surface-container-high" variant="flat" class="pa-4 text-center">
+                    <v-card-text>
+                      <strong>Surface High</strong><br>
+                      Higher emphasis
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="surface-variant" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-surface-variant">
+                      <strong>Surface Variant</strong><br>
+                      Alternative surface
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+
+                <v-col cols="12" sm="6" md="3">
+                  <v-card color="tertiary-container" variant="flat" class="pa-4 text-center">
+                    <v-card-text class="text-on-tertiary-container">
+                      <strong>Tertiary Container</strong><br>
+                      Third accent color
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
             </component-demo-card>
           </v-col>
         </v-row>
@@ -633,83 +664,3 @@ const expansionItems = [
     </v-container>
   </div>
 </template>
-
-<style scoped>
-.component-gallery {
-  min-height: 100vh;
-  background-color: rgb(var(--md-sys-color-background));
-}
-
-/* Custom CSS Variables Demo Styles */
-.custom-elements-demo {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.custom-card {
-  background-color: rgb(var(--md-sys-color-surface-container));
-  color: rgb(var(--md-sys-color-on-surface));
-  border: 1px solid rgb(var(--md-sys-color-outline-variant));
-  border-radius: 12px;
-  padding: 1.5rem;
-}
-
-.custom-card h3 {
-  color: rgb(var(--md-sys-color-primary));
-  margin-bottom: 1rem;
-}
-
-.custom-card code {
-  background-color: rgb(var(--md-sys-color-surface-variant));
-  color: rgb(var(--md-sys-color-on-surface-variant));
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.custom-button-group {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.custom-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.custom-button.primary {
-  background-color: rgb(var(--md-sys-color-primary));
-  color: rgb(var(--md-sys-color-on-primary));
-}
-
-.custom-button.primary:hover {
-  background-color: rgb(var(--md-sys-color-primary-container));
-  color: rgb(var(--md-sys-color-on-primary-container));
-}
-
-.custom-button.secondary {
-  background-color: rgb(var(--md-sys-color-secondary));
-  color: rgb(var(--md-sys-color-on-secondary));
-}
-
-.custom-button.secondary:hover {
-  background-color: rgb(var(--md-sys-color-secondary-container));
-  color: rgb(var(--md-sys-color-on-secondary-container));
-}
-
-.custom-button.surface {
-  background-color: rgb(var(--md-sys-color-surface-container-high));
-  color: rgb(var(--md-sys-color-on-surface));
-  border: 1px solid rgb(var(--md-sys-color-outline));
-}
-
-.custom-button.surface:hover {
-  background-color: rgb(var(--md-sys-color-surface-container-highest));
-}
-</style>
