@@ -1,7 +1,10 @@
 <script lang="ts" setup>
+import { useTheme } from 'vuetify'
 import AccountMenu from '@/components/NavBar/AccountMenu.vue'
 import SearchBox from '@/components/NavBar/SearchBox.vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+
+const theme = useTheme()
 
 const handleSearch = (query: string) => {
   console.log('Search query:', query)
@@ -19,7 +22,7 @@ const { mode } = useResponsiveLayout()
       </div>
 
       <v-spacer />
-
+      <v-btn icon="mdi-theme-light-dark" @click="theme.cycle(['abyssDark', 'abyssLight'])" text="Cycle All Themes"></v-btn>
       <div class="account-menu-container">
         <AccountMenu />
       </div>
