@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: garagge-web
+        working-directory: web
 
     steps:
       - uses: actions/checkout@v4
