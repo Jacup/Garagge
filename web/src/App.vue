@@ -1,32 +1,17 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
-import { useDisplay } from 'vuetify'
-import AppNavigation from './components/layout/AppNavigation.vue'
-import AppBar from './components/layout/AppBar.vue'
+import { ref } from 'vue'
+import ResponsiveNavigation from './components/navigation/ResponsiveNavigation.vue'
+import ApplicationBar from './components/layout/ApplicationBar.vue'
 
-const { name } = useDisplay()
-const drawer = ref(false)
+const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 
-const isDesktop = computed(() => ['lg', 'xl', 'xxl'].includes(name.value))
-const isTablet = computed(() => name.value === 'md')
-const isMobile = computed(() => ['sm', 'xs'].includes(name.value))
 </script>
 
 <template>
   <v-app>
-    <v-navigation-drawer v-if="isDesktop" permanent :width="240">
-      <AppNavigation @navigate="drawer = false" />
-    </v-navigation-drawer>
+    <ResponsiveNavigation ref="navigationRef" />
 
-    <v-navigation-drawer v-else-if="isTablet" rail permanent :width="72">
-      <AppNavigation :is-rail="true" @navigate="drawer = false" />
-    </v-navigation-drawer>
-
-    <v-navigation-drawer v-else v-model="drawer" temporary>
-      <AppNavigation @navigate="drawer = false" />
-    </v-navigation-drawer>
-
-    <AppBar :is-mobile="isMobile" @update:drawer="drawer = !drawer" />
+    <ApplicationBar/>
 
     <v-main>
       <v-container>
@@ -35,4 +20,7 @@ const isMobile = computed(() => ['sm', 'xs'].includes(name.value))
     </v-main>
   </v-app>
 </template>
-<style scoped></style>
+
+<style>
+/* Global app styles can go here */
+</style>

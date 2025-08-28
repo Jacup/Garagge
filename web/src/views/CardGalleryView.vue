@@ -183,8 +183,9 @@
             </v-card-text>
 
             <template v-slot:actions>
-              <v-btn color="primary" variant="text">Primary</v-btn>
-              <v-btn variant="text">Secondary</v-btn>
+              <v-btn color="on-error" variant="flat">Primary</v-btn>
+              <v-btn color="secondary" variant="flat">Secondary</v-btn>
+              <v-btn color="secondary" variant="flat">Secondary</v-btn>
             </template>
           </v-card>
 

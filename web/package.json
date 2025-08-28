@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "run-p type-check \"build-only {@}\" --",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "test:unit": "vitest",
     "build-only": "vite build",
@@ -19,6 +19,7 @@
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "axios": "^1.11.0",
+    "perfect-scrollbar": "^1.5.6",
     "pinia": "^3.0.3",
     "vite-plugin-pwa": "^1.0.1",
     "vite-plugin-vuetify": "^2.1.2",
