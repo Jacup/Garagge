@@ -82,6 +82,12 @@ function edit(id: string | undefined) {
     router.push(`/vehicles/edit/${id}`)
   }
 }
+
+function viewOverview(id: string | undefined) {
+  if (id) {
+    router.push(`/vehicles/${id}`)
+  }
+}
 </script>
 
 <template>
@@ -103,9 +109,49 @@ function edit(id: string | undefined) {
       @update:options="onTableOptionsChange"
     >
       <template v-slot:[`item.actions`]="{ item }">
-        <div class="d-flex ga-2 justify-end">
-          <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
-          <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
+        <div class="d-flex gap-1 justify-end">
+          <v-tooltip text="View Details">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                @click="viewOverview(item.id)"
+                variant="tonal"
+                prepend-icon="mdi-eye"
+                color="primary"
+                text="View"
+                size="small"
+                class="action-btn-small"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Edit Vehicle">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                @click="edit(item.id)"
+                variant="tonal"
+                prepend-icon="mdi-pencil"
+                color="info"
+                text="Edit"
+                size="small"
+                class="action-btn-small"
+              />
+            </template>
+          </v-tooltip>
+          <v-tooltip text="Delete Vehicle">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                @click="remove(item.id)"
+                variant="tonal"
+                prepend-icon="mdi-delete"
+                color="error"
+                text="Delete"
+                size="small"
+                class="action-btn-small"
+              />
+            </template>
+          </v-tooltip>
         </div>
       </template>
     </v-data-table-server>
@@ -130,6 +176,19 @@ function edit(id: string | undefined) {
   border-radius: 8px 8px 0px 0px;
   margin-bottom: 0;
   border-bottom: 1px solid var(--color-border);
+}
+
+/* Enhanced action buttons */
+.action-btn-small {
+  text-transform: none;
+  font-weight: 500;
+  height: 32px;
+  min-width: 70px;
+  font-size: 0.75rem;
+}
+
+.v-data-table :deep(.v-data-table__td) {
+  padding: 8px 16px;
 }
 
 .vehicles-table {

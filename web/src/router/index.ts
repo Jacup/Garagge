@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
+
 import DashboardView from '../views/DashboardView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -7,6 +8,7 @@ import VehiclesView from '@/views/VehiclesView.vue'
 import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
 import ComponentGalleryView from '@/views/ComponentGalleryView.vue'
 import CardGalleryView from '@/views/CardGalleryView.vue'
+import VehicleOverview from '@/views/vehicles/VehicleOverview.vue'
 
 const routes = [
   {
@@ -32,6 +34,12 @@ const routes = [
     component: ModifyVehicleView,
     meta: { requiresAuth: true },
     props: true,
+  },
+  {
+    path: '/vehicles/:id',
+    name: 'VehicleOverview',
+    component: VehicleOverview,
+    meta: { requiresAuth: true },
   },
   {
     path: '/components',
