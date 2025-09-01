@@ -26,6 +26,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - backend
 
   db:
     container_name: db
@@ -43,6 +45,11 @@ services:
       timeout: 5s
       retries: 5
     restart: always
+    networks:
+      - backend
 
 volumes:
   db-data:
+
+networks:
+  backend:
