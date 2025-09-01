@@ -15,7 +15,7 @@ const { mode } = useResponsiveLayout()
 </script>
 
 <template>
-  <v-app-bar v-if="mode === 'desktop'" flat floating class="header" :height="64">
+  <v-app-bar v-if="mode === 'desktop'" flat floating :app="true" class="header" :height="80">
     <div class="navbar-wrapper">
       <div class="search-container">
         <SearchBox @search="handleSearch" />
@@ -29,7 +29,7 @@ const { mode } = useResponsiveLayout()
     </div>
   </v-app-bar>
 
-  <v-app-bar v-else-if="mode === 'mobile'" class="header-mobile">
+  <v-app-bar v-else-if="mode === 'mobile'" :app="true" class="header-mobile" :height="80">
     <div class="navbar-wrapper-mobile">
       <v-btn disabled icon="mdi-menu"></v-btn>
 
@@ -45,51 +45,89 @@ const { mode } = useResponsiveLayout()
 </template>
 
 <style scoped>
-.header {
-  padding-top: 16px;
-  background-color: rgba(var(--v-theme-surface), 0.9) !important;
+/* Base app-bar styles */
+.app-bar-base {
+  padding: 16px 0px 0px 0px;
+  background-color: rgba(var(--v-theme-surface), 0.8) !important;
   backdrop-filter: blur(8px);
 }
 
-.header-mobile {
-  height: 64px;
+.app-bar-content-base {
+  background-color: rgb(var(--v-theme-surface));
+  padding: 0 16px;
+  height: 64px !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+/* Desktop specific */
+.header {
+  padding: 16px 0px 0px 0px;
+  background-color: rgba(var(--v-theme-surface), 0.8) !important;
+  backdrop-filter: blur(8px);
 }
 
 .header :deep(.v-toolbar__content) {
   background-color: rgb(var(--v-theme-surface));
-  padding: 0 20px;
+  padding: 0 16px;
+  height: 64px !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+}
+
+/* Mobile specific */
+.header-mobile {
+  padding: 16px 0px 0px 0px;
+  background-color: rgba(var(--v-theme-surface), 0.8) !important;
+  backdrop-filter: blur(8px);
+  height: 80px;
 }
 
 .header-mobile :deep(.v-toolbar__content) {
   background-color: rgb(var(--v-theme-surface)) !important;
+  padding: 0 16px;
+  height: 64px !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
 }
 
-.navbar-wrapper {
+/* Navbar wrapper base */
+.navbar-wrapper-base {
   width: 100%;
   height: 64px;
-  padding: 0 16px;
-
   display: flex;
   flex-direction: row;
   align-items: center;
-
   background-color: rgba(var(--v-theme-primary), 0.08);
   border-radius: 12px;
 }
 
-.navbar-wrapper-mobile {
+/* Desktop navbar wrapper */
+.navbar-wrapper {
   width: 100%;
   height: 64px;
-  padding: 0 4px;
-
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
-
   background-color: rgba(var(--v-theme-primary), 0.08);
+  border-radius: 12px;
+  padding: 0 16px;
 }
 
+/* Mobile navbar wrapper */
+.navbar-wrapper-mobile {
+  width: 100%;
+  height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(var(--v-theme-primary), 0.08);
+  border-radius: 12px;
+  padding: 0 4px;
+  gap: 8px;
+}
+
+/* Shared utility classes */
 .search-container {
   flex: 1;
 }

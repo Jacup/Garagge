@@ -227,7 +227,6 @@ const quickActions = ref([
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
 }
 
 .stat-icon {
