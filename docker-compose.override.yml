@@ -1,19 +1,31 @@
+# Development Docker Compose Override
+# Use different service combinations for different development scenarios:
+#
+# Case 3a: Backend + Frontend in IDE, DB in container
+#   docker-compose up db seq
+#
+# Case 3b: Frontend + DB in containers, Backend in IDE
+#   docker-compose up web db seq
+#
+# Case 3c: Backend + DB in containers, Frontend in IDE
+#   docker-compose up server db seq
+#
+# Case 3d: Full stack in containers
+#   docker-compose up
+
 services:
   server:
     build:
-      context: ./server
-      dockerfile: ./src/Api/Dockerfile
+      context: .
+      dockerfile: ./server/src/Api/Dockerfile
       target: final-no-frontend
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - DB_HOST=db
+      - DB_HOST=db  # Connect to DB container via Docker network
     ports:
       - "5000:8080"
-      - "5001:8081"
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - "5001:8081"  # HTTPS port for development
 
   web:
     container_name: web
@@ -22,13 +34,19 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4173:4173"
-    depends_on:
-      - server
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:5000  # Browser connects via localhost (exposed port)
 
+  db:
+    ports:
+      - "5432:5432"
+
+  # Development logging
   seq:
     image: datalust/seq:2024.3
     container_name: seq
     environment:
       - ACCEPT_EULA=Y
     ports:
-      - 8081:80
+      - "8082:80"

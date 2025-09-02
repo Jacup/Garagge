@@ -1,28 +1,13 @@
+name: garagge
+
 services:
   server:
     container_name: server
-    build:
-      context: ./server
-      dockerfile: ./src/Api/Dockerfile
+    image: ghcr.io/jacup/garagge:latest
     ports:
       - "5000:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      JWT__SECRET: ${JWT_SECRET}
-      
-      DB_NAME: ${DB_NAME}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-
-      LOG_LEVEL: ${LOG_LEVEL}
-      Serilog__MinimumLevel__Default: ${LOG_LEVEL}
-
-      # Optional, uncomment if you want to change variables in .env file
-      #JWT__ISSUER: ${JWT_ISSUER}
-      #JWT__AUDIENCE: ${JWT_AUDIENCE}
-      #DB_HOST: ${DB_HOST}
-      #DB_PORT: ${DB_PORT}
-      #DB_PORT: ${DB_PORT}
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
@@ -31,18 +16,19 @@ services:
     container_name: db
     image: postgres:17
     environment:
+      POSTGRES_DB: ${DB_DATABASE_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      # Use named volume for better cross-platform compatibility
+      - garagge-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "postgres" ]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE_NAME}"]
+      interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     restart: always
 
 volumes:
-  db-data:
+  garagge-db-data:
