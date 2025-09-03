@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-# USER $APP_UID
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -20,10 +21,10 @@ RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 ARG INCLUDE_FRONTEND=true
 
-FROM node:20 AS frontend-build
+FROM node:20-alpine AS frontend-build
 WORKDIR /src/web
 COPY web/package*.json ./
-RUN npm install
+RUN npm ci
 COPY web/ ./
 RUN npm run build
 
