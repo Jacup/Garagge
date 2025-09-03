@@ -1,11 +1,11 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { useUserStore } from '@/stores/userStore'
+import { apiConfig } from '@/config/api'
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: apiConfig.baseUrl,
+  timeout: apiConfig.timeout,
+  headers: apiConfig.headers,
 })
 
 axiosClient.interceptors.request.use(

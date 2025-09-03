@@ -2,8 +2,13 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
+
+# Accept build argument for mode
+ARG VITE_MODE=production
+ENV VITE_MODE=$VITE_MODE
+
 RUN npm run build
 
 # Etap 2: serwowanie statycznych plików

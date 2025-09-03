@@ -19,30 +19,36 @@ services:
       context: .
       dockerfile: ./server/src/Api/Dockerfile
       target: final-no-frontend
+    image: garagge-server:dev
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - DB_HOST=db  # Connect to DB container via Docker network
+      - DB_HOST=db
     ports:
       - "5000:8080"
-      - "5001:8081"  # HTTPS port for development
+      - "5001:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   web:
     container_name: web
     build:
       context: ./web
       dockerfile: Dockerfile
+      args:
+        - VITE_MODE=development
+    image: garagge-web:dev
     ports:
       - "4173:4173"
-    environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:5000  # Browser connects via localhost (exposed port)
 
   db:
     ports:
       - "5432:5432"
 
-  # Development logging
   seq:
     image: datalust/seq:2024.3
     container_name: seq
