@@ -50,12 +50,12 @@ onMounted(async () => {
       const vehicleData = res.data as VehicleDto
 
       Object.assign(editVehicle, {
-        brand: vehicleData.brand,
-        model: vehicleData.model,
+        brand: vehicleData.brand || '',
+        model: vehicleData.model || '',
         powerType: vehicleData.powerType,
         manufacturedYear: vehicleData.manufacturedYear,
-        type: vehicleData.type,
-        vin: vehicleData.vin,
+        type: vehicleData.type || null,
+        vin: vehicleData.vin || null,
       })
     } catch (error) {
       console.error('Failed to load vehicle data:', error)
@@ -92,15 +92,19 @@ interface HeaderAction {
   variant?: 'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain'
 }
 
-const headerActions = inject('headerActions') as { value: HeaderAction[] }
+const headerActions = inject('headerActions') as { value: HeaderAction[] } | undefined
 
 onMounted(() => {
-  const actionLabel = isEditMode ? 'Update Vehicle' : 'Save Vehicle'
-  headerActions.value = [{ label: actionLabel, action: save, color: 'primary' }]
+  if (headerActions) {
+    const actionLabel = isEditMode ? 'Update Vehicle' : 'Save Vehicle'
+    headerActions.value = [{ label: actionLabel, action: save, color: 'primary' }]
+  }
 })
 
 onUnmounted(() => {
-  headerActions.value = []
+  if (headerActions) {
+    headerActions.value = []
+  }
 })
 </script>
 
@@ -108,6 +112,7 @@ onUnmounted(() => {
   <div class="form-container" v-if="!isLoading">
     <VehicleInformationCard :vehicle="vehicle" @update:vehicle="Object.assign(vehicle, $event)" @save="save" />
     <FileUploadCard :files="uploadedFiles" @update:files="uploadedFiles = $event" />
+    <v-btn @click="save" color="primary" class="mt-4">Zapisz zmiany</v-btn>
   </div>
   <div v-else class="loading-container">
     <v-progress-circular indeterminate color="primary"></v-progress-circular>
