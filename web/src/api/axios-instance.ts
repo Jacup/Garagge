@@ -8,6 +8,11 @@ const axiosClient = axios.create({
   },
 })
 
+// Development helper
+if (import.meta.env.DEV) {
+  console.log(`🔗 API Base URL: ${getApiBaseUrl()}`)
+}
+
 axiosClient.interceptors.request.use(
   (config) => {
     const userStore = useUserStore()
