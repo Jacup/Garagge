@@ -1,12 +1,22 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { useUserStore } from '@/stores/userStore'
-import { apiConfig } from '@/config/api'
+
+const getApiBaseUrl = () => {
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000'
+}
 
 const axiosClient = axios.create({
-  baseURL: apiConfig.baseUrl,
-  timeout: apiConfig.timeout,
-  headers: apiConfig.headers,
+  baseURL: getApiBaseUrl(),
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 })
+
+// Development helper
+if (import.meta.env.DEV) {
+  console.log(`🔗 API Base URL: ${getApiBaseUrl()}`)
+}
 
 axiosClient.interceptors.request.use(
   (config) => {
