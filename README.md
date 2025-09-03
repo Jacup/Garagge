@@ -14,6 +14,7 @@
     - [Configuration](#configuration)
     - [Usage](#usage)
   - [Development](#development)
+    - [Development Setup Modes](#development-setup-modes)
     - [Prerequisites for Development](#prerequisites-for-development)
     - [Setup](#setup)
     - [Frontend Development](#frontend-development)
@@ -42,11 +43,16 @@
    - `docker-compose.yml`
    - `.env`
 
-2. (Recommended) Update JWT secret in `.env` file:
+2. (Recommended) Update security settings in `.env` file:
 ```bash
 # Generate a new JWT secret (recommended for security)
-JWT_SECRET=your-new-random-secret-here
+JWT__SECRET=your-new-random-secret-here
+
+# Change default database password
+DB_PASSWORD=your-secure-password
 ```
+
+For detailed configuration options, see [Environment Variables Documentation](docs/ENVIRONMENT_VARIABLES.md).
 
 3. Start the application:
 ```bash
@@ -56,14 +62,14 @@ docker-compose up -d
 4. Access the application:
    - **Frontend**: http://localhost:4173
    - **Backend API**: http://localhost:5000
-   - **Seq Logging**: http://localhost:8081
+   - **Seq Logging**: http://localhost:8082
 
 ### Configuration
 
 The `.env` file contains all necessary configuration with working defaults. You can customize:
 
 - **Database credentials** (`DB_USERNAME`, `DB_PASSWORD`)
-- **JWT settings** (`JWT_SECRET` - strongly recommended to change)
+- **JWT settings** (`JWT__SECRET` - strongly recommended to change)
 - **Logging level** (`LOG_LEVEL`)
 
 All other settings have sensible defaults and work out of the box.
@@ -76,6 +82,20 @@ All other settings have sensible defaults and work out of the box.
 ## Development
 
 The application provides flexible development environment setup with Docker Compose support. You can run different parts of the stack based on your development needs.
+
+### Development Setup Modes
+
+Garagge supports multiple development modes to match your workflow:
+
+📖 **[Complete Development Setup Guide](docs/DEVELOPMENT_SETUP.md)**
+
+**Quick reference:**
+- **Local Development**: Backend + Frontend in IDE, Database in container (`docker-compose up db seq`)
+- **Hybrid Frontend**: Frontend + Database in containers, Backend in IDE (`docker-compose up web db seq`)
+- **Hybrid Backend**: Backend + Database in containers, Frontend in IDE (`docker-compose up server db seq`)
+- **Full Containerized**: Full stack in containers (`docker-compose up`)
+
+See the [Development Setup Guide](docs/DEVELOPMENT_SETUP.md) for detailed instructions, configuration, and troubleshooting.
 
 ### Prerequisites for Development
 
@@ -98,56 +118,31 @@ cd Garagge
 
 ### Frontend Development
 
-When working primarily on the frontend, run the backend via Docker Compose and frontend locally for live development:
+For frontend-focused development, use **Hybrid Backend** mode where backend and database run in containers while you develop the frontend locally.
 
-```bash
-# Start backend services (API + Database + Seq logging)
-docker-compose up server db seq
+📖 **See [Hybrid Backend Setup](docs/DEVELOPMENT_SETUP.md#hybrid-backend-backend--database-in-containers-frontend-in-ide)**
 
-# In separate terminal, start frontend locally
-cd web
-npm install
-npm run dev
-```
-Frontend will be available at `http://localhost:5173` and will connect to API at `http://localhost:5000`.
+### Backend Development  
 
-### Backend Development
+For backend-focused development, use **Hybrid Frontend** mode where frontend and database run in containers while you develop the backend locally.
 
-When working primarily on the backend, run the frontend in Docker to test your API changes:
-
-```bash
-# Start only dependencies (Database + Seq + Frontend)
-docker-compose up db seq web
-
-# Run backend in your IDE (Visual Studio/Rider/VS Code)
-# or via dotnet CLI:
-cd server/src/Api
-dotnet run
-```
+📖 **See [Hybrid Frontend Setup](docs/DEVELOPMENT_SETUP.md#hybrid-frontend-frontend--database-in-containers-backend-in-ide)**
 
 ### Full Stack Development
 
-For working on both frontend and backend simultaneously:
+For simultaneous frontend and backend development, use **Local Development** mode where only the database runs in a container.
 
-```bash
-# Start only infrastructure services
-docker-compose up db seq
-
-# Run backend locally
-cd server/src/Api
-dotnet run
-
-# In separate terminal, run frontend locally
-cd web
-npm run dev
-```
+📖 **See [Local Development Setup](docs/DEVELOPMENT_SETUP.md#local-development-backend--frontend-in-ide-database-in-container)**
 
 ### Development Services
 
-- **Backend API**: `http://localhost:5000` (HTTP) / `http://localhost:5001` (HTTPS)
-- **Frontend**: `http://localhost:5173` (dev) / `http://localhost:4173` (docker)
-- **Database**: `localhost:5432` (PostgreSQL)
-- **Seq Logging**: `http://localhost:8081`
+Quick reference for development URLs:
+- **Frontend**: http://localhost:4173 (container) / http://localhost:5173 (local)
+- **Backend API**: http://localhost:5000  
+- **Database**: localhost:5432
+- **Seq Logging**: http://localhost:8082
+
+📖 **For detailed port and configuration information, see [Development Setup Guide](docs/DEVELOPMENT_SETUP.md#development-tools)**
 
 ### Useful Commands
 

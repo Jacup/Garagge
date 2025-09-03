@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.DAL;
 
@@ -6,35 +7,34 @@ internal static class DatabaseConfiguration
 {
     internal static string GetConnectionString(this IConfiguration configuration)
     {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        var dbHost = configuration["DB_HOST"] ?? Environment.GetEnvironmentVariable("DB_HOST");
-
-        if (environment == "Development")
+        // Try connection string first (Development or explicit connection string)
+        var connectionString = configuration.GetConnectionString("Database");
+        if (!string.IsNullOrWhiteSpace(connectionString))
         {
-            var cs = configuration.GetConnectionString("Database");
-
-            if (string.IsNullOrWhiteSpace(cs))
-                throw new InvalidOperationException("Connection string 'Database' is not configured.");
-
+            // Always check for host override (supports Development in Docker containers)
+            var dbHost = configuration["DB_HOST"] ?? Environment.GetEnvironmentVariable("DB_HOST");
             if (!string.IsNullOrWhiteSpace(dbHost))
             {
-                var builder = new Npgsql.NpgsqlConnectionStringBuilder(cs)
+                var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
                 {
                     Host = dbHost
                 };
-
                 return builder.ToString();
             }
-            
-            return cs;
+            return connectionString;
         }
-            
-        var host = dbHost ?? "db";
-        var portProd = configuration["DB_PORT"] ?? Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
-        var dbProd = configuration["DB_NAME"] ?? Environment.GetEnvironmentVariable("DB_NAME") ?? "garagge-db";
-        var userProd = configuration["DB_USERNAME"] ?? Environment.GetEnvironmentVariable("DB_USERNAME") ?? "postgres";
-        var passwordProd = configuration["DB_PASSWORD"] ?? Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "postgres";
-
-        return $"Host={host};Port={portProd};Database={dbProd};Username={userProd};Password={passwordProd}";
+        
+        // Build from individual settings (Production or fallback)
+        var options = new DatabaseOptions
+        {
+            Host = configuration["DB_HOST"] ?? Environment.GetEnvironmentVariable("DB_HOST") ?? "db",
+            Port = int.TryParse(configuration["DB_PORT"] ?? Environment.GetEnvironmentVariable("DB_PORT"), out var port) ? port : 5432,
+            Name = configuration["DB_NAME"] ?? Environment.GetEnvironmentVariable("DB_NAME") ?? "garagge-db", 
+            Username = configuration["DB_USERNAME"] ?? Environment.GetEnvironmentVariable("DB_USERNAME") ?? "postgres",
+            Password = configuration["DB_PASSWORD"] ?? Environment.GetEnvironmentVariable("DB_PASSWORD") ?? 
+                       throw new InvalidOperationException("Database password (DB_PASSWORD) must be configured")
+        };
+        
+        return options.BuildConnectionString();
     }
 }
