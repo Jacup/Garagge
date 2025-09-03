@@ -10,8 +10,6 @@ dist/
 
 # Environment files
 .env*
-!.env.development
-
 # IDE and editor files
 .vscode/
 .idea/
