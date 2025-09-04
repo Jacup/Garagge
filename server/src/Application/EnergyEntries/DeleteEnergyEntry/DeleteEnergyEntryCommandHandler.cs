@@ -2,7 +2,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.EnergyEntries.DeleteEnergyEntry;
@@ -27,7 +26,7 @@ public class DeleteEnergyEntryCommandHandler(IApplicationDbContext dbContext, IU
 
         // Check if vehicle belongs to user
         if (energyEntry.Vehicle?.UserId != userId)
-            return Result.Failure(VehicleErrors.NotFound(request.VehicleId));
+            return Result.Failure(EnergyEntryErrors.NotFound(request.VehicleId));
 
         try
         {

@@ -11,7 +11,7 @@ public class DeleteEnergyEntry : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(
+        app.MapDelete(
                 "vehicles/{vehicleId:guid}/energy-entries/{id:guid}",
                 async (Guid id, Guid vehicleId, ISender sender, CancellationToken cancellationToken) =>
                 {

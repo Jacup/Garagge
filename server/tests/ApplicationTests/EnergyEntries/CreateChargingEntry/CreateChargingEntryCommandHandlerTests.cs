@@ -92,7 +92,7 @@ public class CreateChargingEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound(nonExistentVehicleId));
 
         Context.ChargingEntries.Count().ShouldBe(0);
     }
@@ -112,7 +112,7 @@ public class CreateChargingEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(FuelEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
 
         Context.ChargingEntries.Count().ShouldBe(0);
     }
@@ -134,7 +134,7 @@ public class CreateChargingEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(FuelEntryErrors.IncompatiblePowerType(vehicle.Id, powerType));
+        result.Error.ShouldBe(EnergyEntryErrors.IncompatiblePowerType(vehicle.Id, powerType));
 
         Context.ChargingEntries.Count().ShouldBe(0);
     }

@@ -4,7 +4,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Application.EnergyEntries.Dtos;
-using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +22,13 @@ public class CreateChargingEntryCommandHandler(IApplicationDbContext dbContext, 
             .FirstOrDefaultAsync(cancellationToken);
         
         if (vehicleData is null)
-            return Result.Failure<ChargingEntryDto>(VehicleErrors.NotFound(request.VehicleId));
+            return Result.Failure<ChargingEntryDto>(EnergyEntryErrors.NotFound(request.VehicleId));
         
         if (userContext.UserId != vehicleData.UserId)
-            return Result.Failure<ChargingEntryDto>(FuelEntryErrors.Unauthorized);
+            return Result.Failure<ChargingEntryDto>(EnergyEntryErrors.Unauthorized);
 
         if (!vehicleEnergyValidator.CanBeCharged(vehicleData.PowerType))
-            return Result.Failure<ChargingEntryDto>(FuelEntryErrors.IncompatiblePowerType(request.VehicleId ,vehicleData.PowerType));
+            return Result.Failure<ChargingEntryDto>(EnergyEntryErrors.IncompatiblePowerType(request.VehicleId ,vehicleData.PowerType));
         
         var energyEntry = new ChargingEntry
         {
@@ -51,7 +50,7 @@ public class CreateChargingEntryCommandHandler(IApplicationDbContext dbContext, 
         }
         catch (Exception)
         {
-            return Result.Failure<ChargingEntryDto>(FuelEntryErrors.CreateFailed);
+            return Result.Failure<ChargingEntryDto>(EnergyEntryErrors.CreateFailed);
         }
         
         return Result.Success(energyEntry.Adapt<ChargingEntryDto>());

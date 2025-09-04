@@ -4,7 +4,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Application.EnergyEntries.Dtos;
-using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +22,13 @@ public class CreateFuelEntryCommandHandler(IApplicationDbContext dbContext, IUse
             .FirstOrDefaultAsync(cancellationToken);
         
         if (vehicleData is null)
-            return Result.Failure<FuelEntryDto>(VehicleErrors.NotFound(request.VehicleId));
+            return Result.Failure<FuelEntryDto>(EnergyEntryErrors.NotFound(request.VehicleId));
         
         if (userContext.UserId != vehicleData.UserId)
-            return Result.Failure<FuelEntryDto>(FuelEntryErrors.Unauthorized);
+            return Result.Failure<FuelEntryDto>(EnergyEntryErrors.Unauthorized);
 
         if (!vehicleEnergyValidator.CanBeFueled(vehicleData.PowerType))
-            return Result.Failure<FuelEntryDto>(FuelEntryErrors.IncompatiblePowerType(request.VehicleId ,vehicleData.PowerType));
+            return Result.Failure<FuelEntryDto>(EnergyEntryErrors.IncompatiblePowerType(request.VehicleId ,vehicleData.PowerType));
         
         var fuelEntry = new FuelEntry
         {
@@ -50,7 +49,7 @@ public class CreateFuelEntryCommandHandler(IApplicationDbContext dbContext, IUse
         }
         catch (Exception)
         {
-            return Result.Failure<FuelEntryDto>(FuelEntryErrors.CreateFailed);
+            return Result.Failure<FuelEntryDto>(EnergyEntryErrors.CreateFailed);
         }
         
         return Result.Success(fuelEntry.Adapt<FuelEntryDto>());

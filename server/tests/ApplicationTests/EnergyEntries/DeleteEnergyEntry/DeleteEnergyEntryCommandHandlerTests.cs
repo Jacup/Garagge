@@ -84,7 +84,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(vehicle.Id));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound(vehicle.Id));
         
         var existingEntry = Context.EnergyEntries.FirstOrDefault(fe => fe.Id == fuelEntry.Id);
         existingEntry.ShouldNotBeNull();
