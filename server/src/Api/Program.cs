@@ -1,4 +1,3 @@
-using System.Reflection;
 using Application;
 using HealthChecks.UI.Client;
 using Infrastructure;
@@ -15,8 +14,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((context, loggerConfig) => loggerConfig.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddWebApi(builder.Configuration);
-
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
@@ -25,7 +22,6 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 // Swagger/OpenAPI configuration
 
-// builder.Services.AddSwaggerGenWithAuth();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
@@ -33,11 +29,10 @@ builder.Services.AddOpenApi(options =>
 
 
 builder.Services
+    .AddWebApi(builder.Configuration)
     .AddApplication()
     .AddPresentation()
     .AddInfrastructure(builder.Configuration);
-
-builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 WebApplication app = builder.Build();
 
@@ -47,25 +42,21 @@ app.Configuration.ValidateJwtSecret(app.Environment, logger);
 if (EnvironmentExtensions.IsDevelopment())
     app.UseCorsConfiguration();
 
-// Map all API endpoints under /api prefix
-var apiGroup = app.MapGroup("/api");
-app.MapEndpoints(apiGroup);
-
+// Configure OpenAPI/Scalar BEFORE mapping API endpoints
 if (app.Environment.IsDevelopment())
 {
     app.UseOpenApi(useSwaggerWithOpenApi: false);
-    // app.UseSwaggerWithUi();
 }
-else
-{
-    // Enable OpenAPI/Scalar in production for API documentation
-    app.UseOpenApi(useSwaggerWithOpenApi: false);
-}
+
+// Map all API endpoints under /api prefix
+var apiGroup = app.MapGroup("/api");
+
+app.MapEndpoints(apiGroup);
+app.MapHealthChecks("health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
+
 
 app.ApplyMigrations();
 await app.SeedDatabaseAsync();
-
-app.MapHealthChecks("health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
 app.UseRequestContextLogging();
 
@@ -85,7 +76,7 @@ if (app.Environment.IsProduction())
     {
         await next();
         var path = context.Request.Path.Value ?? string.Empty;
-        if (context.Response.StatusCode == 404 && !path.StartsWith("/api") && !path.StartsWith("/scalar") && !path.StartsWith("/openapi"))
+        if (context.Response.StatusCode == 404 && !path.StartsWith("/api"))
         {
             context.Response.StatusCode = 200;
             await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));

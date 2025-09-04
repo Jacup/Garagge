@@ -3,6 +3,7 @@ using System;
 using Infrastructure.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250904114726_RemoveDefaultChargingEntryUnitValue")]
+    partial class RemoveDefaultChargingEntryUnitValue
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,11 +48,6 @@ namespace Infrastructure.DAL.Migrations
                     b.Property<int>("Mileage")
                         .HasColumnType("integer")
                         .HasColumnName("mileage");
-
-                    b.Property<decimal>("PricePerUnit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("price_per_unit");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -186,6 +184,11 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("energy_amount");
 
+                    b.Property<decimal>("PricePerUnit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("price_per_unit");
+
                     b.Property<int>("Unit")
                         .HasColumnType("integer")
                         .HasColumnName("unit");
@@ -196,6 +199,11 @@ namespace Infrastructure.DAL.Migrations
             modelBuilder.Entity("Domain.Entities.EnergyEntries.FuelEntry", b =>
                 {
                     b.HasBaseType("Domain.Entities.EnergyEntries.EnergyEntry");
+
+                    b.Property<decimal>("PricePerUnit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("price_per_unit");
 
                     b.Property<int>("Unit")
                         .HasColumnType("integer")

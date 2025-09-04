@@ -19,12 +19,7 @@ public class ChargingEntryConfiguration : IEntityTypeConfiguration<ChargingEntry
 
         builder.Property(c => c.Unit)
             .IsRequired()
-            .HasConversion<int>()
-            .HasDefaultValue(EnergyUnit.kWh);
-
-        builder.Property(c => c.PricePerUnit)
-            .IsRequired()
-            .HasPrecision(18, 2);
+            .HasConversion<int>();
 
         builder.Property(c => c.ChargingDurationMinutes)
             .IsRequired(false);
