@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Application.EnergyEntries.Dtos;
 using Domain.Enums;
 
 namespace Application.EnergyEntries.CreateFuelEntry;

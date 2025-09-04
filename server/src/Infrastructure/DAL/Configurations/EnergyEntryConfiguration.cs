@@ -20,9 +20,13 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(c => c.PricePerUnit)
+            .IsRequired()
+            .HasPrecision(18, 2);
+
         builder.Property(e => e.VehicleId)
             .IsRequired();
-        
+
         builder.UseTptMappingStrategy();
     }
 }

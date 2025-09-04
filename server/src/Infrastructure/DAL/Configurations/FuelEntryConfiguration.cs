@@ -20,8 +20,5 @@ public class FuelEntryConfiguration : IEntityTypeConfiguration<FuelEntry>
             .IsRequired()
             .HasConversion<int>();
 
-        builder.Property(f => f.PricePerUnit)
-            .IsRequired()
-            .HasPrecision(18, 2);
     }
 }

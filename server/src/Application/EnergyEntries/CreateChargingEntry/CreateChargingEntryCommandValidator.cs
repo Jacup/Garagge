@@ -1,11 +1,11 @@
 ﻿using Application.Abstractions;
 using FluentValidation;
 
-namespace Application.EnergyEntries.CreateFuelEntry;
+namespace Application.EnergyEntries.CreateChargingEntry;
 
-internal sealed class CreateFuelEntryCommandValidator : AbstractValidator<CreateFuelEntryCommand>
+internal sealed class CreateChargingEntryCommandValidator : AbstractValidator<CreateChargingEntryCommand>
 {
-    public CreateFuelEntryCommandValidator(IDateTimeProvider dateTimeProvider)
+    public CreateChargingEntryCommandValidator(IDateTimeProvider dateTimeProvider)
     {
         RuleFor(x => x.VehicleId).NotEmpty();
         
@@ -25,12 +25,16 @@ internal sealed class CreateFuelEntryCommandValidator : AbstractValidator<Create
             .GreaterThan(0)
             .WithMessage("Price per unit must be greater than 0.");
 
-        RuleFor(x => x.Volume)
+        RuleFor(x => x.EnergyAmount)
             .GreaterThan(0)
-            .WithMessage("Volume must be greater than 0.");
+            .WithMessage("Energy amount must be greater than zero");
 
         RuleFor(x => x.Unit)
             .IsInEnum()
             .WithMessage("Unit must be valid enum value");
+
+        RuleFor(x => x.ChargingDurationMinutes)
+            .GreaterThan(0)
+            .When(x => x.ChargingDurationMinutes.HasValue);
     }
 }

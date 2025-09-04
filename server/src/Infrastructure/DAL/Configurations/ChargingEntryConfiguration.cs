@@ -21,10 +21,6 @@ public class ChargingEntryConfiguration : IEntityTypeConfiguration<ChargingEntry
             .IsRequired()
             .HasConversion<int>();
 
-        builder.Property(c => c.PricePerUnit)
-            .IsRequired()
-            .HasPrecision(18, 2);
-
         builder.Property(c => c.ChargingDurationMinutes)
             .IsRequired(false);
     }

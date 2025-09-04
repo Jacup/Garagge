@@ -3,6 +3,7 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Application.EnergyEntries.Dtos;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Mapster;
@@ -27,7 +28,7 @@ public class CreateFuelEntryCommandHandler(IApplicationDbContext dbContext, IUse
         if (userContext.UserId != vehicleData.UserId)
             return Result.Failure<FuelEntryDto>(FuelEntryErrors.Unauthorized);
 
-        if (vehicleEnergyValidator.CanBeCharged(vehicleData.PowerType))
+        if (!vehicleEnergyValidator.CanBeFueled(vehicleData.PowerType))
             return Result.Failure<FuelEntryDto>(FuelEntryErrors.IncompatiblePowerType(request.VehicleId ,vehicleData.PowerType));
         
         var fuelEntry = new FuelEntry

@@ -2,8 +2,8 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries;
 using Application.EnergyEntries.CreateFuelEntry;
+using Application.EnergyEntries.Dtos;
 using Application.Vehicles;
 using Domain.Enums;
 using MediatR;
