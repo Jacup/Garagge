@@ -4,36 +4,56 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { LoginUserCommand, LoginUserResponse, RegisterUserCommand, UserDto } from '../apiV1.schemas'
+import type {
+  LoginUserCommand,
+  LoginUserResponse,
+  RegisterUserCommand,
+  UserDto
+} from '../apiV1.schemas';
 
-import { axiosInstance } from '../../axios-instance'
+import { axiosInstance } from '../../axios-instance';
 
-export const getUsers = () => {
-  const getUsersUserId = (userId: string) => {
-    return axiosInstance<UserDto>({ url: `/users/${userId}`, method: 'GET' })
-  }
-  const getUsersMe = () => {
-    return axiosInstance<UserDto>({ url: `/users/me`, method: 'GET' })
-  }
-  const postUsersLogin = (loginUserCommand: LoginUserCommand) => {
-    return axiosInstance<LoginUserResponse>({
-      url: `/users/login`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: loginUserCommand,
-    })
-  }
-  const postUsersRegister = (registerUserCommand: RegisterUserCommand) => {
-    return axiosInstance<string>({
-      url: `/users/register`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: registerUserCommand,
-    })
-  }
-  return { getUsersUserId, getUsersMe, postUsersLogin, postUsersRegister }
-}
-export type GetUsersUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getUsersUserId']>>>
-export type GetUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getUsersMe']>>>
-export type PostUsersLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['postUsersLogin']>>>
-export type PostUsersRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['postUsersRegister']>>>
+
+
+  export const getUsers = () => {
+const getApiUsersUserId = (
+    userId: string,
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/api/users/${userId}`, method: 'GET'
+    },
+      );
+    }
+  const getApiUsersMe = (
+    
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/api/users/me`, method: 'GET'
+    },
+      );
+    }
+  const postApiUsersLogin = (
+    loginUserCommand: LoginUserCommand,
+ ) => {
+      return axiosInstance<LoginUserResponse>(
+      {url: `/api/users/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: loginUserCommand
+    },
+      );
+    }
+  const postApiUsersRegister = (
+    registerUserCommand: RegisterUserCommand,
+ ) => {
+      return axiosInstance<string>(
+      {url: `/api/users/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: registerUserCommand
+    },
+      );
+    }
+  return {getApiUsersUserId,getApiUsersMe,postApiUsersLogin,postApiUsersRegister}};
+export type GetApiUsersUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersUserId']>>>
+export type GetApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersMe']>>>
+export type PostApiUsersLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['postApiUsersLogin']>>>
+export type PostApiUsersRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['postApiUsersRegister']>>>

@@ -12,13 +12,13 @@ const loading = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
-const { postUsersLogin, getUsersMe } = getUsers()
+const { postApiUsersLogin, getApiUsersMe } = getUsers()
 
 async function onSubmit() {
   error.value = ''
   loading.value = true
   try {
-    const loginRes = await postUsersLogin({ email: email.value, password: password.value })
+    const loginRes = await postApiUsersLogin({ email: email.value, password: password.value })
 
     if (!loginRes.data.accessToken) {
       throw new Error('Missing access token in login response')
@@ -26,7 +26,7 @@ async function onSubmit() {
 
     userStore.setToken(loginRes.data.accessToken)
 
-    const profileRes = await getUsersMe()
+    const profileRes = await getApiUsersMe()
     if (!profileRes.data) {
       throw new Error('Failed to fetch user profile')
     }

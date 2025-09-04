@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { getUsers } from '@/api/generated/users/users'
 import { useUserStore } from '@/stores/userStore'
 
-const { postUsersRegister, postUsersLogin, getUsersMe } = getUsers()
+const { postApiUsersRegister, postApiUsersLogin, getApiUsersMe } = getUsers()
 
 const email = ref('')
 const firstName = ref('')
@@ -20,7 +20,7 @@ async function onSubmit() {
   loading.value = true
 
   try {
-    const registerRes = await postUsersRegister({
+    const registerRes = await postApiUsersRegister({
       email: email.value,
       firstName: firstName.value,
       lastName: lastName.value,
@@ -38,7 +38,7 @@ async function onSubmit() {
       return
     }
 
-    const loginRes = await postUsersLogin({
+    const loginRes = await postApiUsersLogin({
       email: email.value,
       password: password.value,
     })
@@ -50,7 +50,7 @@ async function onSubmit() {
     }
     userStore.setToken(loginRes.data.accessToken)
 
-    const profileRes = await getUsersMe()
+    const profileRes = await getApiUsersMe()
     if (profileRes.status !== 200 || !profileRes.data) {
       error.value = 'Failed to fetch profile: ' + (profileRes.statusText || 'Unknown error')
       loading.value = false

@@ -14,7 +14,7 @@ import type {
 
 const route = useRoute()
 const router = useRouter()
-const { getVehiclesMyId, postVehiclesMy, putVehiclesMyEditId } = getVehicles()
+const { getApiVehiclesMyId, postApiVehiclesMy, putApiVehiclesMyEditId } = getVehicles()
 
 const vehicleId = route.params.id as string
 const isEditMode = !!vehicleId
@@ -46,7 +46,7 @@ const isLoading = ref(isEditMode)
 onMounted(async () => {
   if (isEditMode) {
     try {
-      const res = await getVehiclesMyId(vehicleId)
+      const res = await getApiVehiclesMyId(vehicleId)
       const vehicleData = res.data as VehicleDto
 
       Object.assign(editVehicle, {
@@ -71,12 +71,12 @@ async function save() {
     if (isEditMode) {
       console.log('Update vehicle data:', editVehicle)
       console.log('Vehicle ID:', vehicleId)
-      await putVehiclesMyEditId(vehicleId, editVehicle)
+      await putApiVehiclesMyEditId(vehicleId, editVehicle)
       router.push('/vehicles')
     } else {
       console.log('Vehicle data:', createVehicle)
       console.log('Uploaded files:', uploadedFiles.value)
-      await postVehiclesMy(createVehicle)
+      await postApiVehiclesMy(createVehicle)
       router.push('/vehicles')
     }
   } catch (error) {

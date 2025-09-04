@@ -4,40 +4,68 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateMyVehicleCommand, EditMyVehicleRequest, GetVehiclesMyParams, PagedListOfVehicleDto, VehicleDto } from '../apiV1.schemas'
+import type {
+  CreateMyVehicleCommand,
+  EditMyVehicleRequest,
+  GetApiVehiclesMyParams,
+  PagedListOfVehicleDto,
+  VehicleDto
+} from '../apiV1.schemas';
 
-import { axiosInstance } from '../../axios-instance'
+import { axiosInstance } from '../../axios-instance';
 
-export const getVehicles = () => {
-  const postVehiclesMy = (createMyVehicleCommand: CreateMyVehicleCommand) => {
-    return axiosInstance<VehicleDto>({
-      url: `/vehicles/my`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: createMyVehicleCommand,
-    })
-  }
-  const getVehiclesMy = (params?: GetVehiclesMyParams) => {
-    return axiosInstance<PagedListOfVehicleDto>({ url: `/vehicles/my`, method: 'GET', params })
-  }
-  const deleteVehiclesMyId = (id: string) => {
-    return axiosInstance<null>({ url: `/vehicles/my/${id}`, method: 'DELETE' })
-  }
-  const getVehiclesMyId = (id: string) => {
-    return axiosInstance<VehicleDto>({ url: `/vehicles/my/${id}`, method: 'GET' })
-  }
-  const putVehiclesMyEditId = (id: string, editMyVehicleRequest: EditMyVehicleRequest) => {
-    return axiosInstance<null>({
-      url: `/vehicles/my/edit/${id}`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: editMyVehicleRequest,
-    })
-  }
-  return { postVehiclesMy, getVehiclesMy, deleteVehiclesMyId, getVehiclesMyId, putVehiclesMyEditId }
-}
-export type PostVehiclesMyResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['postVehiclesMy']>>>
-export type GetVehiclesMyResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['getVehiclesMy']>>>
-export type DeleteVehiclesMyIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['deleteVehiclesMyId']>>>
-export type GetVehiclesMyIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['getVehiclesMyId']>>>
-export type PutVehiclesMyEditIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['putVehiclesMyEditId']>>>
+
+
+  export const getVehicles = () => {
+const postApiVehiclesMy = (
+    createMyVehicleCommand: CreateMyVehicleCommand,
+ ) => {
+      return axiosInstance<VehicleDto>(
+      {url: `/api/vehicles/my`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createMyVehicleCommand
+    },
+      );
+    }
+  const getApiVehiclesMy = (
+    params?: GetApiVehiclesMyParams,
+ ) => {
+      return axiosInstance<PagedListOfVehicleDto>(
+      {url: `/api/vehicles/my`, method: 'GET',
+        params
+    },
+      );
+    }
+  const deleteApiVehiclesMyId = (
+    id: string,
+ ) => {
+      return axiosInstance<null>(
+      {url: `/api/vehicles/my/${id}`, method: 'DELETE'
+    },
+      );
+    }
+  const getApiVehiclesMyId = (
+    id: string,
+ ) => {
+      return axiosInstance<VehicleDto>(
+      {url: `/api/vehicles/my/${id}`, method: 'GET'
+    },
+      );
+    }
+  const putApiVehiclesMyEditId = (
+    id: string,
+    editMyVehicleRequest: EditMyVehicleRequest,
+ ) => {
+      return axiosInstance<null>(
+      {url: `/api/vehicles/my/edit/${id}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: editMyVehicleRequest
+    },
+      );
+    }
+  return {postApiVehiclesMy,getApiVehiclesMy,deleteApiVehiclesMyId,getApiVehiclesMyId,putApiVehiclesMyEditId}};
+export type PostApiVehiclesMyResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['postApiVehiclesMy']>>>
+export type GetApiVehiclesMyResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['getApiVehiclesMy']>>>
+export type DeleteApiVehiclesMyIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['deleteApiVehiclesMyId']>>>
+export type GetApiVehiclesMyIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['getApiVehiclesMyId']>>>
+export type PutApiVehiclesMyEditIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['putApiVehiclesMyEditId']>>>
