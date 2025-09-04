@@ -5,7 +5,7 @@ import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import type { VehicleDto } from '@/api/generated'
 
 const route = useRoute()
-const { getVehiclesMyId } = getVehicles()
+const { getApiVehiclesMyId } = getVehicles()
 
 // Vehicle data
 const vehicleId = computed(() => route.params.id as string)
@@ -24,7 +24,7 @@ async function loadVehicle() {
   try {
     loading.value = true
     error.value = null
-    const response = await getVehiclesMyId(vehicleId.value)
+    const response = await getApiVehiclesMyId(vehicleId.value)
     selectedVehicle.value = response.data
   } catch (err) {
     console.error('Failed to load vehicle:', err)

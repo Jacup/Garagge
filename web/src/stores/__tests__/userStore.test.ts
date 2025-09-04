@@ -15,7 +15,7 @@ Object.defineProperty(window, 'localStorage', {
 
 vi.mock('@/api/generated/users/users', () => ({
   getUsers: vi.fn(() => ({
-    getUsersMe: vi.fn(),
+    getApiUsersMe: vi.fn(),
   })),
 }))
 
@@ -132,11 +132,11 @@ describe('useUserStore', () => {
   })
 
   it('initializeStore clears token on API error', async () => {
-    const mockGetUsersMe = vi.fn().mockRejectedValue(new Error('Unauthorized'))
+    const mockGetApiUsersMe = vi.fn().mockRejectedValue(new Error('Unauthorized'))
 
     const { getUsers } = await import('@/api/generated/users/users')
     ;(getUsers as ReturnType<typeof vi.fn>).mockReturnValue({
-      getUsersMe: mockGetUsersMe,
+      getApiUsersMe: mockGetApiUsersMe,
     })
 
     localStorageMock.getItem.mockImplementation((key: string) => {

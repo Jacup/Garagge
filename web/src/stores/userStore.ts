@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import type { UserDto } from '@/api/apiV1.schemas'
 import { getUsers } from '@/api/generated/users/users'
 
-const { getUsersMe } = getUsers()
+const { getApiUsersMe } = getUsers()
 
 type StoredUser = {
   userId: string
@@ -51,7 +51,7 @@ export const useUserStore = defineStore('user', {
       if (!this.accessToken) this.accessToken = token
 
       try {
-        const res = await getUsersMe()
+        const res = await getApiUsersMe()
         if (res.data) {
           this.setProfile(res.data)
         }
