@@ -17,6 +17,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     
     public DbSet<Vehicle> Vehicles { get; set; }
     
+    public DbSet<EnergyEntry> EnergyEntries { get; set; }
     public DbSet<FuelEntry> FuelEntries { get; set; }
     public DbSet<ChargingEntry> ChargingEntries { get; set; }
 

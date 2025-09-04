@@ -10,6 +10,7 @@ public interface IApplicationDbContext
     DbSet<User> Users { get; }
     
     DbSet<Vehicle> Vehicles { get; }
+    DbSet<EnergyEntry> EnergyEntries { get; }
     DbSet<FuelEntry> FuelEntries { get; }
     DbSet<ChargingEntry> ChargingEntries { get; }
     
