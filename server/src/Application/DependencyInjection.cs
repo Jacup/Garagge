@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Behaviors;
 using Application.Core;
+using Application.Services;
 using FluentValidation;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,8 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddSingleton<IResultFactory, ResultFactory>();
+        
+        services.AddScoped<IVehicleEnergyValidator, VehicleEnergyValidator>();
 
         services.AddMediatR(config =>
         {
