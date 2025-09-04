@@ -16,6 +16,6 @@ public sealed class Vehicle : Entity
     
     public required Guid UserId { get; set; }
     public User? User { get; set; }
-    
-    public ICollection<EnergyEntry> EnergyEntries { get; set; } = new List<EnergyEntry>();
+
+    public ICollection<EnergyEntry> EnergyEntries { get; set; } = [];
 }

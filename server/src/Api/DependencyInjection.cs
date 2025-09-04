@@ -8,8 +8,6 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        // services.AddSwaggerGen();
-
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
@@ -21,6 +19,7 @@ public static class DependencyInjection
     {
         if (EnvironmentExtensions.IsDevelopment())
             return services.AddCorsConfiguration(configuration);
+
         return services;
     }
 }

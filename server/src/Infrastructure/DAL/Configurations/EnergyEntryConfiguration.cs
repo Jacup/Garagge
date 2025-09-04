@@ -10,7 +10,6 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
     {
         builder.HasKey(e => e.Id);
 
-        // Common properties from EnergyEntry base class
         builder.Property(e => e.Date)
             .IsRequired();
 
@@ -24,7 +23,6 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
         builder.Property(e => e.VehicleId)
             .IsRequired();
         
-        // Configure Table Per Type (TPT) inheritance
         builder.UseTptMappingStrategy();
     }
 }
