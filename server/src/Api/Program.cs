@@ -42,16 +42,18 @@ app.Configuration.ValidateJwtSecret(app.Environment, logger);
 if (EnvironmentExtensions.IsDevelopment())
     app.UseCorsConfiguration();
 
+// Configure OpenAPI/Scalar BEFORE mapping API endpoints
+if (app.Environment.IsDevelopment())
+{
+    app.UseOpenApi(useSwaggerWithOpenApi: false);
+}
+
 // Map all API endpoints under /api prefix
 var apiGroup = app.MapGroup("/api");
 
 app.MapEndpoints(apiGroup);
 app.MapHealthChecks("health", new HealthCheckOptions { ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseOpenApi(useSwaggerWithOpenApi: false);
-}
 
 app.ApplyMigrations();
 await app.SeedDatabaseAsync();
@@ -74,7 +76,7 @@ if (app.Environment.IsProduction())
     {
         await next();
         var path = context.Request.Path.Value ?? string.Empty;
-        if (context.Response.StatusCode == 404 && !path.StartsWith("/api") && !path.StartsWith("/scalar") && !path.StartsWith("/openapi"))
+        if (context.Response.StatusCode == 404 && !path.StartsWith("/api"))
         {
             context.Response.StatusCode = 200;
             await context.Response.SendFileAsync(Path.Combine(app.Environment.WebRootPath, "index.html"));

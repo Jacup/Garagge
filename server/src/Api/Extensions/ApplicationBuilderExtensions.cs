@@ -14,17 +14,18 @@ public static class ApplicationBuilderExtensions
 
     public static IApplicationBuilder UseOpenApi(this WebApplication app, bool useSwaggerWithOpenApi)
     {
-        app.MapOpenApi();
-        app.MapScalarApiReference(options =>
+        app.MapOpenApi("/api/openapi/{documentName}.json");
+        app.MapScalarApiReference("/api/scalar", options =>
         {
             options
                 .WithTheme(ScalarTheme.Kepler)
-                .WithDarkModeToggle(true)
-                .WithClientButton(true);
+                .WithDarkModeToggle()
+                .WithClientButton()
+                .WithOpenApiRoutePattern("/api/openapi/{documentName}.json");
         });
         
         if (useSwaggerWithOpenApi)
-            app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "v1 API"));
+            app.UseSwaggerUI(options => options.SwaggerEndpoint("/api/openapi/v1.json", "v1 API"));
 
         return app;
     }
