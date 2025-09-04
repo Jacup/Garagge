@@ -274,8 +274,8 @@ public class CreateChargingEntryCommandValidatorTests
             -1,
             -1,
             -1,
-            EnergyUnit.kWh,
             -1,
+            EnergyUnit.kWh,
             -1);
 
         // Act
@@ -299,8 +299,8 @@ public class CreateChargingEntryCommandValidatorTests
             50000,
             85.30m,
             42.5m,
-            EnergyUnit.kWh,
             2.01m,
+            EnergyUnit.kWh,
             90);
     }
 }

@@ -169,8 +169,8 @@ public class CreateChargingEntryCommandHandlerTests : InMemoryDbTestBase
             50000,
             85.30m,
             42.5m,
-            EnergyUnit.kWh,
             2.01m,
+            EnergyUnit.kWh,
             90);
     }
 

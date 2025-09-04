@@ -35,7 +35,7 @@ public class CreateFuelEntry : IEndpoint
                     CustomResults.Problem
                 );
             })
-            .Produces<VehicleDto>(StatusCodes.Status201Created)
+            .Produces<FuelEntryDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)

@@ -9,7 +9,7 @@ public sealed record CreateChargingEntryCommand(
     DateOnly Date,
     int Mileage,
     decimal Cost,
+    decimal PricePerUnit,
     decimal EnergyAmount,
     EnergyUnit Unit,
-    decimal PricePerUnit,
     int? ChargingDurationMinutes) : ICommand<ChargingEntryDto>;
