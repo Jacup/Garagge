@@ -1,3 +1,4 @@
+using Domain.Entities;
 using Domain.Entities.Vehicles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -19,15 +20,18 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
             .HasMaxLength(64);
 
         builder.Property(v => v.PowerType)
-            .IsRequired();
-        
+            .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(v => v.Type)
+            .HasConversion<int?>();
+
         builder.Property(v => v.VIN)
             .HasMaxLength(17);
 
-        builder
-            .HasMany(v => v.EnergyEntries)
-            .WithOne(e => e.Vehicle)
-            .HasForeignKey(e => e.VehicleId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(v => v.User)
+             .WithMany(u => u.Vehicles)
+             .HasForeignKey(v => v.UserId)
+             .OnDelete(DeleteBehavior.Cascade);
     }
 }

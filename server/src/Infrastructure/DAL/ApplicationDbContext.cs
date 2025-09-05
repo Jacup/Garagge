@@ -16,10 +16,8 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<User> Users { get; set; }
     
     public DbSet<Vehicle> Vehicles { get; set; }
-    
     public DbSet<EnergyEntry> EnergyEntries { get; set; }
-    public DbSet<FuelEntry> FuelEntries { get; set; }
-    public DbSet<ChargingEntry> ChargingEntries { get; set; }
+    public DbSet<VehicleEnergyType> VehicleEnergyTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
