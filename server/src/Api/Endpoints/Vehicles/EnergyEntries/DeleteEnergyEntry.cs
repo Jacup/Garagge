@@ -27,6 +27,6 @@ public class DeleteEnergyEntry : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.EnergyEntries);
     }
 }

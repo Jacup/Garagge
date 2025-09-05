@@ -40,7 +40,7 @@ public class CreateEnergyEntry : IEndpoint
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.EnergyEntries);
     }
 }
 

@@ -2,18 +2,20 @@
 
 namespace Application.EnergyEntries.GetEnergyEntriesByUser;
 
-internal sealed class GetEnergyEntryByUserQueryValidator : AbstractValidator<GetEnergyEntriesByUserQuery>
+internal sealed class GetEnergyEntriesByUserQueryValidator : AbstractValidator<GetEnergyEntriesByUserQuery>
 {
-    public GetEnergyEntryByUserQueryValidator()
+    public GetEnergyEntriesByUserQueryValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User ID is required.");
 
         RuleFor(x => x.Page)
-            .Must(BeValidPage)
+            .GreaterThan(0)
             .WithMessage("Page must be greater than 0.");
 
         RuleFor(x => x.PageSize)
-            .Must(BeValidPageSize)
+            .InclusiveBetween(1, 100)
             .WithMessage("Page size must be between 1 and 100.");
 
         RuleFor(x => x.EnergyType)
@@ -21,8 +23,4 @@ internal sealed class GetEnergyEntryByUserQueryValidator : AbstractValidator<Get
             .When(x => x.EnergyType.HasValue)
             .WithMessage("Invalid energy type.");
     }
-
-    private static bool BeValidPage(int page) => page > 0;
-
-    private static bool BeValidPageSize(int pageSize) => pageSize is > 0 and <= 100;
 }

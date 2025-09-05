@@ -2,6 +2,7 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Application.Core;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
@@ -10,7 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.EnergyEntries.CreateEnergyEntry;
 
-public class CreateEnergyEntryCommandHandler(IApplicationDbContext dbContext, IUserContext userContext)
+public class CreateEnergyEntryCommandHandler(
+    IApplicationDbContext dbContext, 
+    IUserContext userContext,
+    IVehicleEnergyCompatibilityService energyCompatibilityService)
     : ICommandHandler<CreateEnergyEntryCommand, EnergyEntryDto>
 {
     public async Task<Result<EnergyEntryDto>> Handle(CreateEnergyEntryCommand request, CancellationToken cancellationToken)
@@ -18,7 +22,6 @@ public class CreateEnergyEntryCommandHandler(IApplicationDbContext dbContext, IU
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
             .Where(v => v.Id == request.VehicleId)
-            .Include(v => v.VehicleEnergyTypes)
             .FirstOrDefaultAsync(cancellationToken);
         
         if (vehicle is null)
@@ -27,10 +30,9 @@ public class CreateEnergyEntryCommandHandler(IApplicationDbContext dbContext, IU
         if (userContext.UserId != vehicle.UserId)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
 
+        var isCompatible = await energyCompatibilityService.IsEnergyTypeCompatibleAsync(request.VehicleId, request.Type, cancellationToken);
 
-        var allowedEnergyTypes = vehicle.VehicleEnergyTypes.Select(vet => vet.EnergyType);
-
-        if (!allowedEnergyTypes.Contains(request.Type))
+        if (!isCompatible)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(request.VehicleId, request.Type));
 
         var lastEntry = await dbContext.EnergyEntries
@@ -40,7 +42,6 @@ public class CreateEnergyEntryCommandHandler(IApplicationDbContext dbContext, IU
 
         if (lastEntry != null && request.Mileage < lastEntry.Mileage)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncorrectMileage);
-
 
         var energyEntry = new EnergyEntry
         {

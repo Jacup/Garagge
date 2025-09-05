@@ -1,5 +1,4 @@
-﻿using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
+﻿using Application.Abstractions.Services;
 using Application.Core;
 using Application.EnergyEntries;
 using Application.EnergyEntries.CreateEnergyEntry;
@@ -7,17 +6,24 @@ using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
-using Shouldly;
+using Moq;
 
 namespace ApplicationTests.EnergyEntries.CreateEnergyEntry;
 
 public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly CreateEnergyEntryCommandHandler _handler;
+    private readonly Mock<IVehicleEnergyCompatibilityService> _energyCompatibilityServiceMock;
 
     public CreateEnergyEntryCommandHandlerTests()
     {
-        _handler = new CreateEnergyEntryCommandHandler(Context, UserContextMock.Object);
+        _energyCompatibilityServiceMock = new Mock<IVehicleEnergyCompatibilityService>();
+        _handler = new CreateEnergyEntryCommandHandler(Context, UserContextMock.Object, _energyCompatibilityServiceMock.Object);
+
+        // Setup default behavior for energy compatibility service
+        _energyCompatibilityServiceMock
+            .Setup(x => x.IsEnergyTypeCompatibleAsync(It.IsAny<Guid>(), It.IsAny<EnergyType>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
     }
 
     [Fact]
@@ -91,6 +97,11 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline); // Vehicle supports only Gasoline
         var command = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Electric }; // Try to add Electricity
 
+        // Setup mock to return false for incompatible energy type
+        _energyCompatibilityServiceMock
+            .Setup(x => x.IsEnergyTypeCompatibleAsync(vehicle.Id, EnergyType.Electric, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -105,7 +116,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        
+
         // Add existing entry with higher mileage
         var existingEntry = new EnergyEntry
         {
@@ -136,7 +147,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        
+
         // Add existing entry
         var existingEntry = new EnergyEntry
         {
@@ -167,7 +178,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        
+
         // Add existing entry
         var existingEntry = new EnergyEntry
         {
@@ -214,7 +225,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, LoggedUserId, new[] { EnergyType.Gasoline, EnergyType.Electric });
-        
+
         // Test Gasoline
         var gasolineCommand = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Gasoline, Mileage = 1000 };
         var gasolineResult = await _handler.Handle(gasolineCommand, CancellationToken.None);
@@ -262,12 +273,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var energyTypesToAdd = supportedEnergyTypes ?? new[] { energyType };
         foreach (var type in energyTypesToAdd)
         {
-            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
-            {
-                Id = Guid.NewGuid(),
-                VehicleId = vehicle.Id,
-                EnergyType = type
-            });
+            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = type });
         }
 
         Context.Vehicles.Add(vehicle);

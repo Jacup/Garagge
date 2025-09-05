@@ -3,28 +3,33 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
+using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.EnergyEntries.GetEnergyEntriesByUser;
+namespace Application.EnergyEntries.GetEnergyEntriesByVehicle;
 
-internal sealed class GetEnergyEntriesByUserQueryHandler(
+internal sealed class GetEnergyEntriesByVehicleQueryHandler(
     IApplicationDbContext dbContext, 
     IUserContext userContext,
     IEnergyEntryFilterService filterService)
-    : IQueryHandler<GetEnergyEntriesByUserQuery, PagedList<EnergyEntryDto>>
+    : IQueryHandler<GetEnergyEntriesByVehicleQuery, PagedList<EnergyEntryDto>>
 {
-    public async Task<Result<PagedList<EnergyEntryDto>>> Handle(GetEnergyEntriesByUserQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedList<EnergyEntryDto>>> Handle(GetEnergyEntriesByVehicleQuery request, CancellationToken cancellationToken)
     {
-        if (userContext.UserId != request.UserId)
+        var vehicle = await dbContext.Vehicles
+            .AsNoTracking()
+            .Where(v => v.Id == request.VehicleId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (vehicle is null)
+            return Result.Failure<PagedList<EnergyEntryDto>>(VehicleErrors.NotFound(request.VehicleId));
+
+        if (vehicle.UserId != userContext.UserId)
             return Result.Failure<PagedList<EnergyEntryDto>>(EnergyEntryErrors.Unauthorized);
 
-        var entriesQuery = dbContext.EnergyEntries
-            .AsNoTracking()
-            .Include(ee => ee.Vehicle) // Add Include to load Vehicle navigation property
-            .AsQueryable(); // Cast back to IQueryable to work with filter service
+        var entriesQuery = dbContext.EnergyEntries.AsNoTracking();
 
-        // Apply filters using the dedicated service
-        entriesQuery = filterService.ApplyUserFilter(entriesQuery, request.UserId);
+        entriesQuery = filterService.ApplyVehicleFilter(entriesQuery, request.VehicleId);
         entriesQuery = filterService.ApplyEnergyTypeFilter(entriesQuery, request.EnergyType);
         entriesQuery = filterService.ApplyDefaultSorting(entriesQuery);
 
@@ -42,7 +47,6 @@ internal sealed class GetEnergyEntriesByUserQueryHandler(
                 ee.Cost,
                 ee.PricePerUnit
             ));
-
 
         var energyEntriesDto = await PagedList<EnergyEntryDto>.CreateAsync(
             energyEntriesDtoQuery,
