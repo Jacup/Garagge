@@ -8,7 +8,7 @@ public static class VehicleFactory
     public static Vehicle Create(
         string brand,
         string model,
-        PowerType powerType,
+        EngineType powerType,
         int? manufacturedYear,
         Guid userId)
     {
@@ -37,7 +37,7 @@ public static class VehicleFactory
         Id = AudiId,
         Brand = "Audi",
         Model = "A4",
-        PowerType = PowerType.Gasoline,
+        PowerType = EngineType.Fuel,
         ManufacturedYear = 2010,
         UserId = AudiUserId,
     };
@@ -47,7 +47,7 @@ public static class VehicleFactory
         Id = Guid.NewGuid(),
         Brand = "BMW",
         Model = "3 Series",
-        PowerType = PowerType.Diesel,
+        PowerType = EngineType.Electric,
         ManufacturedYear = 2010,
         UserId = Guid.NewGuid(),
     };

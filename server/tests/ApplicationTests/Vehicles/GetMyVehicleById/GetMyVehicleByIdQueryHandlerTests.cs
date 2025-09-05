@@ -44,7 +44,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            PowerType = EngineType.Fuel,
             UserId = otherUserId
         };
         
@@ -71,7 +71,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            PowerType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = LoggedUserId
         };
@@ -97,7 +97,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            PowerType = EngineType.Fuel,
             UserId = LoggedUserId
         };
         
@@ -114,7 +114,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldBeOfType<VehicleDto>();
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
-        result.Value.PowerType.ShouldBe(PowerType.Gasoline);
+        result.Value.PowerType.ShouldBe(EngineType.Fuel);
         result.Value.UserId.ShouldBe(LoggedUserId);
     }
 
@@ -126,7 +126,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "BMW",
             Model = "X5",
-            PowerType = PowerType.Hybrid,
+            PowerType = EngineType.Hybrid,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
@@ -145,7 +145,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("BMW");
         result.Value.Model.ShouldBe("X5");
-        result.Value.PowerType.ShouldBe(PowerType.Hybrid);
+        result.Value.PowerType.ShouldBe(EngineType.Hybrid);
         result.Value.ManufacturedYear.ShouldBe(2020);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
@@ -160,7 +160,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Tesla",
             Model = "Model 3",
-            PowerType = PowerType.Electric,
+            PowerType = EngineType.Electric,
             ManufacturedYear = null,
             Type = null,
             VIN = null,
@@ -179,7 +179,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("Tesla");
         result.Value.Model.ShouldBe("Model 3");
-        result.Value.PowerType.ShouldBe(PowerType.Electric);
+        result.Value.PowerType.ShouldBe(EngineType.Electric);
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();

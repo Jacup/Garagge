@@ -12,7 +12,7 @@ public class VehicleDtoTests
         var userId = Guid.NewGuid();
         var brand = "Audi";
         var model = "A4";
-        var powerType = PowerType.Gasoline;
+        var powerType = EngineType.Fuel;
         
         var manufacturedYear = 2010;
         var type = VehicleType.Car;
@@ -53,7 +53,7 @@ public class VehicleDtoTests
         var id = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var brand = "Audi";
-        var powerType = PowerType.Gasoline;
+        var powerType = EngineType.Fuel;
         var model = "A4";
         var createdDate = DateTime.UtcNow;
         var updatedDate = DateTime.UtcNow;

@@ -8,7 +8,8 @@ public sealed class Vehicle : Entity
 {
     public required string Brand { get; set; }
     public required string Model { get; set; }
-    public required PowerType PowerType { get; set; }
+    public required EngineType PowerType { get; set; }
+
     public int? ManufacturedYear { get; set; }
     public VehicleType? Type { get; set; }
     public string? VIN { get; set; }

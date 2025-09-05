@@ -17,13 +17,13 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_ValidFuelEntryDeletion_ReturnsSuccess()
+    public async Task Handle_ValidEnergyEntryDeletion_ReturnsSuccess()
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(PowerType.Gasoline);
-        var fuelEntry = await CreateFuelEntryInDb(vehicle.Id);
-        var command = new DeleteEnergyEntryCommand(fuelEntry.Id, vehicle.Id);
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
+        var energyEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline);
+        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -31,71 +31,16 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
         
-        var deletedEntry = Context.EnergyEntries.FirstOrDefault(fe => fe.Id == fuelEntry.Id);
+        var deletedEntry = Context.EnergyEntries.FirstOrDefault(ee => ee.Id == energyEntry.Id);
         deletedEntry.ShouldBeNull();
     }
 
     [Fact]
-    public async Task Handle_ValidChargingEntryDeletion_ReturnsSuccess()
+    public async Task Handle_EnergyEntryNotFound_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(PowerType.Electric);
-        var chargingEntry = await CreateChargingEntryInDb(vehicle.Id);
-        var command = new DeleteEnergyEntryCommand(chargingEntry.Id, vehicle.Id);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        
-        var deletedEntry = Context.EnergyEntries.FirstOrDefault(ce => ce.Id == chargingEntry.Id);
-        deletedEntry.ShouldBeNull();
-    }
-
-    [Fact]
-    public async Task Handle_UnauthorizedUser_ReturnsUnauthorizedError()
-    {
-        // Arrange
-        UserContextMock.Setup(x => x.UserId).Returns(Guid.Empty);
-        var command = new DeleteEnergyEntryCommand(Guid.NewGuid(), Guid.NewGuid());
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
-    }
-
-    [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsVehicleNotFoundError()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var otherUserId = Guid.NewGuid();
-        var vehicle = await CreateVehicleInDb(PowerType.Gasoline, otherUserId);
-        var fuelEntry = await CreateFuelEntryInDb(vehicle.Id);
-        var command = new DeleteEnergyEntryCommand(fuelEntry.Id, vehicle.Id);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(vehicle.Id));
-        
-        var existingEntry = Context.EnergyEntries.FirstOrDefault(fe => fe.Id == fuelEntry.Id);
-        existingEntry.ShouldNotBeNull();
-    }
-
-    [Fact]
-    public async Task Handle_EnergyEntryNotFound_ReturnsNotFoundError()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(PowerType.Gasoline);
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
         var nonExistentEntryId = Guid.NewGuid();
         var command = new DeleteEnergyEntryCommand(nonExistentEntryId, vehicle.Id);
 
@@ -108,37 +53,99 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_EnergyEntryBelongsToDifferentVehicle_ReturnsNotFoundError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle1 = await CreateVehicleInDb(PowerType.Gasoline);
-        var vehicle2 = await CreateVehicleInDb(PowerType.Electric);
-        var fuelEntry = await CreateFuelEntryInDb(vehicle1.Id);
-        
-        // Try to delete fuel entry using vehicle2's ID
-        var command = new DeleteEnergyEntryCommand(fuelEntry.Id, vehicle2.Id);
+        var otherUserId = Guid.NewGuid();
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, otherUserId);
+        var energyEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline);
+        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(fuelEntry.Id));
-        
-        var existingEntry = Context.EnergyEntries.FirstOrDefault(fe => fe.Id == fuelEntry.Id);
-        existingEntry.ShouldNotBeNull();
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound(vehicle.Id));
     }
 
-    private async Task<Vehicle> CreateVehicleInDb(PowerType powerType, Guid? userId = null)
+    [Fact]
+    public async Task Handle_EnergyEntryBelongsToDifferentVehicle_ReturnsFailureWithNotFoundError()
     {
+        // Arrange
+        SetupAuthorizedUser();
+        var vehicle1 = await CreateVehicleInDb(EnergyType.Gasoline);
+        var vehicle2 = await CreateVehicleInDb(EnergyType.Gasoline);
+        var energyEntry = await CreateEnergyEntryInDb(vehicle1.Id, EnergyType.Gasoline);
+        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle2.Id); // Wrong vehicle ID
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound(energyEntry.Id));
+    }
+
+    [Fact]
+    public async Task Handle_UnauthorizedUser_ReturnsFailureWithUnauthorizedError()
+    {
+        // Arrange
+        UserContextMock.Setup(x => x.UserId).Returns(Guid.Empty); // Unauthorized user
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
+        var energyEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline);
+        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle.Id);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Handle_ElectricEnergyEntryDeletion_ReturnsSuccess()
+    {
+        // Arrange
+        SetupAuthorizedUser();
+        var vehicle = await CreateVehicleInDb(EnergyType.Electric);
+        var energyEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Electric);
+        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle.Id);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        var deletedEntry = Context.EnergyEntries.FirstOrDefault(ee => ee.Id == energyEntry.Id);
+        deletedEntry.ShouldBeNull();
+    }
+
+    private async Task<Vehicle> CreateVehicleInDb(EnergyType energyType, Guid? userId = null)
+    {
+        var vehicleId = Guid.NewGuid();
+        
         var vehicle = new Vehicle
         {
-            Id = Guid.NewGuid(),
-            Brand = "TestBrand",
-            Model = "TestModel",
-            PowerType = powerType,
-            UserId = userId ?? LoggedUserId
+            Id = vehicleId,
+            Brand = "Toyota",
+            Model = "Corolla",
+            PowerType = EngineType.Fuel,
+            ManufacturedYear = 2020,
+            Type = VehicleType.Car,
+            UserId = userId ?? LoggedUserId,
+            VehicleEnergyTypes = new List<VehicleEnergyType>
+            {
+                new VehicleEnergyType
+                {
+                    Id = Guid.NewGuid(),
+                    VehicleId = vehicleId,
+                    EnergyType = energyType
+                }
+            }
         };
 
         Context.Vehicles.Add(vehicle);
@@ -146,42 +153,23 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         return vehicle;
     }
 
-    private async Task<FuelEntry> CreateFuelEntryInDb(Guid vehicleId)
+    private async Task<EnergyEntry> CreateEnergyEntryInDb(Guid vehicleId, EnergyType energyType)
     {
-        var fuelEntry = new FuelEntry
+        var energyEntry = new EnergyEntry
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            Mileage = 10000,
-            Cost = 50.00m,
-            Volume = 40.50m,
-            Unit = VolumeUnit.Liters,
-            PricePerUnit = 1.25m
+            Date = new DateOnly(2023, 10, 14),
+            Mileage = 1000,
+            Type = energyType,
+            EnergyUnit = energyType == EnergyType.Electric ? EnergyUnit.kWh : EnergyUnit.Liter,
+            Volume = 50m,
+            Cost = 100m,
+            PricePerUnit = 2m
         };
 
-        Context.EnergyEntries.Add(fuelEntry);
+        Context.EnergyEntries.Add(energyEntry);
         await Context.SaveChangesAsync();
-        return fuelEntry;
-    }
-
-    private async Task<ChargingEntry> CreateChargingEntryInDb(Guid vehicleId)
-    {
-        var chargingEntry = new ChargingEntry
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            Date = DateOnly.FromDateTime(DateTime.UtcNow),
-            Mileage = 50000,
-            Cost = 85.30m,
-            EnergyAmount = 42.5m,
-            Unit = EnergyUnit.kWh,
-            PricePerUnit = 2.01m,
-            ChargingDurationMinutes = 90
-        };
-
-        Context.EnergyEntries.Add(chargingEntry);
-        await Context.SaveChangesAsync();
-        return chargingEntry;
+        return energyEntry;
     }
 }

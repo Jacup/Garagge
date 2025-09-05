@@ -3,121 +3,176 @@ using Domain.Enums;
 
 namespace DomainTests.EnergyEntries;
 
-public class ChargingEntryTests
+public class ChargingEnergyEntryTests
 {
     private readonly DateOnly _date = new(2024, 1, 15);
     private const int Mileage = 50000;
     private const decimal Cost = 85.30m;
     private readonly Guid _vehicleId = Guid.NewGuid();
-    private const decimal EnergyAmount = 42.5m;
+    private const decimal Volume = 42.5m;
     private const EnergyUnit Unit = EnergyUnit.kWh;
+    private const EnergyType Type = EnergyType.Electric;
     private const decimal PricePerUnit = 2.01m;
-    private const int ChargingDurationMinutes = 90;
 
     [Fact]
-    public void Constructor_ValidProperties_CreatesEntityWithCorrectData()
+    public void Constructor_ValidElectricEnergyEntry_CreatesEntityWithCorrectData()
     {
-        var chargingEntry = new ChargingEntry
+        var energyEntry = new EnergyEntry
         {
             Date = _date,
             Mileage = Mileage,
             Cost = Cost,
             VehicleId = _vehicleId,
-            EnergyAmount = EnergyAmount,
-            Unit = Unit,
-            PricePerUnit = PricePerUnit,
-            ChargingDurationMinutes = ChargingDurationMinutes
+            Volume = Volume,
+            EnergyUnit = Unit,
+            Type = Type,
+            PricePerUnit = PricePerUnit
         };
 
-        chargingEntry.Date.ShouldBe(_date);
-        chargingEntry.Mileage.ShouldBe(Mileage);
-        chargingEntry.Cost.ShouldBe(Cost);
-        chargingEntry.VehicleId.ShouldBe(_vehicleId);
-        chargingEntry.EnergyAmount.ShouldBe(EnergyAmount);
-        chargingEntry.Unit.ShouldBe(Unit);
-        chargingEntry.PricePerUnit.ShouldBe(PricePerUnit);
-        chargingEntry.ChargingDurationMinutes.ShouldBe(ChargingDurationMinutes);
+        energyEntry.Date.ShouldBe(_date);
+        energyEntry.Mileage.ShouldBe(Mileage);
+        energyEntry.Cost.ShouldBe(Cost);
+        energyEntry.VehicleId.ShouldBe(_vehicleId);
+        energyEntry.Volume.ShouldBe(Volume);
+        energyEntry.EnergyUnit.ShouldBe(Unit);
+        energyEntry.Type.ShouldBe(Type);
+        energyEntry.PricePerUnit.ShouldBe(PricePerUnit);
     }
 
     [Fact]
-    public void Constructor_ValidPropertiesAndNullChargingDuration_CreatesEntityWithCorrectData()
+    public void Constructor_ElectricEnergyWithoutOptionalFields_CreatesEntityWithCorrectData()
     {
-        var chargingEntry = new ChargingEntry
+        var energyEntry = new EnergyEntry
         {
             Date = _date,
             Mileage = Mileage,
-            Cost = Cost,
             VehicleId = _vehicleId,
-            EnergyAmount = EnergyAmount,
-            Unit = Unit,
-            PricePerUnit = PricePerUnit,
-            ChargingDurationMinutes = null
+            Volume = Volume,
+            EnergyUnit = Unit,
+            Type = Type
         };
 
-        chargingEntry.Date.ShouldBe(_date);
-        chargingEntry.Mileage.ShouldBe(Mileage);
-        chargingEntry.Cost.ShouldBe(Cost);
-        chargingEntry.VehicleId.ShouldBe(_vehicleId);
-        chargingEntry.EnergyAmount.ShouldBe(EnergyAmount);
-        chargingEntry.Unit.ShouldBe(Unit);
-        chargingEntry.PricePerUnit.ShouldBe(PricePerUnit);
-        chargingEntry.ChargingDurationMinutes.ShouldBeNull();
+        energyEntry.Date.ShouldBe(_date);
+        energyEntry.Mileage.ShouldBe(Mileage);
+        energyEntry.VehicleId.ShouldBe(_vehicleId);
+        energyEntry.Volume.ShouldBe(Volume);
+        energyEntry.EnergyUnit.ShouldBe(Unit);
+        energyEntry.Type.ShouldBe(Type);
+        energyEntry.Cost.ShouldBeNull();
+        energyEntry.PricePerUnit.ShouldBeNull();
     }
 
     [Fact]
-    public void Setters_PropertiesUpdated_UpdatesDataCorrectly()
+    public void EnergyUnit_ElectricType_DefaultsToKwh()
     {
-        var chargingEntry = new ChargingEntry
+        var energyEntry = new EnergyEntry
         {
             Date = _date,
             Mileage = Mileage,
-            Cost = Cost,
             VehicleId = _vehicleId,
-            EnergyAmount = EnergyAmount,
-            Unit = Unit,
-            PricePerUnit = PricePerUnit,
-            ChargingDurationMinutes = ChargingDurationMinutes
+            Volume = Volume,
+            EnergyUnit = EnergyUnit.kWh,
+            Type = EnergyType.Electric
         };
 
-        var newDate = new DateOnly(2024, 2, 20);
-        const int newMileage = 55000;
-        const decimal newCost = 95.75m;
-        var newVehicleId = Guid.NewGuid();
-        const decimal newEnergyAmount = 38.2m;
-        const decimal newPricePerUnit = 2.51m;
-        const int newChargingDurationMinutes = 75;
-
-        chargingEntry.Date = newDate;
-        chargingEntry.Mileage = newMileage;
-        chargingEntry.Cost = newCost;
-        chargingEntry.VehicleId = newVehicleId;
-        chargingEntry.EnergyAmount = newEnergyAmount;
-        chargingEntry.PricePerUnit = newPricePerUnit;
-        chargingEntry.ChargingDurationMinutes = newChargingDurationMinutes;
-
-        chargingEntry.Date.ShouldBe(newDate);
-        chargingEntry.Mileage.ShouldBe(newMileage);
-        chargingEntry.Cost.ShouldBe(newCost);
-        chargingEntry.VehicleId.ShouldBe(newVehicleId);
-        chargingEntry.EnergyAmount.ShouldBe(newEnergyAmount);
-        chargingEntry.PricePerUnit.ShouldBe(newPricePerUnit);
-        chargingEntry.ChargingDurationMinutes.ShouldBe(newChargingDurationMinutes);
+        energyEntry.EnergyUnit.ShouldBe(EnergyUnit.kWh);
+        energyEntry.Type.ShouldBe(EnergyType.Electric);
     }
 
     [Fact]
-    public void Unit_DefaultValue_SetsToKwh()
+    public void Type_ElectricType_IsPartOfAllChargingTypes()
     {
-        var chargingEntry = new ChargingEntry
+        var energyEntry = new EnergyEntry
         {
             Date = _date,
             Mileage = Mileage,
-            Cost = Cost,
             VehicleId = _vehicleId,
-            EnergyAmount = EnergyAmount,
-            PricePerUnit = PricePerUnit,
-            Unit = EnergyUnit.kWh
+            Volume = Volume,
+            EnergyUnit = Unit,
+            Type = EnergyType.Electric
         };
 
-        chargingEntry.Unit.ShouldBe(EnergyUnit.kWh);
+        (energyEntry.Type & EnergyType.AllCharging).ShouldNotBe(EnergyType.None);
+        energyEntry.Type.ShouldBe(EnergyType.Electric);
+    }
+
+    [Fact]
+    public void Type_ElectricType_IsNotPartOfFuelTypes()
+    {
+        var energyEntry = new EnergyEntry
+        {
+            Date = _date,
+            Mileage = Mileage,
+            VehicleId = _vehicleId,
+            Volume = Volume,
+            EnergyUnit = Unit,
+            Type = EnergyType.Electric
+        };
+
+        // Electric should not match any individual fuel types
+        (energyEntry.Type & EnergyType.Gasoline).ShouldBe(EnergyType.None);
+        (energyEntry.Type & EnergyType.Diesel).ShouldBe(EnergyType.None);
+        (energyEntry.Type & EnergyType.LPG).ShouldBe(EnergyType.None);
+    }
+
+    [Theory]
+    [InlineData(42.5, EnergyUnit.kWh)]
+    [InlineData(150.0, EnergyUnit.kWh)]
+    [InlineData(25.8, EnergyUnit.kWh)]
+    public void Volume_ElectricEnergyWithKwh_AcceptsValidValues(decimal volume, EnergyUnit unit)
+    {
+        var energyEntry = new EnergyEntry
+        {
+            Date = _date,
+            Mileage = Mileage,
+            VehicleId = _vehicleId,
+            Volume = volume,
+            EnergyUnit = unit,
+            Type = EnergyType.Electric
+        };
+
+        energyEntry.Volume.ShouldBe(volume);
+        energyEntry.EnergyUnit.ShouldBe(unit);
+    }
+
+    [Fact]
+    public void Vehicle_NavigationProperty_CanBeSetAndRetrieved()
+    {
+        var energyEntry = new EnergyEntry
+        {
+            Date = _date,
+            Mileage = Mileage,
+            VehicleId = _vehicleId,
+            Volume = Volume,
+            EnergyUnit = Unit,
+            Type = Type
+        };
+
+        energyEntry.Vehicle.ShouldBeNull(); // Navigation property starts as null
+        energyEntry.VehicleId.ShouldBe(_vehicleId);
+    }
+
+    [Fact]
+    public void Cost_CalculatedFromVolumeAndPrice_ReturnsCorrectValue()
+    {
+        const decimal volume = 50.0m;
+        const decimal pricePerUnit = 0.12m; // 12 cents per kWh
+        const decimal expectedCost = 6.0m; // 50 * 0.12
+
+        var energyEntry = new EnergyEntry
+        {
+            Date = _date,
+            Mileage = Mileage,
+            VehicleId = _vehicleId,
+            Volume = volume,
+            EnergyUnit = Unit,
+            Type = Type,
+            PricePerUnit = pricePerUnit,
+            Cost = expectedCost
+        };
+
+        energyEntry.Cost.ShouldBe(expectedCost);
+        energyEntry.PricePerUnit.ShouldBe(pricePerUnit);
+        energyEntry.Volume.ShouldBe(volume);
     }
 }

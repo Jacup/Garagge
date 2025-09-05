@@ -1,6 +1,6 @@
 namespace Domain.Enums;
 
-public enum PowerType
+public enum EngineType
 {
     Fuel = 1,
     Hybrid = 2,

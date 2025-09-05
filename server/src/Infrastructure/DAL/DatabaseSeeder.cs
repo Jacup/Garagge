@@ -30,9 +30,9 @@ public static class DatabaseSeeder
             new()
             {
                 Id = Guid.NewGuid(),
-                Email = "user@garagge.app",
-                FirstName = "Anna",
-                LastName = "Nowak",
+                Email = "john.doe@garagge.app",
+                FirstName = "John",
+                LastName = "Doe",
                 PasswordHash = passwordHasher.Hash("password123")
             }
         };
@@ -49,7 +49,7 @@ public static class DatabaseSeeder
                 Model = "Corolla",
                 ManufacturedYear = 2020,
                 UserId = users[0].Id,
-                PowerType = PowerType.Hybrid,
+                PowerType = EngineType.Hybrid,
             },
             new()
             {
@@ -58,16 +58,16 @@ public static class DatabaseSeeder
                 Model = "X5",
                 ManufacturedYear = 2021,
                 UserId = users[0].Id,
-                PowerType = PowerType.Gasoline,
+                PowerType = EngineType.Fuel,
             },
             new()
             {
                 Id = Guid.NewGuid(),
-                Brand = "Volkswagen",
-                Model = "e-Golf",
+                Brand = "Tesla",
+                Model = "Model 3",
                 ManufacturedYear = 2019,
                 UserId = users[0].Id,
-                PowerType = PowerType.Electric,
+                PowerType = EngineType.Electric,
             },
             new()
             {
@@ -76,7 +76,7 @@ public static class DatabaseSeeder
                 Model = "A4",
                 ManufacturedYear = 2022,
                 UserId = users[1].Id,
-                PowerType = PowerType.Gasoline,
+                PowerType = EngineType.Fuel,
             },
             new()
             {
@@ -85,94 +85,126 @@ public static class DatabaseSeeder
                 Model = "C-Class",
                 ManufacturedYear = 2021,
                 UserId = users[1].Id,
-                PowerType = PowerType.PlugInHybrid,
+                PowerType = EngineType.PlugInHybrid,
             }
         };
 
         await context.Vehicles.AddRangeAsync(vehicles);
         await context.SaveChangesAsync();
 
+        var vets = new List<VehicleEnergyType>
+        {
+            new()
+            {
+                VehicleId = vehicles[0].Id, // corolla - hybrid
+                EnergyType = EnergyType.Gasoline
+            },
+            new()
+            {
+                VehicleId = vehicles[2].Id, // Tesla 3 - electric
+                EnergyType = EnergyType.Electric
+            },
+            new()
+            {
+                VehicleId = vehicles[3].Id, // Audi - gasoline + lpg
+                EnergyType = EnergyType.Gasoline
+            },
+            new() { VehicleId = vehicles[3].Id, EnergyType = EnergyType.LPG },
+            new()
+            {
+                VehicleId = vehicles[4].Id, // Mercedes - plugin-hybrid
+                EnergyType = EnergyType.Gasoline
+            },
+            new() { VehicleId = vehicles[4].Id, EnergyType = EnergyType.Electric }
+        };
+
+        await context.VehicleEnergyTypes.AddRangeAsync(vets);
+        await context.SaveChangesAsync();
+        
         var energyEntries = new List<EnergyEntry>
         {
-            // Fuel Entries for the first vehicle (gasoline - fuel entries only)
-            new FuelEntry
+            // first vehicle (gasoline entries only)
+            new()
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[0].Id,
                 Date = new DateOnly(2023, 1, 15),
                 Mileage = 15000,
-                Cost = 50.75m,
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
                 Volume = 25.5m,
-                Unit = VolumeUnit.Liters,
+                Cost = 50.75m,
                 PricePerUnit = 5.50m
             },
-            new FuelEntry
+            new()
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[0].Id,
                 Date = new DateOnly(2023, 1, 20),
-                Mileage = 15000,
-                Cost = 50.75m,
-                Volume = 25.5m,
-                Unit = VolumeUnit.Liters,
-                PricePerUnit = 5.50m
+                Mileage = 15500,
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 25.0m,
             },
 
-            // Charging Entries for the second vehicle (hybrid - charging entries only)
-            new ChargingEntry
+            // Second vehicle (tesla - charging entries only)
+            new()
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[2].Id,
-                Date = new DateOnly(2023, 2, 20),
-                Mileage = 30000,
-                Cost = 80.00m,
-                EnergyAmount = 100.0m,
-                Unit = EnergyUnit.kWh,
-                PricePerUnit = 0.80m
+                Date = new DateOnly(2023, 1, 18),
+                Mileage = 10000,
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 80.0m,
+                Cost = 150.00m,
             },
-            new ChargingEntry
+            new()
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[2].Id,
-                Date = new DateOnly(2023, 2, 25),
-                Mileage = 35000,
-                Cost = 85.00m,
-                EnergyAmount = 80.0m,
-                Unit = EnergyUnit.kWh,
-                PricePerUnit = 0.70m
+                Date = new DateOnly(2023, 1, 21),
+                Mileage = 10500,
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 80.0m,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[2].Id,
+                Date = new DateOnly(2023, 1, 25),
+                Mileage = 11000,
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 80.0m,
             },
 
-            // Mixed Entries for the third vehicle (plugin-hybrid - both entries)
-            new ChargingEntry
+            // third vehicle (plugin-hybrid - gasoline and electric entries)
+            new()
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[4].Id,
-                Date = new DateOnly(2023, 2, 25),
-                Mileage = 35000,
+                Date = new DateOnly(2023, 1, 25),
+                Mileage = 11000,
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 80.0m,
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicles[4].Id,
+                Date = new DateOnly(2023, 1, 25),
+                Mileage = 11000,
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 30.0m,
                 Cost = 250.00m,
-                EnergyAmount = 80.0m,
-                Unit = EnergyUnit.kWh,
-                PricePerUnit = 0.60m
-            },
-            new FuelEntry
-            {
-                Id = Guid.NewGuid(),
-                VehicleId = vehicles[4].Id,
-                Date = new DateOnly(2023, 2, 25),
-                Mileage = 35000,
-                Cost = 60.50m,
-                Volume = 50m,
-                Unit = VolumeUnit.Liters,
-                PricePerUnit = 4.50m
             },
         };
 
-        IEnumerable<FuelEntry> fuelEntries = energyEntries.Where(e => e is FuelEntry).Cast<FuelEntry>();
-        await context.FuelEntries.AddRangeAsync(fuelEntries);
-
-        IEnumerable<ChargingEntry> chargingEntries = energyEntries.Where(e => e is ChargingEntry).Cast<ChargingEntry>();
-        await context.ChargingEntries.AddRangeAsync(chargingEntries);
-
+        await context.EnergyEntries.AddRangeAsync(energyEntries);
         await context.SaveChangesAsync();
     }
 }

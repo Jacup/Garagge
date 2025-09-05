@@ -25,7 +25,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenBrandIsEmpty_ShouldHaveError()
     {
-        var command = new CreateMyVehicleCommand(string.Empty, "A4", PowerType.Gasoline, 2010);
+        var command = new CreateMyVehicleCommand(string.Empty, "A4", EngineType.Fuel, 2010);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -33,7 +33,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenModelIsEmpty_ShouldHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", string.Empty, PowerType.Gasoline, 2010);
+        var command = new CreateMyVehicleCommand("Audi", string.Empty, EngineType.Fuel, 2010);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
     }
@@ -42,7 +42,7 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenBrandIsTooLong_ShouldHaveError()
     {
         var longBrand = new string('A', 65);
-        var command = new CreateMyVehicleCommand(longBrand, "A4", PowerType.Gasoline, 2010);
+        var command = new CreateMyVehicleCommand(longBrand, "A4", EngineType.Fuel, 2010);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -51,18 +51,17 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenModelIsTooLong_ShouldHaveError()
     {
         var longModel = new string('B', 65);
-        var command = new CreateMyVehicleCommand("Audi", longModel, PowerType.Gasoline, 2010);
+        var command = new CreateMyVehicleCommand("Audi", longModel, EngineType.Fuel, 2010);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
     }
 
     [Theory]
-    [InlineData(PowerType.Gasoline)]
-    [InlineData(PowerType.Diesel)]
-    [InlineData(PowerType.Hybrid)]
-    [InlineData(PowerType.PlugInHybrid)]
-    [InlineData(PowerType.Electric)]
-    public void Validate_WhenPowerTypeIsValid_ShouldNotHaveError(PowerType powerType)
+    [InlineData(EngineType.Fuel)]
+    [InlineData(EngineType.Hybrid)]
+    [InlineData(EngineType.PlugInHybrid)]
+    [InlineData(EngineType.Electric)]
+    public void Validate_WhenPowerTypeIsValid_ShouldNotHaveError(EngineType powerType)
     {
         var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010);
         var result = _validator.TestValidate(command);
@@ -73,7 +72,7 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenManufacturedYearIsInFuture_ShouldHaveError()
     {
         var futureYear = _dateTimeProvider.Object.UtcNow.AddYears(1).Year;
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, futureYear);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, futureYear);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
     }
@@ -81,7 +80,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenManufacturedYearIsTooOld_ShouldHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 1885);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 1885);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
     }
@@ -93,7 +92,7 @@ public class CreateMyVehicleCommandValidatorTests
     [InlineData(VehicleType.Truck)]
     public void Validate_WhenVehicleTypeIsValid_ShouldNotHaveError(VehicleType vehicleType)
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, vehicleType);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 2010, vehicleType);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.Type);
     }
@@ -102,7 +101,7 @@ public class CreateMyVehicleCommandValidatorTests
     public void Validate_WhenVINHasCorrectLength_ShouldNotHaveError()
     {
         var validVIN = "1HGBH41JXMN109186"; // 17 characters
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, validVIN);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 2010, null, validVIN);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.VIN);
     }
@@ -113,7 +112,7 @@ public class CreateMyVehicleCommandValidatorTests
     [InlineData("")] // empty
     public void Validate_WhenVINHasIncorrectLength_ShouldHaveError(string invalidVIN)
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, null, invalidVIN);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 2010, null, invalidVIN);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.VIN);
     }
@@ -121,7 +120,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenVINIsNull_ShouldNotHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 2010);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.VIN);
     }
@@ -129,7 +128,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenCommandIsValid_ShouldNotHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline, 2010, VehicleType.Car, "1HGBH41JXMN109186");
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel, 2010, VehicleType.Car, "1HGBH41JXMN109186");
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }
@@ -137,7 +136,7 @@ public class CreateMyVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenCommandIsValidWithMinimalData_ShouldNotHaveError()
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", PowerType.Gasoline);
+        var command = new CreateMyVehicleCommand("Audi", "A4", EngineType.Fuel);
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }

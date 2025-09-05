@@ -3,7 +3,7 @@ using Domain.Enums;
 
 namespace Domain.Entities.EnergyEntries;
 
-public abstract class EnergyEntry : Entity
+public class EnergyEntry : Entity
 {
     public required DateOnly Date { get; set; }
     public required int Mileage { get; set;  }
