@@ -18,7 +18,7 @@ public class MapsterMappingTests
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
@@ -35,7 +35,7 @@ public class MapsterMappingTests
         dto.Id.ShouldBe(vehicle.Id);
         dto.Brand.ShouldBe(vehicle.Brand);
         dto.Model.ShouldBe(vehicle.Model);
-        dto.PowerType.ShouldBe(vehicle.PowerType);
+        dto.PowerType.ShouldBe(vehicle.EngineType);
         dto.ManufacturedYear.ShouldBe(vehicle.ManufacturedYear);
         dto.Type.ShouldBe(vehicle.Type);
         dto.VIN.ShouldBe(vehicle.VIN);
@@ -53,7 +53,7 @@ public class MapsterMappingTests
             Id = Guid.NewGuid(),
             Brand = "BMW",
             Model = "X3",
-            PowerType = EngineType.Electric,
+            EngineType = EngineType.Electric,
             UserId = Guid.NewGuid(),
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = DateTime.UtcNow
@@ -67,7 +67,7 @@ public class MapsterMappingTests
         dto.Id.ShouldBe(vehicle.Id);
         dto.Brand.ShouldBe(vehicle.Brand);
         dto.Model.ShouldBe(vehicle.Model);
-        dto.PowerType.ShouldBe(vehicle.PowerType);
+        dto.PowerType.ShouldBe(vehicle.EngineType);
         dto.ManufacturedYear.ShouldBeNull();
         dto.Type.ShouldBeNull();
         dto.VIN.ShouldBeNull();

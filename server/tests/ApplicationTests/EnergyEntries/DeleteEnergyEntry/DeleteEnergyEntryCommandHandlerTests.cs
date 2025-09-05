@@ -133,7 +133,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "Toyota",
             Model = "Corolla",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? LoggedUserId,

@@ -29,7 +29,7 @@ public class VehicleEnergyTypeTests
         {
             Brand = "Audi",
             Model = "A4",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = Guid.NewGuid()
         };
 
@@ -165,7 +165,7 @@ public class VehicleEnergyTypeTests
         {
             Brand = "BMW",
             Model = "i3",
-            PowerType = EngineType.Electric,
+            EngineType = EngineType.Electric,
             UserId = Guid.NewGuid()
         };
 

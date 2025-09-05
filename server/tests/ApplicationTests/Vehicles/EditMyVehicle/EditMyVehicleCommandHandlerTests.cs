@@ -28,7 +28,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "OldBrand",
             Model = "OldModel",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = LoggedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Bus,
@@ -74,7 +74,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "OldBrand",
             Model = "OldModel",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = LoggedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
@@ -152,7 +152,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "OldBrand",
             Model = "OldModel",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = otherUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
@@ -184,7 +184,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "OldBrand",
             Model = "OldModel",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = LoggedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
@@ -226,7 +226,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Id = vehicleId,
             Brand = "OldBrand",
             Model = "OldModel",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = LoggedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
@@ -245,7 +245,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
         var updatedVehicle = Context.Vehicles.First(v => v.Id == vehicleId);
         updatedVehicle.Brand.ShouldBe("Audi");
         updatedVehicle.Model.ShouldBe("A4");
-        updatedVehicle.PowerType.ShouldBe(EngineType.Fuel);
+        updatedVehicle.EngineType.ShouldBe(EngineType.Fuel);
         updatedVehicle.ManufacturedYear.ShouldBe(2010);
         updatedVehicle.Type.ShouldBe(VehicleType.Car);
         updatedVehicle.VIN.ShouldBe("1HGBH41JXMN109186");

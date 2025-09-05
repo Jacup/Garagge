@@ -17,7 +17,7 @@ public static class VehicleFactory
             Id = Guid.NewGuid(),
             Brand = brand,
             Model = model,
-            PowerType = powerType,
+            EngineType = powerType,
             ManufacturedYear = manufacturedYear,
             UserId = userId,
             CreatedDate = DateTime.UtcNow,
@@ -37,7 +37,7 @@ public static class VehicleFactory
         Id = AudiId,
         Brand = "Audi",
         Model = "A4",
-        PowerType = EngineType.Fuel,
+        EngineType = EngineType.Fuel,
         ManufacturedYear = 2010,
         UserId = AudiUserId,
     };
@@ -47,7 +47,7 @@ public static class VehicleFactory
         Id = Guid.NewGuid(),
         Brand = "BMW",
         Model = "3 Series",
-        PowerType = EngineType.Electric,
+        EngineType = EngineType.Electric,
         ManufacturedYear = 2010,
         UserId = Guid.NewGuid(),
     };

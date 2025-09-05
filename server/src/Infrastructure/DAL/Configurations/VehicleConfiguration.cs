@@ -19,7 +19,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
             .IsRequired()
             .HasMaxLength(64);
 
-        builder.Property(v => v.PowerType)
+        builder.Property(v => v.EngineType)
             .IsRequired()
             .HasConversion<int>();
 

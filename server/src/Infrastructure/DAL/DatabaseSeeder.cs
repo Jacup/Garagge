@@ -49,7 +49,7 @@ public static class DatabaseSeeder
                 Model = "Corolla",
                 ManufacturedYear = 2020,
                 UserId = users[0].Id,
-                PowerType = EngineType.Hybrid,
+                EngineType = EngineType.Hybrid,
             },
             new()
             {
@@ -58,7 +58,7 @@ public static class DatabaseSeeder
                 Model = "X5",
                 ManufacturedYear = 2021,
                 UserId = users[0].Id,
-                PowerType = EngineType.Fuel,
+                EngineType = EngineType.Fuel,
             },
             new()
             {
@@ -67,7 +67,7 @@ public static class DatabaseSeeder
                 Model = "Model 3",
                 ManufacturedYear = 2019,
                 UserId = users[0].Id,
-                PowerType = EngineType.Electric,
+                EngineType = EngineType.Electric,
             },
             new()
             {
@@ -76,7 +76,7 @@ public static class DatabaseSeeder
                 Model = "A4",
                 ManufacturedYear = 2022,
                 UserId = users[1].Id,
-                PowerType = EngineType.Fuel,
+                EngineType = EngineType.Fuel,
             },
             new()
             {
@@ -85,7 +85,7 @@ public static class DatabaseSeeder
                 Model = "C-Class",
                 ManufacturedYear = 2021,
                 UserId = users[1].Id,
-                PowerType = EngineType.PlugInHybrid,
+                EngineType = EngineType.PlugInHybrid,
             }
         };
 

@@ -316,7 +316,7 @@ public class VehicleEnergyCompatibilityServiceTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Toyota",
             Model = "Test Car",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = Guid.NewGuid(),

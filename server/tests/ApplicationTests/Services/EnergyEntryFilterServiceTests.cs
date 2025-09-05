@@ -248,8 +248,8 @@ public class EnergyEntryFilterServiceTests
 
     private static List<EnergyEntry> CreateTestEnergyEntriesWithUsers(Guid userId, Guid otherUserId)
     {
-        var vehicle1 = new Vehicle { Id = Guid.NewGuid(), UserId = userId, Brand = "Toyota", Model = "Corolla", PowerType = EngineType.Fuel };
-        var vehicle2 = new Vehicle { Id = Guid.NewGuid(), UserId = otherUserId, Brand = "Honda", Model = "Civic", PowerType = EngineType.Fuel };
+        var vehicle1 = new Vehicle { Id = Guid.NewGuid(), UserId = userId, Brand = "Toyota", Model = "Corolla", EngineType = EngineType.Fuel };
+        var vehicle2 = new Vehicle { Id = Guid.NewGuid(), UserId = otherUserId, Brand = "Honda", Model = "Civic", EngineType = EngineType.Fuel };
 
         return new List<EnergyEntry>
         {

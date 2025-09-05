@@ -20,14 +20,14 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             ManufacturedYear = _manufacturedYear, 
             UserId = _userId 
         };
 
         vehicle.Brand.ShouldBe(Brand);
         vehicle.Model.ShouldBe(Model);
-        vehicle.PowerType.ShouldBe(EngineType);
+        vehicle.EngineType.ShouldBe(EngineType);
         vehicle.ManufacturedYear.ShouldBe(_manufacturedYear);
         vehicle.UserId.ShouldBe(_userId);
     }
@@ -39,14 +39,14 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             ManufacturedYear = null, 
             UserId = _userId 
         };
 
         vehicle.Brand.ShouldBe(Brand);
         vehicle.Model.ShouldBe(Model);
-        vehicle.PowerType.ShouldBe(EngineType);
+        vehicle.EngineType.ShouldBe(EngineType);
         vehicle.ManufacturedYear.ShouldBeNull();
         vehicle.UserId.ShouldBe(_userId);
     }
@@ -58,7 +58,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             ManufacturedYear = _manufacturedYear,
             Type = VehicleType,
             VIN = VIN,
@@ -67,7 +67,7 @@ public class VehicleTests
 
         vehicle.Brand.ShouldBe(Brand);
         vehicle.Model.ShouldBe(Model);
-        vehicle.PowerType.ShouldBe(EngineType);
+        vehicle.EngineType.ShouldBe(EngineType);
         vehicle.ManufacturedYear.ShouldBe(_manufacturedYear);
         vehicle.Type.ShouldBe(VehicleType);
         vehicle.VIN.ShouldBe(VIN);
@@ -81,7 +81,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             ManufacturedYear = _manufacturedYear, 
             UserId = _userId 
         };
@@ -96,7 +96,7 @@ public class VehicleTests
 
         vehicle.Brand = newVehicleBrand;
         vehicle.Model = newVehicleModel;
-        vehicle.PowerType = newPowerType;
+        vehicle.EngineType = newPowerType;
         vehicle.ManufacturedYear = newVehicleManufacturedYear;
         vehicle.Type = newVehicleType;
         vehicle.VIN = newVIN;
@@ -104,7 +104,7 @@ public class VehicleTests
 
         vehicle.Brand.ShouldBe(newVehicleBrand);
         vehicle.Model.ShouldBe(newVehicleModel);
-        vehicle.PowerType.ShouldBe(newPowerType);
+        vehicle.EngineType.ShouldBe(newPowerType);
         vehicle.ManufacturedYear.ShouldBe(newVehicleManufacturedYear);
         vehicle.Type.ShouldBe(newVehicleType);
         vehicle.VIN.ShouldBe(newVIN);
@@ -123,11 +123,11 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = powerType,
+            EngineType = powerType,
             UserId = _userId 
         };
 
-        vehicle.PowerType.ShouldBe(powerType);
+        vehicle.EngineType.ShouldBe(powerType);
     }
 
     [Theory]
@@ -141,7 +141,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             Type = vehicleType,
             UserId = _userId 
         };
@@ -156,7 +156,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             UserId = _userId 
         };
 
@@ -170,7 +170,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             UserId = _userId 
         };
 
@@ -184,7 +184,7 @@ public class VehicleTests
         { 
             Brand = Brand, 
             Model = Model, 
-            PowerType = EngineType,
+            EngineType = EngineType,
             UserId = _userId 
         };
 

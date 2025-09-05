@@ -44,7 +44,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = otherUserId
         };
         
@@ -71,7 +71,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = LoggedUserId
         };
@@ -97,7 +97,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             UserId = LoggedUserId
         };
         
@@ -126,7 +126,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "BMW",
             Model = "X5",
-            PowerType = EngineType.Hybrid,
+            EngineType = EngineType.Hybrid,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
@@ -160,7 +160,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle {
             Brand = "Tesla",
             Model = "Model 3",
-            PowerType = EngineType.Electric,
+            EngineType = EngineType.Electric,
             ManufacturedYear = null,
             Type = null,
             VIN = null,

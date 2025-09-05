@@ -263,7 +263,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Toyota",
             Model = "Corolla",
-            PowerType = EngineType.Fuel,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? LoggedUserId,

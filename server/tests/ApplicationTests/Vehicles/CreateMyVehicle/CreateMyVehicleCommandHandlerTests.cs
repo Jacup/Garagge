@@ -142,7 +142,7 @@ public class CreateMyVehicleCommandHandlerTests
             It.Is<Vehicle>(v => 
                 v.Brand == "Audi" && 
                 v.Model == "A4" && 
-                v.PowerType == EngineType.Fuel &&
+                v.EngineType == EngineType.Fuel &&
                 v.ManufacturedYear == 2010 &&
                 v.UserId == _userId),
             It.IsAny<CancellationToken>()), Times.Once);
