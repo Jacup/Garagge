@@ -141,7 +141,7 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("character varying(64)")
                         .HasColumnName("model");
 
-                    b.Property<int>("PowerType")
+                    b.Property<int>("EngineType")
                         .HasColumnType("integer")
                         .HasColumnName("power_type");
 

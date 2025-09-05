@@ -16,17 +16,27 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
         builder.Property(e => e.Mileage)
             .IsRequired();
 
-        builder.Property(e => e.Cost)
+        builder.Property(e => e.Type)
             .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(e => e.EnergyUnit)
+            .IsRequired()
+            .HasConversion<int>();
+
+        builder.Property(e => e.Volume)
+            .IsRequired()
+            .HasPrecision(18, 2);
+
+        builder.Property(e => e.Cost)
             .HasPrecision(18, 2);
 
         builder.Property(c => c.PricePerUnit)
-            .IsRequired()
             .HasPrecision(18, 2);
 
-        builder.Property(e => e.VehicleId)
-            .IsRequired();
-
-        builder.UseTptMappingStrategy();
+        builder.HasOne(e => e.Vehicle)
+            .WithMany(v => v.EnergyEntries)
+            .HasForeignKey(e => e.VehicleId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

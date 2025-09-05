@@ -2,5 +2,8 @@ namespace Domain.Enums;
 
 public enum EnergyUnit
 {
-    kWh = 1
+    Liter = 1,
+    Gallon = 2,
+    CubicMeter = 3,
+    kWh = 4
 }

@@ -24,11 +24,5 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
         builder
             .HasIndex(u => u.Email)
             .IsUnique();
-
-        builder
-            .HasMany(u => u.Vehicles)
-            .WithOne(v => v.User)
-            .HasForeignKey(v => v.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

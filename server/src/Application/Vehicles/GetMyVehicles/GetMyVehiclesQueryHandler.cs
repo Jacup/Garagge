@@ -36,7 +36,7 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
             UpdatedDate = v.UpdatedDate,
             Brand = v.Brand,
             Model = v.Model,
-            PowerType = v.PowerType,
+            EngineType = v.EngineType,
             ManufacturedYear = v.ManufacturedYear,
             Type = v.Type,
             VIN = v.VIN,

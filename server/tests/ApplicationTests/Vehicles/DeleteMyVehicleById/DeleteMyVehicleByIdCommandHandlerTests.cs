@@ -57,7 +57,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = requestedId,
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = otherUser
         };
@@ -81,7 +81,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = LoggedUserId
         };
@@ -106,7 +106,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Id = Guid.NewGuid(),
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = LoggedUserId
         };

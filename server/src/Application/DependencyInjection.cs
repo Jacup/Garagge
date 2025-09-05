@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Services;
 using Application.Behaviors;
 using Application.Core;
 using Application.Services;
@@ -14,7 +15,9 @@ public static class DependencyInjection
     {
         services.AddSingleton<IResultFactory, ResultFactory>();
         
-        services.AddScoped<IVehicleEnergyValidator, VehicleEnergyValidator>();
+        // Register services
+        services.AddScoped<IVehicleEnergyCompatibilityService, VehicleEnergyCompatibilityService>();
+        services.AddScoped<IEnergyEntryFilterService, EnergyEntryFilterService>();
 
         services.AddMediatR(config =>
         {

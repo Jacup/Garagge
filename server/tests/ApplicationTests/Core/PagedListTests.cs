@@ -3,6 +3,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests.Core;
 
+public class TestEntity
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Value { get; set; }
+}
+
+public class TestDbContext : DbContext
+{
+    public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
+    
+    public DbSet<TestEntity> TestEntities { get; set; } = null!;
+}
+
 public class PagedListTests
 {
     private DbContextOptions<TestDbContext> GetInMemoryDbOptions()
@@ -309,6 +323,42 @@ public class PagedListTests
         result.HasPreviousPage.ShouldBe(expected);
     }
 
+    [Fact]
+    public async Task CreateAsync_WithEnergyEntryRelatedData_ShouldHandleComplexQueries()
+    {
+        // Arrange
+        await using var context = new TestDbContext(GetInMemoryDbOptions());
+        var energyData = new List<TestEntity>();
+        
+        for (int i = 1; i <= 15; i++)
+        {
+            energyData.Add(new TestEntity
+            {
+                Id = i,
+                Name = i % 2 == 0 ? "Electric" : "Gasoline",
+                Value = i * 50
+            });
+        }
+        
+        context.TestEntities.AddRange(energyData);
+        await context.SaveChangesAsync();
+        
+        var query = context.TestEntities
+            .Where(e => e.Name == "Electric")
+            .OrderBy(e => e.Value)
+            .Select(e => e.Value);
+        
+        // Act
+        var result = await PagedList<int>.CreateAsync(query, 2, 3);
+        
+        // Assert
+        result.Items.Count.ShouldBe(3);
+        result.TotalCount.ShouldBe(7); // 7 electric entries (even numbers)
+        result.HasNextPage.ShouldBeTrue();
+        result.HasPreviousPage.ShouldBeTrue();
+        result.Page.ShouldBe(2);
+    }
+
     private static List<TestEntity> CreateTestEntities(int count)
     {
         var entities = new List<TestEntity>();
@@ -324,18 +374,4 @@ public class PagedListTests
         }
         return entities;
     }
-}
-
-public class TestEntity
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public int Value { get; set; }
-}
-
-public class TestDbContext : DbContext
-{
-    public TestDbContext(DbContextOptions<TestDbContext> options) : base(options) { }
-    
-    public DbSet<TestEntity> TestEntities { get; set; }
 }

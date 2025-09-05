@@ -45,14 +45,14 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         var vehicle1 = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = Guid.NewGuid()
         };
         var vehicle2 = new Vehicle {
             Brand = "BMW",
             Model = "3 Series",
-            PowerType = PowerType.Diesel,
+            EngineType = EngineType.Electric,
             ManufacturedYear = 2011,
             UserId = Guid.NewGuid()
         };
@@ -82,14 +82,14 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         var vehicle1 = new Vehicle {
             Brand = "Audi",
             Model = "A4",
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
             UserId = LoggedUserId
         };
         var vehicle2 = new Vehicle {
             Brand = "BMW",
             Model = "3 Series",
-            PowerType = PowerType.Diesel,
+            EngineType = EngineType.Electric,
             ManufacturedYear = 2011,
             UserId = LoggedUserId
         };
@@ -196,9 +196,9 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
-            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
-            new() { Brand = "Audi", Model = "Q7", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId }
+            new() { Brand = "Audi", Model = "A4", EngineType = EngineType.Fuel, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X5", EngineType = EngineType.Electric, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "Q7", EngineType = EngineType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
@@ -224,9 +224,9 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
-            new() { Brand = "BMW", Model = "X5", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
-            new() { Brand = "Mercedes", Model = "A4", PowerType = PowerType.Electric, ManufacturedYear = 2012, UserId = LoggedUserId }
+            new() { Brand = "Audi", Model = "A4", EngineType = EngineType.Fuel, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X5", EngineType = EngineType.Electric, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Mercedes", Model = "A4", EngineType = EngineType.Electric, ManufacturedYear = 2012, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
@@ -273,10 +273,10 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Audi", Model = "A1", PowerType = PowerType.Gasoline, ManufacturedYear = 2010, UserId = LoggedUserId },
-            new() { Brand = "Audi", Model = "A2", PowerType = PowerType.Diesel, ManufacturedYear = 2011, UserId = LoggedUserId },
-            new() { Brand = "Audi", Model = "A3", PowerType = PowerType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId },
-            new() { Brand = "BMW", Model = "X1", PowerType = PowerType.Electric, ManufacturedYear = 2013, UserId = LoggedUserId }
+            new() { Brand = "Audi", Model = "A1", EngineType = EngineType.Fuel, ManufacturedYear = 2010, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A2", EngineType = EngineType.Electric, ManufacturedYear = 2011, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A3", EngineType = EngineType.Hybrid, ManufacturedYear = 2012, UserId = LoggedUserId },
+            new() { Brand = "BMW", Model = "X1", EngineType = EngineType.Electric, ManufacturedYear = 2013, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
@@ -305,7 +305,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         { 
             Brand = "Audi", 
             Model = "A4", 
-            PowerType = PowerType.Gasoline,
+            EngineType = EngineType.Fuel,
             ManufacturedYear = 2010, 
             UserId = LoggedUserId
         };
@@ -313,7 +313,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         { 
             Brand = "BMW", 
             Model = "X5", 
-            PowerType = PowerType.Diesel,
+            EngineType = EngineType.Electric,
             ManufacturedYear = 2011, 
             UserId = LoggedUserId
         };
@@ -345,9 +345,9 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         
         var vehicles = new List<Vehicle>
         {
-            new() { Brand = "Tesla", Model = "Model 3", PowerType = PowerType.Electric, ManufacturedYear = 2020, UserId = LoggedUserId },
-            new() { Brand = "Toyota", Model = "Prius", PowerType = PowerType.Hybrid, ManufacturedYear = 2019, UserId = LoggedUserId },
-            new() { Brand = "Audi", Model = "A4", PowerType = PowerType.Gasoline, ManufacturedYear = 2018, UserId = LoggedUserId }
+            new() { Brand = "Tesla", Model = "Model 3", EngineType = EngineType.Electric, ManufacturedYear = 2020, UserId = LoggedUserId },
+            new() { Brand = "Toyota", Model = "Prius", EngineType = EngineType.Hybrid, ManufacturedYear = 2019, UserId = LoggedUserId },
+            new() { Brand = "Audi", Model = "A4", EngineType = EngineType.Fuel, ManufacturedYear = 2018, UserId = LoggedUserId }
         };
         
         Context.Vehicles.AddRange(vehicles);
@@ -361,9 +361,9 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.Count.ShouldBe(3);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(PowerType.Electric);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(PowerType.Hybrid);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(PowerType.Gasoline);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Electric);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Hybrid);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Fuel);
     }
 
     [Fact]
@@ -376,7 +376,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         { 
             Brand = "BMW", 
             Model = "X5", 
-            PowerType = PowerType.Diesel,
+            EngineType = EngineType.Electric,
             ManufacturedYear = 2020, 
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
@@ -397,7 +397,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         var returnedVehicle = result.Value.Items[0];
         returnedVehicle.Brand.ShouldBe("BMW");
         returnedVehicle.Model.ShouldBe("X5");
-        returnedVehicle.PowerType.ShouldBe(PowerType.Diesel);
+        returnedVehicle.EngineType.ShouldBe(EngineType.Electric);
         returnedVehicle.ManufacturedYear.ShouldBe(2020);
         returnedVehicle.Type.ShouldBe(VehicleType.Car);
         returnedVehicle.VIN.ShouldBe("1HGBH41JXMN109186");
@@ -406,7 +406,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
     private static List<Vehicle> CreateTestVehicles(int count, Guid userId)
     {
         var vehicles = new List<Vehicle>();
-        var powerTypes = new[] { PowerType.Gasoline, PowerType.Diesel, PowerType.Hybrid, PowerType.Electric };
+        var powerTypes = new[] { EngineType.Fuel, EngineType.Electric, EngineType.Hybrid, EngineType.Electric };
         
         for (int i = 1; i <= count; i++)
         {
@@ -414,7 +414,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             {
                 Brand = $"Brand{i}",
                 Model = $"Model{i}",
-                PowerType = powerTypes[i % powerTypes.Length],
+                EngineType = powerTypes[i % powerTypes.Length],
                 ManufacturedYear = 2010 + i,
                 UserId = userId
             });

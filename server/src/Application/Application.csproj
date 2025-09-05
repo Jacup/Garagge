@@ -22,7 +22,6 @@
     <ItemGroup>
       <Folder Include="EnergyEntries\EditChargingEntry\" />
       <Folder Include="EnergyEntries\EditFuelEntry\" />
-      <Folder Include="EnergyEntries\GetEnergyEntries\" />
     </ItemGroup>
 
 </Project>

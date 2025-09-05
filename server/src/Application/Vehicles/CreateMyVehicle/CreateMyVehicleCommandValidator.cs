@@ -20,7 +20,7 @@ internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<Create
         
         RuleFor(c => c.PowerType)
             .IsInEnum()
-            .WithMessage($"Power type must be a valid enum value. Valid values are: {string.Join(", ", Enum.GetNames<PowerType>())}.");
+            .WithMessage($"Power type must be a valid enum value. Valid values are: {string.Join(", ", Enum.GetNames<EngineType>())}.");
 
         const int firstCarManufacturedYear = 1886;
         

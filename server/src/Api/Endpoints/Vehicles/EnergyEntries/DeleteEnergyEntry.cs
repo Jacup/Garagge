@@ -11,7 +11,7 @@ public class DeleteEnergyEntry : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(
+        app.MapDelete(
                 "vehicles/{vehicleId:guid}/energy-entries/{id:guid}",
                 async (Guid id, Guid vehicleId, ISender sender, CancellationToken cancellationToken) =>
                 {
@@ -27,6 +27,6 @@ public class DeleteEnergyEntry : IEndpoint
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.EnergyEntries);
     }
 }

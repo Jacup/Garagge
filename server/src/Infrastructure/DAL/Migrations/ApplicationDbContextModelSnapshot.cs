@@ -29,7 +29,7 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<decimal>("Cost")
+                    b.Property<decimal?>("Cost")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("cost");
@@ -42,14 +42,22 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("date")
                         .HasColumnName("date");
 
+                    b.Property<int>("EnergyUnit")
+                        .HasColumnType("integer")
+                        .HasColumnName("energy_unit");
+
                     b.Property<int>("Mileage")
                         .HasColumnType("integer")
                         .HasColumnName("mileage");
 
-                    b.Property<decimal>("PricePerUnit")
+                    b.Property<decimal?>("PricePerUnit")
                         .HasPrecision(18, 2)
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("price_per_unit");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -59,14 +67,18 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("vehicle_id");
 
-                    b.HasKey("Id");
+                    b.Property<decimal>("Volume")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("volume");
+
+                    b.HasKey("Id")
+                        .HasName("pk_energy_entries");
 
                     b.HasIndex("VehicleId")
-                        .HasDatabaseName("ix_energy_entry_vehicle_id");
+                        .HasDatabaseName("ix_energy_entries_vehicle_id");
 
-                    b.ToTable("energy_entry", (string)null);
-
-                    b.UseTptMappingStrategy();
+                    b.ToTable("energy_entries", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
@@ -133,6 +145,10 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
 
+                    b.Property<int>("EngineType")
+                        .HasColumnType("integer")
+                        .HasColumnName("engine_type");
+
                     b.Property<int?>("ManufacturedYear")
                         .HasColumnType("integer")
                         .HasColumnName("manufactured_year");
@@ -142,10 +158,6 @@ namespace Infrastructure.DAL.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)")
                         .HasColumnName("model");
-
-                    b.Property<int>("PowerType")
-                        .HasColumnType("integer")
-                        .HasColumnName("power_type");
 
                     b.Property<int?>("Type")
                         .HasColumnType("integer")
@@ -173,40 +185,37 @@ namespace Infrastructure.DAL.Migrations
                     b.ToTable("vehicles", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.EnergyEntries.ChargingEntry", b =>
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleEnergyType", b =>
                 {
-                    b.HasBaseType("Domain.Entities.EnergyEntries.EnergyEntry");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
-                    b.Property<int?>("ChargingDurationMinutes")
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<int>("EnergyType")
                         .HasColumnType("integer")
-                        .HasColumnName("charging_duration_minutes");
+                        .HasColumnName("energy_type");
 
-                    b.Property<decimal>("EnergyAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("energy_amount");
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
 
-                    b.Property<int>("Unit")
-                        .HasColumnType("integer")
-                        .HasColumnName("unit");
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
 
-                    b.ToTable("charging_entries", (string)null);
-                });
+                    b.HasKey("Id")
+                        .HasName("pk_vehicle_energy_types");
 
-            modelBuilder.Entity("Domain.Entities.EnergyEntries.FuelEntry", b =>
-                {
-                    b.HasBaseType("Domain.Entities.EnergyEntries.EnergyEntry");
+                    b.HasIndex("VehicleId", "EnergyType")
+                        .IsUnique()
+                        .HasDatabaseName("ix_vehicle_energy_types_vehicle_id_energy_type");
 
-                    b.Property<int>("Unit")
-                        .HasColumnType("integer")
-                        .HasColumnName("unit");
-
-                    b.Property<decimal>("Volume")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("volume");
-
-                    b.ToTable("fuel_entries", (string)null);
+                    b.ToTable("vehicle_energy_types", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.EnergyEntries.EnergyEntry", b =>
@@ -216,7 +225,7 @@ namespace Infrastructure.DAL.Migrations
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_energy_entry_vehicles_vehicle_id");
+                        .HasConstraintName("fk_energy_entries_vehicles_vehicle_id");
 
                     b.Navigation("Vehicle");
                 });
@@ -233,24 +242,16 @@ namespace Infrastructure.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.EnergyEntries.ChargingEntry", b =>
+            modelBuilder.Entity("Domain.Entities.Vehicles.VehicleEnergyType", b =>
                 {
-                    b.HasOne("Domain.Entities.EnergyEntries.EnergyEntry", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.EnergyEntries.ChargingEntry", "Id")
+                    b.HasOne("Domain.Entities.Vehicles.Vehicle", "Vehicle")
+                        .WithMany("VehicleEnergyTypes")
+                        .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_charging_entries_energy_entry_id");
-                });
+                        .HasConstraintName("fk_vehicle_energy_types_vehicles_vehicle_id");
 
-            modelBuilder.Entity("Domain.Entities.EnergyEntries.FuelEntry", b =>
-                {
-                    b.HasOne("Domain.Entities.EnergyEntries.EnergyEntry", null)
-                        .WithOne()
-                        .HasForeignKey("Domain.Entities.EnergyEntries.FuelEntry", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_fuel_entries_energy_entry_id");
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
@@ -261,6 +262,8 @@ namespace Infrastructure.DAL.Migrations
             modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.Navigation("EnergyEntries");
+
+                    b.Navigation("VehicleEnergyTypes");
                 });
 #pragma warning restore 612, 618
         }

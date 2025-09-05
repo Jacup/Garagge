@@ -4,6 +4,6 @@ namespace Application.Abstractions;
 
 public interface IVehicleEnergyValidator
 {
-    bool CanBeFueled(PowerType powerType);
-    bool CanBeCharged(PowerType powerType);
+    bool CanBeFueled(EngineType powerType);
+    bool CanBeCharged(EngineType powerType);
 }
