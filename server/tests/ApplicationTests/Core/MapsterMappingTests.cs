@@ -35,7 +35,7 @@ public class MapsterMappingTests
         dto.Id.ShouldBe(vehicle.Id);
         dto.Brand.ShouldBe(vehicle.Brand);
         dto.Model.ShouldBe(vehicle.Model);
-        dto.PowerType.ShouldBe(vehicle.EngineType);
+        dto.EngineType.ShouldBe(vehicle.EngineType);
         dto.ManufacturedYear.ShouldBe(vehicle.ManufacturedYear);
         dto.Type.ShouldBe(vehicle.Type);
         dto.VIN.ShouldBe(vehicle.VIN);
@@ -67,7 +67,7 @@ public class MapsterMappingTests
         dto.Id.ShouldBe(vehicle.Id);
         dto.Brand.ShouldBe(vehicle.Brand);
         dto.Model.ShouldBe(vehicle.Model);
-        dto.PowerType.ShouldBe(vehicle.EngineType);
+        dto.EngineType.ShouldBe(vehicle.EngineType);
         dto.ManufacturedYear.ShouldBeNull();
         dto.Type.ShouldBeNull();
         dto.VIN.ShouldBeNull();

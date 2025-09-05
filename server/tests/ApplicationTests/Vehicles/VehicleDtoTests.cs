@@ -27,7 +27,7 @@ public class VehicleDtoTests
             UserId = userId,
             Brand = brand,
             Model = model,
-            PowerType = powerType,
+            EngineType = powerType,
             ManufacturedYear = manufacturedYear,
             Type = type,
             VIN = vin,
@@ -39,7 +39,7 @@ public class VehicleDtoTests
         dto.UserId.ShouldBe(userId);
         dto.Brand.ShouldBe(brand);
         dto.Model.ShouldBe(model);
-        dto.PowerType.ShouldBe(powerType);
+        dto.EngineType.ShouldBe(powerType);
         dto.ManufacturedYear.ShouldBe(manufacturedYear);
         dto.Type.ShouldBe(type);
         dto.VIN.ShouldBe(vin);
@@ -64,7 +64,7 @@ public class VehicleDtoTests
             UserId = userId,
             Brand = brand,
             Model = model,
-            PowerType = powerType,
+            EngineType = powerType,
             
             ManufacturedYear = null,
             Type = null,
@@ -78,7 +78,7 @@ public class VehicleDtoTests
         dto.UserId.ShouldBe(userId);
         dto.Brand.ShouldBe(brand);
         dto.Model.ShouldBe(model);
-        dto.PowerType.ShouldBe(powerType);
+        dto.EngineType.ShouldBe(powerType);
         dto.ManufacturedYear.ShouldBeNull();
         dto.Type.ShouldBeNull();
         dto.VIN.ShouldBeNull();

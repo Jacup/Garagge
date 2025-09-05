@@ -53,7 +53,7 @@ public class CreateMyVehicleCommandHandlerTests
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
-        result.Value.PowerType.ShouldBe(EngineType.Fuel);
+        result.Value.EngineType.ShouldBe(EngineType.Fuel);
         result.Value.ManufacturedYear.ShouldBe(2010);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
@@ -81,7 +81,7 @@ public class CreateMyVehicleCommandHandlerTests
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("BMW");
         result.Value.Model.ShouldBe("X3");
-        result.Value.PowerType.ShouldBe(EngineType.Fuel);
+        result.Value.EngineType.ShouldBe(EngineType.Fuel);
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();
@@ -185,7 +185,7 @@ public class CreateMyVehicleCommandHandlerTests
 
         // Assert
         result.IsSuccess.ShouldBeTrue();
-        result.Value.PowerType.ShouldBe(powerType);
+        result.Value.EngineType.ShouldBe(powerType);
     }
 
     [Fact]

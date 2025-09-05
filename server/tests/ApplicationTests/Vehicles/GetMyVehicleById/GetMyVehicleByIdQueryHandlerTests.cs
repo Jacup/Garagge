@@ -114,7 +114,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldBeOfType<VehicleDto>();
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
-        result.Value.PowerType.ShouldBe(EngineType.Fuel);
+        result.Value.EngineType.ShouldBe(EngineType.Fuel);
         result.Value.UserId.ShouldBe(LoggedUserId);
     }
 
@@ -145,7 +145,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("BMW");
         result.Value.Model.ShouldBe("X5");
-        result.Value.PowerType.ShouldBe(EngineType.Hybrid);
+        result.Value.EngineType.ShouldBe(EngineType.Hybrid);
         result.Value.ManufacturedYear.ShouldBe(2020);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
@@ -179,7 +179,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ShouldNotBeNull();
         result.Value.Brand.ShouldBe("Tesla");
         result.Value.Model.ShouldBe("Model 3");
-        result.Value.PowerType.ShouldBe(EngineType.Electric);
+        result.Value.EngineType.ShouldBe(EngineType.Electric);
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();

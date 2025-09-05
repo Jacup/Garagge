@@ -11,7 +11,7 @@ public record VehicleDto
     
     public required string Brand { get; init; }
     public required string Model { get; init; }
-    public required EngineType PowerType { get; init; }
+    public required EngineType EngineType { get; init; }
     
     public int? ManufacturedYear { get; init; }
     public VehicleType? Type { get; init; }

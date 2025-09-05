@@ -361,9 +361,9 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.Count.ShouldBe(3);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(EngineType.Electric);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(EngineType.Hybrid);
-        result.Value.Items.Select(v => v.PowerType).ShouldContain(EngineType.Fuel);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Electric);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Hybrid);
+        result.Value.Items.Select(v => v.EngineType).ShouldContain(EngineType.Fuel);
     }
 
     [Fact]
@@ -397,7 +397,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
         var returnedVehicle = result.Value.Items[0];
         returnedVehicle.Brand.ShouldBe("BMW");
         returnedVehicle.Model.ShouldBe("X5");
-        returnedVehicle.PowerType.ShouldBe(EngineType.Electric);
+        returnedVehicle.EngineType.ShouldBe(EngineType.Electric);
         returnedVehicle.ManufacturedYear.ShouldBe(2020);
         returnedVehicle.Type.ShouldBe(VehicleType.Car);
         returnedVehicle.VIN.ShouldBe("1HGBH41JXMN109186");
