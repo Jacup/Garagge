@@ -1,4 +1,5 @@
 using Domain.Entities.EnergyEntries;
+using Domain.Entities.ServiceRecords;
 using Domain.Entities.Users;
 using Domain.Enums;
 
@@ -19,6 +20,7 @@ public sealed class Vehicle : Entity
 
     public ICollection<VehicleEnergyType> VehicleEnergyTypes { get; set; } = [];
     public ICollection<EnergyEntry> EnergyEntries { get; set; } = [];
+    public ICollection<ServiceRecord> ServiceRecords { get; set; } = [];
 
     public IEnumerable<EnergyType> AllowedEnergyTypes => VehicleEnergyTypes.Select(vet => vet.EnergyType);
 }
