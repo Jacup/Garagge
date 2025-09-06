@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import type { VehicleDto } from '@/api/apiV1.schemas'
+import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
@@ -18,12 +18,12 @@ const loading = ref(true)
 const totalItems = ref(0)
 
 const headers = [
-  { title: 'Brand', key: 'brand', sortable: false },
-  { title: 'Model', key: 'model', sortable: false },
-  { title: 'Power Type', key: 'powerType', sortable: false },
-  { title: 'Year', key: 'manufacturedYear', sortable: false },
-  { title: 'Type', key: 'type', sortable: false },
-  { title: 'VIN', key: 'vin', sortable: false },
+  { title: 'Brand', key: 'brand', sortable: true },
+  { title: 'Model', key: 'model', sortable: true },
+  { title: 'Engine Type', key: 'engineType', sortable: true },
+  { title: 'Year', key: 'manufacturedYear', sortable: true },
+  { title: 'Type', key: 'type', sortable: true },
+  { title: 'VIN', key: 'vin', sortable: true },
   { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
 ]
 
@@ -107,6 +107,7 @@ function viewOverview(id: string | undefined) {
       :sort-by="sortBy"
       show-select
       @update:options="onTableOptionsChange"
+      @update:sort-by="sortBy = $event"
     >
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex gap-1 justify-end">
@@ -153,6 +154,19 @@ function viewOverview(id: string | undefined) {
             </template>
           </v-tooltip>
         </div>
+      </template>
+      <template v-slot:[`item.manufacturedYear`]="{ item }">
+        {{ item.manufacturedYear || 'N/A' }}
+      </template>
+      <template v-slot:[`item.type`]="{ item }">
+        <v-chip v-if="item.type" size="small" variant="tonal">{{ item.type }}</v-chip>
+        <span v-else class="text-medium-emphasis">N/A</span>
+      </template>
+      <template v-slot:[`item.vin`]="{ item }">
+        {{ item.vin || 'N/A' }}
+      </template>
+      <template v-slot:[`item.engineType`]="{ item }">
+        {{ item.engineType || 'N/A' }}
       </template>
     </v-data-table-server>
   </div>

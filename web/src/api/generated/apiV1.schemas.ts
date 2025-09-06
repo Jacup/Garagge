@@ -4,10 +4,22 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+export interface CreateEnergyEntryRequest {
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
+}
+
 export interface CreateMyVehicleCommand {
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType2;
@@ -18,7 +30,7 @@ export interface CreateMyVehicleCommand {
 export interface EditMyVehicleRequest {
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType2;
@@ -26,6 +38,26 @@ export interface EditMyVehicleRequest {
   vin?: string | null;
 }
 
+export interface EnergyEntryDto {
+  id: string;
+  vehicleId: string;
+  createdDate: string;
+  updatedDate: string;
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
+}
+
+export type EnergyType = string;
+
+export type EnergyUnit = 'Liter' | 'Gallon' | 'CubicMeter' | 'kWh';
+export type EngineType = 'Fuel' | 'Hybrid' | 'PlugInHybrid' | 'Electric' | 'Hydrogen';
 export interface LoginUserCommand {
   email: string;
   password: string;
@@ -35,6 +67,8 @@ export interface LoginUserResponse {
   accessToken: string;
 }
 
+export type NullableOfEnergyType = string;
+
 /**
  * @nullable
  */
@@ -43,6 +77,16 @@ export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null
  * @nullable
  */
 export type NullableOfVehicleType2 = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export interface PagedListOfEnergyEntryDto {
+  /** @nullable */
+  items?: EnergyEntryDto[] | null;
+  page?: number;
+  pageSize?: number;
+  totalCount?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
 export interface PagedListOfVehicleDto {
   /** @nullable */
   items?: VehicleDto[] | null;
@@ -53,12 +97,23 @@ export interface PagedListOfVehicleDto {
   hasPreviousPage?: boolean;
 }
 
-export type PowerType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric';
 export interface RegisterUserCommand {
   email: string;
   firstName: string;
   lastName: string;
   password: string;
+}
+
+export interface UpdateEnergyEntryRequest {
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
 }
 
 export interface UserDto {
@@ -74,18 +129,31 @@ export interface VehicleDto {
   updatedDate?: string;
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType;
   /** @nullable */
   vin?: string | null;
   userId: string;
+  allowedEnergyTypes?: EnergyType[];
 }
 
 export type GetApiVehiclesMyParams = {
 searchTerm?: string;
 pageSize?: number;
 page?: number;
+};
+
+export type GetApiVehiclesVehicleIdEnergyEntriesParams = {
+page?: number;
+pageSize?: number;
+energyType?: NullableOfEnergyType;
+};
+
+export type GetApiUsersUserIdEnergyEntriesParams = {
+page?: number;
+pageSize?: number;
+energyType?: NullableOfEnergyType;
 };
 

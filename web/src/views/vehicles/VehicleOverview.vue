@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import type { VehicleDto } from '@/api/generated'
+import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
 const { getApiVehiclesMyId } = getVehicles()
@@ -211,7 +211,7 @@ onMounted(() => {
                 style="top: 12px; right: 16px; opacity: 0.6"
               />
               <div class="text-caption text-on-primary-container">Fuel Type</div>
-              <div class="text-h6 font-weight-bold text-on-primary-container">{{ selectedVehicle?.powerType || 'N/A' }}</div>
+              <div class="text-h6 font-weight-bold text-on-primary-container">{{ selectedVehicle?.engineType || 'N/A' }}</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -307,7 +307,16 @@ onMounted(() => {
                 <v-col cols="12" sm="6">
                   <v-text-field
                     label="Power Type"
-                    :model-value="selectedVehicle?.powerType"
+                    :model-value="selectedVehicle?.engineType"
+                    readonly
+                    variant="outlined"
+                    density="compact"
+                  />
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <v-text-field
+                    label="Vehicle Type"
+                    :model-value="selectedVehicle?.type || 'Not specified'"
                     readonly
                     variant="outlined"
                     density="compact"

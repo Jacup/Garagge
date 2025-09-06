@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { CreateMyVehicleCommand, PowerType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
+import type { CreateMyVehicleCommand, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
   vehicle: CreateMyVehicleCommand
@@ -18,12 +18,12 @@ const rules = {
   vinLength: (value: string | null) => value === null || value === '' || value.length === 17 || 'VIN must be exactly 17 characters',
 }
 
-const powerTypeOptions: { label: string; value: PowerType }[] = [
-  { label: 'Gasoline', value: 'Gasoline' },
-  { label: 'Diesel', value: 'Diesel' },
+const engineTypeOptions: { label: string; value: EngineType }[] = [
+  { label: 'Fuel', value: 'Fuel' },
   { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'PlugInHybrid', value: 'PlugInHybrid' },
+  { label: 'Plug-in Hybrid', value: 'PlugInHybrid' },
   { label: 'Electric', value: 'Electric' },
+  { label: 'Hydrogen', value: 'Hydrogen' },
 ]
 
 const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
@@ -77,9 +77,9 @@ const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
       ></v-text-field>
 
       <v-select
-        :model-value="vehicle.powerType"
-        @update:model-value="$emit('update:vehicle', { ...vehicle, powerType: $event })"
-        :items="powerTypeOptions"
+        :model-value="vehicle.engineType"
+        @update:model-value="$emit('update:vehicle', { ...vehicle, engineType: $event })"
+        :items="engineTypeOptions"
         :rules="[rules.required]"
         item-title="label"
         item-value="value"

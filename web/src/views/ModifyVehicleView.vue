@@ -7,7 +7,6 @@ import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import type {
   CreateMyVehicleCommand,
   EditMyVehicleRequest,
-  PowerType,
   NullableOfVehicleType2,
   VehicleDto,
 } from '@/api/generated/apiV1.schemas'
@@ -22,17 +21,17 @@ const isEditMode = !!vehicleId
 const createVehicle = reactive<CreateMyVehicleCommand>({
   brand: '',
   model: '',
-  powerType: null as unknown as PowerType,
-  manufacturedYear: null as unknown as number,
-  type: null as NullableOfVehicleType2,
+  engineType: 'Fuel', // Default to first option
+  manufacturedYear: null,
+  type: null,
   vin: null,
 })
 
 const editVehicle = reactive<EditMyVehicleRequest>({
   brand: '',
   model: '',
-  powerType: null as unknown as PowerType,
-  manufacturedYear: null as unknown as number,
+  engineType: 'Fuel',
+  manufacturedYear: null,
   type: null as NullableOfVehicleType2,
   vin: null,
 })
@@ -52,7 +51,7 @@ onMounted(async () => {
       Object.assign(editVehicle, {
         brand: vehicleData.brand || '',
         model: vehicleData.model || '',
-        powerType: vehicleData.powerType,
+        engineType: vehicleData.engineType,
         manufacturedYear: vehicleData.manufacturedYear,
         type: vehicleData.type || null,
         vin: vehicleData.vin || null,

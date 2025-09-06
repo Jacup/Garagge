@@ -7,7 +7,7 @@
 export interface CreateMyVehicleCommand {
   brand: string
   model: string
-  powerType: PowerType
+  engineType: EngineType
   /** @nullable */
   manufacturedYear?: number | null
   type?: NullableOfVehicleType2
@@ -42,7 +42,7 @@ export interface PagedListOfVehicleDto {
   hasPreviousPage?: boolean
 }
 
-export type PowerType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric'
+export type EngineType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric'
 export interface RegisterUserCommand {
   email: string
   firstName: string
@@ -63,7 +63,7 @@ export interface VehicleDto {
   updatedDate?: string
   brand: string
   model: string
-  powerType: PowerType
+  engineType: EngineType
   /** @nullable */
   manufacturedYear?: number | null
   type?: NullableOfVehicleType
