@@ -1,5 +1,4 @@
-﻿using Application.Abstractions;
-using Application.Abstractions.Authentication;
+﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
@@ -9,7 +8,7 @@ using Domain.Entities.EnergyEntries;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.EnergyEntries.CreateEnergyEntry;
+namespace Application.EnergyEntries.Create;
 
 public class CreateEnergyEntryCommandHandler(
     IApplicationDbContext dbContext, 

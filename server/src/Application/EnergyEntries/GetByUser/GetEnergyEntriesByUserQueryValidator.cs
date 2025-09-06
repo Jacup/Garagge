@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Application.EnergyEntries.GetEnergyEntriesByUser;
+namespace Application.EnergyEntries.GetByUser;
 
 internal sealed class GetEnergyEntriesByUserQueryValidator : AbstractValidator<GetEnergyEntriesByUserQuery>
 {

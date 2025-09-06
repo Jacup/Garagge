@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.EnergyEntries;
-using Application.EnergyEntries.GetEnergyEntriesByVehicle;
+using Application.EnergyEntries.GetByVehicle;
 using Application.Services;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;

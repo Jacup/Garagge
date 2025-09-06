@@ -2,7 +2,7 @@
 using Application.Core;
 using Domain.Enums;
 
-namespace Application.EnergyEntries.GetEnergyEntriesByUser;
+namespace Application.EnergyEntries.GetByUser;
 
 public sealed record GetEnergyEntriesByUserQuery(
     Guid UserId, 

@@ -2,7 +2,7 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries.DeleteEnergyEntry;
+using Application.EnergyEntries.Delete;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;

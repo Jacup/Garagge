@@ -1,5 +1,5 @@
 using Application.EnergyEntries;
-using Application.EnergyEntries.DeleteEnergyEntry;
+using Application.EnergyEntries.Delete;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;

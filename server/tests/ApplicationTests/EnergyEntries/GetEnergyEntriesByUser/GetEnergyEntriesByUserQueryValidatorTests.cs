@@ -1,4 +1,4 @@
-﻿using Application.EnergyEntries.GetEnergyEntriesByUser;
+﻿using Application.EnergyEntries.GetByUser;
 using Domain.Enums;
 using FluentValidation.TestHelper;
 

@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions.Services;
 using Application.Core;
 using Application.EnergyEntries;
-using Application.EnergyEntries.CreateEnergyEntry;
+using Application.EnergyEntries.Create;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;

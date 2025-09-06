@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions;
-using Application.EnergyEntries.CreateEnergyEntry;
+using Application.EnergyEntries.Create;
 using Domain.Enums;
 using FluentValidation.TestHelper;
 using Moq;

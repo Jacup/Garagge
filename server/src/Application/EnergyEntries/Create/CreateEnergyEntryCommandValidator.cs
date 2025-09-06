@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions;
 using FluentValidation;
 
-namespace Application.EnergyEntries.CreateEnergyEntry;
+namespace Application.EnergyEntries.Create;
 
 internal sealed class CreateEnergyEntryCommandValidator : AbstractValidator<CreateEnergyEntryCommand>
 {
