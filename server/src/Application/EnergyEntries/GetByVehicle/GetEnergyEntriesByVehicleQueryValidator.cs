@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Application.EnergyEntries.GetEnergyEntriesByVehicle;
+namespace Application.EnergyEntries.GetByVehicle;
 
 internal sealed class GetEnergyEntriesByVehicleQueryValidator : AbstractValidator<GetEnergyEntriesByVehicleQuery>
 {

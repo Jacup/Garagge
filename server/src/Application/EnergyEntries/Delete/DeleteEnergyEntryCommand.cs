@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
 
-namespace Application.EnergyEntries.DeleteEnergyEntry;
+namespace Application.EnergyEntries.Delete;
 
 public sealed record DeleteEnergyEntryCommand(Guid Id, Guid VehicleId) : ICommand;

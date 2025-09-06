@@ -1,10 +1,11 @@
 ﻿using Application.Abstractions.Messaging;
 using Domain.Enums;
 
-namespace Application.EnergyEntries.CreateEnergyEntry;
+namespace Application.EnergyEntries.Update;
 
-public sealed record CreateEnergyEntryCommand(
+public sealed record UpdateEnergyEntryCommand(
     Guid VehicleId,
+    Guid Id,
     DateOnly Date,
     int Mileage,
     EnergyType Type,
