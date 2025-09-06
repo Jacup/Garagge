@@ -13,7 +13,7 @@ public class UpdateEnergyEntry : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(
+        app.MapPut(
                 "vehicles/{vehicleId:guid}/energy-entries/{id:guid}",
                 async (UpdateEnergyEntryRequest request, Guid vehicleId, Guid id, ISender sender, CancellationToken cancellationToken) =>
                 {
