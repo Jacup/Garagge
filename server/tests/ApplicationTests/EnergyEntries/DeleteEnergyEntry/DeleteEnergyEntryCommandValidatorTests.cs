@@ -1,4 +1,4 @@
-using Application.EnergyEntries.DeleteEnergyEntry;
+using Application.EnergyEntries.Delete;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.EnergyEntries.DeleteEnergyEntry;

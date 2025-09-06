@@ -1,4 +1,4 @@
-﻿using Application.EnergyEntries.GetEnergyEntriesByVehicle;
+﻿using Application.EnergyEntries.GetByVehicle;
 using Domain.Enums;
 using FluentValidation.TestHelper;
 

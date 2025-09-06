@@ -4,7 +4,7 @@ using Application.Abstractions.Messaging;
 using Application.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.EnergyEntries.DeleteEnergyEntry;
+namespace Application.EnergyEntries.Delete;
 
 public class DeleteEnergyEntryCommandHandler(IApplicationDbContext dbContext, IUserContext userContext)
     : ICommandHandler<DeleteEnergyEntryCommand>

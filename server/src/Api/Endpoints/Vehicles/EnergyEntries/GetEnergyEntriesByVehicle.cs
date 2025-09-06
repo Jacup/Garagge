@@ -3,7 +3,7 @@ using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
 using Application.EnergyEntries;
-using Application.EnergyEntries.GetEnergyEntriesByVehicle;
+using Application.EnergyEntries.GetByVehicle;
 using Domain.Enums;
 using MediatR;
 

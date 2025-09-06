@@ -2,7 +2,7 @@
 using Application.Core;
 using Domain.Enums;
 
-namespace Application.EnergyEntries.GetEnergyEntriesByVehicle;
+namespace Application.EnergyEntries.GetByVehicle;
 
 public sealed record GetEnergyEntriesByVehicleQuery(
     Guid VehicleId, 

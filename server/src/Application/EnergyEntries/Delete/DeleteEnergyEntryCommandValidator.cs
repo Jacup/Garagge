@@ -1,7 +1,6 @@
-﻿using Application.Abstractions;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Application.EnergyEntries.DeleteEnergyEntry;
+namespace Application.EnergyEntries.Delete;
 
 internal sealed class DeleteEnergyEntryCommandValidator : AbstractValidator<DeleteEnergyEntryCommand>
 {
