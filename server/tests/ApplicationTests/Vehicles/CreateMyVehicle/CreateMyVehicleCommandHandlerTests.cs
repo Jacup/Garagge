@@ -171,10 +171,10 @@ public class CreateMyVehicleCommandHandlerTests
     [InlineData(EngineType.PlugInHybrid)]
     [InlineData(EngineType.Electric)]
     [InlineData(EngineType.Hydrogen)]
-    public async Task Handle_WithDifferentPowerTypes_CreatesVehicleWithCorrectPowerType(EngineType powerType)
+    public async Task Handle_WithDifferentEngineTypes_CreatesVehicleWithCorrectEngineType(EngineType engineType)
     {
         // Arrange
-        var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010);
+        var command = new CreateMyVehicleCommand("Audi", "A4", engineType, 2010);
 
         _dbContextMock
             .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -185,7 +185,7 @@ public class CreateMyVehicleCommandHandlerTests
 
         // Assert
         result.IsSuccess.ShouldBeTrue();
-        result.Value.EngineType.ShouldBe(powerType);
+        result.Value.EngineType.ShouldBe(engineType);
     }
 
     [Fact]

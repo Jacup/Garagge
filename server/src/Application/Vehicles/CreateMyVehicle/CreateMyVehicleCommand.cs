@@ -6,7 +6,7 @@ namespace Application.Vehicles.CreateMyVehicle;
 public sealed record CreateMyVehicleCommand(
     string Brand,
     string Model,
-    EngineType PowerType,
+    EngineType EngineType,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
     string? VIN = null)

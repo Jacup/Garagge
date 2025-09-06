@@ -88,7 +88,7 @@ public class VehicleTests
 
         const string newVehicleBrand = "BMW";
         const string newVehicleModel = "Series 3";
-        const EngineType newPowerType = EngineType.Electric;
+        const EngineType newEngineType = EngineType.Electric;
         const int newVehicleManufacturedYear = 2015;
         const VehicleType newVehicleType = VehicleType.Truck;
         const string newVIN = "2HGBH41JXMN109187";
@@ -96,7 +96,7 @@ public class VehicleTests
 
         vehicle.Brand = newVehicleBrand;
         vehicle.Model = newVehicleModel;
-        vehicle.EngineType = newPowerType;
+        vehicle.EngineType = newEngineType;
         vehicle.ManufacturedYear = newVehicleManufacturedYear;
         vehicle.Type = newVehicleType;
         vehicle.VIN = newVIN;
@@ -104,7 +104,7 @@ public class VehicleTests
 
         vehicle.Brand.ShouldBe(newVehicleBrand);
         vehicle.Model.ShouldBe(newVehicleModel);
-        vehicle.EngineType.ShouldBe(newPowerType);
+        vehicle.EngineType.ShouldBe(newEngineType);
         vehicle.ManufacturedYear.ShouldBe(newVehicleManufacturedYear);
         vehicle.Type.ShouldBe(newVehicleType);
         vehicle.VIN.ShouldBe(newVIN);
@@ -117,17 +117,17 @@ public class VehicleTests
     [InlineData(EngineType.PlugInHybrid)]
     [InlineData(EngineType.Electric)]
     [InlineData(EngineType.Hydrogen)]
-    public void PowerType_ValidPowerTypes_SetsPowerTypeCorrectly(EngineType powerType)
+    public void EngineType_ValidEngineTypes_SetsEngineTypeCorrectly(EngineType engineType)
     {
         var vehicle = new Vehicle 
         { 
             Brand = Brand, 
             Model = Model, 
-            EngineType = powerType,
+            EngineType = engineType,
             UserId = _userId 
         };
 
-        vehicle.EngineType.ShouldBe(powerType);
+        vehicle.EngineType.ShouldBe(engineType);
     }
 
     [Theory]

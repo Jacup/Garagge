@@ -61,11 +61,11 @@ public class CreateMyVehicleCommandValidatorTests
     [InlineData(EngineType.Hybrid)]
     [InlineData(EngineType.PlugInHybrid)]
     [InlineData(EngineType.Electric)]
-    public void Validate_WhenPowerTypeIsValid_ShouldNotHaveError(EngineType powerType)
+    public void Validate_WhenEngineTypeIsValid_ShouldNotHaveError(EngineType engineType)
     {
-        var command = new CreateMyVehicleCommand("Audi", "A4", powerType, 2010);
+        var command = new CreateMyVehicleCommand("Audi", "A4", engineType, 2010);
         var result = _validator.TestValidate(command);
-        result.ShouldNotHaveValidationErrorFor(c => c.PowerType);
+        result.ShouldNotHaveValidationErrorFor(c => c.EngineType);
     }
 
     [Fact]

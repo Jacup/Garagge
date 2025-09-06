@@ -8,7 +8,7 @@ public static class VehicleFactory
     public static Vehicle Create(
         string brand,
         string model,
-        EngineType powerType,
+        EngineType engineType,
         int? manufacturedYear,
         Guid userId)
     {
@@ -17,7 +17,7 @@ public static class VehicleFactory
             Id = Guid.NewGuid(),
             Brand = brand,
             Model = model,
-            EngineType = powerType,
+            EngineType = engineType,
             ManufacturedYear = manufacturedYear,
             UserId = userId,
             CreatedDate = DateTime.UtcNow,

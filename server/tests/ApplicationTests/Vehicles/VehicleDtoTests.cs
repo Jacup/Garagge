@@ -12,7 +12,7 @@ public class VehicleDtoTests
         var userId = Guid.NewGuid();
         var brand = "Audi";
         var model = "A4";
-        var powerType = EngineType.Fuel;
+        var engineType = EngineType.Fuel;
         
         var manufacturedYear = 2010;
         var type = VehicleType.Car;
@@ -27,7 +27,7 @@ public class VehicleDtoTests
             UserId = userId,
             Brand = brand,
             Model = model,
-            EngineType = powerType,
+            EngineType = engineType,
             ManufacturedYear = manufacturedYear,
             Type = type,
             VIN = vin,
@@ -39,7 +39,7 @@ public class VehicleDtoTests
         dto.UserId.ShouldBe(userId);
         dto.Brand.ShouldBe(brand);
         dto.Model.ShouldBe(model);
-        dto.EngineType.ShouldBe(powerType);
+        dto.EngineType.ShouldBe(engineType);
         dto.ManufacturedYear.ShouldBe(manufacturedYear);
         dto.Type.ShouldBe(type);
         dto.VIN.ShouldBe(vin);
@@ -53,7 +53,7 @@ public class VehicleDtoTests
         var id = Guid.NewGuid();
         var userId = Guid.NewGuid();
         var brand = "Audi";
-        var powerType = EngineType.Fuel;
+        var engineType = EngineType.Fuel;
         var model = "A4";
         var createdDate = DateTime.UtcNow;
         var updatedDate = DateTime.UtcNow;
@@ -64,7 +64,7 @@ public class VehicleDtoTests
             UserId = userId,
             Brand = brand,
             Model = model,
-            EngineType = powerType,
+            EngineType = engineType,
             
             ManufacturedYear = null,
             Type = null,
@@ -78,7 +78,7 @@ public class VehicleDtoTests
         dto.UserId.ShouldBe(userId);
         dto.Brand.ShouldBe(brand);
         dto.Model.ShouldBe(model);
-        dto.EngineType.ShouldBe(powerType);
+        dto.EngineType.ShouldBe(engineType);
         dto.ManufacturedYear.ShouldBeNull();
         dto.Type.ShouldBeNull();
         dto.VIN.ShouldBeNull();

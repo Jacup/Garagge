@@ -338,7 +338,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_VehiclesWithDifferentPowerTypes_ShouldReturnAllVehicles()
+    public async Task Handle_VehiclesWithDifferentEngineTypes_ShouldReturnAllVehicles()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -406,7 +406,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
     private static List<Vehicle> CreateTestVehicles(int count, Guid userId)
     {
         var vehicles = new List<Vehicle>();
-        var powerTypes = new[] { EngineType.Fuel, EngineType.Electric, EngineType.Hybrid, EngineType.Electric };
+        var engineTypes = new[] { EngineType.Fuel, EngineType.Electric, EngineType.Hybrid, EngineType.Electric };
         
         for (int i = 1; i <= count; i++)
         {
@@ -414,7 +414,7 @@ public class GetMyVehiclesQueryHandlerTests : InMemoryDbTestBase
             {
                 Brand = $"Brand{i}",
                 Model = $"Model{i}",
-                EngineType = powerTypes[i % powerTypes.Length],
+                EngineType = engineTypes[i % engineTypes.Length],
                 ManufacturedYear = 2010 + i,
                 UserId = userId
             });
