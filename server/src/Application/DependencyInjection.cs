@@ -18,6 +18,7 @@ public static class DependencyInjection
         // Register services
         services.AddScoped<IVehicleEnergyCompatibilityService, VehicleEnergyCompatibilityService>();
         services.AddScoped<IEnergyEntryFilterService, EnergyEntryFilterService>();
+        services.AddScoped<IEnergyEntryMileageValidator, EnergyEntryMileageValidator>();
 
         services.AddMediatR(config =>
         {
