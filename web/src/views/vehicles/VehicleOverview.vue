@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 
 const route = useRoute()
 const { getApiVehiclesMyId } = getVehicles()
@@ -46,18 +47,6 @@ const mockStats = {
   totalServiceCost: 2350.0,
 }
 
-// Pagination
-const fuelPage = ref(1)
-
-// Mock fuel history data
-const mockFuelHistory = ref([
-  { date: '2024-12-20', liters: 50, cost: 322.5, consumption: 7.1, mileage: 125450 },
-  { date: '2024-12-15', liters: 45, cost: 290.25, consumption: 6.9, mileage: 124950 },
-  { date: '2024-12-10', liters: 52, cost: 335.6, consumption: 7.3, mileage: 124450 },
-  { date: '2024-12-05', liters: 48, cost: 309.6, consumption: 7.0, mileage: 123950 },
-  { date: '2024-11-30', liters: 51, cost: 328.95, consumption: 7.2, mileage: 123450 },
-])
-
 // Mock service history data
 const mockServiceHistory = ref([
   { date: '2025-03-15', service: 'Przegląd okresowy', description: 'Zaplanowany przegląd roczny', type: 'upcoming', cost: null },
@@ -66,15 +55,6 @@ const mockServiceHistory = ref([
   { date: '2024-06-10', service: 'Przegląd AC', description: 'Serwis klimatyzacji', type: 'completed', cost: 220.0 },
   { date: '2024-03-15', service: 'Przegląd okresowy', description: 'Przegląd roczny + wymiana świec', type: 'completed', cost: 520.0 },
 ])
-
-// Table configuration
-const fuelHeaders = [
-  { title: 'Date', key: 'date', value: 'date' },
-  { title: 'Liters', key: 'liters', value: 'liters' },
-  { title: 'Cost', key: 'cost', value: 'cost' },
-  { title: 'Consumption', key: 'consumption', value: 'consumption' },
-  { title: 'Mileage', key: 'mileage', value: 'mileage' },
-]
 
 // Utility functions
 const formatDate = (dateString: string) => {
@@ -85,8 +65,8 @@ const formatDate = (dateString: string) => {
   })
 }
 
-onMounted(() => {
-  loadVehicle()
+onMounted(async () => {
+  await loadVehicle()
 })
 </script>
 
@@ -363,36 +343,13 @@ onMounted(() => {
                   <div class="text-body-2 text-medium-emphasis">Total Spent</div>
                   <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.totalFuelCost.toFixed(2) }}</div>
                 </div>
-
               </div>
             </v-card-text>
           </v-card>
         </v-col>
 
         <v-col cols="12" md="8">
-          <v-card class="fuel-history-card card-background" height="400" variant="flat">
-            <template #title>Fuel History</template>
-            <template #append>
-              <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" disabled>Add</v-btn>
-            </template>
-            <v-card-text class="pa-0 d-flex flex-column" style="height: calc(400px - 56px);">
-              <v-data-table
-                :headers="fuelHeaders"
-                :items="mockFuelHistory"
-                :items-per-page="5"
-                :page="fuelPage"
-                @update:page="fuelPage = $event"
-                fixed-header
-                class="fuel-table flex-grow-1"
-              >
-                <template v-slot:[`item.date`]="{ item }">
-                  {{ formatDate(item.date) }}
-                </template>
-                <template v-slot:[`item.cost`]="{ item }"> {{ item.cost.toFixed(2) }} PLN </template>
-                <template v-slot:[`item.consumption`]="{ item }"> {{ item.consumption.toFixed(1) }} L/100km </template>
-              </v-data-table>
-            </v-card-text>
-          </v-card>
+          <EnergyEntriesTable :vehicle-id="vehicleId" />
         </v-col>
       </v-row>
     </section>
@@ -630,5 +587,4 @@ onMounted(() => {
 }
 
 /* Desktop optimizations */
-
 </style>
