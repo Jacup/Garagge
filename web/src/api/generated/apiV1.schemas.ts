@@ -4,10 +4,22 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+export interface CreateEnergyEntryRequest {
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
+}
+
 export interface CreateMyVehicleCommand {
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType2;
@@ -18,7 +30,7 @@ export interface CreateMyVehicleCommand {
 export interface EditMyVehicleRequest {
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType2;
@@ -26,6 +38,48 @@ export interface EditMyVehicleRequest {
   vin?: string | null;
 }
 
+export interface EnergyEntryDto {
+  id: string;
+  vehicleId: string;
+  createdDate: string;
+  updatedDate: string;
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
+}
+
+export enum EnergyType {
+  Gasoline= 'Gasoline',
+  Diesel= 'Diesel',
+  LPG= 'LPG',
+  CNG= 'CNG',
+  Ethanol= 'Ethanol',
+  Biofuel= 'Biofuel',
+  Hydrogen= 'Hydrogen',
+  Electric= 'Electric',
+
+}
+export enum EnergyUnit {
+  Liter= 'Liter',
+  Gallon= 'Gallon',
+  CubicMeter= 'CubicMeter',
+  kWh= 'kWh',
+
+}
+export enum EngineType {
+  Fuel= 'Fuel',
+  Hybrid= 'Hybrid',
+  PlugInHybrid= 'PlugInHybrid',
+  Electric= 'Electric',
+  Hydrogen= 'Hydrogen',
+
+}
 export interface LoginUserCommand {
   email: string;
   password: string;
@@ -38,11 +92,33 @@ export interface LoginUserResponse {
 /**
  * @nullable
  */
-export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export enum NullableOfVehicleType {
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+
+}
 /**
  * @nullable
  */
-export type NullableOfVehicleType2 = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export enum NullableOfVehicleType2 {
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+
+}
+export interface PagedListOfEnergyEntryDto {
+  /** @nullable */
+  items?: EnergyEntryDto[] | null;
+  page?: number;
+  pageSize?: number;
+  totalCount?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
 export interface PagedListOfVehicleDto {
   /** @nullable */
   items?: VehicleDto[] | null;
@@ -53,12 +129,23 @@ export interface PagedListOfVehicleDto {
   hasPreviousPage?: boolean;
 }
 
-export type PowerType = 'Gasoline' | 'Diesel' | 'Hybrid' | 'PlugInHybrid' | 'Electric';
 export interface RegisterUserCommand {
   email: string;
   firstName: string;
   lastName: string;
   password: string;
+}
+
+export interface UpdateEnergyEntryRequest {
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
 }
 
 export interface UserDto {
@@ -74,18 +161,31 @@ export interface VehicleDto {
   updatedDate?: string;
   brand: string;
   model: string;
-  powerType: PowerType;
+  engineType: EngineType;
   /** @nullable */
   manufacturedYear?: number | null;
   type?: NullableOfVehicleType;
   /** @nullable */
   vin?: string | null;
   userId: string;
+  allowedEnergyTypes?: EnergyType[];
 }
 
 export type GetApiVehiclesMyParams = {
 searchTerm?: string;
 pageSize?: number;
 page?: number;
+};
+
+export type GetApiVehiclesVehicleIdEnergyEntriesParams = {
+page?: number;
+pageSize?: number;
+energyTypes?: EnergyType[];
+};
+
+export type GetApiUsersUserIdEnergyEntriesParams = {
+page?: number;
+pageSize?: number;
+energyTypes?: EnergyType[];
 };
 

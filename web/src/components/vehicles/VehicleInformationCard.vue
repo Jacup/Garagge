@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { CreateMyVehicleCommand, PowerType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
+import type { CreateMyVehicleCommand, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
+import { EngineType as EngineTypeEnum, NullableOfVehicleType as VehicleTypeEnum } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
   vehicle: CreateMyVehicleCommand
@@ -18,19 +19,19 @@ const rules = {
   vinLength: (value: string | null) => value === null || value === '' || value.length === 17 || 'VIN must be exactly 17 characters',
 }
 
-const powerTypeOptions: { label: string; value: PowerType }[] = [
-  { label: 'Gasoline', value: 'Gasoline' },
-  { label: 'Diesel', value: 'Diesel' },
-  { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'PlugInHybrid', value: 'PlugInHybrid' },
-  { label: 'Electric', value: 'Electric' },
+const engineTypeOptions: { label: string; value: EngineType }[] = [
+  { label: 'Fuel', value: EngineTypeEnum.Fuel },
+  { label: 'Hybrid', value: EngineTypeEnum.Hybrid },
+  { label: 'Plug-in Hybrid', value: EngineTypeEnum.PlugInHybrid },
+  { label: 'Electric', value: EngineTypeEnum.Electric },
+  { label: 'Hydrogen', value: EngineTypeEnum.Hydrogen },
 ]
 
 const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
-  { label: 'Bus', value: 'Bus' },
-  { label: 'Car', value: 'Car' },
-  { label: 'Motorbike', value: 'Motorbike' },
-  { label: 'Truck', value: 'Truck' },
+  { label: 'Bus', value: VehicleTypeEnum.Bus },
+  { label: 'Car', value: VehicleTypeEnum.Car },
+  { label: 'Motorbike', value: VehicleTypeEnum.Motorbike },
+  { label: 'Truck', value: VehicleTypeEnum.Truck },
 ]
 </script>
 
@@ -77,9 +78,9 @@ const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
       ></v-text-field>
 
       <v-select
-        :model-value="vehicle.powerType"
-        @update:model-value="$emit('update:vehicle', { ...vehicle, powerType: $event })"
-        :items="powerTypeOptions"
+        :model-value="vehicle.engineType"
+        @update:model-value="$emit('update:vehicle', { ...vehicle, engineType: $event })"
+        :items="engineTypeOptions"
         :rules="[rules.required]"
         item-title="label"
         item-value="value"

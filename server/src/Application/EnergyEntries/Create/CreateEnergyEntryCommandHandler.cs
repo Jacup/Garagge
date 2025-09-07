@@ -29,7 +29,7 @@ public class CreateEnergyEntryCommandHandler(
         if (userContext.UserId != vehicle.UserId)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
 
-        var isCompatible = await energyCompatibilityService.IsEnergyTypeCompatibleAsync(request.VehicleId, request.Type, cancellationToken);
+        var isCompatible = await energyCompatibilityService.IsEnergyTypeCompatibleAsync(vehicle.Id, request.Type, cancellationToken);
 
         if (!isCompatible)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(request.VehicleId, request.Type));

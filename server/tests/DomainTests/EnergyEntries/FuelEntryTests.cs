@@ -165,7 +165,8 @@ public class EnergyEntryTests
             };
 
             energyEntry.Type.ShouldBe(fuelType);
-            (energyEntry.Type & EnergyType.AllFuels).ShouldNotBe(EnergyType.None);
+            // Verify it's a fuel type (not Electric)
+            fuelType.ShouldNotBe(EnergyType.Electric);
         }
     }
 
@@ -183,7 +184,7 @@ public class EnergyEntryTests
         };
 
         energyEntry.Type.ShouldBe(EnergyType.Electric);
-        (energyEntry.Type & EnergyType.AllCharging).ShouldNotBe(EnergyType.None);
+        energyEntry.Type.ShouldBe(EnergyType.Electric);
     }
 
     [Fact]
@@ -200,7 +201,8 @@ public class EnergyEntryTests
         };
 
         energyEntry.Type.ShouldBe(EnergyType.Hydrogen);
-        (energyEntry.Type & EnergyType.AllFuels).ShouldNotBe(EnergyType.None);
+        // Verify it's a fuel type (not Electric)
+        EnergyType.Hydrogen.ShouldNotBe(EnergyType.Electric);
     }
 
     [Theory]

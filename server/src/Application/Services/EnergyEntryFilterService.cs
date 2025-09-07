@@ -6,12 +6,12 @@ namespace Application.Services;
 
 internal sealed class EnergyEntryFilterService : IEnergyEntryFilterService
 {
-    public IQueryable<EnergyEntry> ApplyEnergyTypeFilter(IQueryable<EnergyEntry> query, EnergyType? energyType)
+    public IQueryable<EnergyEntry> ApplyEnergyTypeFilter(IQueryable<EnergyEntry> query, IReadOnlyCollection<EnergyType>? energyTypes)
     {
-        if (energyType is null or EnergyType.None)
+        if (energyTypes == null || energyTypes.Count == 0)
             return query;
 
-        return query.Where(ee => (energyType.Value & ee.Type) != 0);
+        return query.Where(ee => energyTypes.Contains(ee.Type));
     }
 
     public IQueryable<EnergyEntry> ApplyUserFilter(IQueryable<EnergyEntry> query, Guid userId)

@@ -36,7 +36,7 @@ public class UpdateEnergyEntry : IEndpoint
                         CustomResults.Problem
                     );
                 })
-            .Produces<EnergyEntryDto>(StatusCodes.Status200OK)
+            .Produces<EnergyEntryDto>()
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)

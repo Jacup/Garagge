@@ -17,7 +17,7 @@ Garagge is a vehicle management application with **Clean Architecture** and stri
 Commands and queries are separate with explicit error handling:
 ```csharp
 // Command pattern
-public record CreateMyVehicleCommand(string Brand, string Model, PowerType PowerType) : ICommand<VehicleDto>;
+public record CreateMyVehicleCommand(string Brand, string Model, EngineType EngineType) : ICommand<VehicleDto>;
 
 // Handler returns Result<T> - never throw exceptions
 public async Task<Result<VehicleDto>> Handle(CreateMyVehicleCommand request, CancellationToken cancellationToken)

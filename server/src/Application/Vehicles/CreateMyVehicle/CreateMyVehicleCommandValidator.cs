@@ -18,7 +18,7 @@ internal sealed class CreateMyVehicleCommandValidator : AbstractValidator<Create
             .MaximumLength(64)
             .WithMessage("Model is required and must not exceed 64 characters.");
         
-        RuleFor(c => c.PowerType)
+        RuleFor(c => c.EngineType)
             .IsInEnum()
             .WithMessage($"Power type must be a valid enum value. Valid values are: {string.Join(", ", Enum.GetNames<EngineType>())}.");
 

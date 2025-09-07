@@ -7,7 +7,7 @@ public sealed record EditMyVehicleCommand(
     Guid VehicleId,
     string Brand,
     string Model,
-    EngineType PowerType,
+    EngineType EngineType,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
     string? VIN = null)

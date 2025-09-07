@@ -4,12 +4,11 @@ import { useRoute, useRouter } from 'vue-router'
 import VehicleInformationCard from '@/components/vehicles/VehicleInformationCard.vue'
 import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import type {
-  CreateMyVehicleCommand,
-  EditMyVehicleRequest,
-  PowerType,
-  NullableOfVehicleType2,
-  VehicleDto,
+import {
+  type CreateMyVehicleCommand,
+  type EditMyVehicleRequest,
+  type VehicleDto,
+  EngineType,
 } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
@@ -22,18 +21,18 @@ const isEditMode = !!vehicleId
 const createVehicle = reactive<CreateMyVehicleCommand>({
   brand: '',
   model: '',
-  powerType: null as unknown as PowerType,
-  manufacturedYear: null as unknown as number,
-  type: null as NullableOfVehicleType2,
+  engineType: EngineType.Fuel, // Default to first option
+  manufacturedYear: null,
+  type: undefined,
   vin: null,
 })
 
 const editVehicle = reactive<EditMyVehicleRequest>({
   brand: '',
   model: '',
-  powerType: null as unknown as PowerType,
-  manufacturedYear: null as unknown as number,
-  type: null as NullableOfVehicleType2,
+  engineType: EngineType.Fuel,
+  manufacturedYear: null,
+  type: undefined,
   vin: null,
 })
 
@@ -52,7 +51,7 @@ onMounted(async () => {
       Object.assign(editVehicle, {
         brand: vehicleData.brand || '',
         model: vehicleData.model || '',
-        powerType: vehicleData.powerType,
+        engineType: vehicleData.engineType,
         manufacturedYear: vehicleData.manufacturedYear,
         type: vehicleData.type || null,
         vin: vehicleData.vin || null,

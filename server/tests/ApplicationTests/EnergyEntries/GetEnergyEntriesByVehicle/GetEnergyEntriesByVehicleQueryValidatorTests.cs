@@ -126,39 +126,39 @@ public class GetEnergyEntriesByVehicleQueryValidatorTests
     public void EnergyType_IsNull_PassesValidation()
     {
         // Arrange
-        var query = CreateValidQuery() with { EnergyType = null };
+        var query = CreateValidQuery() with { EnergyTypes = null };
 
         // Act
         var result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.EnergyType);
+        result.ShouldNotHaveValidationErrorFor(x => x.EnergyTypes);
     }
 
     [Fact]
     public void EnergyType_IsValid_PassesValidation()
     {
         // Arrange
-        var query = CreateValidQuery() with { EnergyType = EnergyType.Electric };
+        var query = CreateValidQuery() with { EnergyTypes = [EnergyType.Electric] };
 
         // Act
         var result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.EnergyType);
+        result.ShouldNotHaveValidationErrorFor(x => x.EnergyTypes);
     }
 
     [Fact]
     public void EnergyType_IsInvalid_HasValidationError()
     {
         // Arrange
-        var query = CreateValidQuery() with { EnergyType = (EnergyType)999 };
+        var query = CreateValidQuery() with { EnergyTypes = [(EnergyType)999] };
 
         // Act
         var result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.EnergyType)
+        result.ShouldHaveValidationErrorFor(x => x.EnergyTypes)
             .WithErrorMessage("Invalid energy type.");
     }
 
@@ -181,6 +181,6 @@ public class GetEnergyEntriesByVehicleQueryValidatorTests
             VehicleId: Guid.NewGuid(),
             Page: 1,
             PageSize: 20,
-            EnergyType: EnergyType.Gasoline);
+            EnergyTypes: [EnergyType.Gasoline]);
     }
 }

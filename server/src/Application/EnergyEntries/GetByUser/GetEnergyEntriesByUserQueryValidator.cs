@@ -18,9 +18,11 @@ internal sealed class GetEnergyEntriesByUserQueryValidator : AbstractValidator<G
             .InclusiveBetween(1, 100)
             .WithMessage("Page size must be between 1 and 100.");
 
-        RuleFor(x => x.EnergyType)
-            .IsInEnum()
-            .When(x => x.EnergyType.HasValue)
-            .WithMessage("Invalid energy type.");
+        When(x => x.EnergyTypes != null, () =>
+        {
+            RuleForEach(x => x.EnergyTypes)
+                .IsInEnum()
+                .WithMessage("Invalid energy type.");
+        });
     }
 }

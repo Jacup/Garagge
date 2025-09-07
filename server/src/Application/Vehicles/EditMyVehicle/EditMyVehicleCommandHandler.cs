@@ -26,7 +26,7 @@ public class EditMyVehicleCommandHandler(IApplicationDbContext dbContext, IUserC
         {
             vehicle.Brand = request.Brand;
             vehicle.Model = request.Model;
-            vehicle.EngineType = request.PowerType;
+            vehicle.EngineType = request.EngineType;
             vehicle.ManufacturedYear = request.ManufacturedYear;
             vehicle.Type = request.Type;
             vehicle.VIN = request.VIN;

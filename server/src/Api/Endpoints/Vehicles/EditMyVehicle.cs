@@ -22,7 +22,7 @@ public class EditMyVehicle : IEndpoint
                         id,
                         request.Brand,
                         request.Model,
-                        request.PowerType,
+                        request.EngineType,
                         request.ManufacturedYear,
                         request.Type,
                         request.VIN
@@ -44,7 +44,7 @@ public class EditMyVehicle : IEndpoint
 record EditMyVehicleRequest(
     string Brand,
     string Model,
-    EngineType PowerType,
+    EngineType EngineType,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
     string? VIN = null);

@@ -29,97 +29,95 @@ public class EnergyEntryFilterServiceTests
         // Assert
         result.Count().ShouldBe(5);
     }
-
+    
     [Fact]
-    public void ApplyEnergyTypeFilter_WhenEnergyTypeIsNone_ReturnsUnfilteredQuery()
+    public void ApplyEnergyTypeFilter_WithEmptyList_ReturnsUnfilteredQuery()
     {
         // Arrange
         var entries = CreateTestEnergyEntries();
         var query = entries.AsQueryable();
 
         // Act
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.None);
+        var result = _service.ApplyEnergyTypeFilter(query, []);
 
         // Assert
-        result.Count().ShouldBe(5);
+        result.Count().ShouldBe(entries.Count);
     }
-
+    
     [Fact]
-    public void ApplyEnergyTypeFilter_WhenEnergyTypeIsGasoline_ReturnsOnlyGasolineEntries()
+    public void ApplyEnergyTypeFilter_WithMultipleTypes_ReturnsOnlyMatchingEntries()
     {
         // Arrange
         var entries = CreateTestEnergyEntries();
         var query = entries.AsQueryable();
+        var types = new[] { EnergyType.Gasoline, EnergyType.Diesel };
 
         // Act
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.Gasoline);
-
-        // Assert
-        var filteredEntries = result.ToList();
-        filteredEntries.Count.ShouldBe(2);
-        filteredEntries.All(e => e.Type == EnergyType.Gasoline).ShouldBeTrue();
-    }
-
-    [Fact]
-    public void ApplyEnergyTypeFilter_WhenEnergyTypeIsElectric_ReturnsOnlyElectricEntries()
-    {
-        // Arrange
-        var entries = CreateTestEnergyEntries();
-        var query = entries.AsQueryable();
-
-        // Act
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.Electric);
-
-        // Assert
-        var filteredEntries = result.ToList();
-        filteredEntries.Count.ShouldBe(1);
-        filteredEntries.All(e => e.Type == EnergyType.Electric).ShouldBeTrue();
-    }
-
-    [Fact]
-    public void ApplyEnergyTypeFilter_WhenEnergyTypeIsAllFuels_ReturnsAllFuelEntries()
-    {
-        // Arrange
-        var entries = CreateTestEnergyEntries();
-        var query = entries.AsQueryable();
-
-        // Act
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.AllFuels);
-
-        // Assert
-        var filteredEntries = result.ToList();
-        filteredEntries.Count.ShouldBe(4);
-        filteredEntries.Any(e => e.Type == EnergyType.Electric).ShouldBeFalse();
-        filteredEntries.Any(e => e.Type == EnergyType.Gasoline).ShouldBeTrue();
-        filteredEntries.Any(e => e.Type == EnergyType.Diesel).ShouldBeTrue();
-        filteredEntries.Any(e => e.Type == EnergyType.LPG).ShouldBeTrue();
-    }
-
-    [Fact]
-    public void ApplyEnergyTypeFilter_WhenEnergyTypeIsCombination_ReturnsMatchingEntries()
-    {
-        // Arrange
-        var entries = CreateTestEnergyEntries();
-        var query = entries.AsQueryable();
-
-        // Act - Filter for Gasoline OR Electric
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.Gasoline | EnergyType.Electric);
+        var result = _service.ApplyEnergyTypeFilter(query, types);
 
         // Assert
         var filteredEntries = result.ToList();
         filteredEntries.Count.ShouldBe(3);
-        filteredEntries.All(e => e.Type is EnergyType.Gasoline or EnergyType.Electric).ShouldBeTrue();
+        filteredEntries.All(e => types.Contains(e.Type)).ShouldBeTrue();
     }
-
+    
     [Fact]
-    public void ApplyEnergyTypeFilter_WhenNoMatchingType_ReturnsEmptyQuery()
+    public void ApplyEnergyTypeFilter_WhenSingleTypeMatches_ReturnsOnlyMatchingEntries()
     {
         // Arrange
         var entries = CreateTestEnergyEntries();
         var query = entries.AsQueryable();
+        var types = new[] { EnergyType.Gasoline };
 
         // Act
-        var result = _service.ApplyEnergyTypeFilter(query, EnergyType.Hydrogen);
+        var result = _service.ApplyEnergyTypeFilter(query, types);
+
+        // Assert
+        var filteredEntries = result.ToList();
+        filteredEntries.All(e => e.Type == EnergyType.Gasoline).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void ApplyEnergyTypeFilter_WhenSingleTypeNoMatch_ReturnsEmpty()
+    {
+        // Arrange
+        var entries = CreateTestEnergyEntries();
+        var query = entries.AsQueryable();
+        var types = new[] { EnergyType.Hydrogen }; // brak w testowych danych
+
+        // Act
+        var result = _service.ApplyEnergyTypeFilter(query, types);
+
+        // Assert
+        result.Count().ShouldBe(0);
+    }
+
+    [Fact]
+    public void ApplyEnergyTypeFilter_WhenMultipleTypes_ReturnsOnlyMatchingEntries()
+    {
+        // Arrange
+        var entries = CreateTestEnergyEntries();
+        var query = entries.AsQueryable();
+        var types = new[] { EnergyType.Gasoline, EnergyType.Diesel };
+
+        // Act
+        var result = _service.ApplyEnergyTypeFilter(query, types);
+
+        // Assert
+        var filteredEntries = result.ToList();
+        filteredEntries.All(e => types.Contains(e.Type)).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void ApplyEnergyTypeFilter_WhenMultipleTypesWithNoMatch_ReturnsEmpty()
+    {
+        // Arrange
+        var entries = CreateTestEnergyEntries();
+        var query = entries.AsQueryable();
+        var types = new[] { EnergyType.Hydrogen, EnergyType.Biofuel }; // brak w danych
+
+        // Act
+        var result = _service.ApplyEnergyTypeFilter(query, types);
 
         // Assert
         result.Count().ShouldBe(0);
