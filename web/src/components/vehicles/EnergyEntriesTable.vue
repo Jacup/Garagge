@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { EnergyEntryDto, EnergyUnit } from '@/api/generated/apiV1.schemas'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   vehicleId: string
@@ -85,7 +86,8 @@ function closeDeleteDialog() {
 async function confirmDelete() {
   if (selectedEntry.value?.id) {
     await remove(selectedEntry.value.id)
-    closeDeleteDialog()
+    deleteDialog.value = false
+    selectedEntry.value = null
   }
 }
 
@@ -164,22 +166,12 @@ onMounted(() => {
   </v-card>
 
 
-  <v-dialog v-model="deleteDialog" class="delete-dialog">
-
-    <v-card
-      title="Delete Energy Entry"
-      text="Are you sure you want to delete this energy entry?"
-      variant="flat"
-    >
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn variant="text" @click="closeDeleteDialog">Cancel</v-btn>
-        <v-btn color="error" variant="text" @click="confirmDelete">Delete</v-btn>
-      </v-card-actions>
-    </v-card>
-
-  </v-dialog>
-
+  <DeleteDialog
+    :is-open="deleteDialog"
+    item-to-delete="energy entry"
+    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteDialog"
+  />
 
 
   <!-- Edit Dialog -->
@@ -254,19 +246,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.delete-dialog {
-  min-width: 280px;
-  max-width: 560px;
-  border-radius: 28px;
-}
-
-.centered-dialog {
-  display: flex;
-  align-items: align-center;
-  justify-content: justify-center;
-}
-
-
 /* Table styling - full container height */
 .fuel-history-card {
   height: 100% !important;
