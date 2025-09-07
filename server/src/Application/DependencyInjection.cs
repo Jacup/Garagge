@@ -16,7 +16,7 @@ public static class DependencyInjection
         services.AddSingleton<IResultFactory, ResultFactory>();
         
         // Register services
-        services.AddScoped<IVehicleEnergyCompatibilityService, VehicleEnergyCompatibilityService>();
+        services.AddScoped<IVehicleEngineCompatibilityService, VehicleEngineCompatibilityService>();
         services.AddScoped<IEnergyEntryFilterService, EnergyEntryFilterService>();
         services.AddScoped<IEnergyEntryMileageValidator, EnergyEntryMileageValidator>();
 

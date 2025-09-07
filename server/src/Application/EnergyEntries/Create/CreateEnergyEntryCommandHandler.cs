@@ -13,7 +13,7 @@ namespace Application.EnergyEntries.Create;
 public class CreateEnergyEntryCommandHandler(
     IApplicationDbContext dbContext, 
     IUserContext userContext,
-    IVehicleEnergyCompatibilityService energyCompatibilityService)
+    IVehicleEngineCompatibilityService engineCompatibilityService)
     : ICommandHandler<CreateEnergyEntryCommand, EnergyEntryDto>
 {
     public async Task<Result<EnergyEntryDto>> Handle(CreateEnergyEntryCommand request, CancellationToken cancellationToken)
@@ -29,7 +29,7 @@ public class CreateEnergyEntryCommandHandler(
         if (userContext.UserId != vehicle.UserId)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
 
-        var isCompatible = await energyCompatibilityService.IsEnergyTypeCompatibleAsync(vehicle.Id, request.Type, cancellationToken);
+        var isCompatible = await engineCompatibilityService.IsEnergyTypeCompatibleAsync(vehicle.Id, request.Type, cancellationToken);
 
         if (!isCompatible)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(request.VehicleId, request.Type));

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-internal sealed class VehicleEnergyCompatibilityService(IApplicationDbContext dbContext) : IVehicleEnergyCompatibilityService
+internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext dbContext) : IVehicleEngineCompatibilityService
 {
     public async Task<bool> IsEnergyTypeCompatibleAsync(Guid vehicleId, EnergyType energyType, CancellationToken cancellationToken = default)
     {

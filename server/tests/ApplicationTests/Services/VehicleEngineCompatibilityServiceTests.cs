@@ -4,13 +4,13 @@ using Domain.Enums;
 
 namespace ApplicationTests.Services;
 
-public class VehicleEnergyCompatibilityServiceTests : InMemoryDbTestBase
+public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
 {
-    private readonly VehicleEnergyCompatibilityService _service;
+    private readonly VehicleEngineCompatibilityService _service;
 
-    public VehicleEnergyCompatibilityServiceTests()
+    public VehicleEngineCompatibilityServiceTests()
     {
-        _service = new VehicleEnergyCompatibilityService(Context);
+        _service = new VehicleEngineCompatibilityService(Context);
     }
 
     [Theory]
