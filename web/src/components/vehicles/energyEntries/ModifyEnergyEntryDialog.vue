@@ -5,6 +5,18 @@ import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 
+// Mapa domyślnych jednostek dla typów energii
+const defaultUnitMap: Record<string, EnergyUnit> = {
+  Gasoline: 'Liter' as EnergyUnit,
+  Diesel: 'Liter' as EnergyUnit,
+  LPG: 'Liter' as EnergyUnit,
+  CNG: 'CubicMeter' as EnergyUnit,
+  Ethanol: 'Liter' as EnergyUnit,
+  Biofuel: 'Liter' as EnergyUnit,
+  Hydrogen: 'CubicMeter' as EnergyUnit,
+  Electric: 'kWh' as EnergyUnit,
+}
+
 const energyTypeOptions = Object.values(EnergyType)
 const energyUnitOptions = Object.values(EnergyUnit)
 
@@ -73,6 +85,15 @@ watch(
   },
   { immediate: true },
 )
+
+// Automatyczna zmiana jednostki po zmianie typu energii
+watch(() => form.value.type, (newType) => {
+  if (!newType) return
+  const defaultUnit = defaultUnitMap[newType]
+  if (defaultUnit) {
+    form.value.energyUnit = defaultUnit
+  }
+})
 
 async function handleSave() {
   if (!props.vehicleId) return
@@ -181,7 +202,8 @@ async function handleSave() {
                 <v-select
                   v-model="form.energyUnit"
                   label="Unit"
-                  :items="energyUnitOptions"
+                  :items="form.type === 'Electric' ? ['kWh'] : energyUnitOptions.filter(u => u !== 'kWh')"
+                  :disabled="form.type === 'Electric'"
                   variant="outlined"
                   density="comfortable"
                   required

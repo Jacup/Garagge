@@ -4,11 +4,11 @@ import { useRoute, useRouter } from 'vue-router'
 import VehicleInformationCard from '@/components/vehicles/VehicleInformationCard.vue'
 import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import type {
-  CreateMyVehicleCommand,
-  EditMyVehicleRequest,
-  NullableOfVehicleType2,
-  VehicleDto,
+import {
+  type CreateMyVehicleCommand,
+  type EditMyVehicleRequest,
+  type VehicleDto,
+  EngineType,
 } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
@@ -21,18 +21,18 @@ const isEditMode = !!vehicleId
 const createVehicle = reactive<CreateMyVehicleCommand>({
   brand: '',
   model: '',
-  engineType: 'Fuel', // Default to first option
+  engineType: EngineType.Fuel, // Default to first option
   manufacturedYear: null,
-  type: null,
+  type: undefined,
   vin: null,
 })
 
 const editVehicle = reactive<EditMyVehicleRequest>({
   brand: '',
   model: '',
-  engineType: 'Fuel',
+  engineType: EngineType.Fuel,
   manufacturedYear: null,
-  type: null as NullableOfVehicleType2,
+  type: undefined,
   vin: null,
 })
 

@@ -1,6 +1,6 @@
 // src/stores/userStore.ts
 import { defineStore } from 'pinia'
-import type { UserDto } from '@/api/apiV1.schemas'
+import type { UserDto } from '@/api/generated/apiV1.schemas'
 import { getUsers } from '@/api/generated/users/users'
 
 const { getApiUsersMe } = getUsers()
