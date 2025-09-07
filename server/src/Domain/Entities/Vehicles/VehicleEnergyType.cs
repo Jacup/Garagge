@@ -1,6 +1,7 @@
 ﻿using Domain.Enums;
 
 namespace Domain.Entities.Vehicles;
+
 public sealed class VehicleEnergyType : Entity
 {
     public required Guid VehicleId { get; set; }
