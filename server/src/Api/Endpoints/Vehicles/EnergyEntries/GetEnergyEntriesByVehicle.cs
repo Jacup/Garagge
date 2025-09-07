@@ -6,6 +6,7 @@ using Application.EnergyEntries;
 using Application.EnergyEntries.GetByVehicle;
 using Domain.Enums;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;
 
@@ -17,11 +18,11 @@ public class GetEnergyEntriesByVehicle : IEndpoint
                 Guid vehicleId,
                 ISender sender,
                 CancellationToken cancellationToken,
-                int page = 1,
-                int pageSize = 10,
-                EnergyType? energyType = null) =>
+                [FromQuery]int page = 1,
+                [FromQuery]int pageSize = 10,
+                [FromQuery]EnergyType[]? energyTypes = null) =>
             {
-                var query = new GetEnergyEntriesByVehicleQuery(vehicleId, page, pageSize, energyType);
+                var query = new GetEnergyEntriesByVehicleQuery(vehicleId, page, pageSize, energyTypes);
 
                 Result<PagedList<EnergyEntryDto>> result = await sender.Send(query, cancellationToken);
 

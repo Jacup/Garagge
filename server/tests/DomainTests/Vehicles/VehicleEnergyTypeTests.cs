@@ -83,81 +83,40 @@ public class VehicleEnergyTypeTests
 
         vehicleEnergyType.EnergyType.ShouldBe(energyType);
     }
-
+    
     [Fact]
-    public void EnergyType_FlagCombinations_SetsCorrectly()
-    {
-        var combinedType = EnergyType.Gasoline | EnergyType.Electric;
-        
-        var vehicleEnergyType = new VehicleEnergyType
-        {
-            VehicleId = _vehicleId,
-            EnergyType = combinedType
-        };
-
-        vehicleEnergyType.EnergyType.ShouldBe(combinedType);
-        (vehicleEnergyType.EnergyType & EnergyType.Gasoline).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.Electric).ShouldNotBe(EnergyType.None);
-    }
-
-    [Fact]
-    public void EnergyType_AllFuelsFlag_MatchesIndividualFuelTypes()
+    public void EnergyType_ElectricType_IsCorrectlyIdentifiedAsChargingType()
     {
         var vehicleEnergyType = new VehicleEnergyType
         {
             VehicleId = _vehicleId,
-            EnergyType = EnergyType.AllFuels
+            EnergyType = EnergyType.Electric
         };
 
-        (vehicleEnergyType.EnergyType & EnergyType.Gasoline).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.Diesel).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.LPG).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.CNG).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.Ethanol).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.Biofuel).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.Hydrogen).ShouldNotBe(EnergyType.None);
-    }
-
-    [Fact]
-    public void EnergyType_AllChargingFlag_MatchesElectricType()
-    {
-        var vehicleEnergyType = new VehicleEnergyType
-        {
-            VehicleId = _vehicleId,
-            EnergyType = EnergyType.AllCharging
-        };
-
-        (vehicleEnergyType.EnergyType & EnergyType.Electric).ShouldNotBe(EnergyType.None);
+        vehicleEnergyType.EnergyType.ShouldBe(EnergyType.Electric);
         vehicleEnergyType.EnergyType.ShouldBe(EnergyType.Electric);
     }
 
-    [Fact]
-    public void EnergyType_AllFlag_ContainsAllEnergyTypes()
+    [Theory]
+    [InlineData(EnergyType.Gasoline)]
+    [InlineData(EnergyType.Diesel)]
+    [InlineData(EnergyType.LPG)]
+    [InlineData(EnergyType.CNG)]
+    [InlineData(EnergyType.Ethanol)]
+    [InlineData(EnergyType.Biofuel)]
+    [InlineData(EnergyType.Hydrogen)]
+    [InlineData(EnergyType.Electric)]
+    public void EnergyType_ValidEnergyTypes_AreCorrectlyIdentifiedAsValidEnergyTypes(EnergyType energyType)
     {
         var vehicleEnergyType = new VehicleEnergyType
         {
             VehicleId = _vehicleId,
-            EnergyType = EnergyType.All
+            EnergyType = energyType
         };
 
-        (vehicleEnergyType.EnergyType & EnergyType.AllFuels).ShouldNotBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.AllCharging).ShouldNotBe(EnergyType.None);
+        vehicleEnergyType.EnergyType.ShouldBe(energyType);
     }
-
-    [Fact]
-    public void EnergyType_NoneFlag_SetsToNone()
-    {
-        var vehicleEnergyType = new VehicleEnergyType
-        {
-            VehicleId = _vehicleId,
-            EnergyType = EnergyType.None
-        };
-
-        vehicleEnergyType.EnergyType.ShouldBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.AllFuels).ShouldBe(EnergyType.None);
-        (vehicleEnergyType.EnergyType & EnergyType.AllCharging).ShouldBe(EnergyType.None);
-    }
-
+    
     [Fact]
     public void Vehicle_NavigationProperty_CanBeSetAndRetrieved()
     {

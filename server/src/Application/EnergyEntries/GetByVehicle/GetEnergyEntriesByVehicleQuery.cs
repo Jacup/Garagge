@@ -8,5 +8,5 @@ public sealed record GetEnergyEntriesByVehicleQuery(
     Guid VehicleId, 
     int Page, 
     int PageSize, 
-    EnergyType? EnergyType = null) 
+    IReadOnlyCollection<EnergyType>? EnergyTypes = null) 
     : IQuery<PagedList<EnergyEntryDto>>;

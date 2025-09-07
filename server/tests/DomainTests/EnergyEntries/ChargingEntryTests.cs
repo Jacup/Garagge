@@ -78,43 +78,7 @@ public class ChargingEnergyEntryTests
         energyEntry.EnergyUnit.ShouldBe(EnergyUnit.kWh);
         energyEntry.Type.ShouldBe(EnergyType.Electric);
     }
-
-    [Fact]
-    public void Type_ElectricType_IsPartOfAllChargingTypes()
-    {
-        var energyEntry = new EnergyEntry
-        {
-            Date = _date,
-            Mileage = Mileage,
-            VehicleId = _vehicleId,
-            Volume = Volume,
-            EnergyUnit = Unit,
-            Type = EnergyType.Electric
-        };
-
-        (energyEntry.Type & EnergyType.AllCharging).ShouldNotBe(EnergyType.None);
-        energyEntry.Type.ShouldBe(EnergyType.Electric);
-    }
-
-    [Fact]
-    public void Type_ElectricType_IsNotPartOfFuelTypes()
-    {
-        var energyEntry = new EnergyEntry
-        {
-            Date = _date,
-            Mileage = Mileage,
-            VehicleId = _vehicleId,
-            Volume = Volume,
-            EnergyUnit = Unit,
-            Type = EnergyType.Electric
-        };
-
-        // Electric should not match any individual fuel types
-        (energyEntry.Type & EnergyType.Gasoline).ShouldBe(EnergyType.None);
-        (energyEntry.Type & EnergyType.Diesel).ShouldBe(EnergyType.None);
-        (energyEntry.Type & EnergyType.LPG).ShouldBe(EnergyType.None);
-    }
-
+    
     [Theory]
     [InlineData(42.5, EnergyUnit.kWh)]
     [InlineData(150.0, EnergyUnit.kWh)]
@@ -148,7 +112,7 @@ public class ChargingEnergyEntryTests
             Type = Type
         };
 
-        energyEntry.Vehicle.ShouldBeNull(); // Navigation property starts as null
+        energyEntry.Vehicle.ShouldBeNull();
         energyEntry.VehicleId.ShouldBe(_vehicleId);
     }
 
@@ -156,8 +120,8 @@ public class ChargingEnergyEntryTests
     public void Cost_CalculatedFromVolumeAndPrice_ReturnsCorrectValue()
     {
         const decimal volume = 50.0m;
-        const decimal pricePerUnit = 0.12m; // 12 cents per kWh
-        const decimal expectedCost = 6.0m; // 50 * 0.12
+        const decimal pricePerUnit = 0.12m;
+        const decimal expectedCost = 6.0m;
 
         var energyEntry = new EnergyEntry
         {

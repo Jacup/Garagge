@@ -14,22 +14,12 @@ internal sealed class VehicleEnergyCompatibilityService(IApplicationDbContext db
         return compatibleTypes.Contains(energyType);
     }
 
-    public async Task<IEnumerable<EnergyType>> GetCompatibleEnergyTypesAsync(Guid vehicleId, CancellationToken cancellationToken = default)
+    internal async Task<IEnumerable<EnergyType>> GetCompatibleEnergyTypesAsync(Guid vehicleId, CancellationToken cancellationToken = default)
     {
         return await dbContext.VehicleEnergyTypes
             .AsNoTracking()
             .Where(vet => vet.VehicleId == vehicleId)
             .Select(vet => vet.EnergyType)
             .ToListAsync(cancellationToken);
-    }
-
-    public async Task<bool> IsAnyEnergyTypeCompatibleAsync(Guid vehicleId, EnergyType energyTypes, CancellationToken cancellationToken = default)
-    {
-        if (energyTypes == EnergyType.None)
-            return false;
-
-        var compatibleTypes = await GetCompatibleEnergyTypesAsync(vehicleId, cancellationToken);
-        
-        return compatibleTypes.Any(compatibleType => (energyTypes & compatibleType) != 0);
     }
 }

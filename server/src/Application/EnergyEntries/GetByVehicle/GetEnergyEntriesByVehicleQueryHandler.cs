@@ -30,7 +30,7 @@ internal sealed class GetEnergyEntriesByVehicleQueryHandler(
         var entriesQuery = dbContext.EnergyEntries.AsNoTracking();
 
         entriesQuery = filterService.ApplyVehicleFilter(entriesQuery, request.VehicleId);
-        entriesQuery = filterService.ApplyEnergyTypeFilter(entriesQuery, request.EnergyType);
+        entriesQuery  = filterService.ApplyEnergyTypeFilter(entriesQuery, request.EnergyTypes);
         entriesQuery = filterService.ApplyDefaultSorting(entriesQuery);
 
         var energyEntriesDtoQuery = entriesQuery

@@ -20,12 +20,11 @@ internal sealed class GetEnergyEntriesByUserQueryHandler(
 
         var entriesQuery = dbContext.EnergyEntries
             .AsNoTracking()
-            .Include(ee => ee.Vehicle) // Add Include to load Vehicle navigation property
-            .AsQueryable(); // Cast back to IQueryable to work with filter service
+            .Include(ee => ee.Vehicle)
+            .AsQueryable();
 
-        // Apply filters using the dedicated service
         entriesQuery = filterService.ApplyUserFilter(entriesQuery, request.UserId);
-        entriesQuery = filterService.ApplyEnergyTypeFilter(entriesQuery, request.EnergyType);
+        entriesQuery  = filterService.ApplyEnergyTypeFilter(entriesQuery, request.EnergyTypes);
         entriesQuery = filterService.ApplyDefaultSorting(entriesQuery);
 
         var energyEntriesDtoQuery = entriesQuery

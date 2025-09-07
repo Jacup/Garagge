@@ -54,8 +54,7 @@ export interface EnergyEntryDto {
   pricePerUnit: number | null;
 }
 
-export type EnergyType = string;
-
+export type EnergyType = 'Gasoline' | 'Diesel' | 'LPG' | 'CNG' | 'Ethanol' | 'Biofuel' | 'Hydrogen' | 'Electric';
 export type EnergyUnit = 'Liter' | 'Gallon' | 'CubicMeter' | 'kWh';
 export type EngineType = 'Fuel' | 'Hybrid' | 'PlugInHybrid' | 'Electric' | 'Hydrogen';
 export interface LoginUserCommand {
@@ -66,8 +65,6 @@ export interface LoginUserCommand {
 export interface LoginUserResponse {
   accessToken: string;
 }
-
-export type NullableOfEnergyType = string;
 
 /**
  * @nullable
@@ -148,12 +145,12 @@ page?: number;
 export type GetApiVehiclesVehicleIdEnergyEntriesParams = {
 page?: number;
 pageSize?: number;
-energyType?: NullableOfEnergyType;
+energyTypes?: EnergyType[];
 };
 
 export type GetApiUsersUserIdEnergyEntriesParams = {
 page?: number;
 pageSize?: number;
-energyType?: NullableOfEnergyType;
+energyTypes?: EnergyType[];
 };
 

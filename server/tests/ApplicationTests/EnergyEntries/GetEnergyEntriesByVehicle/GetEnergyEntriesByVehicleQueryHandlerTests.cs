@@ -43,7 +43,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var otherUserId = Guid.NewGuid();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, otherUserId);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline], otherUserId);
         var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, null);
 
         // Act
@@ -59,7 +59,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
         var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, null);
 
         // Act
@@ -76,8 +76,8 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Electric);
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, EnergyType.Electric);
+        var vehicle = await CreateVehicleInDb([EnergyType.Electric]);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, [EnergyType.Electric]);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -91,8 +91,8 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 3, 5, EnergyType.Gasoline);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 3, 5, [EnergyType.Gasoline]);
 
         var callSequence = new List<string>();
 
@@ -110,7 +110,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
         var entry1 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
         var entry2 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 10), 950);
 
@@ -132,14 +132,13 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline | EnergyType.Diesel | EnergyType.Electric);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline,  EnergyType.Diesel, EnergyType.Electric]);
 
-        var gasolineEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
-        var dieselEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Diesel, new DateOnly(2023, 10, 14), 950);
-        var electricEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Electric, new DateOnly(2023, 10, 13), 900);
+        _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
+        _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Diesel, new DateOnly(2023, 10, 14), 950);
+        _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Electric, new DateOnly(2023, 10, 13), 900);
 
-        // Filter for Gasoline OR Diesel (using flags)
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, EnergyType.Gasoline | EnergyType.Diesel);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, [EnergyType.Gasoline,  EnergyType.Diesel]);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -155,27 +154,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         returnedTypes.ShouldNotContain(EnergyType.Electric);
     }
 
-    [Fact]
-    public async Task Handle_WithEnergyTypeNone_ReturnsAllEntries()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        var entry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
-
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, EnergyType.None);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.Items.Count.ShouldBe(1); // Should return all entries when EnergyType.None
-        result.Value.TotalCount.ShouldBe(1);
-        result.Value.Items[0].Id.ShouldBe(entry.Id);
-    }
-
-    private async Task<Vehicle> CreateVehicleInDb(EnergyType supportedEnergyTypes, Guid? userId = null)
+    private async Task<Vehicle> CreateVehicleInDb(EnergyType[] supportedEnergyTypes, Guid? userId = null)
     {
         var vehicle = new Vehicle
         {
@@ -189,18 +168,15 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
             VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 
-        // Add supported energy types based on flags
-        foreach (EnergyType energyType in Enum.GetValues<EnergyType>())
+        // Add supported energy types
+        foreach (var energyType in supportedEnergyTypes)
         {
-            if (energyType != EnergyType.None && (supportedEnergyTypes & energyType) != 0)
+            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
             {
-                vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
-                {
-                    Id = Guid.NewGuid(),
-                    VehicleId = vehicle.Id,
-                    EnergyType = energyType
-                });
-            }
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle.Id,
+                EnergyType = energyType
+            });
         }
 
         Context.Vehicles.Add(vehicle);
