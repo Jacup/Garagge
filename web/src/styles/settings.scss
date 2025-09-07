@@ -1,0 +1,6 @@
+@use 'vuetify/settings' with (
+  $dialog-elevation: 6,
+
+  $dialog-card-header-padding: 24px 24px 16px 24px,
+  $dialog-card-text-padding: 0px 24px 24px 24px,
+);
