@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { CreateMyVehicleCommand, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
+import { EngineType as EngineTypeEnum, NullableOfVehicleType as VehicleTypeEnum } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
   vehicle: CreateMyVehicleCommand
@@ -19,18 +20,18 @@ const rules = {
 }
 
 const engineTypeOptions: { label: string; value: EngineType }[] = [
-  { label: 'Fuel', value: 'Fuel' },
-  { label: 'Hybrid', value: 'Hybrid' },
-  { label: 'Plug-in Hybrid', value: 'PlugInHybrid' },
-  { label: 'Electric', value: 'Electric' },
-  { label: 'Hydrogen', value: 'Hydrogen' },
+  { label: 'Fuel', value: EngineTypeEnum.Fuel },
+  { label: 'Hybrid', value: EngineTypeEnum.Hybrid },
+  { label: 'Plug-in Hybrid', value: EngineTypeEnum.PlugInHybrid },
+  { label: 'Electric', value: EngineTypeEnum.Electric },
+  { label: 'Hydrogen', value: EngineTypeEnum.Hydrogen },
 ]
 
 const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
-  { label: 'Bus', value: 'Bus' },
-  { label: 'Car', value: 'Car' },
-  { label: 'Motorbike', value: 'Motorbike' },
-  { label: 'Truck', value: 'Truck' },
+  { label: 'Bus', value: VehicleTypeEnum.Bus },
+  { label: 'Car', value: VehicleTypeEnum.Car },
+  { label: 'Motorbike', value: VehicleTypeEnum.Motorbike },
+  { label: 'Truck', value: VehicleTypeEnum.Truck },
 ]
 </script>
 

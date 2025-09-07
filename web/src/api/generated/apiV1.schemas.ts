@@ -97,7 +97,6 @@ export enum NullableOfVehicleType {
   Car= 'Car',
   Motorbike= 'Motorbike',
   Truck= 'Truck',
-  null= null,
 
 }
 /**
@@ -108,7 +107,6 @@ export enum NullableOfVehicleType2 {
   Car= 'Car',
   Motorbike= 'Motorbike',
   Truck= 'Truck',
-  null= null,
 
 }
 export interface PagedListOfEnergyEntryDto {
