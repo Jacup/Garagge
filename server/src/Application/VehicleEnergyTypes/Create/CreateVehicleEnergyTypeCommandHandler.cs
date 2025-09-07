@@ -1,6 +1,7 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Application.Core;
 using Application.Vehicles;
 using Domain.Entities.Vehicles;
@@ -9,7 +10,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.VehicleEnergyTypes.Create;
 
-internal sealed class CreateVehicleEnergyTypeCommandHandler(IApplicationDbContext dbContext, IUserContext userContext)
+internal sealed class CreateVehicleEnergyTypeCommandHandler(
+    IApplicationDbContext dbContext,
+    IUserContext userContext,
+    IVehicleEngineCompatibilityService vehicleEngineCompatibilityService)
     : ICommandHandler<CreateVehicleEnergyTypeCommand, VehicleEnergyTypeDto>
 {
     public async Task<Result<VehicleEnergyTypeDto>> Handle(CreateVehicleEnergyTypeCommand request, CancellationToken cancellationToken)
@@ -20,6 +24,7 @@ internal sealed class CreateVehicleEnergyTypeCommandHandler(IApplicationDbContex
             return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.Unauthorized);
 
         var validationResult = await ValidateRequestAsync(userId, request, cancellationToken);
+        
         if (validationResult.IsFailure)
             return validationResult;
 
@@ -45,7 +50,7 @@ internal sealed class CreateVehicleEnergyTypeCommandHandler(IApplicationDbContex
             .Where(v => v.Id == request.VehicleId)
             .Select(v => new
             {
-                Vehicle = new { v.Id, v.UserId },
+                Vehicle = new { v.Id, v.UserId, v.EngineType },
                 ExistingEnergyType = v.VehicleEnergyTypes
                     .Any(vet => vet.EnergyType == request.EnergyType)
             })
@@ -58,8 +63,10 @@ internal sealed class CreateVehicleEnergyTypeCommandHandler(IApplicationDbContex
             return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.Unauthorized);
 
         if (validationQuery.ExistingEnergyType)
-            return Result.Failure<VehicleEnergyTypeDto>(
-                VehicleEnergyTypeErrors.AlreadyExists(request.VehicleId, request.EnergyType));
+            return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.AlreadyExists(request.VehicleId, request.EnergyType));
+
+        if (!vehicleEngineCompatibilityService.IsEnergyTypeCompatibleWithEngine(request.EnergyType, validationQuery.Vehicle.EngineType))
+            return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.IncompatibleWithEngine(request.EnergyType, validationQuery.Vehicle.EngineType));
 
         return Result.Success<VehicleEnergyTypeDto>(null!);
     }

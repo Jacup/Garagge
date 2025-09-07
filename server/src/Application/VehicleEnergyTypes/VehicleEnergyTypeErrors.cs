@@ -19,5 +19,9 @@ public static class VehicleEnergyTypeErrors
     
     public static Error DeleteFailed(Guid vehicleId) => Error.Failure(
         "VehicleEnergyType.DeleteFailed",
-        $"Failed to delete vehicle entry type with Id = '{vehicleId}'");
+        $"Failed to delete vehicle entry type with Id = '{vehicleId}'");    
+    
+    public static Error IncompatibleWithEngine(EnergyType requestEnergyType, EngineType engineType) => Error.Failure(
+        "VehicleEnergyType.DeleteFailed",
+        $"EnergyType '{requestEnergyType}' is incompatible with EngineType '{engineType}'");
 }
