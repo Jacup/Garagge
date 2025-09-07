@@ -11,7 +11,7 @@ const props = defineProps<Props>()
 
 <template>
   <v-dialog :model-value="isOpen" class="dialog-container" @update:model-value="props.onCancel">
-    <v-card variant="flat" class="delete-dialog-card" rounded="xl" elevation="6">
+    <v-card variant="flat" class="dialog-card" rounded="xl" elevation="6">
       <template v-slot:title>
         <p>Delete {{ itemToDelete }}?</p>
       </template>
@@ -34,19 +34,19 @@ const props = defineProps<Props>()
   max-width: 560px;
 }
 
-.delete-dialog-card {
+.dialog-card {
   background-color: rgb(var(--v-theme-surface-container-high)) !important;
 }
 
-.delete-dialog-card :deep(.v-card-title) {
+.dialog-card :deep(.v-card-title) {
   color: rgb(var(--v-theme-on-surface)) !important;
 }
 
-.delete-dialog-card :deep(.v-card-text) {
+.dialog-card :deep(.v-card-text) {
   color: rgb(var(--v-theme-on-surface-variant)) !important;
 }
 
-.delete-dialog-card :deep(.v-card-actions) {
+.dialog-card :deep(.v-card-actions) {
   padding: 0 24px 24px 24px !important;
 }
 

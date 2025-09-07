@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { EnergyEntryDto, EnergyUnit } from '@/api/generated/apiV1.schemas'
+import type { EnergyEntryDto } from '@/api/generated/apiV1.schemas'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
+import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
 
 interface Props {
   vehicleId: string
@@ -96,32 +97,20 @@ function openEditDialog(entry: EnergyEntryDto) {
   editDialog.value = true
 }
 
+function openAddDialog() {
+  selectedEntry.value = null
+  editDialog.value = true
+}
+
 function closeEditDialog() {
   editDialog.value = false
   selectedEntry.value = null
 }
 
-// Computed properties for form binding
-const editForm = computed({
-  get: () => ({
-    date: selectedEntry.value?.date || '',
-    mileage: selectedEntry.value?.mileage || 0,
-    type: selectedEntry.value?.type || '',
-    volume: selectedEntry.value?.volume || 0,
-    energyUnit: selectedEntry.value?.energyUnit || '',
-    cost: selectedEntry.value?.cost || 0,
-  }),
-  set: (value) => {
-    if (selectedEntry.value) {
-      selectedEntry.value.date = value.date
-      selectedEntry.value.mileage = value.mileage
-      selectedEntry.value.type = value.type
-      selectedEntry.value.volume = value.volume
-      selectedEntry.value.energyUnit = value.energyUnit as EnergyUnit
-      selectedEntry.value.cost = value.cost
-    }
-  }
-})
+function handleEntrySaved() {
+  closeEditDialog()
+  loadEnergyEntries()
+}
 
 onMounted(() => {
   loadEnergyEntries()
@@ -132,7 +121,15 @@ onMounted(() => {
   <v-card class="fuel-history-card card-background" height="400" variant="flat">
     <template #title>Fuel History</template>
     <template #append>
-      <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" disabled>Add</v-btn>
+      <v-btn
+        class="text-none"
+        prepend-icon="mdi-plus"
+        variant="flat"
+        color="primary"
+        @click="openAddDialog"
+      >
+        Add
+      </v-btn>
     </template>
     <v-card-text class="pa-0 d-flex flex-column" style="height: calc(400px - 56px); flex: 1">
       <v-data-table-server
@@ -151,20 +148,31 @@ onMounted(() => {
         <template v-slot:[`item.date`]="{ item }">
           {{ formatDate(item.date) }}
         </template>
-        <template v-slot:[`item.volume`]="{ item }"> {{ item.volume }} {{ item.energyUnit }} </template>
+        <template v-slot:[`item.volume`]="{ item }">
+          {{ item.volume }} {{ item.energyUnit }}
+        </template>
         <template v-slot:[`item.cost`]="{ item }">
           {{ item.cost ? item.cost.toFixed(2) + ' PLN' : 'N/A' }}
         </template>
         <template v-slot:[`item.actions`]="{ item }">
           <div class="d-flex ga-2 justify-end">
-            <v-btn icon="mdi-pencil" variant="text" size="x-small" @click="openEditDialog(item)"></v-btn>
-            <v-btn icon="mdi-delete" variant="text" size="x-small" @click="openDeleteDialog(item.id)"></v-btn>
+            <v-btn
+              icon="mdi-pencil"
+              variant="text"
+              size="x-small"
+              @click="openEditDialog(item)"
+            />
+            <v-btn
+              icon="mdi-delete"
+              variant="text"
+              size="x-small"
+              @click="openDeleteDialog(item.id)"
+            />
           </div>
         </template>
       </v-data-table-server>
     </v-card-text>
   </v-card>
-
 
   <DeleteDialog
     :is-open="deleteDialog"
@@ -173,76 +181,13 @@ onMounted(() => {
     :on-cancel="closeDeleteDialog"
   />
 
-
-  <!-- Edit Dialog -->
-  <v-dialog v-model="editDialog" max-width="600px">
-    <v-card>
-      <v-card-title>
-        <span class="text-h6">Edit Energy Entry</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container>
-          <v-row>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="editForm.date"
-                label="Date"
-                type="date"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="editForm.mileage"
-                label="Mileage"
-                type="number"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="editForm.type"
-                label="Type"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="editForm.volume"
-                label="Volume"
-                type="number"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model="editForm.energyUnit"
-                label="Unit"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6">
-              <v-text-field
-                v-model.number="editForm.cost"
-                label="Cost"
-                type="number"
-                variant="outlined"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeEditDialog">
-          Cancel
-        </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="closeEditDialog">
-          Save
-        </v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <ModifyEnergyEntryDialog
+    :is-open="editDialog"
+    :vehicle-id="vehicleId"
+    :entry="selectedEntry"
+    :on-save="handleEntrySaved"
+    :on-cancel="closeEditDialog"
+  />
 </template>
 
 <style scoped>
