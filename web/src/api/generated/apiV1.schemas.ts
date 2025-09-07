@@ -54,9 +54,32 @@ export interface EnergyEntryDto {
   pricePerUnit: number | null;
 }
 
-export type EnergyType = 'Gasoline' | 'Diesel' | 'LPG' | 'CNG' | 'Ethanol' | 'Biofuel' | 'Hydrogen' | 'Electric';
-export type EnergyUnit = 'Liter' | 'Gallon' | 'CubicMeter' | 'kWh';
-export type EngineType = 'Fuel' | 'Hybrid' | 'PlugInHybrid' | 'Electric' | 'Hydrogen';
+export enum EnergyType {
+  Gasoline= 'Gasoline',
+  Diesel= 'Diesel',
+  LPG= 'LPG',
+  CNG= 'CNG',
+  Ethanol= 'Ethanol',
+  Biofuel= 'Biofuel',
+  Hydrogen= 'Hydrogen',
+  Electric= 'Electric',
+
+}
+export enum EnergyUnit {
+  Liter= 'Liter',
+  Gallon= 'Gallon',
+  CubicMeter= 'CubicMeter',
+  kWh= 'kWh',
+
+}
+export enum EngineType {
+  Fuel= 'Fuel',
+  Hybrid= 'Hybrid',
+  PlugInHybrid= 'PlugInHybrid',
+  Electric= 'Electric',
+  Hydrogen= 'Hydrogen',
+
+}
 export interface LoginUserCommand {
   email: string;
   password: string;
@@ -69,11 +92,25 @@ export interface LoginUserResponse {
 /**
  * @nullable
  */
-export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export enum NullableOfVehicleType {
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+  null= null,
+
+}
 /**
  * @nullable
  */
-export type NullableOfVehicleType2 = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export enum NullableOfVehicleType2 {
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+  null= null,
+
+}
 export interface PagedListOfEnergyEntryDto {
   /** @nullable */
   items?: EnergyEntryDto[] | null;

@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import type { EnergyEntryDto, EnergyUnit, CreateEnergyEntryRequest, UpdateEnergyEntryRequest } from '@/api/generated/apiV1.schemas'
+import type { EnergyEntryDto, CreateEnergyEntryRequest, UpdateEnergyEntryRequest } from '@/api/generated/apiV1.schemas'
+import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
+
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
+
+const energyTypeOptions = Object.values(EnergyType)
+const energyUnitOptions = Object.values(EnergyUnit)
 
 interface Props {
   isOpen: boolean
@@ -16,16 +21,16 @@ const props = defineProps<Props>()
 const { postApiVehiclesVehicleIdEnergyEntries, putApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
 
 const isLoading = ref(false)
+const formRef = ref()
+const isFormValid = ref(true)
 const form = ref({
   date: '',
   mileage: 0,
-  type: '',
+  type: 'Gasoline' as EnergyType,
   volume: 0,
   energyUnit: 'Liter' as EnergyUnit,
   cost: 0,
 })
-
-const energyUnitOptions: EnergyUnit[] = ['Liter', 'Gallon', 'CubicMeter', 'kWh']
 
 const isEditMode = computed(() => !!props.entry?.id)
 const dialogTitle = computed(() => (isEditMode.value ? 'Edit Energy Entry' : 'Add Energy Entry'))
@@ -58,9 +63,9 @@ watch(
         form.value = {
           date: new Date().toISOString().split('T')[0], // Today's date
           mileage: 0,
-          type: '',
+          type: '' as EnergyType,
           volume: 0,
-          energyUnit: 'Liter',
+          energyUnit: '' as EnergyUnit,
           cost: 0,
         }
       }
@@ -71,6 +76,10 @@ watch(
 
 async function handleSave() {
   if (!props.vehicleId) return
+  // Validate form before submit
+  const valid = await formRef.value?.validate()
+  isFormValid.value = valid?.valid ?? true
+  if (!isFormValid.value) return
 
   isLoading.value = true
   try {
@@ -116,9 +125,9 @@ async function handleSave() {
       </template>
 
       <template v-slot:text>
-        <v-container class="pa-0">
-          <div class="section-container">
-            <v-row class="mt-2">
+        <v-form ref="formRef" v-model="isFormValid" lazy-validation @submit.prevent="handleSave">
+          <v-container class="form-container pa-4">
+            <v-row class="mb-2" align="center" justify="center">
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.date"
@@ -126,8 +135,8 @@ async function handleSave() {
                   type="date"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-calendar"
                   required
+                  class="form-field"
                 />
               </v-col>
               <v-col cols="12" md="6">
@@ -137,45 +146,38 @@ async function handleSave() {
                   type="number"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-speedometer"
                   suffix="km"
                   required
+                  class="form-field"
                 />
               </v-col>
             </v-row>
-          </div>
-
-          <v-divider />
-
-          <!-- What & How Much Section -->
-          <div class="section-container">
-            <v-row class="mt-2">
-              <v-col cols="12">
-                <v-text-field
+            <v-row class="mb-2" align="center" justify="center">
+              <v-col cols="12" md="6">
+                <v-select
                   v-model="form.type"
-                  label="Entry Type"
+                  label="Fuel entry type"
+                  :items="energyTypeOptions"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-tag"
-                  placeholder="e.g., Refuel, Charge, Top-up"
-                  hint="Describe what kind of energy entry this is"
-                  persistent-hint
+                  required
+                  class="form-field"
                 />
               </v-col>
-              <v-col cols="12" md="8">
+              <v-col cols="12" md="3">
                 <v-text-field
                   v-model.number="form.volume"
                   label="Amount"
                   type="number"
-                  step="0.01"
+                  step="0.1"
                   min="0"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-fuel"
                   required
+                  class="form-field"
                 />
               </v-col>
-              <v-col cols="12" md="4">
+              <v-col cols="12" md="3">
                 <v-select
                   v-model="form.energyUnit"
                   label="Unit"
@@ -183,21 +185,12 @@ async function handleSave() {
                   variant="outlined"
                   density="comfortable"
                   required
+                  class="form-field"
                 />
               </v-col>
             </v-row>
-          </div>
-
-          <v-divider class="my-4" />
-
-          <!-- Prices Section -->
-          <div class="section-container">
-            <div class="section-header">
-              <v-icon color="primary" class="mr-2">mdi-currency-usd</v-icon>
-              <span class="section-title">Prices</span>
-              <span class="section-subtitle ml-2">(optional)</span>
-            </div>
-            <v-row class="mt-2">
+            <v-divider class="my-4" />
+            <v-row class="mb-2" align="center" justify="center">
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model.number="form.cost"
@@ -207,10 +200,8 @@ async function handleSave() {
                   min="0"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-cash"
                   suffix="PLN"
-                  hint="Total amount paid"
-                  persistent-hint
+                  class="form-field"
                 />
               </v-col>
               <v-col cols="12" md="6">
@@ -220,16 +211,16 @@ async function handleSave() {
                   type="number"
                   variant="outlined"
                   density="comfortable"
-                  prepend-inner-icon="mdi-calculator"
                   :suffix="`PLN/${form.energyUnit}`"
                   readonly
                   hint="Automatically calculated"
                   persistent-hint
+                  class="form-field"
                 />
               </v-col>
             </v-row>
-          </div>
-        </v-container>
+          </v-container>
+        </v-form>
       </template>
 
       <v-card-actions>
@@ -244,70 +235,44 @@ async function handleSave() {
 </template>
 
 <style scoped>
+.form-container {
+  padding: 16px 8px;
+}
+.form-field {
+  margin-bottom: 12px;
+}
 .dialog-container {
-  min-width: 280px;
+  min-width: 320px;
   max-width: 600px;
 }
-
 .dialog-card {
   background-color: rgb(var(--v-theme-surface-container-high)) !important;
 }
-
 .dialog-card :deep(.v-card-title) {
   color: rgb(var(--v-theme-on-surface)) !important;
   font-size: 1.25rem;
   font-weight: 500;
 }
-
 .dialog-card :deep(.v-card-text) {
   color: rgb(var(--v-theme-on-surface-variant)) !important;
   padding: 24px !important;
 }
-
 .dialog-card :deep(.v-card-actions) {
   padding: 0 24px 24px 24px !important;
 }
-
-.section-container {
-  margin-bottom: 8px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.section-title {
-  font-size: 1rem;
-  font-weight: 500;
-  color: rgb(var(--v-theme-on-surface));
-}
-
-.section-subtitle {
-  font-size: 0.875rem;
-  color: rgb(var(--v-theme-on-surface-variant));
-  font-style: italic;
-}
-
-/* Better spacing for form fields */
-:deep(.v-field) {
-  margin-bottom: 4px;
-}
-
-:deep(.v-divider) {
+.v-divider {
   opacity: 0.6;
 }
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .dialog-container {
     margin: 16px;
     max-width: calc(100vw - 32px);
   }
-
+  .form-container {
+    padding: 8px 2px;
+  }
   .dialog-card :deep(.v-card-text) {
-    padding: 16px !important;
+    padding: 12px !important;
   }
 }
 </style>
