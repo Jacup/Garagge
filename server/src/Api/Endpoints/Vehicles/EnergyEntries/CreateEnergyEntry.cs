@@ -51,6 +51,5 @@ public record CreateEnergyEntryRequest(
         EnergyUnit EnergyUnit,
         decimal Volume,
         decimal? Cost,
-        decimal? PricePerUnit)
-    ;
+        decimal? PricePerUnit);
 
