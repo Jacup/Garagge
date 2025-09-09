@@ -2,17 +2,20 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Application.Users;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Users.Register;
+namespace Application.Auth.Register;
 
-internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher) 
+internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher)
     : ICommandHandler<RegisterUserCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(RegisterUserCommand command, CancellationToken cancellationToken)
     {
-        if (await context.Users.AnyAsync(u => u.Email == command.Email, cancellationToken))
+        var normalizedEmail = command.Email.Trim().ToLowerInvariant();
+
+        if (await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken))
         {
             return Result.Failure<Guid>(UserErrors.EmailNotUnique);
         }
@@ -20,7 +23,7 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Email = command.Email,
+            Email = normalizedEmail,
             FirstName = command.FirstName,
             LastName = command.LastName,
             PasswordHash = passwordHasher.Hash(command.Password)
@@ -29,8 +32,14 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
         user.Raise(new UserRegisteredDomainEvent(user.Id));
 
         context.Users.Add(user);
-
-        await context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            return Result.Failure<Guid>(AuthErrors.CreateFailed);
+        }
 
         return user.Id;
     }

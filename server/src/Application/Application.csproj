@@ -19,8 +19,4 @@
         <InternalsVisibleTo Include="$(AssemblyName)Tests" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Auth\" />
-    </ItemGroup>
-
 </Project>

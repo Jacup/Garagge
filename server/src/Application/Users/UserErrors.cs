@@ -15,16 +15,12 @@ public static class UserErrors
     public static readonly Error WrongPassword = Error.Unauthorized(
         "Users.WrongPassword",
         "The provided password is incorrect");
-    
-    public static readonly Error WrongEmailOrPassword = Error.Unauthorized(
-        "Users.WrongEmailOrPassword",
-        "The provided email or password is incorrect");
-    
+
     public static readonly Error NotFoundByEmail = Error.NotFound(
         "Users.NotFoundByEmail",
         "The user with the specified email was not found");
 
     public static readonly Error EmailNotUnique = Error.Conflict(
         "Users.EmailNotUnique",
-        "The provided email is not unique");   
+        "The provided email is not unique");
 }

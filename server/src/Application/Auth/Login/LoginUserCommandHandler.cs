@@ -2,7 +2,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Users;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +18,7 @@ internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPa
 
         if (user is null || passwordHasher.Verify(command.Password, user.PasswordHash))
         {
-            return Result.Failure<LoginUserResponse>(UserErrors.WrongEmailOrPassword);
+            return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
         }
         
         string token = tokenProvider.Create(user);

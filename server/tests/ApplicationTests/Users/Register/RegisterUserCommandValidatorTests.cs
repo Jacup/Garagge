@@ -1,4 +1,4 @@
-using Application.Users.Register;
+using Application.Auth.Register;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.Users.Register;
