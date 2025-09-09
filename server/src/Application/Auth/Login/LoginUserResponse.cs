@@ -1,4 +1,4 @@
-﻿namespace Application.Users.Login;
+﻿namespace Application.Auth.Login;
 
 public sealed record LoginUserResponse
 {

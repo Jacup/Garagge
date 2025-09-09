@@ -1,16 +1,16 @@
-﻿using Api.Infrastructure;
-using Application.Users.Login;
-using MediatR;
-using Api.Extensions;
+﻿using Api.Extensions;
+using Api.Infrastructure;
+using Application.Auth.Login;
 using Application.Core;
+using MediatR;
 
-namespace Api.Endpoints.Users;
+namespace Api.Endpoints.Auth;
 
 internal sealed class Login : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/login", async (LoginUserCommand command, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPost("auth/login", async (LoginUserCommand command, ISender sender, CancellationToken cancellationToken) =>
         {
             Result<LoginUserResponse> result = await sender.Send(command, cancellationToken);
 
@@ -18,7 +18,6 @@ internal sealed class Login : IEndpoint
         })
         .Produces<LoginUserResponse>()
         .Produces(StatusCodes.Status401Unauthorized)
-        .Produces(StatusCodes.Status404NotFound)
-        .WithTags(Tags.Users);
+        .WithTags(Tags.Auth);
     }
 }

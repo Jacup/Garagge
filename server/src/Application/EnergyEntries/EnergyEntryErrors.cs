@@ -13,7 +13,7 @@ public static class EnergyEntryErrors
         "FuelEntries.CreateFailed",
         "Failed to create fuel entry");
 
-    public static Error IncorrectMileage => Error.Failure(
+    public static Error IncorrectMileage => Error.Problem(
         "EnergyEntries.IncorrectMileage",
         "The mileage of the energy entry cannot be less than the mileage of the last energy entry or greater than the mileage of the next energy entry.");
     
@@ -33,7 +33,7 @@ public static class EnergyEntryErrors
         "EnergyEntries.NotOwnedByUser",
         $"Energy entry with Id = '{entryId}' does not belong to the current user.");
 
-    public static Error IncompatibleEnergyType(Guid vehicleId, EnergyType energyType) => Error.Failure(
+    public static Error IncompatibleEnergyType(Guid vehicleId, EnergyType energyType) => Error.Problem(
         "FuelEntries.IncompatibleEnergyType",
         $"Cannot add '{energyType}' to vehicle with Id = '{vehicleId}' because vehicle does not support this type of energy.");
 }

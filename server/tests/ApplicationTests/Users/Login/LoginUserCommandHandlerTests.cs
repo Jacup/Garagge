@@ -1,6 +1,6 @@
 using Application.Abstractions.Authentication;
+using Application.Auth.Login;
 using Application.Users;
-using Application.Users.Login;
 using Domain.Entities.Users;
 using Moq;
 
