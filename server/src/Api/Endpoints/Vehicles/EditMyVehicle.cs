@@ -9,12 +9,12 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles;
 
-public class EditMyVehicle : IEndpoint
+internal sealed class EditMyVehicle : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPut(
-                "vehicles/my/edit/{id:guid}",
+                "vehicles/my/{id:guid}",
                 async (Guid id, EditMyVehicleRequest request, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new EditMyVehicleCommand
@@ -32,7 +32,7 @@ public class EditMyVehicle : IEndpoint
 
                     return result.Match(Results.Ok, CustomResults.Problem);
                 })
-            .Produces(StatusCodes.Status200OK)
+            .Produces<VehicleDto>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)

@@ -13,11 +13,11 @@ namespace ApplicationTests.EnergyEntries.CreateEnergyEntry;
 public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly CreateEnergyEntryCommandHandler _handler;
-    private readonly Mock<IVehicleEnergyCompatibilityService> _energyCompatibilityServiceMock;
+    private readonly Mock<IVehicleEngineCompatibilityService> _energyCompatibilityServiceMock;
 
     public CreateEnergyEntryCommandHandlerTests()
     {
-        _energyCompatibilityServiceMock = new Mock<IVehicleEnergyCompatibilityService>();
+        _energyCompatibilityServiceMock = new Mock<IVehicleEngineCompatibilityService>();
         _handler = new CreateEnergyEntryCommandHandler(Context, UserContextMock.Object, _energyCompatibilityServiceMock.Object);
 
         // Setup default behavior for energy compatibility service

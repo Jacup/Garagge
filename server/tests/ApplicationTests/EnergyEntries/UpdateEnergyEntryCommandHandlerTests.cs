@@ -12,12 +12,12 @@ namespace ApplicationTests.EnergyEntries;
 public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly UpdateEnergyEntryCommandHandler _handler;
-    private readonly Mock<IVehicleEnergyCompatibilityService> _energyCompatibilityServiceMock;
+    private readonly Mock<IVehicleEngineCompatibilityService> _energyCompatibilityServiceMock;
     private readonly Mock<IEnergyEntryMileageValidator> _mileageValidatorMock;
 
     public UpdateEnergyEntryCommandHandlerTests()
     {
-        _energyCompatibilityServiceMock = new Mock<IVehicleEnergyCompatibilityService>();
+        _energyCompatibilityServiceMock = new Mock<IVehicleEngineCompatibilityService>();
         _mileageValidatorMock = new Mock<IEnergyEntryMileageValidator>();
         _handler = new UpdateEnergyEntryCommandHandler(Context, UserContextMock.Object, _energyCompatibilityServiceMock.Object, _mileageValidatorMock.Object);
         

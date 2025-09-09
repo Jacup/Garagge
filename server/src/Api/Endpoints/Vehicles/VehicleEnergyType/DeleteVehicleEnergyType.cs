@@ -2,20 +2,21 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries.Delete;
+using Application.VehicleEnergyTypes;
+using Application.VehicleEnergyTypes.Delete;
 using MediatR;
 
-namespace Api.Endpoints.Vehicles.EnergyEntries;
+namespace Api.Endpoints.Vehicles.VehicleEnergyType;
 
-internal sealed class DeleteEnergyEntry : IEndpoint
+internal sealed class DeleteVehicleEnergyType : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapDelete(
-                "vehicles/{vehicleId:guid}/energy-entries/{id:guid}",
-                async (Guid id, Guid vehicleId, ISender sender, CancellationToken cancellationToken) =>
+                "vehicles/{vehicleId:guid}/energy-types/{id:guid}",
+                async (Guid vehicleId, Guid id, ISender sender, CancellationToken cancellationToken) =>
                 {
-                    var command = new DeleteEnergyEntryCommand(id, vehicleId);
+                    var command = new DeleteVehicleEnergyTypeCommand(id, vehicleId);
 
                     Result result = await sender.Send(command, cancellationToken);
 
@@ -24,9 +25,8 @@ internal sealed class DeleteEnergyEntry : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.EnergyEntries);
+            .WithTags(Tags.VehicleEnergyTypes);
     }
 }

@@ -12,7 +12,7 @@ namespace Application.EnergyEntries.Update;
 internal sealed class UpdateEnergyEntryCommandHandler(
     IApplicationDbContext dbContext,
     IUserContext userContext,
-    IVehicleEnergyCompatibilityService energyCompatibilityService,
+    IVehicleEngineCompatibilityService engineCompatibilityService,
     IEnergyEntryMileageValidator mileageValidator)
     : ICommandHandler<UpdateEnergyEntryCommand, EnergyEntryDto>
 {
@@ -31,7 +31,7 @@ internal sealed class UpdateEnergyEntryCommandHandler(
         if (actualEnergyEntry.Vehicle!.UserId != userContext.UserId)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
 
-        var isCompatible = await energyCompatibilityService.IsEnergyTypeCompatibleAsync(actualEnergyEntry.VehicleId, request.Type, cancellationToken);
+        var isCompatible = await engineCompatibilityService.IsEnergyTypeCompatibleAsync(actualEnergyEntry.VehicleId, request.Type, cancellationToken);
 
         if (!isCompatible)
             return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(actualEnergyEntry.VehicleId, request.Type));

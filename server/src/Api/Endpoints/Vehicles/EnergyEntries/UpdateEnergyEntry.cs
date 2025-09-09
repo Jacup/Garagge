@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;
 
-public class UpdateEnergyEntry : IEndpoint
+internal sealed class UpdateEnergyEntry : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

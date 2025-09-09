@@ -56,7 +56,7 @@ public class VehicleErrorTests
         // Assert
         result.Type.ShouldBe(ErrorType.NotFound);
         result.Code.ShouldBe("Vehicles.NotFound");
-        result.Description.ShouldBe($"Not found any cars with the UserId = '{userId}'");
+        result.Description.ShouldBe($"Not found any vehicles with the UserId = '{userId}'");
     }
     
     [Fact]

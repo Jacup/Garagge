@@ -22,7 +22,7 @@ public static class VehicleErrors
     
     public static Error NotFoundForUser(Guid userId) => Error.NotFound(
         "Vehicles.NotFound",
-        $"Not found any cars with the UserId = '{userId}'");
+        $"Not found any vehicles with the UserId = '{userId}'");
     
     public static Error NotFound(Guid vehicleId) => Error.NotFound(
         "Vehicles.NotFound",

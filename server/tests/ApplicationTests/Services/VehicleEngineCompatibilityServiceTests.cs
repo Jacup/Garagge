@@ -4,13 +4,13 @@ using Domain.Enums;
 
 namespace ApplicationTests.Services;
 
-public class VehicleEnergyCompatibilityServiceTests : InMemoryDbTestBase
+public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
 {
-    private readonly VehicleEnergyCompatibilityService _service;
+    private readonly VehicleEngineCompatibilityService _service;
 
-    public VehicleEnergyCompatibilityServiceTests()
+    public VehicleEngineCompatibilityServiceTests()
     {
-        _service = new VehicleEnergyCompatibilityService(Context);
+        _service = new VehicleEngineCompatibilityService(Context);
     }
 
     [Theory]
@@ -96,6 +96,108 @@ public class VehicleEnergyCompatibilityServiceTests : InMemoryDbTestBase
 
         // Assert
         result.ShouldBe(isCompatible);
+    }
+
+    // Tests for IsEnergyTypeCompatibleWithEngine method
+    
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void IsEnergyTypeCompatibleWithEngine_FuelEngine_ReturnsExpectedCompatibility(EnergyType energyType, bool expectedResult)
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(energyType, EngineType.Fuel);
+
+        // Assert
+        result.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void IsEnergyTypeCompatibleWithEngine_HybridEngine_ReturnsExpectedCompatibility(EnergyType energyType, bool expectedResult)
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(energyType, EngineType.Hybrid);
+
+        // Assert
+        result.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, true)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void IsEnergyTypeCompatibleWithEngine_PlugInHybridEngine_ReturnsExpectedCompatibility(EnergyType energyType, bool expectedResult)
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(energyType, EngineType.PlugInHybrid);
+
+        // Assert
+        result.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, false)]
+    [InlineData(EnergyType.Diesel, false)]
+    [InlineData(EnergyType.LPG, false)]
+    [InlineData(EnergyType.CNG, false)]
+    [InlineData(EnergyType.Ethanol, false)]
+    [InlineData(EnergyType.Biofuel, false)]
+    [InlineData(EnergyType.Electric, true)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void IsEnergyTypeCompatibleWithEngine_ElectricEngine_ReturnsExpectedCompatibility(EnergyType energyType, bool expectedResult)
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(energyType, EngineType.Electric);
+
+        // Assert
+        result.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, false)]
+    [InlineData(EnergyType.Diesel, false)]
+    [InlineData(EnergyType.LPG, false)]
+    [InlineData(EnergyType.CNG, false)]
+    [InlineData(EnergyType.Ethanol, false)]
+    [InlineData(EnergyType.Biofuel, false)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, true)]
+    public void IsEnergyTypeCompatibleWithEngine_HydrogenEngine_ReturnsExpectedCompatibility(EnergyType energyType, bool expectedResult)
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(energyType, EngineType.Hydrogen);
+
+        // Assert
+        result.ShouldBe(expectedResult);
+    }
+
+    [Fact]
+    public void IsEnergyTypeCompatibleWithEngine_UnknownEngineType_ReturnsFalse()
+    {
+        // Act
+        var result = _service.IsEnergyTypeCompatibleWithEngine(EnergyType.Gasoline, (EngineType)999);
+
+        // Assert
+        result.ShouldBeFalse();
     }
 
     private async Task<Vehicle> CreateGasolineVehicleInDb()

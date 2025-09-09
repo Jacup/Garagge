@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;
 
-public class CreateEnergyEntry : IEndpoint
+internal sealed class CreateEnergyEntry : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -51,6 +51,5 @@ public record CreateEnergyEntryRequest(
         EnergyUnit EnergyUnit,
         decimal Volume,
         decimal? Cost,
-        decimal? PricePerUnit)
-    ;
+        decimal? PricePerUnit);
 
