@@ -19,9 +19,4 @@
         <InternalsVisibleTo Include="$(AssemblyName)Tests" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="VehicleEnergyTypes\Delete\" />
-      <Folder Include="VehicleEnergyTypes\GetAllByVehicle\" />
-    </ItemGroup>
-
 </Project>

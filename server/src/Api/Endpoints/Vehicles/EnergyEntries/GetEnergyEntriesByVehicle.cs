@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;
 
-public class GetEnergyEntriesByVehicle : IEndpoint
+internal sealed class GetEnergyEntriesByVehicle : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

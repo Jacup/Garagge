@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace Api.Endpoints.Vehicles;
 
-public class GetMyVehicleById : IEndpoint
+internal sealed class GetMyVehicleById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

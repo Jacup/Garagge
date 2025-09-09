@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles;
 
-public class DeleteVehicle : IEndpoint
+internal sealed class DeleteVehicle : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

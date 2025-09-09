@@ -9,7 +9,7 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles.VehicleEnergyType;
 
-public class CreateVehicleEnergyType : IEndpoint
+internal sealed class CreateVehicleEnergyType : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -31,7 +31,7 @@ public class CreateVehicleEnergyType : IEndpoint
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
             .HasPermission(Permissions.UsersAccess)
-            .WithTags(Tags.EnergyEntries);
+            .WithTags(Tags.VehicleEnergyTypes);
     }
 }
 

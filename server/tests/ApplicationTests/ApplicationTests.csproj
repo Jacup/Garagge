@@ -22,9 +22,4 @@
 	  <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="VehicleEnergyTypes\Delete\" />
-	  <Folder Include="VehicleEnergyTypes\GetAllByVehicle\" />
-	</ItemGroup>
-
 </Project>
