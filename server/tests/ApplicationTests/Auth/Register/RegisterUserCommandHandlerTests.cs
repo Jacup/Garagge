@@ -4,7 +4,7 @@ using Application.Users;
 using Domain.Entities.Users;
 using Moq;
 
-namespace ApplicationTests.Users.Register;
+namespace ApplicationTests.Auth.Register;
 
 public class RegisterUserCommandHandlerTests : InMemoryDbTestBase
 {

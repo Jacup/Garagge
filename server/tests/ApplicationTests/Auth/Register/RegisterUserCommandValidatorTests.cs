@@ -1,7 +1,7 @@
 using Application.Auth.Register;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Users.Register;
+namespace ApplicationTests.Auth.Register;
 
 public class RegisterUserCommandValidatorTests
 {

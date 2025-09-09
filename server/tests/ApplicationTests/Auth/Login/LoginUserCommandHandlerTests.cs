@@ -1,10 +1,11 @@
 using Application.Abstractions.Authentication;
+using Application.Auth;
 using Application.Auth.Login;
 using Application.Users;
 using Domain.Entities.Users;
 using Moq;
 
-namespace ApplicationTests.Users.Login;
+namespace ApplicationTests.Auth.Login;
 
 public class LoginUserCommandHandlerTests : InMemoryDbTestBase
 {
@@ -18,7 +19,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_UserNotFound_ShouldReturnNotFoundByEmailError()
+    public async Task Handle_UserNotFound_ShouldReturnWrongEmailOrPassword()
     {
         // Arrange
         var command = new LoginUserCommand("nonexistent@example.com", "password123");
@@ -27,12 +28,12 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(UserErrors.NotFoundByEmail);
+        result.Error.ShouldBe(AuthErrors.WrongEmailOrPassword);
         result.IsFailure.ShouldBeTrue();
     }
 
     [Fact]
-    public async Task Handle_WrongPassword_ShouldReturnWrongPasswordError()
+    public async Task Handle_WrongPassword_ShouldReturnWrongEmailOrPassword()
     {
         // Arrange
         const string email = "test@example.com";
@@ -61,7 +62,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(UserErrors.WrongPassword);
+        result.Error.ShouldBe(AuthErrors.WrongEmailOrPassword);
         result.IsFailure.ShouldBeTrue();
         _passwordHasherMock.Verify(x => x.Verify(password, hashedPassword), Times.Once);
     }

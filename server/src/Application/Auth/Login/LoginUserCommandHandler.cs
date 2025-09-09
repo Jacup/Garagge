@@ -16,7 +16,7 @@ internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPa
             .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
-        if (user is null || passwordHasher.Verify(command.Password, user.PasswordHash))
+        if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
         {
             return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
         }
