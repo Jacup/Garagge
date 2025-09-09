@@ -9,7 +9,7 @@ internal sealed class CreateVehicleEnergyTypeCommandValidator : AbstractValidato
     {
         RuleFor(c => c.VehicleId)
             .NotEmpty()
-            .WithMessage("Energy Type ID is required and must be a valid GUID.");
+            .WithMessage("Vehicle ID is required and must be a valid GUID.");
         
         RuleFor(c => c.EnergyType)
             .IsInEnum()
