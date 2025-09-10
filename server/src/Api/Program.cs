@@ -86,8 +86,4 @@ if (app.Environment.IsProduction())
 
 await app.RunAsync();
 
-
-namespace Api
-{
-    public partial class Program;
-}
+public partial class Program;
