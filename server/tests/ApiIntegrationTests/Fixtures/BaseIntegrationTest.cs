@@ -1,5 +1,4 @@
 ﻿using Infrastructure.DAL;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiIntegrationTests.Fixtures;
@@ -17,7 +16,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         Client = factory.CreateClient();
     }
 
-    protected HttpClient Client { get; }
+    protected HttpClient Client { get; init; }
 
     public async Task InitializeAsync()
     {
@@ -25,10 +24,11 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         RefreshServices();
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
         _scope?.Dispose();
         DbContext?.Dispose();
+        return Task.CompletedTask;
     }
     
     private void RefreshServices()

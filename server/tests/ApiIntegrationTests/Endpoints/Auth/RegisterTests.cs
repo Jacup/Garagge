@@ -42,24 +42,6 @@ public class RegisterTests : BaseIntegrationTest
     }
     
     [Fact]
-    public async Task Register_DuplicateEmail_ReturnsConflict()
-    {
-        // Act
-        var request = new RegisterUserCommand("test-conflict@garagge.app", "John", "Doe", "Password123");
-
-        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
-        
-        // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
-        
-        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
-    }
-    
-    [Fact]
     public async Task Register_MissingEmail_ReturnsBadRequest()
     {
         // Act
@@ -78,5 +60,128 @@ public class RegisterTests : BaseIntegrationTest
         problemDetails.Errors.ShouldContain(AuthErrors.InvalidEmail);
         
         DbContext.Users.Count().ShouldBe(0);
+    }    
+    
+    [Theory]
+    [InlineData("this-is-not-an-email")]
+    [InlineData("@garagge.app")]
+    [InlineData("test@")]
+    public async Task Register_InvalidEmail_ReturnsBadRequest(string email)
+    {
+        // Act
+        var request = new RegisterUserCommand(email, "John", "Doe", "Password123");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+
+        problemDetails.Errors.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContain(AuthErrors.InvalidEmail);
+        
+        DbContext.Users.Count().ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task Register_MissingFirstName_ReturnsBadRequest()
+    {
+        // Act
+        var request = new RegisterUserCommand("test@garagge.app", "", "Doe", "Password123");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+
+        problemDetails.Errors.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContain(AuthErrors.MissingFirstName);
+        
+        DbContext.Users.Count().ShouldBe(0);
+    }
+    
+    [Fact]
+    public async Task Register_MissingLastName_ReturnsBadRequest()
+    {
+        // Act
+        var request = new RegisterUserCommand("test@garagge.app", "John", "", "Password123");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+
+        problemDetails.Errors.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContain(AuthErrors.MissingLastName);
+        
+        DbContext.Users.Count().ShouldBe(0);
+    }
+    
+    [Fact]
+    public async Task Register_MissingPassword_ReturnsBadRequest()
+    {
+        // Act
+        var request = new RegisterUserCommand("test@garagge.app", "John", "Doe", "");
+        const int passwordLength = 8;
+        
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+
+        problemDetails.Errors.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContain(AuthErrors.InvalidPassword(passwordLength));
+        
+        DbContext.Users.Count().ShouldBe(0);
+    }
+    
+    [Fact]
+    public async Task Register_TooShortPassword_ReturnsBadRequest()
+    {
+        // Act
+        var request = new RegisterUserCommand("test@garagge.app", "John", "Doe", "1234567");
+        const int passwordLength = 8;
+        
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+
+        problemDetails.Errors.ShouldNotBeNull();
+        problemDetails.Errors.ShouldContain(AuthErrors.InvalidPassword(passwordLength));
+        
+        DbContext.Users.Count().ShouldBe(0);
+    }
+    
+    [Fact]
+    public async Task Register_DuplicateEmail_ReturnsConflict()
+    {
+        // Act
+        var request = new RegisterUserCommand("test-conflict@garagge.app", "John", "Doe", "Password123");
+
+        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+        problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
     }
 }

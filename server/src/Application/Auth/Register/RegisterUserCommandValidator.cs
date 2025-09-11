@@ -15,17 +15,17 @@ internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterU
         
         RuleFor(c => c.FirstName)
             .NotEmpty()
-            .WithMessage("First name is required.");
+            .WithError(AuthErrors.MissingFirstName);
         
         RuleFor(c => c.LastName)
             .NotEmpty()
-            .WithMessage("Last name is required.");
+            .WithError(AuthErrors.MissingLastName);
 
         const int minPasswordLength = 8;
         
         RuleFor(c => c.Password)
             .NotEmpty()
             .MinimumLength(minPasswordLength)
-            .WithMessage($"Password must be at least {minPasswordLength} characters long.");
+            .WithError(AuthErrors.InvalidPassword(minPasswordLength));
     }
 }

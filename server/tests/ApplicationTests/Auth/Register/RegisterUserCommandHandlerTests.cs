@@ -1,6 +1,6 @@
 using Application.Abstractions.Authentication;
+using Application.Auth;
 using Application.Auth.Register;
-using Application.Users;
 using Domain.Entities.Users;
 using Moq;
 
@@ -40,7 +40,7 @@ public class RegisterUserCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(UserErrors.EmailNotUnique);
+        result.Error.ShouldBe(AuthErrors.EmailNotUnique);
         result.IsFailure.ShouldBeTrue();
     }
 
