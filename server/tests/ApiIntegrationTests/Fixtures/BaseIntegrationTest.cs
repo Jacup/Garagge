@@ -1,11 +1,40 @@
-﻿namespace ApiIntegrationTests.Fixtures;
+﻿using Infrastructure.DAL;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>
+namespace ApiIntegrationTests.Fixtures;
+
+public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
-    public BaseIntegrationTest(CustomWebApplicationFactory factory)
+    private readonly CustomWebApplicationFactory _factory;
+    private IServiceScope _scope;
+
+    protected ApplicationDbContext DbContext;
+
+    protected BaseIntegrationTest(CustomWebApplicationFactory factory)
     {
+        _factory = factory;
         Client = factory.CreateClient();
     }
+
+    protected HttpClient Client { get; }
+
+    public async Task InitializeAsync()
+    {
+        await _factory.ResetDatabaseAsync();
+        RefreshServices();
+    }
+
+    public async Task DisposeAsync()
+    {
+        _scope?.Dispose();
+        DbContext?.Dispose();
+    }
     
-    protected HttpClient Client { get; init; }
+    private void RefreshServices()
+    {
+        _scope?.Dispose();
+        _scope = _factory.Services.CreateScope();
+        DbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    }
 }

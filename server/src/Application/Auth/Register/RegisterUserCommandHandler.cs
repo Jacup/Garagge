@@ -2,7 +2,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Users;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +16,7 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
 
         if (await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken))
         {
-            return Result.Failure<Guid>(UserErrors.EmailNotUnique);
+            return Result.Failure<Guid>(AuthErrors.EmailNotUnique);
         }
 
         var user = new User

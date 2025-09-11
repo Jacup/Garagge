@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Application.Core;
+using FluentValidation;
 
 namespace Application.Auth.Register;
 
@@ -6,6 +7,12 @@ internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterU
 {
     public RegisterUserCommandValidator()
     {
+        RuleFor(c => c.Email)
+            .NotEmpty()
+            .WithError(AuthErrors.MissingEmail)
+            .EmailAddress()
+            .WithError(AuthErrors.InvalidEmail);
+        
         RuleFor(c => c.FirstName)
             .NotEmpty()
             .WithMessage("First name is required.");
@@ -13,11 +20,6 @@ internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterU
         RuleFor(c => c.LastName)
             .NotEmpty()
             .WithMessage("Last name is required.");
-        
-        RuleFor(c => c.Email)
-            .NotEmpty()
-            .EmailAddress()
-            .WithMessage("A valid email address is required.");
 
         const int minPasswordLength = 8;
         
