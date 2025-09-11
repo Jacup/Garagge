@@ -9,4 +9,10 @@ internal sealed class CustomProblemDetails
     public int Status { get; set; }
     public string? Detail { get; set; }
     public List<Error>? Errors { get; set; }
+
+    public void ShouldBeErrorOfType(Error error)
+    {
+        Title.ShouldBe(error.Code);
+        Detail.ShouldBe(error.Description);
+    }
 }
