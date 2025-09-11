@@ -1,5 +1,8 @@
-﻿namespace Application.Core;
+﻿using System.Text.Json.Serialization;
 
+namespace Application.Core;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ErrorType
 {
     Failure = 0,

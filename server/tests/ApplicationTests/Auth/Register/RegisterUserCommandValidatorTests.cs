@@ -1,7 +1,8 @@
-using Application.Users.Register;
+using Application.Auth;
+using Application.Auth.Register;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Users.Register;
+namespace ApplicationTests.Auth.Register;
 
 public class RegisterUserCommandValidatorTests
 {
@@ -60,6 +61,18 @@ public class RegisterUserCommandValidatorTests
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
+    public void Validate_MissingEmail_ShouldHaveValidationError(string email)
+    {
+        // Arrange
+        var command = new RegisterUserCommand(email, "John", "Doe", "password123");
+
+        // Act & Assert
+        var result = _sut.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(x => x.Email)
+              .WithErrorMessage(AuthErrors.MissingEmail.Description);
+    }
+
+    [Theory]
     [InlineData("invalid-email")]
     [InlineData("@example.com")]
     [InlineData("test@")]
@@ -71,7 +84,7 @@ public class RegisterUserCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.Email)
-              .WithErrorMessage("A valid email address is required.");
+              .WithErrorMessage(AuthErrors.InvalidEmail.Description);
     }
 
     [Fact]

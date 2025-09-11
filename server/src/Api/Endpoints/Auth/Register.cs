@@ -1,16 +1,16 @@
-﻿using Api.Infrastructure;
-using Application.Users.Register;
-using MediatR;
-using Api.Extensions;
+﻿using Api.Extensions;
+using Api.Infrastructure;
+using Application.Auth.Register;
 using Application.Core;
+using MediatR;
 
-namespace Api.Endpoints.Users;
+namespace Api.Endpoints.Auth;
 
 internal sealed class Register : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("users/register", async (RegisterUserCommand command, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPost("auth/register", async (RegisterUserCommand command, ISender sender, CancellationToken cancellationToken) =>
         {
             Result<Guid> result = await sender.Send(command, cancellationToken);
 
@@ -19,6 +19,6 @@ internal sealed class Register : IEndpoint
         .Produces<Guid>()
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status409Conflict)
-        .WithTags(Tags.Users);
+        .WithTags(Tags.Auth);
     }
 }

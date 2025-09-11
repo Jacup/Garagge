@@ -22,4 +22,8 @@
 	  <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Auth\" />
+	</ItemGroup>
+
 </Project>

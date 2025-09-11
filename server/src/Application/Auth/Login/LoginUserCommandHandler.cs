@@ -5,12 +5,10 @@ using Application.Core;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Users.Login;
+namespace Application.Auth.Login;
 
-internal sealed class LoginUserCommandHandler(
-    IApplicationDbContext context,
-    IPasswordHasher passwordHasher,
-    ITokenProvider tokenProvider) : ICommandHandler<LoginUserCommand, LoginUserResponse>
+internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher, ITokenProvider tokenProvider)
+    : ICommandHandler<LoginUserCommand, LoginUserResponse>
 {
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
@@ -18,18 +16,11 @@ internal sealed class LoginUserCommandHandler(
             .AsNoTracking()
             .SingleOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
 
-        if (user is null)
+        if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
         {
-            return Result.Failure<LoginUserResponse>(UserErrors.NotFoundByEmail);
+            return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
         }
-
-        bool verified = passwordHasher.Verify(command.Password, user.PasswordHash);
-
-        if (!verified)
-        {
-            return Result.Failure<LoginUserResponse>(UserErrors.WrongPassword);
-        }
-
+        
         string token = tokenProvider.Create(user);
 
         return new LoginUserResponse { AccessToken = token };

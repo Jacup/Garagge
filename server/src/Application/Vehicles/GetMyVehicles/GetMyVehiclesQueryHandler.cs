@@ -15,34 +15,38 @@ internal sealed class GetMyVehiclesQueryHandler(IApplicationDbContext context, I
             return Result.Failure<PagedList<VehicleDto>>(VehicleErrors.Unauthorized);
 
         var vehiclesQuery = context.Vehicles
-            .AsNoTracking()
-            .Where(v => v.UserId == request.UserId);
+                .AsNoTracking()
+                .Where(v => v.UserId == request.UserId)
+            ;
 
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {
             var searchTerm = request.SearchTerm.ToLower();
-            
+
             vehiclesQuery = vehiclesQuery.Where(v =>
-                v.Brand.ToLower().Contains(searchTerm) ||
-                v.Model.ToLower().Contains(searchTerm));
+                v.Brand.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
+                v.Model.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
         }
-        
+
         vehiclesQuery = vehiclesQuery.OrderBy(v => v.CreatedDate);
 
-        var vehiclesDtoQuery = vehiclesQuery.Select(v => new VehicleDto
-        {
-            Id = v.Id,
-            CreatedDate = v.CreatedDate,
-            UpdatedDate = v.UpdatedDate,
-            Brand = v.Brand,
-            Model = v.Model,
-            EngineType = v.EngineType,
-            ManufacturedYear = v.ManufacturedYear,
-            Type = v.Type,
-            VIN = v.VIN,
-            UserId = v.UserId
-        });
-        
+        var vehiclesDtoQuery = vehiclesQuery
+            .Include(v => v.VehicleEnergyTypes)
+            .Select(v => new VehicleDto
+            {
+                Id = v.Id,
+                CreatedDate = v.CreatedDate,
+                UpdatedDate = v.UpdatedDate,
+                Brand = v.Brand,
+                Model = v.Model,
+                EngineType = v.EngineType,
+                ManufacturedYear = v.ManufacturedYear,
+                Type = v.Type,
+                VIN = v.VIN,
+                UserId = v.UserId,
+                AllowedEnergyTypes = v.AllowedEnergyTypes
+            });
+
         var vehiclesDto = await PagedList<VehicleDto>.CreateAsync(
             vehiclesDtoQuery,
             request.Page,

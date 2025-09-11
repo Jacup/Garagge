@@ -1,37 +1,73 @@
-﻿using Api;
+﻿using Infrastructure.DAL;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Npgsql;
+using Respawn;
+using System.Data.Common;
+using Testcontainers.PostgreSql;
 
 namespace ApiIntegrationTests.Fixtures;
 
-public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly string _environment;
-    private readonly Dictionary<string, string?>? _overrides;
+    private DbConnection _dbConnection = null!;
+    
+    private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
+        .WithImage("postgres:latest")
+        .WithDatabase("test")
+        .WithUsername("postgres")
+        .WithPassword("postgres")
+        .Build();
+    
+    private Respawner _respawner = null!;
+    
+    public HttpClient HttpClient { get; private set; } = null!;
 
-
-    public CustomWebApplicationFactory(string environment = "Development", Dictionary<string, string?>? overrides = null)
+    public async Task InitializeAsync()
     {
-        _environment = environment;
-        _overrides = overrides;
+        await _dbContainer.StartAsync();
+        
+        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
+        
+        HttpClient = CreateClient();
+        
+        await _dbConnection.OpenAsync();
+        await InitializeRespawnerAsync();
     }
 
-    protected override IHost CreateHost(IHostBuilder builder)
+    public async Task ResetDatabaseAsync()
     {
-        ArgumentNullException.ThrowIfNull(builder);
+        await _respawner.ResetAsync(_dbConnection);
+    }
+    
+    public new async Task DisposeAsync()
+    {
+        await _dbContainer.DisposeAsync();
+        await _dbConnection.DisposeAsync();
+    }
 
-        builder.UseEnvironment(_environment);
-
-        builder.ConfigureAppConfiguration((context, config) =>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureTestServices(services =>
         {
-            if (_overrides != null)
-            {
-                config.AddInMemoryCollection(_overrides);
-            }
-        });
+            services.RemoveAll<ApplicationDbContext>();
 
-        return base.CreateHost(builder);
+            services.AddDbContext<ApplicationDbContext>(options => options
+                .UseNpgsql(_dbContainer.GetConnectionString())
+                .UseSnakeCaseNamingConvention());
+        });
+    }
+    
+    private async Task InitializeRespawnerAsync()
+    {
+        _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
+        {
+            SchemasToInclude = [ "public" ],
+            DbAdapter = DbAdapter.Postgres
+        });
     }
 }

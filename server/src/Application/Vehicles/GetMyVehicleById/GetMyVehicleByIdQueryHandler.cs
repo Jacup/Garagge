@@ -17,6 +17,7 @@ internal sealed class GetMyVehicleByIdQueryHandler(IApplicationDbContext context
         var vehicle = await context.Vehicles
             .AsNoTracking()
             .Where(v => v.UserId == request.UserId && v.Id == request.VehicleId)
+            .Include(v => v.VehicleEnergyTypes)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle == null)
