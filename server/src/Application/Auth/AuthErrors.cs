@@ -15,6 +15,10 @@ public static class AuthErrors
     public static readonly Error MissingEmail = Error.Problem(
         "Auth.MissingEmail",
         "Email is required");
+    
+    public static readonly Error MissingPassword = Error.Problem(
+        "Auth.MissingPassword",
+        "Password is required");
 
     public static readonly Error InvalidEmail = Error.Problem(
         "Auth.InvalidEmail",

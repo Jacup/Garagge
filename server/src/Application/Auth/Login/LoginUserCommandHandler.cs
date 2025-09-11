@@ -12,9 +12,11 @@ internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPa
 {
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
+        var normalizedEmail = command.Email.Trim().ToLowerInvariant();
+        
         User? user = await context.Users
             .AsNoTracking()
-            .SingleOrDefaultAsync(u => u.Email == command.Email, cancellationToken);
+            .SingleOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
         {

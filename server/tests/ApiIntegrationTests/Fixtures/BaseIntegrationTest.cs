@@ -1,4 +1,7 @@
-﻿using Infrastructure.DAL;
+﻿using Application.Abstractions.Authentication;
+using Domain.Entities.Users;
+using Infrastructure.DAL;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ApiIntegrationTests.Fixtures;
@@ -18,6 +21,30 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
     protected HttpClient Client { get; init; }
 
+    protected async Task<User> CreateUserAsync(
+        string email = "test@garagge.app",
+        string password = "Password123",
+        string firstName = "John",
+        string lastName = "Doe")
+    {
+        var passwordHasher = _factory.Services.GetRequiredService<IPasswordHasher>();
+        
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            FirstName = firstName,
+            LastName = lastName,
+            PasswordHash = passwordHasher.Hash(password),
+        };
+        
+        DbContext.Users.Add(user);
+        await DbContext.SaveChangesAsync();
+        
+        return user;
+    }
+    
+    
     public async Task InitializeAsync()
     {
         await _factory.ResetDatabaseAsync();
