@@ -6,9 +6,9 @@ namespace ApiIntegrationTests.Fixtures;
 public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory;
-    private IServiceScope _scope;
+    private IServiceScope _scope = null!;
 
-    protected ApplicationDbContext DbContext;
+    protected ApplicationDbContext DbContext = null!;
 
     protected BaseIntegrationTest(CustomWebApplicationFactory factory)
     {
