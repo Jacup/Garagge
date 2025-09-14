@@ -66,7 +66,7 @@ public class GetUserByEmailQueryHandlerTests : InMemoryDbTestBase
 
         var user = new User
         {
-            Id = LoggedUserId,
+            Id = AuthorizedUserId,
             Email = email,
             FirstName = "John",
             LastName = "Doe",

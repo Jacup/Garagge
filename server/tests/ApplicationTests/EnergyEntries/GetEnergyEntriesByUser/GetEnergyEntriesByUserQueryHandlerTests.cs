@@ -38,7 +38,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -54,7 +54,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20, [EnergyType.Gasoline]);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20, [EnergyType.Gasoline]);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -68,7 +68,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 2, 10, [EnergyType.Electric]);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 2, 10, [EnergyType.Electric]);
 
         var callSequence = new List<string>();
 
@@ -90,7 +90,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         var energyEntry1 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
         var energyEntry2 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 10), 950);
 
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -115,7 +115,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
             await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, i), 1000 + i * 10);
         }
 
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 2, 2);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 2, 2);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -141,7 +141,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         var entry1 = await CreateEnergyEntryInDb(vehicle1.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
         var entry2 = await CreateEnergyEntryInDb(vehicle2.Id, EnergyType.Electric, new DateOnly(2023, 10, 10), 500);
 
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -169,7 +169,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         // Different date
         var entry3 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 16), 950);
 
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -195,7 +195,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Electric, new DateOnly(2023, 10, 13), 900);
 
         // Filter for Gasoline and Diesel
-        var query = new GetEnergyEntriesByUserQuery(LoggedUserId, 1, 20, [EnergyType.Gasoline, EnergyType.Diesel]);
+        var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 1, 20, [EnergyType.Gasoline, EnergyType.Diesel]);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -221,7 +221,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
-            UserId = userId ?? LoggedUserId,
+            UserId = userId ?? AuthorizedUserId,
             VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 

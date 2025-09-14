@@ -1,9 +1,7 @@
 ﻿using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
-using Application.Auth.Login;
-using Application.Auth.Register;
 using Application.Users;
-using Application.Users.Update;
+using Application.Users.Me.Update;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -11,25 +9,6 @@ namespace ApiIntegrationTests.Flows;
 
 public class UserFlowTests(CustomWebApplicationFactory factory) : BaseIntegrationTest(factory)
 {
-    private async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword)
-    {
-        var registerRequest = new RegisterUserCommand(userEmail, firstName, lastName, userPassword);
-        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
-
-        registerResponse.EnsureSuccessStatusCode();
-
-        var loginRequest = new LoginUserCommand(userEmail, userPassword);
-        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
-
-        loginResponse.EnsureSuccessStatusCode();
-
-        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginUserResponse>();
-        loginResult.ShouldNotBeNull();
-        loginResult.AccessToken.ShouldNotBeNull();
-
-        Authenticate(loginResult.AccessToken);
-    }
-
     [Fact]
     public async Task UserProfileFlow_RegisterLoginGetProfile_Success()
     {
@@ -142,7 +121,7 @@ public class UserFlowTests(CustomWebApplicationFactory factory) : BaseIntegratio
         const string newFirstName = "Jane";
         const string newLastName = "Smith";
         const string newEmail = "new@garagge.app";
-        var updateRequest = new UpdateUserCommand(result.Id, newEmail, newFirstName, newLastName);
+        var updateRequest = new UpdateMeCommand(newEmail, newFirstName, newLastName);
         var updateResponse = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -201,7 +180,7 @@ public class UserFlowTests(CustomWebApplicationFactory factory) : BaseIntegratio
         result.LastName.ShouldBe(lastName);
 
         // Step 3: PUT /api/users/me with invalid data (should fail)
-        var updateRequest = new UpdateUserCommand(result.Id, "invalid-email", string.Empty, "Smith");
+        var updateRequest = new UpdateMeCommand("invalid-email", string.Empty, "Smith");
 
         var updateResponse = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 

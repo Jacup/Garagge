@@ -22,7 +22,11 @@ public static class UserErrors
     
     public static readonly Error UpdateFailed = Error.Problem(
         "User.UpdateFailed",
-        "Update user failed");
+        "Update user failed");  
+    
+    public static readonly Error DeleteFailed = Error.Problem(
+        "User.DeleteFailed",
+        "Delete user failed");
     
     public static Error NotFound(Guid userId) => Error.NotFound(
         "Users.NotFound",

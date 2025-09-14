@@ -83,7 +83,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Model = "A4",
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         
         Context.Vehicles.Add(vehicle);
@@ -108,7 +108,7 @@ public class DeleteMyVehicleByIdCommandHandlerTests : InMemoryDbTestBase
             Model = "A4",
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();

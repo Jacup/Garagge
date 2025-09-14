@@ -16,6 +16,7 @@ internal sealed class Login : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
+        .AllowAnonymous()
         .Produces<LoginUserResponse>()
         .Produces(StatusCodes.Status401Unauthorized)
         .WithTags(Tags.Auth);

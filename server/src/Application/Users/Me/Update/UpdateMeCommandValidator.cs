@@ -1,11 +1,11 @@
 ﻿using Application.Core;
 using FluentValidation;
 
-namespace Application.Users.Update;
+namespace Application.Users.Me.Update;
 
-public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
+public class UpdateMeCommandValidator : AbstractValidator<UpdateMeCommand>
 {
-    public UpdateUserCommandValidator()
+    public UpdateMeCommandValidator()
     {
         RuleFor(c => c.Email)
             .NotEmpty()

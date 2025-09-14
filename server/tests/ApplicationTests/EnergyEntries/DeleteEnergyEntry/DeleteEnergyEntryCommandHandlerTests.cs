@@ -136,7 +136,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
-            UserId = userId ?? LoggedUserId,
+            UserId = userId ?? AuthorizedUserId,
             VehicleEnergyTypes = new List<VehicleEnergyType>
             {
                 new VehicleEnergyType

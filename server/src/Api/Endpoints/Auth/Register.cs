@@ -16,6 +16,7 @@ internal sealed class Register : IEndpoint
 
             return result.Match(Results.Ok, CustomResults.Problem);
         })
+        .AllowAnonymous()
         .Produces<Guid>()
         .Produces(StatusCodes.Status400BadRequest)
         .Produces(StatusCodes.Status409Conflict)

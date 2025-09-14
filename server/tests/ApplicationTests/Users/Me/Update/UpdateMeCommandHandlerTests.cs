@@ -1,30 +1,31 @@
 ﻿using Application.Users;
-using Application.Users.Update;
+using Application.Users.Me.Update;
 using Domain.Entities.Users;
 
-namespace ApplicationTests.Users.Update;
+namespace ApplicationTests.Users.Me.Update;
 
-public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
+public class UpdateMeCommandHandlerTests : InMemoryDbTestBase
 {
-    private readonly UpdateUserCommandHandler _sut;
-
-    public UpdateUserCommandHandlerTests()
+    private readonly UpdateMeCommandHandler _sut;
+    
+    public UpdateMeCommandHandlerTests()
     {
-        _sut = new UpdateUserCommandHandler(Context);
+        _sut = new UpdateMeCommandHandler(Context, UserContextMock.Object);
     }
 
     [Fact]
     public async Task Handle_ValidCommand_ShouldUpdateAndReturnValidDto()
     {
         // Arrange
-        var id = Guid.NewGuid();
+        SetupAuthorizedUser();
+        
         const string newEmail = "newemail@garagge.app";
         const string newFirstName = "John";
         const string newLastName = "Smith";
 
         var user = new User
         {
-            Id = id,
+            Id = AuthorizedUserId,
             Email = "example@garagge.app",
             FirstName = "John",
             LastName = "Doe",
@@ -34,7 +35,7 @@ public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
         Context.Users.Add(user);
         await Context.SaveChangesAsync();
         
-        var command = new UpdateUserCommand(id, newEmail, newFirstName, newLastName);
+        var command = new UpdateMeCommand(newEmail, newFirstName, newLastName);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -43,14 +44,14 @@ public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.ShouldNotBeNull();
 
-        result.Value.Id.ShouldBe(id);
+        result.Value.Id.ShouldBe(AuthorizedUserId);
         result.Value.Email.ShouldBe(newEmail);
         result.Value.FirstName.ShouldBe(newFirstName);
         result.Value.LastName.ShouldBe(newLastName);
         
         var userEntity = Context.Users.Single();
         
-        userEntity.Id.ShouldBe(id);
+        userEntity.Id.ShouldBe(AuthorizedUserId);
         userEntity.Email.ShouldBe(newEmail);
         userEntity.FirstName.ShouldBe(newFirstName);
         userEntity.LastName.ShouldBe(newLastName);
@@ -60,21 +61,24 @@ public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
     public async Task Handle_UserDoesNotExists_ShouldReturnNotFoundError()
     {
         // Arrange
-        var id = Guid.NewGuid();
-        var command = new UpdateUserCommand(id, "example@garagge.app", "John", "Doe");
+        SetupAuthorizedUser();
+        
+        var command = new UpdateMeCommand("example@garagge.app", "John", "Doe");
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
         result.IsSuccess.ShouldBeFalse();
-        result.Error.ShouldBe(UserErrors.NotFound(id));
+        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
     }
     
     [Fact]
     public async Task Handle_EmailAlreadyExists_ShouldReturnEmailNotUniqueError()
     {
         // Arrange
+        SetupAuthorizedUser();
+        
         const string existingEmail = "existing@garagge.app";
         var existingUser = new User
         {
@@ -88,10 +92,10 @@ public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
         Context.Users.Add(existingUser);
         await Context.SaveChangesAsync();
 
-        var testedUserId = Guid.NewGuid();
+        
         var testedUser = new User
         {
-            Id = testedUserId,
+            Id = AuthorizedUserId,
             Email = "old@garagge.app",
             FirstName = "John",
             LastName = "Doe",
@@ -101,7 +105,7 @@ public class UpdateUserCommandHandlerTests : InMemoryDbTestBase
         Context.Users.Add(testedUser);
         await Context.SaveChangesAsync();
         
-        var command = new UpdateUserCommand(testedUserId, existingEmail, testedUser.FirstName, testedUser.LastName);
+        var command = new UpdateMeCommand(existingEmail, testedUser.FirstName, testedUser.LastName);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
