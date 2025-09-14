@@ -2,7 +2,10 @@
 using Domain.Entities.Users;
 using Infrastructure.DAL;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace ApiIntegrationTests.Fixtures;
 
@@ -44,6 +47,10 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         return user;
     }
     
+    protected void Authenticate(string accessToken)
+    {
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    }
     
     public async Task InitializeAsync()
     {
