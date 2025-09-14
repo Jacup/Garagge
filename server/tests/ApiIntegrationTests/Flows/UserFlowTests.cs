@@ -88,7 +88,11 @@ public class UserFlowTests : BaseIntegrationTest
         // Assert
         responseA.StatusCode.ShouldBe(HttpStatusCode.OK);
         responseB.StatusCode.ShouldBe(HttpStatusCode.OK);
+        
+        dataA.ShouldNotBeNull();
         dataA.Email.ShouldBe("usera@garagge.app");
+        
+        dataB.ShouldNotBeNull();
         dataB.Email.ShouldBe("userb@garagge.app");
         dataA.Id.ShouldNotBe(dataB.Id);
     }
