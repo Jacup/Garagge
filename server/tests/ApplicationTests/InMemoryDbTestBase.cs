@@ -12,7 +12,7 @@ public abstract class InMemoryDbTestBase : IDisposable
     protected readonly Mock<IPublisher> PublisherMock;
     protected readonly Mock<IUserContext> UserContextMock = new();
 
-    protected readonly Guid LoggedUserId = Guid.NewGuid();
+    protected readonly Guid AuthorizedUserId = Guid.NewGuid();
     
     protected InMemoryDbTestBase()
     {
@@ -29,6 +29,6 @@ public abstract class InMemoryDbTestBase : IDisposable
     {
         UserContextMock
             .Setup(o => o.UserId)
-            .Returns(LoggedUserId);
+            .Returns(AuthorizedUserId);
     }
 }

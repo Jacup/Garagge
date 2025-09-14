@@ -1,11 +1,12 @@
-﻿using Application.Abstractions.Authentication;
+﻿using ApiIntegrationTests.Definitions;
+using Application.Abstractions.Authentication;
+using Application.Auth.Login;
+using Application.Auth.Register;
 using Domain.Entities.Users;
 using Infrastructure.DAL;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
-using System.Security.Claims;
+using System.Net.Http.Json;
 
 namespace ApiIntegrationTests.Fixtures;
 
@@ -45,6 +46,36 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         await DbContext.SaveChangesAsync();
         
         return user;
+    }
+    
+    protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword)
+    {
+        await RegisterUser(userEmail, firstName, lastName, userPassword);
+
+        LoginUserResponse loginResult = await LoginUser(userEmail, userPassword);
+
+        Authenticate(loginResult.AccessToken);
+    }
+    
+    protected async Task RegisterUser(string userEmail, string firstName, string lastName, string userPassword)
+    {
+        var registerRequest = new RegisterUserCommand(userEmail, firstName, lastName, userPassword);
+        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
+
+        registerResponse.EnsureSuccessStatusCode();
+    }
+
+    protected async Task<LoginUserResponse> LoginUser(string userEmail, string userPassword)
+    {
+        var loginRequest = new LoginUserCommand(userEmail, userPassword);
+        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
+
+        loginResponse.EnsureSuccessStatusCode();
+
+        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginUserResponse>();
+        loginResult.ShouldNotBeNull();
+        loginResult.AccessToken.ShouldNotBeNull();
+        return loginResult;
     }
     
     protected void Authenticate(string accessToken)

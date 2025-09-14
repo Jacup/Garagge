@@ -11,6 +11,7 @@ public static class ApiV1Definition
         public static string Register = $"{ApiBase}/auth/register";
         public static string Refresh = $"{ApiBase}/auth/refresh";
         public static string Logout = $"{ApiBase}/auth/logout";
+        public static string ChangePassword = $"{ApiBase}/auth/change-password";
     }
 
     // ==================== USERS MANAGEMENT ====================

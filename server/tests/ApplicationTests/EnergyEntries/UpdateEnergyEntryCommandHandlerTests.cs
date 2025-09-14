@@ -35,7 +35,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = new Vehicle
         {
             Id = Guid.NewGuid(),
-            UserId = userId ?? LoggedUserId,
+            UserId = userId ?? AuthorizedUserId,
             Brand = "TestBrand",
             Model = "TestModel",
             EngineType = engineType

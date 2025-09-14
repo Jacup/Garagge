@@ -18,13 +18,13 @@ public class GetUserByIdQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var query = new GetUserByIdQuery(LoggedUserId);
+        var query = new GetUserByIdQuery(AuthorizedUserId);
 
         // Act
         var result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(UserErrors.NotFound(LoggedUserId));
+        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
         result.IsFailure.ShouldBeTrue();
     }
 
@@ -52,7 +52,7 @@ public class GetUserByIdQueryHandlerTests : InMemoryDbTestBase
 
         var user = new User
         {
-            Id = LoggedUserId,
+            Id = AuthorizedUserId,
             Email = "test@example.com",
             FirstName = "John",
             LastName = "Doe",
@@ -62,7 +62,7 @@ public class GetUserByIdQueryHandlerTests : InMemoryDbTestBase
         Context.Users.Add(user);
         await Context.SaveChangesAsync();
 
-        var query = new GetUserByIdQuery(LoggedUserId);
+        var query = new GetUserByIdQuery(AuthorizedUserId);
 
         // Act
         var result = await _sut.Handle(query, CancellationToken.None);

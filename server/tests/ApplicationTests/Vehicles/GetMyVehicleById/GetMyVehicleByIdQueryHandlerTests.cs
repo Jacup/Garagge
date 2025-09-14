@@ -27,7 +27,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         
         UserContextMock
             .Setup(o => o.UserId)
-            .Returns(LoggedUserId);
+            .Returns(AuthorizedUserId);
 
         var result = await _sut.Handle(request, CancellationToken.None);
 
@@ -52,7 +52,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(AuthorizedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -73,14 +73,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             Model = "A4",
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2010,
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(LoggedUserId, requestedVehicleId);
+        var request = new GetMyVehicleByIdQuery(AuthorizedUserId, requestedVehicleId);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -98,14 +98,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             Brand = "Audi",
             Model = "A4",
             EngineType = EngineType.Fuel,
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(AuthorizedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -115,7 +115,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
         result.Value.EngineType.ShouldBe(EngineType.Fuel);
-        result.Value.UserId.ShouldBe(LoggedUserId);
+        result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
 
     [Fact]
@@ -130,14 +130,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109186",
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(AuthorizedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -149,7 +149,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBe(2020);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
-        result.Value.UserId.ShouldBe(LoggedUserId);
+        result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
 
     [Fact]
@@ -164,14 +164,14 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = null,
             Type = null,
             VIN = null,
-            UserId = LoggedUserId
+            UserId = AuthorizedUserId
         };
         
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
 
         var sut = new GetMyVehicleByIdQueryHandler(Context, UserContextMock.Object);
-        var request = new GetMyVehicleByIdQuery(LoggedUserId, vehicle.Id);
+        var request = new GetMyVehicleByIdQuery(AuthorizedUserId, vehicle.Id);
         
         var result = await sut.Handle(request, CancellationToken.None);
 
@@ -183,7 +183,7 @@ public class GetMyVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();
-        result.Value.UserId.ShouldBe(LoggedUserId);
+        result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
     
 

@@ -29,7 +29,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Brand = "OldBrand",
             Model = "OldModel",
             EngineType = EngineType.Fuel,
-            UserId = LoggedUserId,
+            UserId = AuthorizedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Bus,
             VIN = "1HGBH41JXMN109111"
@@ -59,7 +59,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBe(2010);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
-        result.Value.UserId.ShouldBe(LoggedUserId);
+        result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Brand = "OldBrand",
             Model = "OldModel",
             EngineType = EngineType.Fuel,
-            UserId = LoggedUserId,
+            UserId = AuthorizedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109111"
@@ -102,7 +102,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
         result.Value.ManufacturedYear.ShouldBeNull();
         result.Value.Type.ShouldBeNull();
         result.Value.VIN.ShouldBeNull();
-        result.Value.UserId.ShouldBe(LoggedUserId);
+        result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
 
     [Fact]
@@ -185,7 +185,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Brand = "OldBrand",
             Model = "OldModel",
             EngineType = EngineType.Fuel,
-            UserId = LoggedUserId,
+            UserId = AuthorizedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109111"
@@ -227,7 +227,7 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
             Brand = "OldBrand",
             Model = "OldModel",
             EngineType = EngineType.Fuel,
-            UserId = LoggedUserId,
+            UserId = AuthorizedUserId,
             ManufacturedYear = 2005,
             Type = VehicleType.Car,
             VIN = "1HGBH41JXMN109111"
@@ -249,6 +249,6 @@ public class EditMyVehicleCommandHandlerTests : InMemoryDbTestBase
         updatedVehicle.ManufacturedYear.ShouldBe(2010);
         updatedVehicle.Type.ShouldBe(VehicleType.Car);
         updatedVehicle.VIN.ShouldBe("1HGBH41JXMN109186");
-        updatedVehicle.UserId.ShouldBe(LoggedUserId);
+        updatedVehicle.UserId.ShouldBe(AuthorizedUserId);
     }
 }

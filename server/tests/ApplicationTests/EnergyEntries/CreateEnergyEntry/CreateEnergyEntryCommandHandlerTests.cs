@@ -224,7 +224,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, LoggedUserId, new[] { EnergyType.Gasoline, EnergyType.Electric });
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, AuthorizedUserId, new[] { EnergyType.Gasoline, EnergyType.Electric });
 
         // Test Gasoline
         var gasolineCommand = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Gasoline, Mileage = 1000 };
@@ -266,7 +266,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             EngineType = EngineType.Fuel,
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
-            UserId = userId ?? LoggedUserId,
+            UserId = userId ?? AuthorizedUserId,
             VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 

@@ -1,13 +1,12 @@
 ﻿using Application.Auth;
-using Application.Auth.Register;
-using Application.Users.Update;
+using Application.Users.Me.Update;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Users.Update;
+namespace ApplicationTests.Users.Me.Update;
 
-public class UpdateUserCommandValidatorTests
+public class UpdateMeCommandValidatorTests
 {
-    private readonly UpdateUserCommandValidator _sut = new();
+    private readonly UpdateMeCommandValidator _sut = new();
 
     [Theory]
     [InlineData("")]
@@ -15,7 +14,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_EmptyFirstName_ShouldHaveValidationError(string firstName)
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), "test@example.com", firstName, "Doe");
+        var command = new UpdateMeCommand("test@example.com", firstName, "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -27,7 +26,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_NullFirstName_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), "test@example.com", null!, "Doe");
+        var command = new UpdateMeCommand("test@example.com", null!, "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -40,7 +39,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_EmptyLastName_ShouldHaveValidationError(string lastName)
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), "test@example.com", "John", lastName);
+        var command = new UpdateMeCommand("test@example.com", "John", lastName);
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -52,7 +51,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_NullLastName_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), "test@example.com", "John", null!);
+        var command = new UpdateMeCommand("test@example.com", "John", null!);
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -65,7 +64,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_MissingEmail_ShouldHaveValidationError(string email)
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), email, "John", "Doe");
+        var command = new UpdateMeCommand(email, "John", "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -80,7 +79,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_InvalidEmail_ShouldHaveValidationError(string email)
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), email, "John", "Doe");
+        var command = new UpdateMeCommand(email, "John", "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -92,7 +91,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_NullEmail_ShouldHaveValidationError()
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), null!, "John", "Doe");
+        var command = new UpdateMeCommand(null!, "John", "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -103,7 +102,7 @@ public class UpdateUserCommandValidatorTests
     public void Validate_ValidCommand_ShouldNotHaveValidationErrors()
     {
         // Arrange
-        var command = new UpdateUserCommand(Guid.NewGuid(), "test@example.com", "John", "Doe");
+        var command = new UpdateMeCommand("test@example.com", "John", "Doe");
 
         // Act & Assert
         var result = _sut.TestValidate(command);
@@ -117,7 +116,7 @@ public class UpdateUserCommandValidatorTests
 
         foreach (var email in validEmails)
         {
-            var command = new UpdateUserCommand(Guid.NewGuid(), email, "John", "Doe");
+            var command = new UpdateMeCommand(email, "John", "Doe");
             var result = _sut.TestValidate(command);
             result.ShouldNotHaveValidationErrorFor(x => x.Email);
         }
