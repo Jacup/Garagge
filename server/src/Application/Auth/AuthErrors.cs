@@ -23,7 +23,7 @@ public static class AuthErrors
     public static readonly Error InvalidEmail = Error.Problem(
         "Auth.InvalidEmail",
         "Email is not valid");
-
+    
     public static Error InvalidPassword(int minPasswordLength) => Error.Problem(
         "Auth.InvalidPassword",
         $"Password must be at least {minPasswordLength} characters long.");

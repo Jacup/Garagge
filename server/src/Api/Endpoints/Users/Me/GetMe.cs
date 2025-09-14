@@ -1,13 +1,13 @@
-﻿using Api.Infrastructure;
-using Application.Users.GetById;
-using MediatR;
-using Api.Extensions;
+﻿using Api.Extensions;
+using Api.Infrastructure;
 using Application.Core;
 using Application.Users;
+using Application.Users.GetById;
 using Infrastructure.Authentication;
+using MediatR;
 using System.Security.Claims;
 
-namespace Api.Endpoints.Users;
+namespace Api.Endpoints.Users.Me;
 
 internal sealed class GetMe : IEndpoint
 {
