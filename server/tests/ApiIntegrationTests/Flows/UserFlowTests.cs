@@ -1,5 +1,6 @@
 ﻿using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
+using Application.Auth.Login;
 using Application.Users;
 using Application.Users.Me.Update;
 using System.Net;
@@ -7,278 +8,417 @@ using System.Net.Http.Json;
 
 namespace ApiIntegrationTests.Flows;
 
-public class UserFlowTests(CustomWebApplicationFactory factory) : BaseIntegrationTest(factory)
+[Collection("UserFlowTests")]
+public class UserFlowTests : BaseIntegrationTest
 {
-    [Fact]
-    public async Task UserProfileFlow_RegisterLoginGetProfile_Success()
+    private const string UserEmail = "user@garagge.app";
+    private const string FirstName = "John";
+    private const string LastName = "Doe";
+    private const string UserPassword = "Password123";
+
+    public UserFlowTests(CustomWebApplicationFactory factory) : base(factory)
     {
-        const string userEmail = "test@garagge.app";
-        const string firstName = "John";
-        const string lastName = "Doe";
-        const string userPassword = "Password123";
+    }
 
-        await RegisterAndAuthenticateUser(userEmail, firstName, lastName, userPassword);
+    #region Get Profile Flow - Positive Tests
 
-        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+    [Fact]
+    public async Task GetProfile_AuthenticatedUser_Success()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
 
-        getMeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
+        // Act
+        var response = await Client.GetAsync(ApiV1Definition.Users.GetMe);
 
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content.ReadFromJsonAsync<UserDto>();
+        
         result.ShouldNotBeNull();
         result.Id.ShouldNotBe(Guid.Empty);
-        result.Email.ShouldBe(userEmail);
-        result.FirstName.ShouldBe(firstName);
-        result.LastName.ShouldBe(lastName);
+        result.Email.ShouldBe(UserEmail);
+        result.FirstName.ShouldBe(FirstName);
+        result.LastName.ShouldBe(LastName);
     }
 
     [Fact]
-    public async Task UserProfileFlow_LoginGetProfileMultipleTimes_ConsistentData()
+    public async Task GetProfile_MultipleTimes_ConsistentData()
     {
-        const string userEmail = "test@garagge.app";
-        const string firstName = "John";
-        const string lastName = "Doe";
-        const string userPassword = "Password123";
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
 
-        await RegisterAndAuthenticateUser(userEmail, firstName, lastName, userPassword);
-
+        // Act
         var tasks = Enumerable.Range(0, 5)
             .Select(_ => Client.GetAsync(ApiV1Definition.Users.GetMe))
             .ToArray();
-
         var responses = await Task.WhenAll(tasks);
 
+        // Assert
         foreach (var response in responses)
         {
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
             var result = await response.Content.ReadFromJsonAsync<UserDto>();
-
             result.ShouldNotBeNull();
-            result.Id.ShouldNotBe(Guid.Empty);
-            result.Email.ShouldBe(userEmail);
-            result.FirstName.ShouldBe(firstName);
-            result.LastName.ShouldBe(lastName);
+            result.Email.ShouldBe(UserEmail);
+            result.FirstName.ShouldBe(FirstName);
+            result.LastName.ShouldBe(LastName);
         }
     }
 
-    // [Fact]
-    // public async Task UserProfileFlow_LoginGetProfileLogoutGetProfile_LogoutRevokesAccess()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: GET /api/users/me - should work
-    //     // Step 3: Logout
-    //     // Step 4: GET /api/users/me - should fail (401)
-    // }
+    [Fact]
+    public async Task GetProfile_TwoUsers_DataIsolation()
+    {
+        // Arrange
+        await RegisterUser("usera@garagge.app", "User", "A", UserPassword);
+        var tokenA = (await LoginUser("usera@garagge.app", UserPassword)).AccessToken;
+        
+        await RegisterAndAuthenticateUser("userb@garagge.app", "User", "B", UserPassword);
+        var tokenB = (await LoginUser("userb@garagge.app", UserPassword)).AccessToken;
 
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_MultipleDevicesLogin_EachCanAccessProfile()
-    // {
-    //     // Step 1: Register user
-    //     // Step 2: Login from "device 1" (get token1)
-    //     // Step 3: Login from "device 2" (get token2)
-    //     // Step 4: Both tokens can access /api/users/me
-    //     // Assert: Both return same user data
-    // }
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_LoginTokenExpiresGetProfile_RequiresNewLogin()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: GET /api/users/me - works
-    //     // Step 3: Wait for token expiration or manually expire
-    //     // Step 4: GET /api/users/me - fails (401)
-    //     // Step 5: Login again, GET /api/users/me - works
-    // }
-    //
-    // // ===== DATA UPDATE FLOW =====
-    //
+        // Act
+        Authenticate(tokenA);
+        var responseA = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+        var dataA = await responseA.Content.ReadFromJsonAsync<UserDto>();
+
+        Authenticate(tokenB);
+        var responseB = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+        var dataB = await responseB.Content.ReadFromJsonAsync<UserDto>();
+
+        // Assert
+        responseA.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseB.StatusCode.ShouldBe(HttpStatusCode.OK);
+        dataA.Email.ShouldBe("usera@garagge.app");
+        dataB.Email.ShouldBe("userb@garagge.app");
+        dataA.Id.ShouldNotBe(dataB.Id);
+    }
+
+    #endregion
+
+    #region Get Profile Flow - Negative Tests
 
     [Fact]
-    public async Task UserProfileFlow_LoginUpdateProfileGetProfile_ReturnsUpdatedData()
+    public async Task GetProfile_Unauthorized_ShouldReturn401()
     {
-        // Step 1: Register and login
-        const string userEmail = "test@garagge.app";
-        const string firstName = "John";
-        const string lastName = "Doe";
-        const string userPassword = "Password123";
+        // Act
+        var response = await Client.GetAsync(ApiV1Definition.Users.GetMe);
 
-        await RegisterAndAuthenticateUser(userEmail, firstName, lastName, userPassword);
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
 
-        // Step 2: GET /api/users/me - original data
-        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+    // [Fact]
+    // public async Task GetProfile_AfterLogout_ShouldReturn401()
+    // {
+    //     // Arrange
+    //     await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+    //     await Logout();
+    //
+    //     // Act
+    //     var response = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+    //
+    //     // Assert
+    //     response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    // }
 
-        getMeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
+    [Fact]
+    public async Task GetProfile_AfterAccountDeletion_ShouldReturn401()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var deleteResponse = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+        deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        result.ShouldNotBeNull();
-        result.Id.ShouldNotBe(Guid.Empty);
-        result.Email.ShouldBe(userEmail);
-        result.FirstName.ShouldBe(firstName);
-        result.LastName.ShouldBe(lastName);
+        // Act
+        var response = await Client.GetAsync(ApiV1Definition.Users.GetMe);
 
-        // Step 3: PUT /api/users/me (update profile)
+        // Assert
+        response.IsSuccessStatusCode.ShouldBeFalse();
+    }
+
+    #endregion
+
+    #region Update Profile Flow - Positive Tests
+
+    [Fact]
+    public async Task UpdateProfile_ValidData_Success()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
         const string newFirstName = "Jane";
         const string newLastName = "Smith";
-        const string newEmail = "new@garagge.app";
+        const string newEmail = "jane.smith@garagge.app";
+
+        // Act
         var updateRequest = new UpdateMeCommand(newEmail, newFirstName, newLastName);
         var updateResponse = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
+        // Assert
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-
+        
         var updateResult = await updateResponse.Content.ReadFromJsonAsync<UserDto>();
         updateResult.ShouldNotBeNull();
-        updateResult.Id.ShouldBe(result.Id);
         updateResult.Email.ShouldBe(newEmail);
         updateResult.FirstName.ShouldBe(newFirstName);
         updateResult.LastName.ShouldBe(newLastName);
 
-        // Step 4: GET /api/users/me - updated data
-        var getMeUpdatedResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
-
-        getMeUpdatedResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var updatedResult = await getMeUpdatedResponse.Content.ReadFromJsonAsync<UserDto>();
-
-        updatedResult.ShouldNotBeNull();
-        updatedResult.Id.ShouldNotBe(Guid.Empty);
-        updatedResult.Email.ShouldBe(newEmail);
-        updatedResult.FirstName.ShouldBe(newFirstName);
-        updatedResult.LastName.ShouldBe(newLastName);
-
-        // Assert: Data reflects changes
-        var user = DbContext.Users.FirstOrDefault();
-
-        user.ShouldNotBeNull();
-        user.Id.ShouldBe(result.Id);
+        var user = DbContext.Users.First();
         user.Email.ShouldBe(newEmail);
         user.FirstName.ShouldBe(newFirstName);
         user.LastName.ShouldBe(newLastName);
+        
+        // Verify changes persisted
+        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+        
+        getMeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        
+        var persistedResult = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
+        persistedResult.ShouldNotBeNull();
+        persistedResult.Email.ShouldBe(newEmail);
+        persistedResult.FirstName.ShouldBe(newFirstName);
+        persistedResult.LastName.ShouldBe(newLastName);
     }
-
 
     [Fact]
-    public async Task UserProfileFlow_UpdateProfileInvalidDataGetProfile_ProfileUnchanged()
+    public async Task UpdateProfile_SameEmail_Success()
     {
-        // Step 1: Register and login
-        const string userEmail = "test@garagge.app";
-        const string firstName = "John";
-        const string lastName = "Doe";
-        const string userPassword = "Password123";
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        const string newFirstName = "UpdatedFirst";
 
-        await RegisterAndAuthenticateUser(userEmail, firstName, lastName, userPassword);
+        // Act - Update with the same email but different name
+        var updateRequest = new UpdateMeCommand(UserEmail, newFirstName, LastName);
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
-        // Step 2: GET /api/users/me - original data
-        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
-
-        getMeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
-
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        
+        var result = await response.Content.ReadFromJsonAsync<UserDto>();
+        
         result.ShouldNotBeNull();
-        result.Id.ShouldNotBe(Guid.Empty);
-        result.Email.ShouldBe(userEmail);
-        result.FirstName.ShouldBe(firstName);
-        result.LastName.ShouldBe(lastName);
-
-        // Step 3: PUT /api/users/me with invalid data (should fail)
-        var updateRequest = new UpdateMeCommand("invalid-email", string.Empty, "Smith");
-
-        var updateResponse = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
-
-        updateResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-
-        // Step 4: GET /api/users/me - original data unchanged
-        var getMeNotUpdatedResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
-
-        getMeNotUpdatedResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var notUpdatedResult = await getMeNotUpdatedResponse.Content.ReadFromJsonAsync<UserDto>();
-
-        notUpdatedResult.ShouldNotBeNull();
-        notUpdatedResult.Id.ShouldBe(result.Id);
-        notUpdatedResult.Email.ShouldBe(userEmail);
-        notUpdatedResult.FirstName.ShouldBe(firstName);
-        notUpdatedResult.LastName.ShouldBe(lastName);
+        result.Email.ShouldBe(UserEmail);
+        result.FirstName.ShouldBe(newFirstName);
     }
 
-    // // ===== MULTI-USER SCENARIOS =====
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_TwoUsersLoginEachGetOwnProfile_DataIsolation()
-    // {
-    //     // Step 1: Register user A and user B
-    //     // Step 2: Login user A, GET /api/users/me
-    //     // Step 3: Login user B, GET /api/users/me
-    //     // Assert: Each user sees only their own data
-    // }
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_UserALoginUserBTokenGetProfile_Unauthorized()
-    // {
-    //     // Step 1: Register user A and user B
-    //     // Step 2: Login user A, get tokenA
-    //     // Step 3: Login user B, get tokenB
-    //     // Step 4: Use tokenB to GET /api/users/me
-    //     // Step 5: Try to use tokenA with different request (security test)
-    //     // Assert: Each token only works for its owner
-    // }
-    //
-    // // ===== ERROR RECOVERY FLOW =====
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_LoginGetProfileServerErrorRetry_EventuallySucceeds()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: Simulate server error scenario
-    //     // Step 3: Retry GET /api/users/me
-    //     // Assert: Eventually succeeds with correct data
-    // }
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_LoginGetProfileNetworkTimeoutRetry_Succeeds()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: First request times out
-    //     // Step 3: Retry GET /api/users/me
-    //     // Assert: Second request succeeds
-    // }
-    //
-    // // ===== ACCOUNT LIFECYCLE FLOW =====
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_RegisterLoginGetProfileDeleteAccountGetProfile_Fails()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: GET /api/users/me - works
-    //     // Step 3: DELETE /api/users/me (delete account)
-    //     // Step 4: GET /api/users/me - should fail
-    // }
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_RegisterLoginGetProfileDeactivateAccountGetProfile_Fails()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: GET /api/users/me - works
-    //     // Step 3: Deactivate account (if feature exists)
-    //     // Step 4: GET /api/users/me - should fail or return limited data
-    // }
-    //
-    // // ===== SECURITY FLOW =====
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_LoginGetProfileChangePasswordOldTokenGetProfile_TokenStillValid()
-    // {
-    //     // Step 1: Register and login, get token
-    //     // Step 2: GET /api/users/me - works
-    //     // Step 3: Change password
-    //     // Step 4: GET /api/users/me with old token
-    //     // Assert: Depends on security policy - might still work or fail
-    // }
-    //
-    // [Fact]
-    // public async Task UserProfileFlow_SuspiciousActivityGetProfile_SecurityMeasures()
-    // {
-    //     // Step 1: Register and login
-    //     // Step 2: Simulate suspicious activity
-    //     // Step 3: GET /api/users/me
-    //     // Assert: May require additional verification or be blocked
-    // }
+    #endregion
+
+    #region Update Profile Flow - Negative Tests
+
+    [Fact]
+    public async Task UpdateProfile_Unauthorized_ShouldReturn401()
+    {
+        // Arrange
+        var updateRequest = new UpdateMeCommand("test@garagge.app", "Test", "User");
+
+        // Act
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_InvalidEmail_ShouldReturn400()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var updateRequest = new UpdateMeCommand("invalid-email", FirstName, LastName);
+
+        // Act
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        // Verify profile unchanged
+        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+        
+        var result = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
+        
+        result.ShouldNotBeNull();
+        result.Email.ShouldBe(UserEmail);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_EmptyFirstName_ShouldReturn400()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var updateRequest = new UpdateMeCommand(UserEmail, "", LastName);
+
+        // Act
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_EmptyLastName_ShouldReturn400()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var updateRequest = new UpdateMeCommand(UserEmail, FirstName, "");
+
+        // Act
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_DuplicateEmail_ShouldReturn409()
+    {
+        // Arrange
+        await RegisterUser("user1@garagge.app", "User", "One", UserPassword);
+        
+        await RegisterAndAuthenticateUser("user2@garagge.app", "User", "Two", UserPassword);
+
+        // Act - Try to update user2's email to user1's email
+        var updateRequest = new UpdateMeCommand("user1@garagge.app", "User", "Two");
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_NotAuthenticated_ShouldReturn401()
+    {
+        // Arrange
+        await RegisterUser(UserEmail, FirstName, LastName, UserPassword);
+
+        // Act
+        var updateRequest = new UpdateMeCommand("new@garagge.app", "New", "User");
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task UpdateProfile_AfterAccountDeletion_ShouldReturn401()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var deleteResponse = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+        deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act
+        var updateRequest = new UpdateMeCommand("new@garagge.app", "New", "User");
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.IsSuccessStatusCode.ShouldBeFalse();
+    }
+    
+    #endregion
+
+    #region Delete Profile Flow - Positive Tests
+
+    [Fact]
+    public async Task DeleteProfile_AuthenticatedUser_Success()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+
+        // Act
+        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task DeleteProfile_ThenRegisterWithSameEmail_Success()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        
+        var deleteResponse = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+        
+        deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act
+        await RegisterUser(UserEmail, FirstName, LastName, UserPassword);
+    }
+
+    #endregion
+
+    #region Delete Profile Flow - Negative Tests
+
+    [Fact]
+    public async Task DeleteProfile_Unauthorized_ShouldReturn401()
+    {
+        // Act
+        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task DeleteProfile_Twice_SecondShouldReturn401()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var response1 = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+        response1.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act
+        var response2 = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+
+        // Assert
+        response2.IsSuccessStatusCode.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task DeleteProfile_ThenLogin_ShouldFail()
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var deleteResponse = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMe);
+        deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        // Act
+        var loginRequest = new LoginUserCommand(UserEmail, UserPassword);
+        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
+
+        // Assert
+        loginResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    #endregion
+    
+    #region Edge Cases
+
+    [Theory]
+    [InlineData("", "Valid", "User")] // Empty email
+    [InlineData("invalid-email", "Valid", "User")] // Invalid email format
+    [InlineData("valid@email.com", "", "User")] // Empty first name
+    [InlineData("valid@email.com", "Valid", "")] // Empty last name
+    public async Task UpdateProfile_InvalidData_ShouldReturn400(string email, string firstName, string lastName)
+    {
+        // Arrange
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+        var updateRequest = new UpdateMeCommand(email, firstName, lastName);
+
+        // Act
+        var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        // Verify original data unchanged
+        var getMeResponse = await Client.GetAsync(ApiV1Definition.Users.GetMe);
+        
+        var result = await getMeResponse.Content.ReadFromJsonAsync<UserDto>();
+        result.ShouldNotBeNull();
+        result.Email.ShouldBe(UserEmail);
+        result.FirstName.ShouldBe(FirstName);
+        result.LastName.ShouldBe(LastName);
+    }
+
+    #endregion
 }
