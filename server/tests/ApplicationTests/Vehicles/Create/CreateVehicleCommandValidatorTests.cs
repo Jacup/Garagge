@@ -1,4 +1,7 @@
 using Application.Abstractions;
+using Application.Abstractions.Data;
+using Application.Abstractions.Services;
+using Application.Services;
 using Application.Vehicles.Create;
 using Domain.Enums;
 using FluentValidation.TestHelper;
@@ -10,16 +13,20 @@ public class CreateVehicleCommandValidatorTests
 {
     private readonly CreateVehicleCommandValidator _validator;
     private readonly Mock<IDateTimeProvider> _dateTimeProvider;
+    private readonly IVehicleEngineCompatibilityService _compatibilityService;
 
     public CreateVehicleCommandValidatorTests()
     {
         _dateTimeProvider = new Mock<IDateTimeProvider>();
         
+        var mockDbContext = new Mock<IApplicationDbContext>();
+        _compatibilityService = new VehicleEngineCompatibilityService(mockDbContext.Object);
+        
         _dateTimeProvider
             .Setup(o => o.UtcNow)
             .Returns(new DateTime(2024, 01, 25));
         
-        _validator = new CreateVehicleCommandValidator(_dateTimeProvider.Object);
+        _validator = new CreateVehicleCommandValidator(_dateTimeProvider.Object, _compatibilityService);
     }
 
     [Fact]
@@ -140,4 +147,110 @@ public class CreateVehicleCommandValidatorTests
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }
+
+    #region EnergyTypes Validation Tests
+
+    [Fact]
+    public void Validate_WhenEnergyTypesIsNull_ShouldNotHaveError()
+    {
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: null);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenEnergyTypesIsEmpty_ShouldNotHaveError()
+    {
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: new List<EnergyType>());
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Theory]
+    [InlineData(EngineType.Fuel, EnergyType.Gasoline)]
+    [InlineData(EngineType.Fuel, EnergyType.Diesel)]
+    [InlineData(EngineType.Fuel, EnergyType.LPG)]
+    [InlineData(EngineType.Electric, EnergyType.Electric)]
+    [InlineData(EngineType.Hydrogen, EnergyType.Hydrogen)]
+    public void Validate_WhenEnergyTypeIsCompatibleWithEngine_ShouldNotHaveError(EngineType engineType, EnergyType energyType)
+    {
+        var command = new CreateVehicleCommand("Audi", "A4", engineType, EnergyTypes: [energyType]);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Theory]
+    [InlineData(EngineType.Electric, EnergyType.Gasoline)]
+    [InlineData(EngineType.Electric, EnergyType.Diesel)]
+    [InlineData(EngineType.Fuel, EnergyType.Electric)]
+    [InlineData(EngineType.Fuel, EnergyType.Hydrogen)]
+    [InlineData(EngineType.Hydrogen, EnergyType.Electric)]
+    [InlineData(EngineType.Hydrogen, EnergyType.Gasoline)]
+    public void Validate_WhenEnergyTypeIsNotCompatibleWithEngine_ShouldHaveError(EngineType engineType, EnergyType energyType)
+    {
+        var command = new CreateVehicleCommand("Audi", "A4", engineType, EnergyTypes: [energyType]);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenMultipleCompatibleEnergyTypes_ShouldNotHaveError()
+    {
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Diesel, EnergyType.LPG };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenPlugInHybridWithElectricAndGasoline_ShouldNotHaveError()
+    {
+        var energyTypes = new[] { EnergyType.Electric, EnergyType.Gasoline };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.PlugInHybrid, EnergyTypes: energyTypes);
+        var result = _validator.TestValidate(command);
+        result.ShouldNotHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenEnergyTypesContainsDuplicates_ShouldHaveError()
+    {
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Gasoline, EnergyType.Diesel };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenEnergyTypesExceedsMaximumCount_ShouldHaveError()
+    {
+        var energyTypes = new[] 
+        { 
+            EnergyType.Gasoline, EnergyType.Diesel, EnergyType.LPG, EnergyType.CNG,
+            EnergyType.Ethanol, EnergyType.Biofuel, EnergyType.Electric, EnergyType.Hydrogen,
+            EnergyType.Gasoline 
+        };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenInvalidEnumValue_ShouldHaveError()
+    {
+        var energyTypes = new[] { (EnergyType)999 };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+        var result = _validator.TestValidate(command);
+        result.ShouldHaveValidationErrorFor(c => c.EnergyTypes);
+    }
+
+    [Fact]
+    public void Validate_WhenCommandWithValidEnergyTypes_ShouldNotHaveError()
+    {
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.LPG };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, 2010, VehicleType.Car, "1HGBH41JXMN109186", energyTypes);
+        var result = _validator.TestValidate(command);
+        result.IsValid.ShouldBeTrue();
+    }
+
+    #endregion
 }

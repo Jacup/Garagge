@@ -9,5 +9,6 @@ public sealed record CreateVehicleCommand(
     EngineType EngineType,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
-    string? VIN = null)
+    string? VIN = null,
+    IEnumerable<EnergyType>? EnergyTypes = null)
     : ICommand<VehicleDto>;

@@ -124,7 +124,7 @@ public static class ApiV1Definition
     // ==================== VEHICLES MANAGEMENT ====================
     public static class Vehicles
     {
-        // Personal vehicles
+        // Context-aware endpoints (single codebase for all deployment modes)
         public static string GetAll = $"{ApiBase}/vehicles";
         public static string Create = $"{ApiBase}/vehicles";
         
@@ -143,7 +143,7 @@ public static class ApiV1Definition
         /// </summary>
         public static string DeleteById = $"{ApiBase}/vehicles/{{0}}";
 
-        // Vehicle permissions (Fleet only)
+        // Vehicle permissions (Future: Fleet/SAAS only)
         /// <summary>
         /// Get vehicle permissions. Use: string.Format(Vehicles.GetPermissions, vehicleId)
         /// </summary>
@@ -153,6 +153,11 @@ public static class ApiV1Definition
         /// Grant vehicle access. Use: string.Format(Vehicles.GrantPermission, vehicleId)
         /// </summary>
         public static string GrantPermission = $"{ApiBase}/vehicles/{{0}}/permissions";
+        
+        /// <summary>
+        /// Update user permissions. Use: string.Format(Vehicles.UpdatePermission, vehicleId, userId)
+        /// </summary>
+        public static string UpdatePermission = $"{ApiBase}/vehicles/{{0}}/permissions/{{1}}";
         
         /// <summary>
         /// Remove vehicle access. Use: string.Format(Vehicles.RemovePermission, vehicleId, userId)

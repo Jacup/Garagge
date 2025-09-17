@@ -14,6 +14,7 @@ public class CreateVehicleCommandHandlerTests
     private readonly Mock<IApplicationDbContext> _dbContextMock;
     private readonly Mock<IUserContext> _userContextMock;
     private readonly Mock<DbSet<Vehicle>> _vehicleDbSetMock;
+    private readonly Mock<DbSet<VehicleEnergyType>> _vehicleEnergyTypeDbSetMock;
     private readonly CreateVehicleCommandHandler _handler;
     private readonly Guid _userId = Guid.NewGuid();
 
@@ -22,8 +23,10 @@ public class CreateVehicleCommandHandlerTests
         _dbContextMock = new Mock<IApplicationDbContext>();
         _userContextMock = new Mock<IUserContext>();
         _vehicleDbSetMock = new Mock<DbSet<Vehicle>>();
+        _vehicleEnergyTypeDbSetMock = new Mock<DbSet<VehicleEnergyType>>();
         
         _dbContextMock.Setup(x => x.Vehicles).Returns(_vehicleDbSetMock.Object);
+        _dbContextMock.Setup(x => x.VehicleEnergyTypes).Returns(_vehicleEnergyTypeDbSetMock.Object);
         _userContextMock.Setup(x => x.UserId).Returns(_userId);
         
         _handler = new CreateVehicleCommandHandler(_dbContextMock.Object, _userContextMock.Object);
@@ -204,5 +207,224 @@ public class CreateVehicleCommandHandlerTests
         // Assert
         result.IsSuccess.ShouldBeTrue();
         result.Value.Id.ShouldNotBe(Guid.Empty);
+    }
+
+    [Fact]
+    public async Task Handle_WithEnergyTypes_CreatesVehicleEnergyTypesAndSetsNavigationProperty()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Diesel };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.Is<IEnumerable<VehicleEnergyType>>(vets => 
+                vets.Count() == 2 &&
+                vets.Any(vet => vet.EnergyType == EnergyType.Gasoline) &&
+                vets.Any(vet => vet.EnergyType == EnergyType.Diesel) &&
+                vets.All(vet => vet.VehicleId != Guid.Empty && vet.Id != Guid.Empty)),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        result.Value.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+        result.Value.AllowedEnergyTypes.ShouldContain(EnergyType.Diesel);
+        result.Value.AllowedEnergyTypes.Count().ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Handle_WithNullEnergyTypes_DoesNotCreateVehicleEnergyTypes()
+    {
+        // Arrange
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: null);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.IsAny<IEnumerable<VehicleEnergyType>>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        result.Value.AllowedEnergyTypes.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_WithEmptyEnergyTypes_DoesNotCreateVehicleEnergyTypes()
+    {
+        // Arrange
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: new List<EnergyType>());
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.IsAny<IEnumerable<VehicleEnergyType>>(),
+            It.IsAny<CancellationToken>()), Times.Never);
+
+        result.Value.AllowedEnergyTypes.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Handle_WithDuplicateEnergyTypes_CreatesDedupedVehicleEnergyTypes()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Diesel, EnergyType.Gasoline, EnergyType.LPG };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.Is<IEnumerable<VehicleEnergyType>>(vets => 
+                vets.Count() == 3 &&
+                vets.Count(vet => vet.EnergyType == EnergyType.Gasoline) == 1 && 
+                vets.Any(vet => vet.EnergyType == EnergyType.Diesel) &&
+                vets.Any(vet => vet.EnergyType == EnergyType.LPG)),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        result.Value.AllowedEnergyTypes.Count().ShouldBe(3);
+        result.Value.AllowedEnergyTypes.Count(et => et == EnergyType.Gasoline).ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Handle_WithSingleEnergyType_CreatesOneVehicleEnergyType()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Electric };
+        var command = new CreateVehicleCommand("Tesla", "Model 3", EngineType.Electric, EnergyTypes: energyTypes);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.Is<IEnumerable<VehicleEnergyType>>(vets => 
+                vets.Count() == 1 &&
+                vets.First().EnergyType == EnergyType.Electric &&
+                vets.First().VehicleId != Guid.Empty),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        result.Value.AllowedEnergyTypes.ShouldHaveSingleItem();
+        result.Value.AllowedEnergyTypes.First().ShouldBe(EnergyType.Electric);
+    }
+
+    [Fact]
+    public async Task Handle_WithMultipleEnergyTypes_AssignsCorrectVehicleIdToAllEnergyTypes()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Diesel, EnergyType.LPG };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+
+        Vehicle createdVehicle = null!;
+        _vehicleDbSetMock
+            .Setup(x => x.AddAsync(It.IsAny<Vehicle>(), It.IsAny<CancellationToken>()))
+            .Callback<Vehicle, CancellationToken>((v, _) => createdVehicle = v);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        createdVehicle.ShouldNotBeNull();
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.Is<IEnumerable<VehicleEnergyType>>(vets => 
+                vets.All(vet => vet.VehicleId == createdVehicle.Id) &&
+                vets.All(vet => vet.Id != Guid.Empty)),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WhenEnergyTypesProvidedButSaveFails_StillReturnsCreateFailedError()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Gasoline };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("Database connection failed"));
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(VehicleErrors.CreateFailed);
+        
+        _vehicleEnergyTypeDbSetMock.Verify(x => x.AddRangeAsync(
+            It.IsAny<IEnumerable<VehicleEnergyType>>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_EnsuresNavigationPropertyIsSetForMapsterMapping()
+    {
+        // Arrange
+        var energyTypes = new[] { EnergyType.Gasoline, EnergyType.Diesel };
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: energyTypes);
+
+        Vehicle vehiclePassedToAdd = null!;
+        _vehicleDbSetMock
+            .Setup(x => x.AddAsync(It.IsAny<Vehicle>(), It.IsAny<CancellationToken>()))
+            .Callback<Vehicle, CancellationToken>((v, ct) => vehiclePassedToAdd = v);
+
+        _dbContextMock
+            .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        vehiclePassedToAdd.ShouldNotBeNull();
+        
+        vehiclePassedToAdd.VehicleEnergyTypes.ShouldNotBeNull();
+        vehiclePassedToAdd.VehicleEnergyTypes.Count.ShouldBe(2);
+        vehiclePassedToAdd.VehicleEnergyTypes.ShouldContain(vet => vet.EnergyType == EnergyType.Gasoline);
+        vehiclePassedToAdd.VehicleEnergyTypes.ShouldContain(vet => vet.EnergyType == EnergyType.Diesel);
+        
+        vehiclePassedToAdd.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+        vehiclePassedToAdd.AllowedEnergyTypes.ShouldContain(EnergyType.Diesel);
+        vehiclePassedToAdd.AllowedEnergyTypes.Count().ShouldBe(2);
     }
 }

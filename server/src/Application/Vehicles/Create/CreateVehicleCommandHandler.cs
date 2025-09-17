@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Mapster;
 
 namespace Application.Vehicles.Create;
@@ -28,10 +29,19 @@ internal sealed class CreateVehicleCommandHandler(IApplicationDbContext dbContex
             VIN = request.VIN,
             UserId = userId,
         };
-        
+
+        await dbContext.Vehicles.AddAsync(vehicle, cancellationToken);
+
+        if (request.EnergyTypes is not null && request.EnergyTypes.Any())
+        {
+            var vehicleEnergyTypes = CreateVehicleEnergyTypes(request.EnergyTypes, vehicle.Id).ToList();
+            await dbContext.VehicleEnergyTypes.AddRangeAsync(vehicleEnergyTypes, cancellationToken);
+
+            vehicle.VehicleEnergyTypes = vehicleEnergyTypes;
+        }
+
         try
         {
-            await dbContext.Vehicles.AddAsync(vehicle, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception)
@@ -40,5 +50,12 @@ internal sealed class CreateVehicleCommandHandler(IApplicationDbContext dbContex
         }
 
         return Result.Success(vehicle.Adapt<VehicleDto>());
+    }
+
+    private static IEnumerable<VehicleEnergyType> CreateVehicleEnergyTypes(IEnumerable<EnergyType> energyTypes, Guid vehicleId)
+    {
+        return energyTypes
+            .Distinct()
+            .Select(energyType => new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicleId, EnergyType = energyType });
     }
 }
