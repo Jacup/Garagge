@@ -1,5 +1,4 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
 using Application.VehicleEnergyTypes;
@@ -7,7 +6,7 @@ using Application.VehicleEnergyTypes.Create;
 using Domain.Enums;
 using MediatR;
 
-namespace Api.Endpoints.Vehicles.VehicleEnergyType;
+namespace Api.Endpoints.VehicleEnergyType;
 
 internal sealed class CreateVehicleEnergyType : IEndpoint
 {
@@ -26,11 +25,11 @@ internal sealed class CreateVehicleEnergyType : IEndpoint
                         CustomResults.Problem
                     );
                 })
+            .RequireAuthorization()
             .Produces<VehicleEnergyTypeDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.VehicleEnergyTypes);
     }
 }

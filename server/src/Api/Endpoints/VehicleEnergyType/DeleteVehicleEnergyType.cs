@@ -1,12 +1,10 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.VehicleEnergyTypes;
 using Application.VehicleEnergyTypes.Delete;
 using MediatR;
 
-namespace Api.Endpoints.Vehicles.VehicleEnergyType;
+namespace Api.Endpoints.VehicleEnergyType;
 
 internal sealed class DeleteVehicleEnergyType : IEndpoint
 {
@@ -22,11 +20,11 @@ internal sealed class DeleteVehicleEnergyType : IEndpoint
 
                     return result.Match(Results.NoContent, CustomResults.Problem);
                 })
+            .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.VehicleEnergyTypes);
     }
 }
