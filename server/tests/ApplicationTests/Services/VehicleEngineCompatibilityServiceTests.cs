@@ -1,6 +1,9 @@
-﻿using Application.Services;
+﻿using Application.Core;
+using Application.Services;
+using Application.VehicleEnergyTypes;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests.Services;
 
@@ -11,6 +14,167 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
     public VehicleEngineCompatibilityServiceTests()
     {
         _service = new VehicleEngineCompatibilityService(Context);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void ValidateEnergyTypeAssignment_ValidFuelVehicleWithNoExistingEnergyType_ShouldReturnSuccess(EnergyType energyType, bool expectedResult)
+    {
+        // Arrange
+        var vehicle = FuelVehicle;
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+
+        // Assert
+        result.IsSuccess.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void ValidateEnergyTypeAssignment_ValidHybridVehicleWithNoExistingEnergyType_ShouldReturnSuccess(EnergyType energyType, bool expectedResult)
+    {
+        // Arrange
+        var vehicle = HybridVehicle;
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+
+        // Assert
+        result.IsSuccess.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, true)]
+    [InlineData(EnergyType.Diesel, true)]
+    [InlineData(EnergyType.LPG, true)]
+    [InlineData(EnergyType.CNG, true)]
+    [InlineData(EnergyType.Ethanol, true)]
+    [InlineData(EnergyType.Biofuel, true)]
+    [InlineData(EnergyType.Electric, true)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void ValidateEnergyTypeAssignment_ValidPHEVVehicleWithNoExistingEnergyType_ShouldReturnSuccess(EnergyType energyType, bool expectedResult)
+    {
+        // Arrange
+        var vehicle = PHEVVehicle;
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+
+        // Assert
+        result.IsSuccess.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, false)]
+    [InlineData(EnergyType.Diesel, false)]
+    [InlineData(EnergyType.LPG, false)]
+    [InlineData(EnergyType.CNG, false)]
+    [InlineData(EnergyType.Ethanol, false)]
+    [InlineData(EnergyType.Biofuel, false)]
+    [InlineData(EnergyType.Electric, true)]
+    [InlineData(EnergyType.Hydrogen, false)]
+    public void ValidateEnergyTypeAssignment_ValidElectricVehicleWithNoExistingEnergyType_ShouldReturnSuccess(EnergyType energyType, bool expectedResult)
+    {
+        // Arrange
+        var vehicle = ElectricVehicle;
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+        
+        // Assert
+        result.IsSuccess.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline, false)]
+    [InlineData(EnergyType.Diesel, false)]
+    [InlineData(EnergyType.LPG, false)]
+    [InlineData(EnergyType.CNG, false)]
+    [InlineData(EnergyType.Ethanol, false)]
+    [InlineData(EnergyType.Biofuel, false)]
+    [InlineData(EnergyType.Electric, false)]
+    [InlineData(EnergyType.Hydrogen, true)]
+    public void ValidateEnergyTypeAssignment_ValidHydrogenVehicleWithNoExistingEnergyType_ShouldReturnSuccess(EnergyType energyType, bool expectedResult)
+    {
+        // Arrange
+        var vehicle = HydrogenVehicle;
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+
+        // Assert
+        result.IsSuccess.ShouldBe(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(EnergyType.Gasoline)]
+    [InlineData(EnergyType.Diesel)]
+    [InlineData(EnergyType.LPG)]
+    [InlineData(EnergyType.CNG)]
+    [InlineData(EnergyType.Ethanol)]
+    [InlineData(EnergyType.Biofuel)]
+    [InlineData(EnergyType.Electric)]
+    public void ValidateEnergyTypeAssignment_ValidVehicleWithExistingEnergyType_ShouldReturnFailure(EnergyType energyType)
+    {
+        // Arrange
+        var vehicle = PHEVVehicle;
+        vehicle.VehicleEnergyTypes = new List<VehicleEnergyType> { new() { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = energyType } };
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, energyType);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(VehicleEnergyTypeErrors.AlreadyExists(vehicle.Id, energyType));
+    }
+    
+    [Fact]
+    public void ValidateEnergyTypeAssignment_InValidVehicleWithExistingEnergyType_ShouldReturnTwoErrors()
+    {
+        // Arrange
+        var vehicle = ElectricVehicle;
+        vehicle.VehicleEnergyTypes = new List<VehicleEnergyType> { new() { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = EnergyType.Gasoline } };
+
+        // Act
+        var result = _service.ValidateEnergyTypeAssignment(vehicle, EnergyType.Gasoline);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.Code.ShouldBe("Validation.General");
+        result.Error.Description.ShouldBe("One or more validation errors occurred");
+        var validationError = result.Error as ValidationError;
+        validationError.ShouldNotBeNull();
+        validationError.Errors.Length.ShouldBe(2);
+    }
+
+    [Fact]
+    public void ValidateEngineCompatibility_IncompatibleEnergyType_ShouldReturnFailure()
+    {
+        // Arrange
+        var vehicle = FuelVehicle;
+        var incompatibleEnergyType = EnergyType.Electric;
+
+        // Act
+        var result = _service.ValidateEngineCompatibility(vehicle.EngineType, incompatibleEnergyType);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+        result.Error.ShouldBe(VehicleEnergyTypeErrors.IncompatibleWithEngine(incompatibleEnergyType, vehicle.EngineType));
     }
 
     [Theory]
@@ -33,8 +197,8 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
         // Assert
         result.ShouldBe(isCompatible);
     }
-    
-    
+
+
     [Theory]
     [InlineData(EnergyType.Gasoline, true)]
     [InlineData(EnergyType.Diesel, false)]
@@ -99,7 +263,7 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
     }
 
     // Tests for IsEnergyTypeCompatibleWithEngine method
-    
+
     [Theory]
     [InlineData(EnergyType.Gasoline, true)]
     [InlineData(EnergyType.Diesel, true)]
@@ -202,18 +366,7 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
 
     private async Task<Vehicle> CreateGasolineVehicleInDb()
     {
-        var vehicle = new Vehicle
-        {
-            Id = Guid.NewGuid(),
-            Brand = "Toyota",
-            Model = "Test Car",
-            EngineType = EngineType.Fuel,
-            ManufacturedYear = 2020,
-            Type = VehicleType.Car,
-            UserId = Guid.NewGuid(),
-            VehicleEnergyTypes = new List<VehicleEnergyType>()
-        };
-
+        var vehicle = FuelVehicle;
         vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType() { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = EnergyType.Gasoline });
 
         Context.Vehicles.Add(vehicle);
@@ -242,7 +395,7 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
         await Context.SaveChangesAsync();
         return vehicle;
     }
-    
+
     private async Task<Vehicle> CreateEVVehicleInDb()
     {
         var vehicle = new Vehicle
@@ -285,4 +438,50 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
         await Context.SaveChangesAsync();
         return vehicle;
     }
+
+
+    private static Vehicle FuelVehicle => new()
+    {
+        Id = Guid.NewGuid(),
+        Brand = "Audi",
+        Model = "Test Car",
+        EngineType = EngineType.Fuel,
+        UserId = Guid.NewGuid(),
+    };
+
+    private static Vehicle HybridVehicle => new()
+    {
+        Id = Guid.NewGuid(),
+        Brand = "Toyota",
+        Model = "Test Car",
+        EngineType = EngineType.Hybrid,
+        UserId = Guid.NewGuid(),
+    };
+
+    private static Vehicle PHEVVehicle => new()
+    {
+        Id = Guid.NewGuid(),
+        Brand = "Toyota",
+        Model = "Test Car",
+        EngineType = EngineType.PlugInHybrid,
+        UserId = Guid.NewGuid(),
+    };
+
+    private static Vehicle ElectricVehicle => new()
+    {
+        Id = Guid.NewGuid(),
+        Brand = "Tesla",
+        Model = "Test Car",
+        EngineType = EngineType.Electric,
+        UserId = Guid.NewGuid(),
+    };
+
+    private static Vehicle HydrogenVehicle => new()
+    {
+        Id = Guid.NewGuid(),
+        Brand = "Toyota",
+        Model = "Test Car",
+        EngineType = EngineType.Hydrogen,
+        UserId = Guid.NewGuid(),
+    };
 }

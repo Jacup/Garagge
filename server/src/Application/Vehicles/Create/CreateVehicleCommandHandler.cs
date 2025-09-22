@@ -4,13 +4,12 @@ using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
 using Domain.Entities.Vehicles;
-using Domain.Enums;
 using Mapster;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Vehicles.Create;
 
-internal sealed class CreateVehicleCommandHandler(
+public sealed class CreateVehicleCommandHandler(
     IApplicationDbContext dbContext,
     IUserContext userContext,
     IVehicleEngineCompatibilityService vehicleEngineCompatibilityService,
@@ -26,7 +25,7 @@ internal sealed class CreateVehicleCommandHandler(
 
         var energyTypes = request.EnergyTypes?.Distinct().ToList();
 
-        if (energyTypes?.Count == 0)
+        if (energyTypes is not null && energyTypes.Count != 0)
         {
             var validationResult = vehicleEngineCompatibilityService.ValidateEngineCompatibility(request.EngineType, energyTypes);
             

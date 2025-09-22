@@ -44,13 +44,13 @@ public class Result
 
     public static Result Combine(IEnumerable<Result> results) => Combine(results.ToArray());
 
-    public static Result<TValue> Combine<TValue>(TValue value, params Result[] results)
-    {
-        var combinedResult = Combine(results);
-        return combinedResult.IsSuccess 
-            ? Success(value) 
-            : Failure<TValue>(combinedResult.Error);
-    }
+    // public static Result<TValue> Combine<TValue>(TValue value, params Result[] results)
+    // {
+    //     var combinedResult = Combine(results);
+    //     return combinedResult.IsSuccess 
+    //         ? Success(value) 
+    //         : Failure<TValue>(combinedResult.Error);
+    // }
 
     public static Result<TValue> Combine<TValue>(TValue value, IEnumerable<Result> results) => 
         Combine(value, results.ToArray());

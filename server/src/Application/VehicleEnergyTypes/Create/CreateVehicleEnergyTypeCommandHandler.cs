@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.VehicleEnergyTypes.Create;
 
-internal sealed class CreateVehicleEnergyTypeCommandHandler(
+public sealed class CreateVehicleEnergyTypeCommandHandler(
     IApplicationDbContext dbContext,
     IUserContext userContext,
     IVehicleEngineCompatibilityService vehicleEngineCompatibilityService,
@@ -32,7 +32,7 @@ internal sealed class CreateVehicleEnergyTypeCommandHandler(
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle == null)
-            return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.NotFound(request.VehicleId));
+            return Result.Failure<VehicleEnergyTypeDto>(VehicleEnergyTypeErrors.VehicleNotFound(request.VehicleId));
 
         var validationResult = vehicleEngineCompatibilityService.ValidateEnergyTypeAssignment(vehicle, request.EnergyType);
         if (validationResult.IsFailure)

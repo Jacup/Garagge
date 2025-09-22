@@ -35,7 +35,7 @@ internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext db
 
     public Result ValidateEngineCompatibility(EngineType engineType, EnergyType requestEnergyType)
     {
-        if (IsEnergyTypeCompatibleWithEngine(requestEnergyType, engineType))
+        if (!IsEnergyTypeCompatibleWithEngine(requestEnergyType, engineType))
         {
             return Result.Failure(VehicleEnergyTypeErrors.IncompatibleWithEngine(requestEnergyType, engineType));
         }
@@ -71,7 +71,7 @@ internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext db
         };
     }
 
-    private static Result ValidateDuplicateEnergyType(Vehicle vehicle, EnergyType requestEnergyType)
+    internal static Result ValidateDuplicateEnergyType(Vehicle vehicle, EnergyType requestEnergyType)
     {
         if (vehicle.AllowedEnergyTypes.Any(e => e == requestEnergyType))
         {

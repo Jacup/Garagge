@@ -16,6 +16,10 @@ public static class VehicleEnergyTypeErrors
     public static Error NotFound(Guid id) => Error.Failure(
         "VehicleEnergyType.NotFound",
         $"Not found vehicle energy type with ID = '{id}'");
+    
+    public static Error VehicleNotFound(Guid id) => Error.Failure(
+        "VehicleEnergyType.VehicleNotFound",
+        $"Not found vehicle with ID = '{id}'");
 
     public static Error AlreadyExists(Guid id, EnergyType energyType) => Error.Conflict(
         "VehicleEnergyType.AlreadyExists",
