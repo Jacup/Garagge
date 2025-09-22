@@ -24,6 +24,25 @@ public class Result
 
     public static Result Failure(Error error) => new(false, error);
     public static Result<TValue> Failure<TValue>(Error error) => new(default, false, error);
+
+    public static Result Combine(params Result[] results)
+    {
+        if (results.Length == 0)
+            return Success();
+
+        var failures = results.Where(r => r.IsFailure).ToArray();
+
+        if (failures.Length == 0)
+            return Success();
+
+        if (failures.Length == 1)
+            return failures[0];
+
+        var errors = failures.Select(f => f.Error).ToArray();
+        return Failure(new ValidationError(errors));
+    }
+
+    public static Result Combine(IEnumerable<Result> results) => Combine(results.ToArray());
 }
 
 public class Result<TValue> : Result

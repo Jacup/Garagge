@@ -1,25 +1,26 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Vehicles.Delete;
+using Application.Vehicles;
+using Application.Vehicles.GetById;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles;
 
-internal sealed class DeleteVehicle : IEndpoint
+internal sealed class GetVehicleById : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("vehicles/{id:guid}", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
+        app.MapGet("vehicles/{id:guid}", async (Guid id, ISender sender, CancellationToken cancellationToken) =>
             {
-                var command = new DeleteVehicleByIdCommand(id);
-                
-                Result result = await sender.Send(command, cancellationToken);
+                var query = new GetVehicleByIdQuery(id);
 
-                return result.Match(Results.NoContent, CustomResults.Problem);
-            })
+                Result<VehicleDto> result = await sender.Send(query, cancellationToken);
+
+                return result.Match(Results.Ok, CustomResults.Problem);
+            })            
             .RequireAuthorization()
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<VehicleDto>()
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
