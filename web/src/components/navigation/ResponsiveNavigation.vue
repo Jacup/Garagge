@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+
 import DrawerNavigation from './DrawerNavigation.vue'
 import BottomNavigation from './BottomNavigation.vue'
 
@@ -50,5 +51,4 @@ defineExpose({
   </template>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
