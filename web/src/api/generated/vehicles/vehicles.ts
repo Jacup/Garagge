@@ -4,66 +4,38 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type {
-  CreateVehicleCommand,
-  GetApiVehiclesParams,
-  PagedListOfVehicleDto,
-  UpdateVehicleRequest,
-  VehicleDto
-} from '../apiV1.schemas';
+import type { CreateVehicleCommand, GetApiVehiclesParams, PagedListOfVehicleDto, UpdateVehicleRequest, VehicleDto } from '../apiV1.schemas'
 
-import { axiosInstance } from '../../axios-instance';
+import { axiosInstance } from '../../axios-instance'
 
-
-
-  export const getVehicles = () => {
-const postApiVehicles = (
-    createVehicleCommand: CreateVehicleCommand,
- ) => {
-      return axiosInstance<VehicleDto>(
-      {url: `/api/vehicles`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createVehicleCommand
-    },
-      );
-    }
-  const getApiVehicles = (
-    params?: GetApiVehiclesParams,
- ) => {
-      return axiosInstance<PagedListOfVehicleDto>(
-      {url: `/api/vehicles`, method: 'GET',
-        params
-    },
-      );
-    }
-  const deleteApiVehiclesId = (
-    id: string,
- ) => {
-      return axiosInstance<null>(
-      {url: `/api/vehicles/${id}`, method: 'DELETE'
-    },
-      );
-    }
-  const getApiVehiclesId = (
-    id: string,
- ) => {
-      return axiosInstance<VehicleDto>(
-      {url: `/api/vehicles/${id}`, method: 'GET'
-    },
-      );
-    }
-  const putApiVehiclesId = (
-    id: string,
-    updateVehicleRequest: UpdateVehicleRequest,
- ) => {
-      return axiosInstance<VehicleDto>(
-      {url: `/api/vehicles/${id}`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: updateVehicleRequest
-    },
-      );
-    }
-  return {postApiVehicles,getApiVehicles,deleteApiVehiclesId,getApiVehiclesId,putApiVehiclesId}};
+export const getVehicles = () => {
+  const postApiVehicles = (createVehicleCommand: CreateVehicleCommand) => {
+    return axiosInstance<VehicleDto>({
+      url: `/api/vehicles`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: createVehicleCommand,
+    })
+  }
+  const getApiVehicles = (params?: GetApiVehiclesParams) => {
+    return axiosInstance<PagedListOfVehicleDto>({ url: `/api/vehicles`, method: 'GET', params })
+  }
+  const deleteApiVehiclesId = (id: string) => {
+    return axiosInstance<null>({ url: `/api/vehicles/${id}`, method: 'DELETE' })
+  }
+  const getApiVehiclesId = (id: string) => {
+    return axiosInstance<VehicleDto>({ url: `/api/vehicles/${id}`, method: 'GET' })
+  }
+  const putApiVehiclesId = (id: string, updateVehicleRequest: UpdateVehicleRequest) => {
+    return axiosInstance<VehicleDto>({
+      url: `/api/vehicles/${id}`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: updateVehicleRequest,
+    })
+  }
+  return { postApiVehicles, getApiVehicles, deleteApiVehiclesId, getApiVehiclesId, putApiVehiclesId }
+}
 export type PostApiVehiclesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['postApiVehicles']>>>
 export type GetApiVehiclesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['getApiVehicles']>>>
 export type DeleteApiVehiclesIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicles>['deleteApiVehiclesId']>>>

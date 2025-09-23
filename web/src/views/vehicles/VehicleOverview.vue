@@ -6,7 +6,7 @@ import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 
 const route = useRoute()
-const { getApiVehiclesMyId } = getVehicles()
+const { getApiVehiclesId } = getVehicles()
 
 // Vehicle data
 const vehicleId = computed(() => route.params.id as string)
@@ -25,7 +25,7 @@ async function loadVehicle() {
   try {
     loading.value = true
     error.value = null
-    const response = await getApiVehiclesMyId(vehicleId.value)
+    const response = await getApiVehiclesId(vehicleId.value)
     selectedVehicle.value = response.data
   } catch (err) {
     console.error('Failed to load vehicle:', err)
