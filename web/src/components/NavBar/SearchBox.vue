@@ -2,16 +2,25 @@
 import { ref, computed, watch } from 'vue'
 import { useHotkey } from 'vuetify'
 
-const { isRail } = defineProps<{
+// Props
+const { isRail, isMobile } = defineProps<{
   isRail?: boolean
+  isMobile?: boolean
 }>()
 
+// Emits
 const emit = defineEmits<{
   search: [query: string]
 }>()
 
+// Reactive state
 const searchText = ref('')
 const isOverlayOpen = ref(false)
+
+// Computed properties
+const searchButtonClass = computed(() => {
+  return isMobile ? 'search-button-mobile' : 'search-button'
+})
 
 const isMac = computed(() => {
   return typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)
@@ -21,6 +30,7 @@ const shortcutKey = computed(() => {
   return isMac.value ? '⌘' : 'Ctrl'
 })
 
+// Functions
 function openSearchOverlay() {
   isOverlayOpen.value = true
 }
@@ -30,7 +40,11 @@ function closeSearchOverlay() {
   searchText.value = ''
 }
 
-// Simple debounce for search
+function handleVoiceSearch() {
+  console.log('Voice search triggered (placeholder)')
+}
+
+// Search debounce
 let searchTimeout: ReturnType<typeof setTimeout>
 
 function searchWithDebounce(query: string) {
@@ -40,20 +54,19 @@ function searchWithDebounce(query: string) {
   }, 300)
 }
 
-// Watch for search text changes
+// Watchers
 watch(searchText, (newValue) => {
   if (newValue.trim()) {
     searchWithDebounce(newValue)
   }
 })
 
+// Hotkeys (desktop only)
 useHotkey('cmd+k', (event) => {
   event.preventDefault()
   event.stopPropagation()
   event.stopImmediatePropagation()
-
   openSearchOverlay()
-
   return false
 })
 
@@ -64,16 +77,30 @@ useHotkey('escape', () => {
 })
 </script>
 <template>
-  <v-btn v-if="isRail" variant="text" icon="mdi-magnify" class="search-button-rail" @click="openSearchOverlay" rounded="4" />
-
-  <v-btn v-else variant="outlined" prepend-icon="mdi-magnify" class="search-button" @click="openSearchOverlay" block rounded="4">
-    Search...
-    <template #append>
-      <div class="hotkey-container">
+  <v-btn
+  variant="flat"
+  rounded="pill"
+  height="56px"
+  block
+  append-icon="mdi-microphone"
+  spaced="both"
+  @click="openSearchOverlay">
+    Search
+    <!-- <template #append>
+      <div v-if="!isMobile" class="hotkey-container">
         <kbd class="hotkey-key">{{ shortcutKey }}</kbd>
         <kbd class="hotkey-key">K</kbd>
       </div>
-    </template>
+      <v-btn
+        v-else
+        icon="mdi-microphone"
+        variant="text"
+        size="small"
+        @click.stop="handleVoiceSearch"
+        class="voice-search-btn"
+        aria-label="Voice search"
+      />
+    </template> -->
   </v-btn>
 
   <v-overlay v-model="isOverlayOpen" class="search-overlay" role="dialog" aria-labelledby="search-modal-title" aria-modal="true">
@@ -117,6 +144,12 @@ useHotkey('escape', () => {
 
 .search-button {
   text-transform: none;
+  background-color: rgb(var(--v-theme-surface-container-lowest));
+}
+
+.search-button-mobile {
+  text-transform: none;
+  background-color: rgb(var(--v-theme-surface-container-lowest));
 }
 
 .search-button :deep(.v-btn__content) {
@@ -129,6 +162,15 @@ useHotkey('escape', () => {
 .search-button :deep(.v-btn__append) {
   margin-left: auto;
   margin-inline-start: auto;
+}
+
+.voice-search-btn {
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.voice-search-btn:hover {
+  opacity: 1;
 }
 
 .hotkey-container {

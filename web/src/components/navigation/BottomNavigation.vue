@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { layout } = withDefaults(defineProps<Props>(), {
-  layout: 'vertical'
+  layout: 'vertical',
 })
 
 const router = useRouter()
@@ -27,26 +27,24 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
   return currentRoute.value === item.link
 }
 
-// MD3: Use filled icon for active destination, outlined for inactive
 const getIconForState = (item: (typeof MAIN_NAVIGATION_ITEMS)[0], active: boolean) => {
-  // Map of base icons to their outlined variants
   const iconVariants: Record<string, { filled: string; outlined: string }> = {
     'mdi-view-dashboard': {
       filled: 'mdi-view-dashboard',
-      outlined: 'mdi-view-dashboard-outline'
+      outlined: 'mdi-view-dashboard-outline',
     },
     'mdi-car': {
       filled: 'mdi-car',
-      outlined: 'mdi-car-outline'
+      outlined: 'mdi-car-outline',
     },
     'mdi-palette': {
       filled: 'mdi-palette',
-      outlined: 'mdi-palette-outline'
+      outlined: 'mdi-palette-outline',
     },
     'mdi-card': {
       filled: 'mdi-card',
-      outlined: 'mdi-card-outline'
-    }
+      outlined: 'mdi-card-outline',
+    },
   }
 
   const variant = iconVariants[item.icon]
@@ -60,23 +58,12 @@ const getIconForState = (item: (typeof MAIN_NAVIGATION_ITEMS)[0], active: boolea
 </script>
 
 <template>
-  <nav
-    :class="[
-      'm3-bottom-navigation',
-      `m3-bottom-navigation--${layout}`
-    ]"
-    role="navigation"
-    aria-label="Mobile navigation"
-  >
+  <nav :class="['m3-bottom-navigation', `m3-bottom-navigation--${layout}`]" role="navigation" aria-label="Mobile navigation">
     <div class="nav-container">
       <button
         v-for="item in MAIN_NAVIGATION_ITEMS"
         :key="item.title"
-        :class="[
-          'nav-item',
-          `nav-item--${layout}`,
-          { 'nav-item--active': isActive(item) }
-        ]"
+        :class="['nav-item', `nav-item--${layout}`, { 'nav-item--active': isActive(item) }]"
         :aria-label="`Navigate to ${item.title}`"
         :aria-current="isActive(item) ? 'page' : undefined"
         @click="handleNavigation(item.link)"
@@ -253,29 +240,17 @@ const getIconForState = (item: (typeof MAIN_NAVIGATION_ITEMS)[0], active: boolea
 
 /* Hover State - 8% state layer */
 .nav-item--active:hover .nav-item__icon-container {
-  background-color: color-mix(
-    in srgb,
-    rgb(var(--v-theme-secondary-container)),
-    rgba(var(--v-theme-on-secondary-container), 0.08)
-  );
+  background-color: color-mix(in srgb, rgb(var(--v-theme-secondary-container)), rgba(var(--v-theme-on-secondary-container), 0.08));
 }
 
 /* Focus State - 10% state layer */
 .nav-item--active:focus-visible .nav-item__icon-container {
-  background-color: color-mix(
-    in srgb,
-    rgb(var(--v-theme-secondary-container)),
-    rgba(var(--v-theme-on-secondary-container), 0.1)
-  );
+  background-color: color-mix(in srgb, rgb(var(--v-theme-secondary-container)), rgba(var(--v-theme-on-secondary-container), 0.1));
 }
 
 /* Pressed State - 12% state layer */
 .nav-item--active:active .nav-item__icon-container {
-  background-color: color-mix(
-    in srgb,
-    rgb(var(--v-theme-secondary-container)),
-    rgba(var(--v-theme-on-secondary-container), 0.12)
-  );
+  background-color: color-mix(in srgb, rgb(var(--v-theme-secondary-container)), rgba(var(--v-theme-on-secondary-container), 0.12));
 }
 
 /* Remove default focus outline */

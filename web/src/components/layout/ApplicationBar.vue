@@ -8,7 +8,6 @@ const theme = useTheme()
 
 const handleSearch = (query: string) => {
   console.log('Search query:', query)
-  // TODO: Implement search functionality
 }
 
 const { mode } = useResponsiveLayout()
@@ -31,12 +30,11 @@ const { mode } = useResponsiveLayout()
 
   <v-app-bar v-else-if="mode === 'mobile'" :app="true" class="header-mobile" :height="80">
     <div class="navbar-wrapper-mobile">
-      <v-btn disabled icon="mdi-menu"></v-btn>
+      <v-btn icon="mdi-menu"></v-btn>
 
       <div class="search-container">
-        <SearchBox @search="handleSearch" />
+        <SearchBox @search="handleSearch" :is-mobile="true" />
       </div>
-
       <div class="account-menu-container">
         <AccountMenu />
       </div>
@@ -135,5 +133,6 @@ const { mode } = useResponsiveLayout()
 .account-menu-container {
   display: flex;
   align-items: center;
+  padding-right: 4px;
 }
 </style>
