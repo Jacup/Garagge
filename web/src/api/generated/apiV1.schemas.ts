@@ -4,6 +4,11 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface CreateEnergyEntryRequest {
   date: string;
   mileage: number;
@@ -16,7 +21,7 @@ export interface CreateEnergyEntryRequest {
   pricePerUnit: number | null;
 }
 
-export interface CreateMyVehicleCommand {
+export interface CreateVehicleCommand {
   brand: string;
   model: string;
   engineType: EngineType;
@@ -25,17 +30,12 @@ export interface CreateMyVehicleCommand {
   type?: NullableOfVehicleType2;
   /** @nullable */
   vin?: string | null;
+  /** @nullable */
+  energyTypes?: EnergyType[] | null;
 }
 
-export interface EditMyVehicleRequest {
-  brand: string;
-  model: string;
-  engineType: EngineType;
-  /** @nullable */
-  manufacturedYear?: number | null;
-  type?: NullableOfVehicleType2;
-  /** @nullable */
-  vin?: string | null;
+export interface CreateVehicleEnergyTypeRequest {
+  type: EnergyType;
 }
 
 export interface EnergyEntryDto {
@@ -97,6 +97,7 @@ export enum NullableOfVehicleType {
   Car= 'Car',
   Motorbike= 'Motorbike',
   Truck= 'Truck',
+  null= null,
 
 }
 /**
@@ -107,6 +108,7 @@ export enum NullableOfVehicleType2 {
   Car= 'Car',
   Motorbike= 'Motorbike',
   Truck= 'Truck',
+  null= null,
 
 }
 export interface PagedListOfEnergyEntryDto {
@@ -148,6 +150,23 @@ export interface UpdateEnergyEntryRequest {
   pricePerUnit: number | null;
 }
 
+export interface UpdateMeRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface UpdateVehicleRequest {
+  brand: string;
+  model: string;
+  engineType: EngineType;
+  /** @nullable */
+  manufacturedYear?: number | null;
+  type?: NullableOfVehicleType2;
+  /** @nullable */
+  vin?: string | null;
+}
+
 export interface UserDto {
   id?: string;
   email: string;
@@ -171,7 +190,15 @@ export interface VehicleDto {
   allowedEnergyTypes?: EnergyType[];
 }
 
-export type GetApiVehiclesMyParams = {
+export interface VehicleEnergyTypeDto {
+  id: string;
+  vehicleId: string;
+  createdDate?: string;
+  updatedDate?: string;
+  energyType: EnergyType;
+}
+
+export type GetApiVehiclesParams = {
 searchTerm?: string;
 pageSize?: number;
 page?: number;

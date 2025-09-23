@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getAuth } from '@/api/generated/auth/auth'
 import { getUsers } from '@/api/generated/users/users'
 import { useUserStore } from '@/stores/userStore'
 
-const { postApiUsersRegister, postApiUsersLogin, getApiUsersMe } = getUsers()
+const { getApiUsersMe } = getUsers()
+const { postApiAuthLogin, postApiAuthRegister } = getAuth()
 
 const email = ref('')
 const firstName = ref('')
@@ -20,7 +22,7 @@ async function onSubmit() {
   loading.value = true
 
   try {
-    const registerRes = await postApiUsersRegister({
+    const registerRes = await postApiAuthRegister({
       email: email.value,
       firstName: firstName.value,
       lastName: lastName.value,
@@ -38,7 +40,7 @@ async function onSubmit() {
       return
     }
 
-    const loginRes = await postApiUsersLogin({
+    const loginRes = await postApiAuthLogin({
       email: email.value,
       password: password.value,
     })
