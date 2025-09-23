@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import type { CreateMyVehicleCommand, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
+import type { CreateVehicleCommand, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
 import { EngineType as EngineTypeEnum, NullableOfVehicleType as VehicleTypeEnum } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
-  vehicle: CreateMyVehicleCommand
+  vehicle: CreateVehicleCommand
 }>()
 
 defineEmits<{
   save: []
-  'update:vehicle': [vehicle: CreateMyVehicleCommand]
+  'update:vehicle': [vehicle: CreateVehicleCommand]
 }>()
 
 const rules = {

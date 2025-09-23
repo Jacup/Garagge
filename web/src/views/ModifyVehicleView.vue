@@ -3,22 +3,23 @@ import { ref, reactive, inject, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import VehicleInformationCard from '@/components/vehicles/VehicleInformationCard.vue'
 import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
+
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import {
-  type CreateMyVehicleCommand,
-  type EditMyVehicleRequest,
+  type CreateVehicleCommand,
+  type UpdateVehicleRequest,
   type VehicleDto,
   EngineType,
 } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
 const router = useRouter()
-const { getApiVehiclesMyId, postApiVehiclesMy, putApiVehiclesMyEditId } = getVehicles()
+const { getApiVehiclesId, postApiVehicles, putApiVehiclesId } = getVehicles()
 
 const vehicleId = route.params.id as string
 const isEditMode = !!vehicleId
 
-const createVehicle = reactive<CreateMyVehicleCommand>({
+const createVehicle = reactive<CreateVehicleCommand>({
   brand: '',
   model: '',
   engineType: EngineType.Fuel, // Default to first option
@@ -27,7 +28,7 @@ const createVehicle = reactive<CreateMyVehicleCommand>({
   vin: null,
 })
 
-const editVehicle = reactive<EditMyVehicleRequest>({
+const editVehicle = reactive<UpdateVehicleRequest>({
   brand: '',
   model: '',
   engineType: EngineType.Fuel,
@@ -45,7 +46,7 @@ const isLoading = ref(isEditMode)
 onMounted(async () => {
   if (isEditMode) {
     try {
-      const res = await getApiVehiclesMyId(vehicleId)
+      const res = await getApiVehiclesId(vehicleId)
       const vehicleData = res.data as VehicleDto
 
       Object.assign(editVehicle, {
@@ -70,12 +71,12 @@ async function save() {
     if (isEditMode) {
       console.log('Update vehicle data:', editVehicle)
       console.log('Vehicle ID:', vehicleId)
-      await putApiVehiclesMyEditId(vehicleId, editVehicle)
+      await putApiVehiclesId(vehicleId, editVehicle)
       router.push('/vehicles')
     } else {
       console.log('Vehicle data:', createVehicle)
       console.log('Uploaded files:', uploadedFiles.value)
-      await postApiVehiclesMy(createVehicle)
+      await postApiVehicles(createVehicle)
       router.push('/vehicles')
     }
   } catch (error) {

@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { getAuth } from '@/api/generated/auth/auth'
 import { getUsers } from '@/api/generated/users/users'
 import { useUserStore } from '@/stores/userStore'
 
@@ -12,13 +13,14 @@ const loading = ref(false)
 const userStore = useUserStore()
 const router = useRouter()
 
-const { postApiUsersLogin, getApiUsersMe } = getUsers()
+const { postApiAuthLogin } = getAuth()
+const { getApiUsersMe } = getUsers()
 
 async function onSubmit() {
   error.value = ''
   loading.value = true
   try {
-    const loginRes = await postApiUsersLogin({ email: email.value, password: password.value })
+    const loginRes = await postApiAuthLogin({ email: email.value, password: password.value })
 
     if (!loginRes.data.accessToken) {
       throw new Error('Missing access token in login response')

@@ -6,7 +6,7 @@ import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 
-const { getApiVehiclesMy, deleteApiVehiclesMyId } = getVehicles()
+const { getApiVehicles, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
 
 const page = ref(1)
@@ -52,10 +52,10 @@ onMounted(() => {
 async function loadItems() {
   loading.value = true
   try {
-    const res = await getApiVehiclesMy({
-      page: page.value,
-      pageSize: itemsPerPage.value,
+    const res = await getApiVehicles({
       searchTerm: search.value || undefined,
+      pageSize: itemsPerPage.value,
+      page: page.value,
     })
     serverItems.value = res.data.items ?? []
     totalItems.value = res.data.totalCount ?? 0
@@ -69,7 +69,7 @@ async function loadItems() {
 }
 
 async function remove(id: string | undefined) {
-  const res = await deleteApiVehiclesMyId(id ?? '')
+  const res = await deleteApiVehiclesId(id ?? '')
   if (res.status === 204) {
     loadItems()
   } else {
