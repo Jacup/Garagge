@@ -12,7 +12,7 @@ export interface ResponsiveLayout {
 }
 
 export interface NavigationConfig {
-  type: 'drawer' | 'rail' | 'bottom'
+  type: 'expanded' | 'collapsed' | 'bottom'
   width?: number
   railWidth?: number
   permanent: boolean
@@ -41,7 +41,7 @@ export function useResponsiveLayout(): ResponsiveLayout {
     switch (mode.value) {
       case 'desktop':
         return {
-          type: 'drawer',
+          type: 'expanded',
           width: 260,
           permanent: true,
           floating: true,
@@ -49,8 +49,8 @@ export function useResponsiveLayout(): ResponsiveLayout {
         }
       case 'tablet':
         return {
-          type: 'rail',
-          railWidth: 80,
+          type: 'collapsed',
+          railWidth: 112,
           permanent: true,
           floating: true,
           temporary: false,
