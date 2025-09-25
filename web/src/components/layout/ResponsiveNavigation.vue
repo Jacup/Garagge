@@ -2,8 +2,9 @@
 import { ref } from 'vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 
-import DrawerNavigation from './DrawerNavigation.vue'
-import BottomNavigation from './BottomNavigation.vue'
+import NavigationRail from './NavigationRail.vue'
+import DrawerNavigation from '../navigation/DrawerNavigation.vue'
+import BottomNavigation from '../navigation/BottomNavigation.vue'
 
 const { navigationConfig, mode } = useResponsiveLayout()
 
