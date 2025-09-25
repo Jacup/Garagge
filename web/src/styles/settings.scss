@@ -1,6 +1,8 @@
 @use 'vuetify/settings' with (
+  // Enhanced elevations for MD3 Expressive
   $dialog-elevation: 6,
-
+  
+  // Enhanced spacing for better layout
   $dialog-card-header-padding: 24px 24px 16px 24px,
   $dialog-card-text-padding: 0px 24px 24px 24px,
 );
