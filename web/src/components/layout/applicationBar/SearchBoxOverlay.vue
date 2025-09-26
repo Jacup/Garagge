@@ -1,36 +1,29 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
-import { useHotkey } from 'vuetify'
+import { ref, watch } from 'vue'
 
-const { isRail } = defineProps<{
-  isRail?: boolean
+// Props
+const { isOpen } = defineProps<{
+  isOpen: boolean
 }>()
 
+// Emits
 const emit = defineEmits<{
+  close: []
   search: [query: string]
+  'update:isOpen': [value: boolean]
 }>()
 
+// Reactive state
 const searchText = ref('')
-const isOverlayOpen = ref(false)
 
-const isMac = computed(() => {
-  return typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform)
-})
-
-const shortcutKey = computed(() => {
-  return isMac.value ? '⌘' : 'Ctrl'
-})
-
-function openSearchOverlay() {
-  isOverlayOpen.value = true
-}
-
-function closeSearchOverlay() {
-  isOverlayOpen.value = false
+// Functions
+function closeOverlay() {
+  emit('update:isOpen', false)
+  emit('close')
   searchText.value = ''
 }
 
-// Simple debounce for search
+// Search debounce
 let searchTimeout: ReturnType<typeof setTimeout>
 
 function searchWithDebounce(query: string) {
@@ -40,43 +33,28 @@ function searchWithDebounce(query: string) {
   }, 300)
 }
 
-// Watch for search text changes
+// Watchers
 watch(searchText, (newValue) => {
   if (newValue.trim()) {
     searchWithDebounce(newValue)
   }
 })
 
-useHotkey('cmd+k', (event) => {
-  event.preventDefault()
-  event.stopPropagation()
-  event.stopImmediatePropagation()
-
-  openSearchOverlay()
-
-  return false
-})
-
-useHotkey('escape', () => {
-  if (isOverlayOpen.value) {
-    closeSearchOverlay()
-  }
+// Expose the close function for parent components
+defineExpose({
+  close: closeOverlay,
 })
 </script>
+
 <template>
-  <v-btn v-if="isRail" variant="text" icon="mdi-magnify" class="search-button-rail" @click="openSearchOverlay" rounded="4" />
-
-  <v-btn v-else variant="outlined" prepend-icon="mdi-magnify" class="search-button" @click="openSearchOverlay" block rounded="4">
-    Search...
-    <template #append>
-      <div class="hotkey-container">
-        <kbd class="hotkey-key">{{ shortcutKey }}</kbd>
-        <kbd class="hotkey-key">K</kbd>
-      </div>
-    </template>
-  </v-btn>
-
-  <v-overlay v-model="isOverlayOpen" class="search-overlay" role="dialog" aria-labelledby="search-modal-title" aria-modal="true">
+  <v-overlay
+    :model-value="isOpen"
+    @update:model-value="emit('update:isOpen', $event)"
+    class="search-overlay"
+    role="dialog"
+    aria-labelledby="search-modal-title"
+    aria-modal="true"
+  >
     <div class="search-modal">
       <h2 id="search-modal-title" class="sr-only">Search</h2>
       <v-text-field
@@ -115,48 +93,22 @@ useHotkey('escape', () => {
   border: 0;
 }
 
-.search-button {
-  text-transform: none;
-}
-
-.search-button :deep(.v-btn__content) {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.search-button :deep(.v-btn__append) {
-  margin-left: auto;
-  margin-inline-start: auto;
-}
-
-.hotkey-container {
-  display: flex;
-  gap: 2px;
-}
-
-.hotkey-key {
-  background-color: rgb(var(--md-sys-color-surface-container));
-  border: 1px solid rgb(var(--md-sys-color-outline-variant));
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  font-family: monospace;
-  color: rgb(var(--md-sys-color-on-surface-variant));
-  min-width: 20px;
-  text-align: center;
-  line-height: 1.2;
-}
-
 .search-overlay {
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   background-color: rgba(0, 0, 0, 0);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 10vh;
   transition: all 0.15s ease-out;
+}
+
+@media (max-width: 768px) {
+  .search-overlay {
+    align-items: flex-start;
+    padding-top: 8vh;
+  }
 }
 
 .search-overlay.v-overlay--active {
@@ -169,16 +121,23 @@ useHotkey('escape', () => {
   width: 90vw;
   max-width: 600px;
   max-height: 70vh;
-  background: rgb(var(--md-sys-color-surface));
+  background: rgb(var(--v-theme-surface));
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin: auto;
+  margin: 0;
   opacity: 0;
   transform: scale(0.96) translateY(-8px);
   transition: all 0.15s ease-out;
+}
+
+@media (max-width: 768px) {
+  .search-modal {
+    width: 95vw;
+    max-height: 60vh;
+  }
 }
 
 .search-overlay.v-overlay--active .search-modal {
@@ -187,7 +146,7 @@ useHotkey('escape', () => {
 }
 
 .search-input-modal {
-  border-bottom: 1px solid rgb(var(--md-sys-color-outline-variant));
+  border-bottom: 1px solid rgb(var(--v-theme-outline-variant));
 }
 
 .search-input-modal :deep(.v-field) {

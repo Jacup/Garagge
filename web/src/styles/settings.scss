@@ -4,3 +4,11 @@
   $dialog-card-header-padding: 24px 24px 16px 24px,
   $dialog-card-text-padding: 0px 24px 24px 24px,
 );
+
+// Custom utility classes
+.roboto-mono {
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

@@ -16,9 +16,9 @@ const handleLogout = () => {
 <template>
   <v-menu location="bottom end" transition="fade-transition" offset="4">
     <template #activator="{ props }">
-      <v-btn v-bind="props" icon size="36" class="rounded-circle">
-        <v-avatar color="surface-variant" size="36">
-          <span class="text-h6">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
+      <v-btn v-bind="props" icon size="48" class="rounded-circle">
+        <v-avatar color="surface-variant" size="32">
+          <span class="text-h8">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
         </v-avatar>
       </v-btn>
     </template>
@@ -26,7 +26,7 @@ const handleLogout = () => {
     <v-card class="mx-auto" max-width="300">
       <template v-slot:prepend>
         <v-avatar color="surface-variant" size="40">
-          <span class="text-h5">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
+          <span class="text-h6">{{ userStore.user?.firstName?.[0] }}{{ userStore.user?.lastName?.[0] }}</span>
         </v-avatar>
       </template>
       <template v-slot:title> {{ userStore.user?.firstName }} {{ userStore.user?.lastName }} </template>

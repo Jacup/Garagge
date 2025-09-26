@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
-import DrawerNavigation from './DrawerNavigation.vue'
-import BottomNavigation from './BottomNavigation.vue'
+
+import DrawerNavigation from './navigation/DrawerNavigation.vue'
+import BottomNavigation from './navigation/BottomNavigation.vue'
 
 const { navigationConfig, mode } = useResponsiveLayout()
 
@@ -37,7 +38,7 @@ defineExpose({
     <DrawerNavigation @navigate="handleNavigate" />
   </v-navigation-drawer>
 
-  <v-navigation-drawer v-else-if="mode === 'tablet'" rail permanent floating :rail-width="navigationConfig.railWidth">
+  <v-navigation-drawer v-else-if="mode === 'tablet'" permanent floating rail :rail-width="navigationConfig.railWidth">
     <DrawerNavigation is-rail @navigate="handleNavigate" />
   </v-navigation-drawer>
 
@@ -50,5 +51,4 @@ defineExpose({
   </template>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
