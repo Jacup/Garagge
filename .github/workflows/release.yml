@@ -43,7 +43,7 @@ jobs:
         run: |
           echo "Testing build with new version..."
           dotnet restore
-          dotnet build --configuration Release --no-restore
+           dotnet build server/Garagge.sln --no-restore --configuration Release
 
       - name: Commit version changes
         run: |
