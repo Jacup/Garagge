@@ -5,13 +5,17 @@ import ResponsiveNavigation from './components/layout/ResponsiveNavigation.vue'
 import ApplicationBar from './components/layout/applicationBar/ApplicationBar.vue'
 
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
+
+const handleToggleDrawer = () => {
+  navigationRef.value?.toggleDrawer()
+}
 </script>
 
 <template>
   <v-app>
     <ResponsiveNavigation ref="navigationRef" />
 
-    <ApplicationBar />
+    <ApplicationBar @toggle-drawer="handleToggleDrawer" />
 
     <v-main>
       <v-container class="app-container" fluid>

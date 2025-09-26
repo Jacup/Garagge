@@ -6,6 +6,10 @@ import SearchBox from '@/components/layout/applicationBar/SearchBox.vue'
 
 const theme = useTheme()
 
+const emit = defineEmits<{
+  toggleDrawer: []
+}>()
+
 const handleSearch = (query: string) => {
   console.log('Search query:', query)
 }
@@ -14,7 +18,8 @@ const { mode } = useResponsiveLayout()
 </script>
 
 <template>
-  <v-app-bar v-if="mode === 'desktop'" flat floating :app="true" class="header" :height="80">
+  <!-- Desktop and Tablet - same layout -->
+  <v-app-bar v-if="mode === 'desktop' || mode === 'tablet'" flat floating :app="true" class="header" :height="80">
     <div class="navbar-wrapper">
       <div class="search-container">
         <SearchBox @search="handleSearch" />
@@ -28,9 +33,10 @@ const { mode } = useResponsiveLayout()
     </div>
   </v-app-bar>
 
+  <!-- Mobile - with hamburger menu -->
   <v-app-bar v-else-if="mode === 'mobile'" :app="true" class="header-mobile" :height="80">
     <div class="navbar-wrapper-mobile">
-      <v-btn icon="mdi-menu"></v-btn>
+      <v-btn icon="mdi-menu" @click="emit('toggleDrawer')"></v-btn>
 
       <div class="search-container">
         <SearchBox @search="handleSearch" :is-mobile="true" />
