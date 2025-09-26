@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 import ResponsiveNavigation from './components/layout/ResponsiveNavigation.vue'
-import ApplicationBar from './components/layout/ApplicationBar.vue'
+import ApplicationBar from './components/layout/applicationBar/ApplicationBar.vue'
 
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 </script>

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { useTheme } from 'vuetify'
-import AccountMenu from '@/components/NavBar/AccountMenu.vue'
-import SearchBox from '@/components/NavBar/SearchBox.vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+import AccountMenu from '@/components/layout/applicationBar/AccountMenu.vue'
+import SearchBox from '@/components/layout/applicationBar/SearchBox.vue'
 
 const theme = useTheme()
 
