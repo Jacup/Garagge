@@ -1,0 +1,123 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 0.3.0)"
+        required: true
+        type: string
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format X.Y.Z (e.g., 0.3.0)"
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Update .csproj version
+        run: |
+          echo "Updating version to ${{ github.event.inputs.version }}"
+          find . -name "*.csproj" -type f -exec sed -i "s|<Version>.*</Version>|<Version>${{ github.event.inputs.version }}</Version>|g" {} \;
+
+          echo "Modified files:"
+          find . -name "*.csproj" -type f -exec echo "=== {} ===" \; -exec grep -A 2 -B 2 "<Version>" {} \; || true
+
+      - name: Test build
+        run: |
+          echo "Testing build with new version..."
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+
+      - name: Commit version changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add "*.csproj"
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit - version might already be up to date"
+          else
+            git commit -m "Bump version to ${{ github.event.inputs.version }}"
+            git push
+          fi
+
+      - name: Create and push tag
+        run: |
+          git tag "v${{ github.event.inputs.version }}" -m "Release version ${{ github.event.inputs.version }}"
+          git push origin "v${{ github.event.inputs.version }}"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "First release - no previous version to compare"
+            cat << 'EOF' > release_notes.txt
+          🎉 First release of Garagge v${{ github.event.inputs.version }}
+
+          ## Features
+          - Modern vehicle management application
+          - Built with .NET
+
+          **Author**: Jakub Gramburg
+          EOF
+          else
+            echo "Generating notes from $PREVIOUS_TAG to v${{ github.event.inputs.version }}"
+            COMMIT_LOG=$(git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG"..HEAD --reverse)
+            cat << EOF > release_notes.txt
+          ## What's Changed in v${{ github.event.inputs.version }}
+
+          $COMMIT_LOG
+
+          **Full Changelog**: https://github.com/Jacup/Garagge/compare/$PREVIOUS_TAG...v${{ github.event.inputs.version }}
+          EOF
+          fi
+
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          cat release_notes.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Garagge v${{ github.event.inputs.version }}
+          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build release package
+        run: |
+          echo "Building release package..."
+          dotnet publish --configuration Release --output ./publish
+
+          cd publish
+          tar -czf ../garagge-v${{ github.event.inputs.version }}-linux-x64.tar.gz *
+          cd ..
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          files: garagge-v${{ github.event.inputs.version }}-linux-x64.tar.gz
+          token: ${{ secrets.GITHUB_TOKEN }}
