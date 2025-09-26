@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { MAIN_NAVIGATION_ITEMS, SYSTEM_NAVIGATION_ITEMS } from '@/constants/navigation'
+import { get } from 'http'
 
 interface Props {
   isRail?: boolean
@@ -20,47 +21,6 @@ const currentRoute = computed(() => router.currentRoute.value.path)
 
 const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
   return currentRoute.value === item.link
-}
-
-const getIconForState = (item: (typeof MAIN_NAVIGATION_ITEMS)[0], active: boolean) => {
-  const iconVariants: Record<string, { filled: string; outlined: string }> = {
-    'mdi-view-dashboard': {
-      filled: 'mdi-view-dashboard',
-      outlined: 'mdi-view-dashboard-outline',
-    },
-    'mdi-car': {
-      filled: 'mdi-car',
-      outlined: 'mdi-car-outline',
-    },
-    'mdi-palette': {
-      filled: 'mdi-palette',
-      outlined: 'mdi-palette-outline',
-    },
-    'mdi-card': {
-      filled: 'mdi-card',
-      outlined: 'mdi-card-outline',
-    },
-    'mdi-cog': {
-      filled: 'mdi-cog',
-      outlined: 'mdi-cog-outline',
-    },
-    'mdi-server': {
-      filled: 'mdi-server',
-      outlined: 'mdi-server-outline',
-    },
-  }
-
-  const variant = iconVariants[item.icon]
-  if (variant) {
-    return active ? variant.filled : variant.outlined
-  }
-
-  return item.icon
-}
-
-const handleNavigation = (path: string) => {
-  router.push(path)
-  emit('navigate')
 }
 </script>
 
@@ -81,7 +41,7 @@ const handleNavigation = (path: string) => {
         @click="emit('navigate')"
       >
         <template #prepend>
-          <v-icon :size="24" class="mr-2">{{ item.icon }}</v-icon>
+          <v-icon :size="24" class="mr-2">{{ isActive(item) ? item.activeIcon : item.icon }}</v-icon>
         </template>
       </v-list-item>
     </v-list>
@@ -136,7 +96,11 @@ const handleNavigation = (path: string) => {
     }
 
     &.v-list-item--active:hover {
-      background-color: color-mix(in srgb, rgb(var(--v-theme-secondary-container)), rgba(var(--v-theme-on-secondary-container), 0.08)) !important;
+      background-color: color-mix(
+        in srgb,
+        rgb(var(--v-theme-secondary-container)),
+        rgba(var(--v-theme-on-secondary-container), 0.08)
+      ) !important;
     }
   }
 }
