@@ -42,7 +42,7 @@ export function useResponsiveLayout(): ResponsiveLayout {
       case 'desktop':
         return {
           type: 'expanded',
-          width: 240,
+          width: 260,
           permanent: true,
           floating: true,
           temporary: false,

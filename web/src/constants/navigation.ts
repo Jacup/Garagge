@@ -15,7 +15,6 @@ export const MAIN_NAVIGATION_ITEMS: NavigationItem[] = [
 
 export const SYSTEM_NAVIGATION_ITEMS: NavigationItem[] = [
   { title: 'Settings', icon: 'mdi-cog', link: '/settings', value: '/settings' },
-  { title: 'Server Info', icon: 'mdi-server', link: '/server', value: '/server' },
 ] as const
 
 export const ALL_NAVIGATION_ITEMS = [...MAIN_NAVIGATION_ITEMS, ...SYSTEM_NAVIGATION_ITEMS] as const

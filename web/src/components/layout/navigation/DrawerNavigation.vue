@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { MAIN_NAVIGATION_ITEMS, SYSTEM_NAVIGATION_ITEMS } from '@/constants/navigation'
-import { get } from 'http'
+import { MAIN_NAVIGATION_ITEMS } from '@/constants/navigation'
+import ServerInfo from './ServerInfo.vue'
 
 interface Props {
   isRail?: boolean
@@ -16,7 +16,6 @@ const emit = defineEmits<{
   navigate: []
 }>()
 
-// Track current route for rail active states
 const currentRoute = computed(() => router.currentRoute.value.path)
 
 const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
@@ -26,38 +25,52 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
 
 <template>
   <div class="drawer-navigation">
-    <v-list nav class="px-6" base-color="on-surface-variant" active-color="secondary">
-      <v-list-item
-        v-for="item in MAIN_NAVIGATION_ITEMS"
-        :key="item.title"
-        :title="item.title"
-        :to="item.link"
-        :min-height="56"
-        rounded="pill"
-        class="px-4"
-        base-color="on-surface-variant"
-        active-color="secondary"
-        link
-        @click="emit('navigate')"
-      >
-        <template #prepend>
-          <v-icon :size="24" class="mr-2">{{ isActive(item) ? item.activeIcon : item.icon }}</v-icon>
-        </template>
-      </v-list-item>
-    </v-list>
-    <!-- <button
-      v-for="item in MAIN_NAVIGATION_ITEMS"
-      :key="item.title"
-      :class="['rail-nav-item', { 'rail-nav-item--active': isActive(item) }]"
-      :aria-label="`Navigate to ${item.title}`"
-      :aria-current="isActive(item) ? 'page' : undefined"
-      @click="handleNavigation(item.link)"
-    >
-      <div class="rail-nav-item__icon-container">
-        <v-icon :size="24">{{ getIconForState(item, isActive(item)) }}</v-icon>
-      </div>
-      <span class="rail-nav-item__label">{{ item.title }}</span>
-    </button> -->
+    <div class="main-nav">
+      <v-list nav class="px-4" base-color="on-surface-variant" active-color="secondary">
+        <v-list-item
+          v-for="item in MAIN_NAVIGATION_ITEMS"
+          :key="item.title"
+          :title="item.title"
+          :to="item.link"
+          :min-height="56"
+          rounded="pill"
+          class="px-4"
+          base-color="on-surface-variant"
+          active-color="secondary"
+          link
+          @click="emit('navigate')"
+        >
+          <template #prepend>
+            <v-icon :size="24" class="mr-2">{{ isActive(item) ? item.activeIcon : item.icon }}</v-icon>
+          </template>
+        </v-list-item>
+      </v-list>
+    </div>
+    <div class="system-navigation">
+      <v-list nav class="px-4" base-color="on-surface-variant" active-color="secondary">
+        <v-list-item
+          :key="'Server Online'"
+          :title="'Server Online'"
+          :min-height="48"
+          rounded="pill"
+          class="px-4 server-status-item"
+          base-color="on-surface-variant"
+          active-color="secondary"
+          :ripple="false"
+          link
+          variant="tonal"
+        >
+          <template #prepend>
+            <v-badge location="top right" :offset-y="-5" :offset-x="3" color="success" dot>
+              <v-icon :size="24" class="mr-2">mdi-server</v-icon>
+            </v-badge>
+          </template>
+          <template #append>
+            <v-chip size="x-small" flat rounded="pill" class="roboto-mono">v1.2.0</v-chip>
+          </template>
+        </v-list-item>
+      </v-list>
+    </div>
   </div>
 </template>
 
@@ -74,14 +87,13 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
   gap: 8px;
 
   :deep(.v-list-item__prepend) {
-    width: 32px; /* 24px ikona + 8px margin-right */
+    width: 32px;
   }
 
   :deep(.v-list-item) {
     width: fit-content;
     min-width: auto;
 
-    /* Aktywny stan - tło secondary-container */
     &.v-list-item--active {
       background-color: rgb(var(--v-theme-secondary-container)) !important;
 
@@ -90,7 +102,6 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
       }
     }
 
-    /* Hover stany */
     &:hover:not(.v-list-item--active) {
       background-color: rgba(var(--v-theme-on-surface-variant), 0.08);
     }
@@ -103,6 +114,23 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
       ) !important;
     }
   }
+}
+
+.main-nav {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.system-navigation {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
+.server-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 .drawer-navigation--rail {
@@ -316,5 +344,10 @@ const isActive = (item: (typeof MAIN_NAVIGATION_ITEMS)[0]) => {
 /* Remove default focus outline */
 .rail-nav-item:focus {
   outline: none;
+}
+
+.server-status-item {
+  width: 100% !important;
+  min-width: 100% !important;
 }
 </style>
