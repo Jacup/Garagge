@@ -28,7 +28,7 @@ const handleToggleDrawer = () => {
 <style>
 .app-container {
   margin: 0 !important;
-  padding: 4px !important;
+  padding: 16px !important;
   max-width: none !important;
 }
 

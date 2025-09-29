@@ -5,6 +5,7 @@ import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
+import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
 
 const { getApiVehicles, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
@@ -16,6 +17,13 @@ const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
 const serverItems = ref([] as VehicleDto[])
 const loading = ref(true)
 const totalItems = ref(0)
+const viewMode = ref<'list' | 'detailed-list' | 'cards'>('cards')
+
+const viewModeOptions = [
+  { value: 'cards' as const, icon: 'mdi-view-grid', tooltip: 'Card View' },
+  { value: 'list' as const, icon: 'mdi-view-agenda', tooltip: 'List View' },
+  { value: 'detailed-list' as const, icon: 'mdi-view-list', tooltip: 'Detailed List View' },
+]
 
 const headers = [
   { title: 'Brand', key: 'brand', sortable: true },
@@ -91,9 +99,16 @@ function viewOverview(id: string | undefined) {
 </script>
 
 <template>
-  <div class="vehicles-view">
+  <div class="page-content">
     <div class="vehicles-topbar">
       <SearchTable v-model="search" />
+
+      <ConnectedButtonGroup
+        v-model="viewMode"
+        :options="viewModeOptions"
+        mandatory
+      />
+
       <ActionItems />
     </div>
     <v-data-table-server
@@ -173,12 +188,8 @@ function viewOverview(id: string | undefined) {
 </template>
 
 <style scoped>
-.vehicles-view {
-  height: 70vh;
-}
-.vehicles-table :deep() .v-data-table-header,
-.vehicles-table :deep() .v-data-table__th {
-  background-color: var(--color-card-contrast);
+.page-content {
+  margin: 0 auto;
 }
 
 .vehicles-topbar {
@@ -190,6 +201,11 @@ function viewOverview(id: string | undefined) {
   border-radius: 8px 8px 0px 0px;
   margin-bottom: 0;
   border-bottom: 1px solid var(--color-border);
+}
+
+.vehicles-table :deep() .v-data-table-header,
+.vehicles-table :deep() .v-data-table__th {
+  background-color: var(--color-card-contrast);
 }
 
 /* Enhanced action buttons */
