@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { MAIN_NAVIGATION_ITEMS } from '@/constants/navigation'
-import DrawerNavigationItem from './DrawerNavigationItem.vue'
-import DrawerFab from './DrawerFab.vue'
-import NavigationButton from './NavigationButton.vue'
-import ServerStatus from './ServerStatus.vue'
+import { DrawerFab } from '../fab'
+import { DrawerNavigationItem, NavigationButton, ServerStatus } from '.'
 
 interface Props {
   isRail?: boolean

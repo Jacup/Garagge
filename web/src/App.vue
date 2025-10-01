@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-import ResponsiveNavigation from './components/layout/ResponsiveNavigation.vue'
-import ApplicationBar from './components/layout/applicationBar/ApplicationBar.vue'
-import FloatingFab from './components/layout/FloatingFab.vue'
+import { ResponsiveNavigation, ApplicationBar, FloatingFab } from './components/layout'
 
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 
