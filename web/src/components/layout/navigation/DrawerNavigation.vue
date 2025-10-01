@@ -18,9 +18,10 @@ const emit = defineEmits<{
 
 <template>
   <div class="drawer-navigation" :class="{ 'drawer-navigation--rail': isRail }">
-    <div class="nav-logo"></div>
+        <div class="nav-logo"></div>
 
-    <DrawerFab :is-rail="isRail" />
+    <!-- FAB Component - automatically detects display mode -->
+    <DrawerFab />
 
     <div class="main-nav">
       <v-list nav class="px-4" base-color="on-surface-variant" active-color="secondary">

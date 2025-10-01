@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 import ResponsiveNavigation from './components/layout/ResponsiveNavigation.vue'
 import ApplicationBar from './components/layout/applicationBar/ApplicationBar.vue'
+import FloatingFab from './components/layout/FloatingFab.vue'
 
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 
@@ -22,6 +23,9 @@ const handleToggleDrawer = () => {
         <router-view />
       </v-container>
     </v-main>
+
+    <!-- Floating FAB for mobile -->
+    <FloatingFab />
   </v-app>
 </template>
 

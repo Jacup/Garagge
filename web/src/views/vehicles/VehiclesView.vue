@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
@@ -14,8 +13,7 @@ import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
 
 const { getApiVehicles, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
-const { registerFab, unregisterFab, shouldShowFloating } = useLayoutFab()
-const { mode } = useResponsiveLayout()
+const { registerFab, unregisterFab } = useLayoutFab()
 
 const page = ref(1)
 const itemsPerPage = ref(10)
@@ -148,40 +146,12 @@ onUnmounted(() => {
 
       <VehicleCardsView v-else :items="serverItems" :loading="loading" @edit="edit" @delete="remove" @view="viewOverview" />
     </div>
-
-    <!-- Mobile floating FAB (only shown on mobile when FAB config allows) -->
-    <v-fab
-      v-if="shouldShowFloating(mode)"
-      size="80px"
-      icon="mdi-plus"
-      color="tertiary"
-      @click="goToAddVehicle"
-      class="fab-custom"
-    />
   </div>
 </template>
 
 <style scoped>
 .page-content {
   margin: 0 auto;
-}
-
-.fab-custom {
-  position: fixed !important;
-  right: 16px !important;
-  bottom: 16px !important;
-  z-index: 1006 !important;
-}
-
-/* On mobile, position above bottom navigation */
-@media (max-width: 959px) {
-  .fab-custom {
-    bottom: calc(64px + 16px) !important; /* 64px bottom nav + 16px margin */
-  }
-}
-
-.fab-custom :deep(.v-icon) {
-  font-size: 28px !important;
 }
 
 .vehicles-topbar {

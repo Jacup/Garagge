@@ -2,21 +2,19 @@
 import { computed } from 'vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
 
-interface Props {
-  isRail?: boolean
-}
+/**
+ * Floating Action Button component for navigation drawer
+ * Uses new simplified layout logic - no need for isRail prop
+ * Layout system automatically determines display mode
+ */
 
-const { isRail = false } = defineProps<Props>()
-const { fabConfig, shouldShowInDrawer } = useLayoutFab()
+const { fabConfig, isDrawerExtended, isDrawerCompact } = useLayoutFab()
 
 const commonButtonProps = computed(() => ({
   variant: 'flat' as const,
   rounded: 'md-16px' as const,
   color: 'tertiary-container' as const,
 }))
-
-const shouldShowExtended = computed(() => !isRail && shouldShowInDrawer('desktop'))
-const shouldShowCompact = computed(() => isRail && shouldShowInDrawer('tablet'))
 
 const handleFabClick = () => {
   if (fabConfig.value?.action) {
@@ -26,11 +24,14 @@ const handleFabClick = () => {
   }
 }
 
-const fabAriaLabel = computed(() => (fabConfig.value?.text ? `${fabConfig.value.text} button` : 'Action button'))
+const fabAriaLabel = computed(() =>
+  fabConfig.value?.text ? `${fabConfig.value.text} button` : 'Action button'
+)
 </script>
 
 <template>
-  <div v-if="shouldShowExtended" class="drawer-fab-container">
+  <!-- Extended FAB for desktop mode -->
+  <div v-if="isDrawerExtended" class="drawer-fab-container">
     <v-btn
       v-bind="commonButtonProps"
       height="56px"
@@ -48,7 +49,8 @@ const fabAriaLabel = computed(() => (fabConfig.value?.text ? `${fabConfig.value.
     </v-btn>
   </div>
 
-  <div v-else-if="shouldShowCompact" class="rail-fab-container">
+  <!-- Compact FAB for tablet/rail mode -->
+  <div v-else-if="isDrawerCompact" class="rail-fab-container">
     <v-btn
       v-bind="commonButtonProps"
       size="56px"
