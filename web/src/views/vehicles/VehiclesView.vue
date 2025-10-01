@@ -1,14 +1,21 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
+import { useLayoutFab } from '@/composables/useLayoutFab'
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
+import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
+import VehicleDetailedListView from '@/components/vehicles/views/VehicleDetailedListView.vue'
+import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
 
 const { getApiVehicles, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
+const { registerFab, unregisterFab, shouldShowFloating } = useLayoutFab()
+const { mode } = useResponsiveLayout()
 
 const page = ref(1)
 const itemsPerPage = ref(10)
@@ -23,16 +30,6 @@ const viewModeOptions = [
   { value: 'cards' as const, icon: 'mdi-view-grid', tooltip: 'Card View' },
   { value: 'list' as const, icon: 'mdi-view-agenda', tooltip: 'List View' },
   { value: 'detailed-list' as const, icon: 'mdi-view-list', tooltip: 'Detailed List View' },
-]
-
-const headers = [
-  { title: 'Brand', key: 'brand', sortable: true },
-  { title: 'Model', key: 'model', sortable: true },
-  { title: 'Engine Type', key: 'engineType', sortable: true },
-  { title: 'Year', key: 'manufacturedYear', sortable: true },
-  { title: 'Type', key: 'type', sortable: true },
-  { title: 'VIN', key: 'vin', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
 ]
 
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
@@ -96,6 +93,22 @@ function viewOverview(id: string | undefined) {
     router.push(`/vehicles/${id}`)
   }
 }
+function goToAddVehicle() {
+  router.push('/vehicles/add')
+}
+
+onMounted(() => {
+  registerFab({
+    icon: 'mdi-plus',
+    text: 'Add',
+    action: goToAddVehicle
+  })
+})
+
+// Cleanup FAB when leaving route
+onUnmounted(() => {
+  unregisterFab()
+})
 </script>
 
 <template>
@@ -103,87 +116,48 @@ function viewOverview(id: string | undefined) {
     <div class="vehicles-topbar">
       <SearchTable v-model="search" />
 
-      <ConnectedButtonGroup
-        v-model="viewMode"
-        :options="viewModeOptions"
-        mandatory
-      />
+      <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
 
       <ActionItems />
     </div>
-    <v-data-table-server
-      v-model:items-per-page="itemsPerPage"
-      :headers="headers"
-      :items="serverItems"
-      :items-length="totalItems"
-      :loading="loading"
-      item-value="id"
-      :page="page"
-      :sort-by="sortBy"
-      show-select
-      @update:options="onTableOptionsChange"
-      @update:sort-by="sortBy = $event"
-    >
-      <template v-slot:[`item.actions`]="{ item }">
-        <div class="d-flex gap-1 justify-end">
-          <v-tooltip text="View Details">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                @click="viewOverview(item.id)"
-                variant="tonal"
-                prepend-icon="mdi-eye"
-                color="primary"
-                text="View"
-                size="small"
-                class="action-btn-small"
-              />
-            </template>
-          </v-tooltip>
-          <v-tooltip text="Edit Vehicle">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                @click="edit(item.id)"
-                variant="tonal"
-                prepend-icon="mdi-pencil"
-                color="info"
-                text="Edit"
-                size="small"
-                class="action-btn-small"
-              />
-            </template>
-          </v-tooltip>
-          <v-tooltip text="Delete Vehicle">
-            <template #activator="{ props }">
-              <v-btn
-                v-bind="props"
-                @click="remove(item.id)"
-                variant="tonal"
-                prepend-icon="mdi-delete"
-                color="error"
-                text="Delete"
-                size="small"
-                class="action-btn-small"
-              />
-            </template>
-          </v-tooltip>
-        </div>
-      </template>
-      <template v-slot:[`item.manufacturedYear`]="{ item }">
-        {{ item.manufacturedYear || 'N/A' }}
-      </template>
-      <template v-slot:[`item.type`]="{ item }">
-        <v-chip v-if="item.type" size="small" variant="tonal">{{ item.type }}</v-chip>
-        <span v-else class="text-medium-emphasis">N/A</span>
-      </template>
-      <template v-slot:[`item.vin`]="{ item }">
-        {{ item.vin || 'N/A' }}
-      </template>
-      <template v-slot:[`item.engineType`]="{ item }">
-        {{ item.engineType || 'N/A' }}
-      </template>
-    </v-data-table-server>
+
+    <div class="vehicles-content">
+      <VehicleListView
+        v-if="viewMode === 'list'"
+        :items="serverItems"
+        :loading="loading"
+        @edit="edit"
+        @delete="remove"
+        @view="viewOverview"
+      />
+
+      <VehicleDetailedListView
+        v-else-if="viewMode === 'detailed-list'"
+        :items="serverItems"
+        :loading="loading"
+        :page="page"
+        :items-per-page="itemsPerPage"
+        :total-items="totalItems"
+        :sort-by="sortBy"
+        @edit="edit"
+        @delete="remove"
+        @view="viewOverview"
+        @update:options="onTableOptionsChange"
+        @update:sort-by="sortBy = $event"
+      />
+
+      <VehicleCardsView v-else :items="serverItems" :loading="loading" @edit="edit" @delete="remove" @view="viewOverview" />
+    </div>
+
+    <!-- Mobile floating FAB (only shown on mobile when FAB config allows) -->
+    <v-fab
+      v-if="shouldShowFloating(mode)"
+      size="80px"
+      icon="mdi-plus"
+      color="tertiary"
+      @click="goToAddVehicle"
+      class="fab-custom"
+    />
   </div>
 </template>
 
@@ -192,39 +166,36 @@ function viewOverview(id: string | undefined) {
   margin: 0 auto;
 }
 
+.fab-custom {
+  position: fixed !important;
+  right: 16px !important;
+  bottom: 16px !important;
+  z-index: 1006 !important;
+}
+
+/* On mobile, position above bottom navigation */
+@media (max-width: 959px) {
+  .fab-custom {
+    bottom: calc(64px + 16px) !important; /* 64px bottom nav + 16px margin */
+  }
+}
+
+.fab-custom :deep(.v-icon) {
+  font-size: 28px !important;
+}
+
 .vehicles-topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: var(--color-card, #1e1e1e);
-  border-radius: 8px 8px 0px 0px;
+  background-color: rgba(var(--v-theme-primary), 0.08);
+  border-radius: 16px;
   margin-bottom: 0;
   border-bottom: 1px solid var(--color-border);
 }
 
-.vehicles-table :deep() .v-data-table-header,
-.vehicles-table :deep() .v-data-table__th {
-  background-color: var(--color-card-contrast);
-}
-
-/* Enhanced action buttons */
-.action-btn-small {
-  text-transform: none;
-  font-weight: 500;
-  height: 32px;
-  min-width: 70px;
-  font-size: 0.75rem;
-}
-
-.v-data-table :deep(.v-data-table__td) {
-  padding: 8px 16px;
-}
-
-.vehicles-table {
-  background: var(--color-card, #1e1e1e);
-  color: var(--color-text);
-  border-radius: 0px 0px 8px 8px;
-  height: 100%;
+.vehicles-content {
+  padding: 16px 0px;
 }
 </style>

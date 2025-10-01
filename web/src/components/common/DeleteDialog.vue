@@ -13,7 +13,7 @@ const props = defineProps<Props>()
   <v-dialog :model-value="isOpen" class="dialog-container" @update:model-value="props.onCancel">
     <v-card variant="flat" class="dialog-card" rounded="xl" elevation="6">
       <template v-slot:title>
-        <p>Delete {{ itemToDelete }}?</p>
+        <p>Delete?</p>
       </template>
       <template v-slot:text>
         <p>This {{ itemToDelete }} will be permanently removed. This action can't be undone.</p>

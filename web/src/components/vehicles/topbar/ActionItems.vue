@@ -9,7 +9,6 @@ function goToAddVehicle() {
 
 <template>
   <div class="action-items-container">
-    <v-btn variant="outlined" :disabled="true" prepend-icon="mdi-export-variant">Export</v-btn>
     <v-btn prepend-icon="mdi-plus" color="primary" @click="goToAddVehicle">Add car</v-btn>
   </div>
 </template>

@@ -3,6 +3,10 @@
 
   $dialog-card-header-padding: 24px 24px 16px 24px,
   $dialog-card-text-padding: 0px 24px 24px 24px,
+  $rounded: (
+  'md-medium': 12px,
+  'md-16px': 16px
+)
 );
 
 // Custom utility classes
@@ -11,4 +15,20 @@
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+}
+
+.md3-btn {
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+  letter-spacing: 0.1px !important;
+}
+
+.no-uppercase {
+  text-transform: none !important;
+}
+
+/* FAB 80px with 28px icon */
+.v-fab[size="80px"] .v-icon {
+  font-size: 28px !important;
 }
