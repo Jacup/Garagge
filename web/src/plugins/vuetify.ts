@@ -33,5 +33,10 @@ export default createVuetify({
       abyssLight: abyssLight
     }
   },
+  defaults: {
+    VBtn: {
+      class: 'md3-btn no-uppercase'
+    },
+  },
   blueprint: md3,
 })

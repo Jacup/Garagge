@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-import ResponsiveNavigation from './components/layout/ResponsiveNavigation.vue'
-import ApplicationBar from './components/layout/applicationBar/ApplicationBar.vue'
+import { ResponsiveNavigation, ApplicationBar, FloatingFab } from './components/layout'
 
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 
@@ -22,13 +21,16 @@ const handleToggleDrawer = () => {
         <router-view />
       </v-container>
     </v-main>
+
+    <!-- Floating FAB for mobile -->
+    <FloatingFab />
   </v-app>
 </template>
 
 <style>
 .app-container {
   margin: 0 !important;
-  padding: 4px !important;
+  padding: 16px !important;
   max-width: none !important;
 }
 
@@ -48,5 +50,12 @@ const handleToggleDrawer = () => {
 
 .app-container .v-row:not(:last-child) {
   margin-bottom: 16px;
+}
+
+/* Add bottom layout offset for mobile view when bottom navigation is present */
+@media (max-width: 959px) {
+  .v-main {
+    --v-layout-bottom: 64px !important;
+  }
 }
 </style>
