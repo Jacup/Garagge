@@ -24,9 +24,9 @@ const totalItems = ref(0)
 const viewMode = ref<'list' | 'detailed-list' | 'cards'>('cards')
 
 const viewModeOptions = [
-  { value: 'cards' as const, icon: 'mdi-view-grid', tooltip: 'Card View' },
-  { value: 'list' as const, icon: 'mdi-view-agenda', tooltip: 'List View' },
-  { value: 'detailed-list' as const, icon: 'mdi-view-list', tooltip: 'Detailed List View' },
+  { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
+  { value: 'list' as const, icon: 'mdi-view-agenda-outline', selectedIcon: 'mdi-view-agenda', tooltip: 'List View' },
+  { value: 'detailed-list' as const, icon: 'mdi-view-list-outline', selectedIcon: 'mdi-view-list', tooltip: 'Detailed List View' },
 ]
 
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
@@ -112,7 +112,7 @@ onUnmounted(() => {
     <div class="vehicles-topbar">
       <SearchTable v-model="search" />
 
-      <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" size="small" mandatory />
+      <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
 
     </div>
 
