@@ -17,7 +17,9 @@ defineEmits<Emits>()
 </script>
 
 <template>
-  <v-list>
+  <v-list
+    class="transparent-list"
+    >
     <template v-if="loading">
       <v-list-item v-for="n in 5" :key="n">
         <v-list-item-title>
@@ -35,6 +37,7 @@ defineEmits<Emits>()
       :key="vehicle.id"
       @click="$emit('view', vehicle.id!)"
       class="vehicle-list-item"
+      rounded="xl"
     >
       <v-list-item-title>
         {{ vehicle.brand }} {{ vehicle.model }}
@@ -65,12 +68,16 @@ defineEmits<Emits>()
   </v-list>
 </template>
 
-<style scoped>
-.vehicle-list-item {
-  cursor: pointer;
+<style scoped lang="scss">
+.transparent-list {
+  background: transparent !important;
 }
 
-.vehicle-list-item:hover {
-  background-color: rgba(var(--v-theme-on-surface), 0.08);
+.vehicle-list-item {
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(var(--v-theme-on-surface), 0.08);
+  }
 }
 </style>

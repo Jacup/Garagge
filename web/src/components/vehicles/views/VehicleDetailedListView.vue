@@ -4,17 +4,13 @@ import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 interface Props {
   items: VehicleDto[]
   loading?: boolean
-  page: number
-  itemsPerPage: number
-  totalItems: number
-  sortBy: { key: string; order: 'asc' | 'desc' }[]
+  sortBy?: { key: string; order: 'asc' | 'desc' }[]
 }
 
 interface Emits {
   (e: 'edit', id: string): void
   (e: 'delete', id: string): void
   (e: 'view', id: string): void
-  (e: 'update:options', options: { page: number; itemsPerPage: number }): void
   (e: 'update:sort-by', sortBy: { key: string; order: 'asc' | 'desc' }[]): void
 }
 
@@ -33,17 +29,13 @@ const headers = [
 </script>
 
 <template>
-  <v-data-table-server
-    :items-per-page="itemsPerPage"
+  <v-data-table
     :headers="headers"
     :items="items"
-    :items-length="totalItems"
     :loading="loading"
     item-value="id"
-    :page="page"
     :sort-by="sortBy"
-    show-select
-    @update:options="$emit('update:options', $event)"
+    hide-default-footer
     @update:sort-by="$emit('update:sort-by', $event)"
   >
     <template v-slot:[`item.actions`]="{ item }">
@@ -109,7 +101,7 @@ const headers = [
     <template v-slot:[`item.engineType`]="{ item }">
       {{ item.engineType || 'N/A' }}
     </template>
-  </v-data-table-server>
+  </v-data-table>
 </template>
 
 <style scoped>
