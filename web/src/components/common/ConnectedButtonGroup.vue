@@ -34,7 +34,9 @@ defineEmits<Emits>()
       v-for="option in options"
       :key="option.value"
       :text="option.tooltip"
+      location="top"
       :disabled="!option.tooltip"
+      class="tooltip-plain"
     >
       <template #activator="{ props }">
         <v-btn

@@ -32,3 +32,16 @@
 .v-fab[size="80px"] .v-icon {
   font-size: 28px !important;
 }
+
+/* MD3 Expressive Tooltips */
+.v-tooltip.tooltip-plain .v-overlay__content {
+  background-color: rgb(var(--v-theme-inverse-surface)) !important;
+  color: rgb(var(--v-theme-inverse-on-surface)) !important;
+}
+
+.v-tooltip.tooltip-rich .v-overlay__content {
+  background-color: rgb(var(--v-theme-surface-variant)) !important;
+  color: rgb(var(--v-theme-on-surface-variant)) !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+}

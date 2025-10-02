@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import ActionItems from '@/components/vehicles/topbar/ActionItems.vue'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
 import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
@@ -103,7 +102,6 @@ onMounted(() => {
   })
 })
 
-// Cleanup FAB when leaving route
 onUnmounted(() => {
   unregisterFab()
 })
@@ -114,9 +112,8 @@ onUnmounted(() => {
     <div class="vehicles-topbar">
       <SearchTable v-model="search" />
 
-      <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
+      <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" size="small" mandatory />
 
-      <ActionItems />
     </div>
 
     <div class="vehicles-content">
@@ -149,7 +146,7 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .page-content {
   margin: 0 auto;
 }
@@ -168,4 +165,5 @@ onUnmounted(() => {
 .vehicles-content {
   padding: 16px 0px;
 }
+
 </style>
