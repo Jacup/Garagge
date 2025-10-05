@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   items: VehicleDto[]
@@ -15,7 +17,27 @@ interface Emits {
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const deleteDialog = ref(false)
+const selectedVehicle = ref<VehicleDto | null>(null)
+
+function openDeleteDialog(vehicle: VehicleDto) {
+  selectedVehicle.value = vehicle
+  deleteDialog.value = true
+}
+
+function closeDeleteDialog() {
+  deleteDialog.value = false
+  selectedVehicle.value = null
+}
+
+async function confirmDelete() {
+  if (selectedVehicle.value?.id) {
+    emit('delete', selectedVehicle.value.id)
+    closeDeleteDialog()
+  }
+}
 
 const headers = [
   { title: 'Brand', key: 'brand', sortable: true },
@@ -72,7 +94,7 @@ const headers = [
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              @click="$emit('delete', item.id!)"
+              @click="openDeleteDialog(item)"
               variant="tonal"
               prepend-icon="mdi-delete"
               color="error"
@@ -102,6 +124,15 @@ const headers = [
       {{ item.engineType || 'N/A' }}
     </template>
   </v-data-table>
+
+  <!-- Delete Confirmation Dialog -->
+  <DeleteDialog
+    v-if="selectedVehicle"
+    :item-to-delete="`${selectedVehicle.brand} ${selectedVehicle.model}`"
+    :is-open="deleteDialog"
+    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteDialog"
+  />
 </template>
 
 <style scoped>

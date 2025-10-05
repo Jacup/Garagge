@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   items: VehicleDto[]
@@ -13,7 +15,27 @@ interface Emits {
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const deleteDialog = ref(false)
+const selectedVehicle = ref<VehicleDto | null>(null)
+
+function openDeleteDialog(vehicle: VehicleDto) {
+  selectedVehicle.value = vehicle
+  deleteDialog.value = true
+}
+
+function closeDeleteDialog() {
+  deleteDialog.value = false
+  selectedVehicle.value = null
+}
+
+async function confirmDelete() {
+  if (selectedVehicle.value?.id) {
+    emit('delete', selectedVehicle.value.id)
+    closeDeleteDialog()
+  }
+}
 </script>
 
 <template>
@@ -60,12 +82,21 @@ defineEmits<Emits>()
             size="small"
             variant="text"
             color="error"
-            @click.stop="$emit('delete', vehicle.id!)"
+            @click.stop="openDeleteDialog(vehicle)"
           />
         </div>
       </template>
     </v-list-item>
   </v-list>
+
+  <!-- Delete Confirmation Dialog -->
+  <DeleteDialog
+    v-if="selectedVehicle"
+    :item-to-delete="`${selectedVehicle.brand} ${selectedVehicle.model}`"
+    :is-open="deleteDialog"
+    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteDialog"
+  />
 </template>
 
 <style scoped lang="scss">

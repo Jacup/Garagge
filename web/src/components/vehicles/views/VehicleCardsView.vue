@@ -64,8 +64,8 @@ async function confirmDelete() {
         <v-card-actions>
           <v-spacer />
 
-          <v-btn icon="mdi-pencil" variant="text" size="x-small" @click.stop="openDeleteDialog(vehicle)" />
-          <v-btn icon="mdi-delete" color="error" variant="text" size="x-small" @click.stop="openDeleteDialog(vehicle)" />
+          <v-btn icon="mdi-pencil" variant="text" size="x-small" @click.stop="$emit('edit', vehicle.id!)" />
+          <v-btn icon="mdi-delete" variant="text" size="x-small" color="error" @click.stop="openDeleteDialog(vehicle)" />
         </v-card-actions>
       </v-card>
     </v-col>

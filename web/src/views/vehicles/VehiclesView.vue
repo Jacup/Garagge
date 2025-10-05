@@ -1,16 +1,31 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, CreateVehicleCommand, UpdateVehicleRequest } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
+
+// API Error Response interface
+interface ApiErrorResponse {
+  type: string
+  title: string
+  status: number
+  detail: string
+  errors?: Array<{
+    code: string
+    description: string
+    type: string
+  }>
+  traceId?: string
+}
 import { useLayoutFab } from '@/composables/useLayoutFab'
 import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
 import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
 import VehicleDetailedListView from '@/components/vehicles/views/VehicleDetailedListView.vue'
 import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
+import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 
-const { getApiVehicles, deleteApiVehiclesId } = getVehicles()
+const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
 const { registerFab, unregisterFab } = useLayoutFab()
 
@@ -22,6 +37,12 @@ const serverItems = ref([] as VehicleDto[])
 const loading = ref(true)
 const totalItems = ref(0)
 const viewMode = ref<'list' | 'detailed-list' | 'cards'>('cards')
+
+// Dialog state
+const showVehicleDialog = ref(false)
+const editingVehicle = ref<VehicleDto | null>(null)
+const savingVehicle = ref(false)
+const vehicleFormDialogRef = ref()
 
 const viewModeOptions = [
   { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
@@ -97,9 +118,15 @@ async function remove(id: string | undefined) {
   }
 }
 
-function edit(id: string | undefined) {
+async function edit(id: string | undefined) {
   if (id) {
-    router.push(`/vehicles/edit/${id}`)
+    try {
+      const res = await getApiVehiclesId(id)
+      editingVehicle.value = res.data
+      showVehicleDialog.value = true
+    } catch (error) {
+      console.error('Failed to fetch vehicle for editing:', error)
+    }
   }
 }
 
@@ -109,15 +136,70 @@ function viewOverview(id: string | undefined) {
   }
 }
 
-function goToAddVehicle() {
-  router.push('/vehicles/add')
+function openAddVehicleDialog() {
+  editingVehicle.value = null
+  showVehicleDialog.value = true
+}
+
+async function saveVehicle(vehicleData: CreateVehicleCommand | UpdateVehicleRequest) {
+  savingVehicle.value = true
+  try {
+    if (editingVehicle.value) {
+      // Update existing vehicle
+      await putApiVehiclesId(editingVehicle.value.id!, vehicleData as UpdateVehicleRequest)
+    } else {
+      // Create new vehicle
+      await postApiVehicles(vehicleData as CreateVehicleCommand)
+    }
+    showVehicleDialog.value = false
+    editingVehicle.value = null
+    await loadItems()
+  } catch (error: unknown) {
+    console.error('Failed to save vehicle:', error)
+
+    // Handle API validation errors
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { status: number; data: ApiErrorResponse } }
+      if (axiosError.response && axiosError.response.status === 400 && axiosError.response.data) {
+        const apiErrorResponse = axiosError.response.data
+        // Pass error to dialog component
+        if (vehicleFormDialogRef.value) {
+          vehicleFormDialogRef.value.setApiError(apiErrorResponse)
+        }
+      } else {
+        // Handle other errors (network, 500, etc.)
+        if (vehicleFormDialogRef.value) {
+          vehicleFormDialogRef.value.setApiError({
+            type: 'error',
+            title: 'Error',
+            status: axiosError.response?.status || 500,
+            detail: 'An unexpected error occurred while saving the vehicle.',
+            errors: [],
+          } as ApiErrorResponse)
+        }
+      }
+    } else {
+      // Handle unexpected errors
+      if (vehicleFormDialogRef.value) {
+        vehicleFormDialogRef.value.setApiError({
+          type: 'error',
+          title: 'Error',
+          status: 500,
+          detail: 'An unexpected error occurred while saving the vehicle.',
+          errors: [],
+        } as ApiErrorResponse)
+      }
+    }
+  } finally {
+    savingVehicle.value = false
+  }
 }
 
 onMounted(() => {
   registerFab({
     icon: 'mdi-plus',
     text: 'Add',
-    action: goToAddVehicle,
+    action: openAddVehicleDialog,
   })
   loadItems()
 })
@@ -181,6 +263,17 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
+
+  <!-- Vehicle Form Dialog -->
+    <!-- Vehicle Form Dialog -->
+  <VehicleFormDialog
+    ref="vehicleFormDialogRef"
+    :is-open="showVehicleDialog"
+    :vehicle="editingVehicle"
+    :loading="savingVehicle"
+    @update:is-open="showVehicleDialog = $event"
+    @save="saveVehicle"
+  />
 </template>
 
 <style lang="scss" scoped>
