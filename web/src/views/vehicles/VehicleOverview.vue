@@ -356,7 +356,7 @@ onMounted(async () => {
     <!-- Fuel & Service Section -->
     <v-row class="equal-height-row">
       <v-col cols="12" md="8">
-        <v-card class="card-background" variant="flat" rounded="md-16px" height="542px">
+        <v-card class="card-background" variant="flat" rounded="md-16px" height="520px">
           <template #title>Fuel History</template>
           <template #append>
             <v-btn
