@@ -71,7 +71,7 @@ internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext db
         };
     }
 
-    public Task<ICollection<EnergyType>> GetValidEnergyTypesForEngine(EngineType engineType)
+    public Task<ICollection<EnergyType>> GetCompatibleEnergyTypesForEngine(EngineType engineType)
     {
         ICollection<EnergyType> validTypes = engineType switch
         {

@@ -5,11 +5,12 @@ using Domain.Enums;
 
 namespace Application.VehicleEnergyTypes.GetSupportedForEngine;
 
-public sealed class GetSupportedEnergyTypeForEngineQueryHandler(IVehicleEngineCompatibilityService vehicleEngineCompatibilityService) : IQueryHandler<GetSupportedEnergyTypeForEngineQuery, ICollection<EnergyType>>
+public sealed class GetSupportedEnergyTypeForEngineQueryHandler(IVehicleEngineCompatibilityService vehicleEngineCompatibilityService)
+    : IQueryHandler<GetSupportedEnergyTypeForEngineQuery, ICollection<EnergyType>>
 {
     public async Task<Result<ICollection<EnergyType>>> Handle(GetSupportedEnergyTypeForEngineQuery request, CancellationToken cancellationToken)
     {
-        var supported = await vehicleEngineCompatibilityService.GetValidEnergyTypesForEngine(request.EngineType);
+        var supported = await vehicleEngineCompatibilityService.GetCompatibleEnergyTypesForEngine(request.EngineType);
 
         return Result.Success(supported);
     }

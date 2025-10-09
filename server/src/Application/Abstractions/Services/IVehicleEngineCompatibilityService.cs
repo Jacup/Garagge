@@ -12,5 +12,5 @@ public interface IVehicleEngineCompatibilityService
 
     Task<bool> IsEnergyTypeCompatibleAsync(Guid vehicleId, EnergyType energyType, CancellationToken cancellationToken = default);
     bool IsEnergyTypeCompatibleWithEngine(EnergyType energyType, EngineType engineType);
-    Task<ICollection<EnergyType>> GetValidEnergyTypesForEngine(EngineType engineType);
+    Task<ICollection<EnergyType>> GetCompatibleEnergyTypesForEngine(EngineType engineType);
 }
