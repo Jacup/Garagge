@@ -5,6 +5,22 @@ import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 
+// API Error Response interfaces
+interface ApiError {
+  code: string
+  description: string
+  type: string
+}
+
+interface ApiErrorResponse {
+  type: string
+  title: string
+  status: number
+  detail: string
+  errors?: ApiError[]
+  traceId?: string
+}
+
 // Mapa domyślnych jednostek dla typów energii
 const defaultUnitMap: Record<string, EnergyUnit> = {
   Gasoline: 'Liter' as EnergyUnit,
@@ -35,6 +51,11 @@ const { postApiVehiclesVehicleIdEnergyEntries, putApiVehiclesVehicleIdEnergyEntr
 const isLoading = ref(false)
 const formRef = ref()
 const isFormValid = ref(true)
+
+// Error handling
+const apiErrors = ref<ApiError[]>([])
+const generalError = ref<string | null>(null)
+
 const form = ref({
   date: '',
   mileage: 0,
@@ -81,6 +102,8 @@ watch(
           cost: 0,
         }
       }
+      // Clear any previous errors when opening dialog
+      clearErrors()
     }
   },
   { immediate: true },
@@ -95,6 +118,16 @@ watch(() => form.value.type, (newType) => {
   }
 })
 
+const clearErrors = () => {
+  apiErrors.value = []
+  generalError.value = null
+}
+
+const setApiError = (errorResponse: ApiErrorResponse): void => {
+  apiErrors.value = errorResponse.errors || []
+  generalError.value = 'An unexpected error occurred'
+}
+
 async function handleSave() {
   if (!props.vehicleId) return
   // Validate form before submit
@@ -103,6 +136,8 @@ async function handleSave() {
   if (!isFormValid.value) return
 
   isLoading.value = true
+  clearErrors()
+
   try {
     if (isEditMode.value && props.entry?.id) {
       // Update existing entry
@@ -130,12 +165,27 @@ async function handleSave() {
       await postApiVehiclesVehicleIdEnergyEntries(props.vehicleId, createCommand)
     }
     props.onSave()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to save energy entry:', error)
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { data?: ApiErrorResponse } }
+      if (axiosError.response?.data) {
+        setApiError(axiosError.response.data)
+      } else {
+        generalError.value = 'Failed to save energy entry. Please try again.'
+      }
+    } else {
+      generalError.value = 'Failed to save energy entry. Please try again.'
+    }
   } finally {
     isLoading.value = false
   }
 }
+
+defineExpose({
+  setApiError,
+  clearErrors
+})
 </script>
 
 <template>
@@ -146,6 +196,16 @@ async function handleSave() {
       </template>
 
       <template v-slot:text>
+        <!-- Error alerts -->
+        <div v-if="generalError || apiErrors.length > 0" class="mb-4">
+          <v-alert v-if="generalError" type="error" class="mb-2">
+            {{ generalError }}
+          </v-alert>
+          <v-alert v-for="error in apiErrors" :key="error.code" type="error" class="mb-2">
+            {{ error.description }}
+          </v-alert>
+        </div>
+
         <v-form ref="formRef" v-model="isFormValid" lazy-validation @submit.prevent="handleSave">
           <v-container class="form-container pa-4">
             <v-row class="mb-2" align="center" justify="center">

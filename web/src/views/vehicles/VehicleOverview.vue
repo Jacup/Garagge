@@ -2,17 +2,36 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
+import type { VehicleDto, EnergyEntryDto } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
+import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
+import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 const route = useRoute()
 const { getApiVehiclesId } = getVehicles()
+const { getApiVehiclesVehicleIdEnergyEntries } = getEnergyEntries()
 
 // Vehicle data
 const vehicleId = computed(() => route.params.id as string)
 const selectedVehicle = ref<VehicleDto | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+
+// Energy entries for timeline
+const energyEntries = ref<EnergyEntryDto[]>([])
+const timelineLoading = ref(false)
+
+// Dialog state
+const addDialog = ref(false)
+const bulkDeleteDialog = ref(false)
+
+// Selection state for energy entries
+const selectedEnergyEntries = ref<string[]>([])
+
+// Component refs
+const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
 
 // Load vehicle data from API
 async function loadVehicle() {
@@ -27,11 +46,33 @@ async function loadVehicle() {
     error.value = null
     const response = await getApiVehiclesId(vehicleId.value)
     selectedVehicle.value = response.data
+    // Load energy entries for timeline
+    await loadEnergyEntries()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
     error.value = 'Failed to load vehicle data'
   } finally {
     loading.value = false
+  }
+}
+
+// Load energy entries for timeline
+async function loadEnergyEntries() {
+  if (!vehicleId.value) return
+
+  try {
+    timelineLoading.value = true
+    // Get all energy entries (high page size to get full timeline)
+    const response = await getApiVehiclesVehicleIdEnergyEntries(vehicleId.value, {
+      page: 1,
+      pageSize: 1000, // Get all entries for timeline
+    })
+    energyEntries.value = response.data.items ?? []
+  } catch (err) {
+    console.error('Failed to load energy entries for timeline:', err)
+    energyEntries.value = []
+  } finally {
+    timelineLoading.value = false
   }
 }
 
@@ -63,6 +104,39 @@ const formatDate = (dateString: string) => {
     month: 'short',
     day: 'numeric',
   })
+}
+
+// Dialog functions
+function openAddDialog() {
+  addDialog.value = true
+}
+
+function closeAddDialog() {
+  addDialog.value = false
+}
+
+function handleEntrySaved() {
+  closeAddDialog()
+  loadEnergyEntries()
+  // Refresh the energy entries table
+  energyEntriesTableRef.value?.loadEnergyEntries()
+}
+
+// Bulk delete functions
+function openBulkDeleteDialog() {
+  bulkDeleteDialog.value = true
+}
+
+function closeBulkDeleteDialog() {
+  bulkDeleteDialog.value = false
+}
+
+async function confirmBulkDelete() {
+  if (selectedEnergyEntries.value.length > 0) {
+    await energyEntriesTableRef.value?.removeMultiple(selectedEnergyEntries.value)
+    selectedEnergyEntries.value = []
+  }
+  bulkDeleteDialog.value = false
 }
 
 onMounted(async () => {
@@ -181,7 +255,7 @@ onMounted(async () => {
     <!-- Enhanced Summary Cards with Material Design Colors -->
     <section class="summary-section mb-6">
       <v-row>
-        <v-col cols="12" sm="6" md="3">
+        <v-col cols="12" sm="6" md="3" class="grid-column">
           <v-card class="summary-card" height="120" color="primary-container" variant="flat">
             <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
               <v-icon
@@ -238,121 +312,103 @@ onMounted(async () => {
       </v-row>
     </section>
 
-    <!-- Main Details Section -->
-    <section class="details-section mb-6">
-      <v-row class="equal-height-row">
-        <!-- Vehicle Image Card -->
-        <v-col cols="12" md="4">
-          <v-card class="card-background" height="320" variant="flat">
-            <template #title>
-              <span>Vehicle Image</span>
-            </template>
-            <v-card-text class="d-flex flex-column align-center justify-center h-100">
-              <v-avatar size="120" class="mb-4">
-                <v-img
-                  :src="`https://via.placeholder.com/150x150/104C83/white?text=${selectedVehicle?.brand.charAt(0)}${selectedVehicle?.model.charAt(0)}`"
-                  alt="Vehicle"
-                />
-              </v-avatar>
-            </v-card-text>
-          </v-card>
-        </v-col>
+    <v-row class="equal-height-row">
+      <v-col cols="12" md="4">
+        <v-card class="card-background" variant="flat" rounded="md-16px" height="260px">
+          <template #title>{{ selectedVehicle?.brand }} {{ selectedVehicle?.model }}</template>
+          <template #append>
+            <v-btn prepend-icon="mdi-pencil" variant="flat" color="primary">Edit</v-btn>
+          </template>
+          <template #subtitle>
+            <v-chip variant="tonal" size="small" density="comfortable" rounded="lg">
+              {{ selectedVehicle?.engineType }}
+            </v-chip>
+          </template>
+          <v-card-text>
+            <div class="details-items-container">
+              <VehicleDetailItem
+                icon="mdi-calendar"
+                label="Year"
+                :value="selectedVehicle?.manufacturedYear ? selectedVehicle.manufacturedYear : 'N/A'"
+              />
+              <v-spacer />
+              <VehicleDetailItem icon="mdi-car" label="Type" :value="selectedVehicle?.type ? selectedVehicle.type : 'N/A'" />
+              <v-spacer />
+            </div>
+            <v-divider class="my-3" />
+            <div class="details-items-container">
+              <VehicleDetailItem icon="mdi-pound" label="VIN" :value="selectedVehicle?.vin ? selectedVehicle.vin : 'N/A'" />
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-        <!-- Vehicle Details Card -->
-        <v-col cols="12" md="8">
-          <v-card class="card-background" height="320" variant="flat">
-            <template #title>
-              <span>Vehicle Details</span>
-            </template>
-            <template #append>
-              <v-btn class="text-none" prepend-icon="mdi-pencil" variant="flat" color="primary" disabled>Edit</v-btn>
-            </template>
-            <v-card-text>
-              <v-row>
-                <v-col cols="12" sm="6">
-                  <v-text-field label="Brand" :model-value="selectedVehicle?.brand" readonly variant="outlined" density="compact" />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field label="Model" :model-value="selectedVehicle?.model" readonly variant="outlined" density="compact" />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    label="Year"
-                    :model-value="selectedVehicle?.manufacturedYear"
-                    readonly
-                    variant="outlined"
-                    density="compact"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    label="Power Type"
-                    :model-value="selectedVehicle?.engineType"
-                    readonly
-                    variant="outlined"
-                    density="compact"
-                  />
-                </v-col>
-                <v-col cols="12" sm="6">
-                  <v-text-field
-                    label="Vehicle Type"
-                    :model-value="selectedVehicle?.type || 'Not specified'"
-                    readonly
-                    variant="outlined"
-                    density="compact"
-                  />
-                </v-col>
-                <v-col cols="12">
-                  <v-text-field
-                    label="VIN"
-                    :model-value="selectedVehicle?.vin || 'Not specified'"
-                    readonly
-                    variant="outlined"
-                    density="compact"
-                  />
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </section>
+      <v-col cols="12" md="8">
+        <v-card class="card-background vehicle-image-card" variant="flat" rounded="md-16px" height="260px">
+          <v-card-text class="image-placeholder">
+            <v-icon size="64">mdi-image-off-outline</v-icon>
+            <span>No image available</span>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- Fuel & Service Section -->
-    <section class="fuel-section mb-6">
-      <v-row class="equal-height-row">
-        <v-col cols="12" md="4">
-          <v-card class="fuel-stats-card card-background" height="400" variant="flat">
-            <v-card-title>Fuel Statistics</v-card-title>
-            <v-card-text>
-              <div class="stats-grid">
-                <div class="stat-item">
-                  <div class="text-body-2 text-medium-emphasis">Last Fill-up</div>
-                  <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.lastFuelCost.toFixed(2) }}</div>
-                  <div class="text-caption text-medium-emphasis">{{ mockStats.lastFuelDate }}</div>
-                </div>
-                <div class="stat-item">
-                  <div class="text-body-2 text-medium-emphasis">Average Price</div>
-                  <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.avgFuelPrice.toFixed(2) }}/L</div>
-                </div>
-                <div class="stat-item">
-                  <div class="text-body-2 text-medium-emphasis">Monthly Average</div>
-                  <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.monthlyFuelCost.toFixed(2) }}</div>
-                </div>
-                <div class="stat-item">
-                  <div class="text-body-2 text-medium-emphasis">Total Spent</div>
-                  <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.totalFuelCost.toFixed(2) }}</div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-        </v-col>
+    <v-row class="equal-height-row">
+      <v-col cols="12" md="8">
+        <v-card class="card-background" variant="flat" rounded="md-16px" height="520px">
+          <template #title>Fuel History</template>
+          <template #append>
+            <v-btn
+              v-if="selectedEnergyEntries.length > 0"
+              class="text-none mr-2"
+              prepend-icon="mdi-delete"
+              variant="flat"
+              color="error"
+              size="small"
+              @click="openBulkDeleteDialog"
+            >
+              Delete ({{ selectedEnergyEntries.length }})
+            </v-btn>
+            <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" size="small" @click="openAddDialog"> Add </v-btn>
+          </template>
+          <v-card-text>
+            <EnergyEntriesTable
+              ref="energyEntriesTableRef"
+              :vehicle-id="vehicleId"
+              v-model:selected="selectedEnergyEntries"
+            />
+          </v-card-text>
+        </v-card>
+      </v-col>
 
-        <v-col cols="12" md="8">
-          <EnergyEntriesTable :vehicle-id="vehicleId" />
-        </v-col>
-      </v-row>
-    </section>
+      <v-col cols="12" md="4">
+        <v-card class="fuel-stats-card card-background" height="400" variant="flat">
+          <v-card-title>Fuel Statistics</v-card-title>
+          <v-card-text>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="text-body-2 text-medium-emphasis">Last Fill-up</div>
+                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.lastFuelCost.toFixed(2) }}</div>
+                <div class="text-caption text-medium-emphasis">{{ mockStats.lastFuelDate }}</div>
+              </div>
+              <div class="stat-item">
+                <div class="text-body-2 text-medium-emphasis">Average Price</div>
+                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.avgFuelPrice.toFixed(2) }}/L</div>
+              </div>
+              <div class="stat-item">
+                <div class="text-body-2 text-medium-emphasis">Monthly Average</div>
+                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.monthlyFuelCost.toFixed(2) }}</div>
+              </div>
+              <div class="stat-item">
+                <div class="text-body-2 text-medium-emphasis">Total Spent</div>
+                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.totalFuelCost.toFixed(2) }}</div>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- Service History -->
     <section class="service-section mb-6">
@@ -429,13 +485,64 @@ onMounted(async () => {
     <h3 class="text-h5 mb-2">No vehicle found</h3>
     <p class="text-body-1 text-medium-emphasis">The requested vehicle could not be found.</p>
   </div>
+
+  <!-- Add Energy Entry Dialog -->
+  <ModifyEnergyEntryDialog
+    :is-open="addDialog"
+    :vehicle-id="vehicleId"
+    :on-save="handleEntrySaved"
+    :on-cancel="closeAddDialog"
+  />
+
+  <!-- Bulk Delete Dialog -->
+  <DeleteDialog
+    :is-open="bulkDeleteDialog"
+    :item-to-delete="`${selectedEnergyEntries.length} energy entries`"
+    :on-confirm="confirmBulkDelete"
+    :on-cancel="closeBulkDeleteDialog"
+  />
 </template>
 
 <style scoped>
 /* Layout */
 .page-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.details-container {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+}
+
+.details-items-container {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  align-items: center;
+}
+
+.details-item {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+}
+
+.details-item-data {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.details-item-label {
+  font-weight: 400;
+  color: rgba(var(--v-theme-on-surface-variant), 0.8);
+}
+
+.details-item-label {
+  font-weight: 400;
 }
 
 /* Equal height rows */
@@ -503,6 +610,15 @@ onMounted(async () => {
   text-align: center;
 }
 
+.image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+
 /* Card titles with action buttons */
 .v-card-title {
   padding-left: 16px;
@@ -527,7 +643,6 @@ onMounted(async () => {
 .timeline-card {
   border-left: 2px solid rgba(var(--v-theme-primary), 0.12);
   margin-left: 8px;
-  padding-left: 12px !important;
 }
 
 /* Table styling - full container height */
@@ -584,6 +699,10 @@ onMounted(async () => {
   .summary-card {
     margin-bottom: 12px;
   }
+}
+
+.energy-entries-card .v-card-text {
+  overflow: hidden;
 }
 
 /* Desktop optimizations */

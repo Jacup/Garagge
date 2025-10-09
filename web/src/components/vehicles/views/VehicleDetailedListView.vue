@@ -1,25 +1,43 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   items: VehicleDto[]
   loading?: boolean
-  page: number
-  itemsPerPage: number
-  totalItems: number
-  sortBy: { key: string; order: 'asc' | 'desc' }[]
+  sortBy?: { key: string; order: 'asc' | 'desc' }[]
 }
 
 interface Emits {
   (e: 'edit', id: string): void
   (e: 'delete', id: string): void
   (e: 'view', id: string): void
-  (e: 'update:options', options: { page: number; itemsPerPage: number }): void
   (e: 'update:sort-by', sortBy: { key: string; order: 'asc' | 'desc' }[]): void
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const deleteDialog = ref(false)
+const selectedVehicle = ref<VehicleDto | null>(null)
+
+function openDeleteDialog(vehicle: VehicleDto) {
+  selectedVehicle.value = vehicle
+  deleteDialog.value = true
+}
+
+function closeDeleteDialog() {
+  deleteDialog.value = false
+  selectedVehicle.value = null
+}
+
+async function confirmDelete() {
+  if (selectedVehicle.value?.id) {
+    emit('delete', selectedVehicle.value.id)
+    closeDeleteDialog()
+  }
+}
 
 const headers = [
   { title: 'Brand', key: 'brand', sortable: true },
@@ -33,17 +51,13 @@ const headers = [
 </script>
 
 <template>
-  <v-data-table-server
-    :items-per-page="itemsPerPage"
+  <v-data-table
     :headers="headers"
     :items="items"
-    :items-length="totalItems"
     :loading="loading"
     item-value="id"
-    :page="page"
     :sort-by="sortBy"
-    show-select
-    @update:options="$emit('update:options', $event)"
+    hide-default-footer
     @update:sort-by="$emit('update:sort-by', $event)"
   >
     <template v-slot:[`item.actions`]="{ item }">
@@ -80,7 +94,7 @@ const headers = [
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              @click="$emit('delete', item.id!)"
+              @click="openDeleteDialog(item)"
               variant="tonal"
               prepend-icon="mdi-delete"
               color="error"
@@ -109,7 +123,16 @@ const headers = [
     <template v-slot:[`item.engineType`]="{ item }">
       {{ item.engineType || 'N/A' }}
     </template>
-  </v-data-table-server>
+  </v-data-table>
+
+  <!-- Delete Confirmation Dialog -->
+  <DeleteDialog
+    v-if="selectedVehicle"
+    :item-to-delete="`${selectedVehicle.brand} ${selectedVehicle.model}`"
+    :is-open="deleteDialog"
+    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteDialog"
+  />
 </template>
 
 <style scoped>

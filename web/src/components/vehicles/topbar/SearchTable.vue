@@ -30,7 +30,7 @@ const search = computed({
   display: flex;
   justify-content: flex-start;
   width: 30%;
-  min-width: 200px;
+  min-width: 150px;
   background-color: transparent;
 }
 

@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   items: VehicleDto[]
@@ -13,11 +15,33 @@ interface Emits {
 }
 
 defineProps<Props>()
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+const deleteDialog = ref(false)
+const selectedVehicle = ref<VehicleDto | null>(null)
+
+function openDeleteDialog(vehicle: VehicleDto) {
+  selectedVehicle.value = vehicle
+  deleteDialog.value = true
+}
+
+function closeDeleteDialog() {
+  deleteDialog.value = false
+  selectedVehicle.value = null
+}
+
+async function confirmDelete() {
+  if (selectedVehicle.value?.id) {
+    emit('delete', selectedVehicle.value.id)
+    closeDeleteDialog()
+  }
+}
 </script>
 
 <template>
-  <v-list>
+  <v-list
+    class="transparent-list"
+    >
     <template v-if="loading">
       <v-list-item v-for="n in 5" :key="n">
         <v-list-item-title>
@@ -35,6 +59,7 @@ defineEmits<Emits>()
       :key="vehicle.id"
       @click="$emit('view', vehicle.id!)"
       class="vehicle-list-item"
+      rounded="xl"
     >
       <v-list-item-title>
         {{ vehicle.brand }} {{ vehicle.model }}
@@ -57,20 +82,33 @@ defineEmits<Emits>()
             size="small"
             variant="text"
             color="error"
-            @click.stop="$emit('delete', vehicle.id!)"
+            @click.stop="openDeleteDialog(vehicle)"
           />
         </div>
       </template>
     </v-list-item>
   </v-list>
+
+  <!-- Delete Confirmation Dialog -->
+  <DeleteDialog
+    v-if="selectedVehicle"
+    :item-to-delete="`${selectedVehicle.brand} ${selectedVehicle.model}`"
+    :is-open="deleteDialog"
+    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteDialog"
+  />
 </template>
 
-<style scoped>
-.vehicle-list-item {
-  cursor: pointer;
+<style scoped lang="scss">
+.transparent-list {
+  background: transparent !important;
 }
 
-.vehicle-list-item:hover {
-  background-color: rgba(var(--v-theme-on-surface), 0.08);
+.vehicle-list-item {
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba(var(--v-theme-on-surface), 0.08);
+  }
 }
 </style>

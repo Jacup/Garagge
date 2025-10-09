@@ -36,8 +36,6 @@ async function confirmDelete() {
     closeDeleteDialog()
   }
 }
-
-
 </script>
 
 <template>
@@ -60,15 +58,14 @@ async function confirmDelete() {
     </template>
 
     <v-col v-else v-for="vehicle in items" :key="vehicle.id" cols="12" sm="6" md="4" lg="3" class="pa-1">
-      <v-card class="vehicle-card" color="surface-container-highest" variant="flat" rounded="md-medium" @click="$emit('view', vehicle.id!)">
+      <v-card class="vehicle-card" variant="tonal" rounded="md-medium" @click="$emit('view', vehicle.id!)">
         <v-card-title> {{ vehicle.brand }} {{ vehicle.model }} </v-card-title>
         <v-card-subtitle>{{ vehicle.engineType || 'N/A' }}</v-card-subtitle>
         <v-card-actions>
-
           <v-spacer />
 
-          <v-btn icon="mdi-pencil" variant="text" size="x-small" @click.stop="openDeleteDialog(vehicle)" />
-          <v-btn icon="mdi-delete" color="error" variant="text" size="x-small" @click.stop="openDeleteDialog(vehicle)" />
+          <v-btn icon="mdi-pencil" variant="text" size="x-small" @click.stop="$emit('edit', vehicle.id!)" />
+          <v-btn icon="mdi-delete" variant="text" size="x-small" color="error" @click.stop="openDeleteDialog(vehicle)" />
         </v-card-actions>
       </v-card>
     </v-col>

@@ -2,6 +2,7 @@
 interface ButtonOption {
   value: T
   icon?: string
+  selectedIcon?: string
   text?: string
   tooltip?: string
 }
@@ -17,8 +18,14 @@ interface Emits {
   (e: 'update:modelValue', value: T): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 defineEmits<Emits>()
+
+// Function to get the correct icon based on selection state
+function getIcon(option: ButtonOption) {
+  const isSelected = props.modelValue === option.value
+  return isSelected && option.selectedIcon ? option.selectedIcon : option.icon
+}
 </script>
 
 <template>
@@ -28,20 +35,23 @@ defineEmits<Emits>()
     :mandatory="mandatory"
     variant="flat"
     color="secondary"
-    :class="['connected-button-group', $props.class]"
+    :class="['connected-button-group']"
   >
     <v-tooltip
       v-for="option in options"
       :key="option.value"
       :text="option.tooltip"
+      location="top"
       :disabled="!option.tooltip"
+      class="tooltip-plain"
     >
       <template #activator="{ props }">
         <v-btn
           v-bind="props"
           :value="option.value"
-          :icon="option.icon"
+          :icon="getIcon(option)"
           :text="option.text"
+          size="small"
         />
       </template>
     </v-tooltip>
@@ -51,28 +61,13 @@ defineEmits<Emits>()
 <style scoped>
 .connected-button-group {
   gap: 2px;
-  border-radius: 50px;
-  overflow: hidden;
 }
 
-.connected-button-group :deep(.v-btn) {
-  border-radius: 0;
-  min-width: 40px;
-}
-
-.connected-button-group :deep(.v-btn:first-child) {
-  border-radius: 50px 8px 8px 50px;
-}
-
-.connected-button-group :deep(.v-btn:last-child) {
-  border-radius: 8px 50px 50px 8px;
-}
-
-.connected-button-group :deep(.v-btn:not(:first-child):not(:last-child)) {
+.v-btn-group .v-btn {
   border-radius: 8px;
 }
 
 .connected-button-group :deep(.v-btn--active) {
-  border-radius: 50px !important;
+  border-radius: 9999px !important;
 }
 </style>
