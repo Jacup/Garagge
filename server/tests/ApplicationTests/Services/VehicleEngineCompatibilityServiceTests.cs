@@ -4,7 +4,6 @@ using Application.VehicleEnergyTypes;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.ObjectModel;
 
 namespace ApplicationTests.Services;
 
