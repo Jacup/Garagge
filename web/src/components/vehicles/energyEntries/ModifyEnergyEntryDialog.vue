@@ -21,30 +21,61 @@ interface ApiErrorResponse {
   traceId?: string
 }
 
-// Mapa domyślnych jednostek dla typów energii
-const defaultUnitMap: Record<string, EnergyUnit> = {
-  Gasoline: 'Liter' as EnergyUnit,
-  Diesel: 'Liter' as EnergyUnit,
-  LPG: 'Liter' as EnergyUnit,
-  CNG: 'CubicMeter' as EnergyUnit,
-  Ethanol: 'Liter' as EnergyUnit,
-  Biofuel: 'Liter' as EnergyUnit,
-  Hydrogen: 'CubicMeter' as EnergyUnit,
-  Electric: 'kWh' as EnergyUnit,
+// Energy type labels mapping
+const ENERGY_TYPE_LABELS: Record<EnergyType, string> = {
+  [EnergyType.Gasoline]: 'Gasoline',
+  [EnergyType.Diesel]: 'Diesel',
+  [EnergyType.Electric]: 'Electric',
+  [EnergyType.LPG]: 'LPG',
+  [EnergyType.CNG]: 'CNG',
+  [EnergyType.Ethanol]: 'Ethanol',
+  [EnergyType.Biofuel]: 'Biofuel',
+  [EnergyType.Hydrogen]: 'Hydrogen',
 }
 
-const energyTypeOptions = Object.values(EnergyType)
+// Mapa domyślnych jednostek dla typów energii
+const defaultUnitMap: Record<string, EnergyUnit> = {
+  [EnergyType.Gasoline]: EnergyUnit.Liter,
+  [EnergyType.Diesel]: EnergyUnit.Liter,
+  [EnergyType.LPG]: EnergyUnit.Liter,
+  [EnergyType.CNG]: EnergyUnit.CubicMeter,
+  [EnergyType.Ethanol]: EnergyUnit.Liter,
+  [EnergyType.Biofuel]: EnergyUnit.Liter,
+  [EnergyType.Hydrogen]: EnergyUnit.CubicMeter,
+  [EnergyType.Electric]: EnergyUnit.kWh,
+}
+
 const energyUnitOptions = Object.values(EnergyUnit)
 
 interface Props {
   isOpen: boolean
   vehicleId: string
   entry?: EnergyEntryDto | null
+  allowedEnergyTypes?: string[] // Energy types allowed for this vehicle
   onSave: () => void
   onCancel: () => void
 }
 
 const props = defineProps<Props>()
+
+// Create filtered energy type options based on vehicle's allowed types
+const availableEnergyTypeOptions = computed(() => {
+  if (!props.allowedEnergyTypes || props.allowedEnergyTypes.length === 0) {
+    // Fallback to all energy types if no allowed types specified
+    return Object.values(EnergyType).map(type => ({
+      title: ENERGY_TYPE_LABELS[type],
+      value: type
+    }))
+  }
+
+  // Filter to only show allowed energy types
+  return props.allowedEnergyTypes
+    .filter(type => Object.values(EnergyType).includes(type as EnergyType))
+    .map(type => ({
+      title: ENERGY_TYPE_LABELS[type as EnergyType],
+      value: type as EnergyType
+    }))
+})
 
 const { postApiVehiclesVehicleIdEnergyEntries, putApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
 
@@ -92,13 +123,16 @@ watch(
           cost: props.entry.cost || 0,
         }
       } else {
-        // Add mode - reset form
+        // Add mode - reset form with first available energy type
+        const firstAvailableType = availableEnergyTypeOptions.value[0]?.value || ('' as EnergyType)
+        const defaultUnit = firstAvailableType ? defaultUnitMap[firstAvailableType] || ('' as EnergyUnit) : ('' as EnergyUnit)
+
         form.value = {
           date: new Date().toISOString().split('T')[0], // Today's date
           mileage: 0,
-          type: '' as EnergyType,
+          type: firstAvailableType,
           volume: 0,
-          energyUnit: '' as EnergyUnit,
+          energyUnit: defaultUnit,
           cost: 0,
         }
       }
@@ -117,6 +151,18 @@ watch(() => form.value.type, (newType) => {
     form.value.energyUnit = defaultUnit
   }
 })
+
+// Watch for changes in allowed energy types - reset form type if no longer allowed
+watch(() => props.allowedEnergyTypes, (newAllowedTypes) => {
+  if (!newAllowedTypes || !form.value.type) return
+
+  // Check if current selected type is still allowed
+  if (!newAllowedTypes.includes(form.value.type)) {
+    // Reset to first available type or empty if none available
+    const firstAvailable = availableEnergyTypeOptions.value[0]?.value
+    form.value.type = firstAvailable || ('' as EnergyType)
+  }
+}, { deep: true })
 
 const clearErrors = () => {
   apiErrors.value = []
@@ -238,7 +284,9 @@ defineExpose({
                 <v-select
                   v-model="form.type"
                   label="Fuel entry type"
-                  :items="energyTypeOptions"
+                  :items="availableEnergyTypeOptions"
+                  item-title="title"
+                  item-value="value"
                   variant="outlined"
                   density="comfortable"
                   required
