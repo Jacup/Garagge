@@ -71,6 +71,20 @@ internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext db
         };
     }
 
+    public Task<ICollection<EnergyType>> GetValidEnergyTypesForEngine(EngineType engineType)
+    {
+        ICollection<EnergyType> validTypes = engineType switch
+        {
+            EngineType.Fuel or EngineType.Hybrid => IceFuels,
+            EngineType.PlugInHybrid => PlugInHybridFuels,
+            EngineType.Electric => [ EnergyType.Electric ],
+            EngineType.Hydrogen => [ EnergyType.Hydrogen ],
+            _ => []
+        };
+
+        return Task.FromResult(validTypes);
+    }
+
     internal static Result ValidateDuplicateEnergyType(Vehicle vehicle, EnergyType requestEnergyType)
     {
         if (vehicle.AllowedEnergyTypes.Any(e => e == requestEnergyType))
