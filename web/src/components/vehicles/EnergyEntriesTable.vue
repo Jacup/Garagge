@@ -7,10 +7,12 @@ import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyE
 
 interface Props {
   vehicleId: string
+  allowedEnergyTypes?: string[] // Energy types allowed for this vehicle
   selected?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  allowedEnergyTypes: () => [],
   selected: () => []
 })
 
@@ -205,6 +207,7 @@ defineExpose({
     <ModifyEnergyEntryDialog
       :is-open="editDialog"
       :vehicle-id="vehicleId"
+      :allowed-energy-types="allowedEnergyTypes"
       :entry="selectedEntry"
       :on-save="handleEntrySaved"
       :on-cancel="closeEditDialog"

@@ -4,30 +4,51 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { UpdateMeRequest, UserDto } from '../apiV1.schemas'
+import type {
+  UpdateMeRequest,
+  UserDto
+} from '../apiV1.schemas';
 
-import { axiosInstance } from '../../axios-instance'
+import { axiosInstance } from '../../axios-instance';
 
-export const getUsers = () => {
-  const getApiUsersUserId = (userId: string) => {
-    return axiosInstance<UserDto>({ url: `/api/users/${userId}`, method: 'GET' })
-  }
-  const deleteApiUsersMe = () => {
-    return axiosInstance<null>({ url: `/api/users/me`, method: 'DELETE' })
-  }
-  const getApiUsersMe = () => {
-    return axiosInstance<UserDto>({ url: `/api/users/me`, method: 'GET' })
-  }
-  const putApiUsersMe = (updateMeRequest: UpdateMeRequest) => {
-    return axiosInstance<UserDto>({
-      url: `/api/users/me`,
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      data: updateMeRequest,
-    })
-  }
-  return { getApiUsersUserId, deleteApiUsersMe, getApiUsersMe, putApiUsersMe }
-}
+
+
+  export const getUsers = () => {
+const getApiUsersUserId = (
+    userId: string,
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/api/users/${userId}`, method: 'GET'
+    },
+      );
+    }
+  const deleteApiUsersMe = (
+    
+ ) => {
+      return axiosInstance<null>(
+      {url: `/api/users/me`, method: 'DELETE'
+    },
+      );
+    }
+  const getApiUsersMe = (
+    
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/api/users/me`, method: 'GET'
+    },
+      );
+    }
+  const putApiUsersMe = (
+    updateMeRequest: UpdateMeRequest,
+ ) => {
+      return axiosInstance<UserDto>(
+      {url: `/api/users/me`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: updateMeRequest
+    },
+      );
+    }
+  return {getApiUsersUserId,deleteApiUsersMe,getApiUsersMe,putApiUsersMe}};
 export type GetApiUsersUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersUserId']>>>
 export type DeleteApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['deleteApiUsersMe']>>>
 export type GetApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersMe']>>>

@@ -6,15 +6,15 @@ import type {
   VehicleDto,
   EngineType,
   EnergyType,
-  NullableOfVehicleType,
+  NullableOfVehicleType2,
 } from '@/api/generated/apiV1.schemas'
 import {
   EngineType as EngineTypeEnum,
   EnergyType as EnergyTypeEnum,
-  NullableOfVehicleType as VehicleTypeEnum,
+  NullableOfVehicleType2 as VehicleTypeEnum,
 } from '@/api/generated/apiV1.schemas'
+import { getVehicleEnergyTypes } from '@/api/generated/vehicle-energy-types/vehicle-energy-types'
 
-// API Error Response interfaces
 interface ApiError {
   code: string
   description: string
@@ -53,71 +53,122 @@ const form = ref()
 const isValid = ref(false)
 const isEditMode = ref(false)
 
-// Error handling
 const apiErrors = ref<ApiError[]>([])
 const generalError = ref<string | null>(null)
 
-const formData = reactive<CreateVehicleCommand & UpdateVehicleRequest>({
+const energyTypesLoading = ref(false)
+const availableEnergyTypes = ref<{ label: string; value: EnergyType }[]>([])
+const isLoadingVehicle = ref(false)
+
+interface VehicleFormData {
+  brand: string
+  model: string
+  engineType: EngineType | null
+  manufacturedYear: number | null
+  type: NullableOfVehicleType2 | undefined
+  vin: string | null
+  energyTypes: EnergyType[]
+}
+
+const formData = reactive<VehicleFormData>({
   brand: '',
   model: '',
-  engineType: EngineTypeEnum.Fuel,
+  engineType: null,
   manufacturedYear: null,
   type: undefined,
   vin: null,
   energyTypes: [],
 })
 
-// Form validation rules
+const MAX_FIELD_LENGTH = 64
+const VIN_LENGTH = 17
+const MIN_YEAR = 1886
+const CURRENT_YEAR = new Date().getFullYear()
+
 const rules = {
   required: (value: string | number | null) => !!value || 'This field is required.',
-  counter: (value: string) => value.length <= 64 || 'Max 64 characters',
-  yearMin: (value: number | null) => !value || value >= 1886 || 'Year must be >= 1886',
-  yearMax: (value: number | null) => !value || value <= new Date().getFullYear() || `Year cannot be in the future`,
-  vinLength: (value: string | null) => !value || value.length === 17 || 'VIN must be exactly 17 characters',
+  counter: (value: string) => value.length <= MAX_FIELD_LENGTH || `Max ${MAX_FIELD_LENGTH} characters`,
+  yearMin: (value: number | null) => !value || value >= MIN_YEAR || `Year must be >= ${MIN_YEAR}`,
+  yearMax: (value: number | null) => !value || value <= CURRENT_YEAR || `Year cannot be in the future`,
+  vinLength: (value: string | null) => !value || value.length === VIN_LENGTH || `VIN must be exactly ${VIN_LENGTH} characters`,
 }
 
-// Options for select fields
-const engineTypeOptions: { label: string; value: EngineType }[] = [
-  { label: 'Fuel', value: EngineTypeEnum.Fuel },
-  { label: 'Hybrid', value: EngineTypeEnum.Hybrid },
-  { label: 'Plug-in Hybrid', value: EngineTypeEnum.PlugInHybrid },
-  { label: 'Electric', value: EngineTypeEnum.Electric },
-  { label: 'Hydrogen', value: EngineTypeEnum.Hydrogen },
-]
+const ENERGY_TYPE_LABELS: Record<EnergyType, string> = {
+  [EnergyTypeEnum.Gasoline]: 'Gasoline',
+  [EnergyTypeEnum.Diesel]: 'Diesel',
+  [EnergyTypeEnum.Electric]: 'Electric',
+  [EnergyTypeEnum.LPG]: 'LPG',
+  [EnergyTypeEnum.CNG]: 'CNG',
+  [EnergyTypeEnum.Ethanol]: 'Ethanol',
+  [EnergyTypeEnum.Biofuel]: 'Biofuel',
+  [EnergyTypeEnum.Hydrogen]: 'Hydrogen',
+}
 
-const vehicleTypeOptions: { label: string; value: NullableOfVehicleType }[] = [
-  { label: 'Bus', value: VehicleTypeEnum.Bus },
-  { label: 'Car', value: VehicleTypeEnum.Car },
-  { label: 'Motorbike', value: VehicleTypeEnum.Motorbike },
-  { label: 'Truck', value: VehicleTypeEnum.Truck },
-]
+const ENGINE_TYPE_LABELS: Record<EngineType, string> = {
+  [EngineTypeEnum.Fuel]: 'Fuel',
+  [EngineTypeEnum.Hybrid]: 'Hybrid',
+  [EngineTypeEnum.PlugInHybrid]: 'Plug-in Hybrid',
+  [EngineTypeEnum.Electric]: 'Electric',
+  [EngineTypeEnum.Hydrogen]: 'Hydrogen',
+}
 
-const energyTypeOptions: { label: string; value: EnergyType }[] = [
-  { label: 'Gasoline', value: EnergyTypeEnum.Gasoline },
-  { label: 'Diesel', value: EnergyTypeEnum.Diesel },
-  { label: 'Electric', value: EnergyTypeEnum.Electric },
-  { label: 'LPG', value: EnergyTypeEnum.LPG },
-  { label: 'CNG', value: EnergyTypeEnum.CNG },
-  { label: 'Ethanol', value: EnergyTypeEnum.Ethanol },
-  { label: 'Biofuel', value: EnergyTypeEnum.Biofuel },
-  { label: 'Hydrogen', value: EnergyTypeEnum.Hydrogen },
-]
+const VEHICLE_TYPE_LABELS: Record<NullableOfVehicleType2, string> = {
+  [VehicleTypeEnum.Bus]: 'Bus',
+  [VehicleTypeEnum.Car]: 'Car',
+  [VehicleTypeEnum.Motorbike]: 'Motorbike',
+  [VehicleTypeEnum.Truck]: 'Truck',
+}
 
-// Watch for vehicle prop changes to populate form
+const createEnergyTypeOptions = (energyTypes: EnergyType[]) => energyTypes.map((type) => ({ label: ENERGY_TYPE_LABELS[type], value: type }))
+
+const engineTypeOptions: { label: string; value: EngineType }[] = Object.entries(ENGINE_TYPE_LABELS).map(([value, label]) => ({
+  label,
+  value: value as EngineType,
+}))
+
+const vehicleTypeOptions: { label: string; value: NullableOfVehicleType2 }[] = Object.entries(VEHICLE_TYPE_LABELS)
+  .map(([value, label]) => ({ label, value: value as NullableOfVehicleType2 }))
+
+async function fetchSupportedEnergyTypes(engineType: EngineType) {
+  try {
+    energyTypesLoading.value = true
+    const api = getVehicleEnergyTypes()
+    const result = await api.getApiEnergyTypesSupported({ engineType })
+
+    availableEnergyTypes.value = createEnergyTypeOptions(result.data)
+  } catch (error) {
+    console.error('Failed to fetch supported energy types:', error)
+    availableEnergyTypes.value = []
+    generalError.value = 'Failed to load supported energy types for the selected engine type. Please try again.'
+  } finally {
+    energyTypesLoading.value = false
+  }
+}
+
+function populateFormWithVehicle(vehicle: VehicleDto) {
+  Object.assign(formData, {
+    brand: vehicle.brand,
+    model: vehicle.model,
+    engineType: vehicle.engineType,
+    manufacturedYear: vehicle.manufacturedYear,
+    type: vehicle.type,
+    vin: vehicle.vin,
+    energyTypes: [...(vehicle.allowedEnergyTypes || [])],
+  })
+}
+
 watch(
   () => props.vehicle,
-  (newVehicle) => {
+  async (newVehicle) => {
     if (newVehicle) {
+      isLoadingVehicle.value = true
       isEditMode.value = true
-      Object.assign(formData, {
-        brand: newVehicle.brand,
-        model: newVehicle.model,
-        engineType: newVehicle.engineType,
-        manufacturedYear: newVehicle.manufacturedYear,
-        type: newVehicle.type,
-        vin: newVehicle.vin,
-        energyTypes: [...(newVehicle.allowedEnergyTypes || [])],
-      })
+      populateFormWithVehicle(newVehicle)
+
+      if (newVehicle.engineType) {
+        await fetchSupportedEnergyTypes(newVehicle.engineType)
+      }
+      isLoadingVehicle.value = false
     } else {
       isEditMode.value = false
       resetForm()
@@ -126,7 +177,21 @@ watch(
   { immediate: true },
 )
 
-// Watch for dialog open/close
+watch(
+  () => formData.engineType,
+  async (newEngineType, oldEngineType) => {
+    if (oldEngineType === undefined || isLoadingVehicle.value) return
+
+    if (newEngineType && newEngineType !== oldEngineType) {
+      formData.energyTypes = []
+      await fetchSupportedEnergyTypes(newEngineType)
+    } else if (!newEngineType) {
+      formData.energyTypes = []
+      availableEnergyTypes.value = []
+    }
+  },
+)
+
 watch(
   () => props.isOpen,
   async (isOpen) => {
@@ -147,12 +212,14 @@ function resetForm() {
   Object.assign(formData, {
     brand: '',
     model: '',
-    engineType: EngineTypeEnum.Fuel,
+    engineType: null,
     manufacturedYear: null,
     type: undefined,
     vin: null,
     energyTypes: [],
   })
+  // Reset available energy types
+  availableEnergyTypes.value = []
   form.value?.resetValidation()
   clearErrors()
 }
@@ -161,11 +228,32 @@ function closeDialog() {
   emit('update:isOpen', false)
 }
 
+function transformFormDataToApiFormat(formData: VehicleFormData) {
+  if (!formData.engineType) {
+    throw new Error('Engine type is required')
+  }
+
+  return {
+    brand: formData.brand,
+    model: formData.model,
+    engineType: formData.engineType,
+    manufacturedYear: formData.manufacturedYear,
+    type: formData.type,
+    vin: formData.vin,
+    energyTypes: formData.energyTypes,
+  }
+}
+
 async function handleSave() {
   const { valid } = await form.value.validate()
-  if (valid) {
+  if (valid && formData.engineType) {
     clearErrors()
-    emit('save', { ...formData })
+    try {
+      const vehicleData = transformFormDataToApiFormat(formData)
+      emit('save', vehicleData)
+    } catch (error) {
+      generalError.value = error instanceof Error ? error.message : 'Invalid form data'
+    }
   }
 }
 
@@ -174,7 +262,6 @@ function handleCancel() {
   closeDialog()
 }
 
-// Function to be called from parent when API error occurs
 function setApiError(errorResponse: ApiErrorResponse) {
   if (errorResponse.errors && errorResponse.errors.length > 0) {
     apiErrors.value = errorResponse.errors
@@ -183,9 +270,8 @@ function setApiError(errorResponse: ApiErrorResponse) {
   }
 }
 
-// Expose the setApiError function to parent
 defineExpose({
-  setApiError
+  setApiError,
 })
 </script>
 
@@ -288,7 +374,7 @@ defineExpose({
               <v-select
                 v-model="formData.energyTypes"
                 label="Supported Energy Types"
-                :items="energyTypeOptions"
+                :items="availableEnergyTypes"
                 item-title="label"
                 item-value="value"
                 variant="outlined"
@@ -296,7 +382,8 @@ defineExpose({
                 multiple
                 chips
                 clearable
-                :disabled="loading"
+                :disabled="loading || energyTypesLoading || !formData.engineType"
+                :loading="energyTypesLoading"
                 hint="Select the energy types this vehicle can use (gasoline, diesel, electric, etc.)"
                 persistent-hint
               />
@@ -307,24 +394,12 @@ defineExpose({
         <!-- Error Display -->
         <div v-if="generalError || apiErrors.length > 0" class="mt-4">
           <!-- General Error -->
-          <v-alert
-            v-if="generalError"
-            type="error"
-            variant="tonal"
-            density="compact"
-            class="mb-3"
-          >
+          <v-alert v-if="generalError" type="error" variant="tonal" density="compact" class="mb-3">
             {{ generalError }}
           </v-alert>
 
           <!-- API Validation Errors -->
-          <v-alert
-            v-if="apiErrors.length > 0"
-            type="error"
-            variant="tonal"
-            density="compact"
-            class="mb-3"
-          >
+          <v-alert v-if="apiErrors.length > 0" type="error" variant="tonal" density="compact" class="mb-3">
             <div class="font-weight-medium mb-2">Validation Errors:</div>
             <ul class="ml-4">
               <li v-for="error in apiErrors" :key="error.code" class="mb-1">

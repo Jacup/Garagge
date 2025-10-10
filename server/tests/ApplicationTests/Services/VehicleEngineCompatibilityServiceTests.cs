@@ -363,7 +363,98 @@ public class VehicleEngineCompatibilityServiceTests : InMemoryDbTestBase
         // Assert
         result.ShouldBeFalse();
     }
+    
+    [Fact]
+    public async Task GetCompatibleEnergyTypesForEngine_FuelEngineType_ReturnsExpectedEnergyTypes()
+    {
+        // Act
+        var result = await _service.GetCompatibleEnergyTypesForEngine(EngineType.Fuel);
 
+        // Assert
+        EnergyType[] expectedEnergyTypes =
+        [
+            EnergyType.Gasoline,
+            EnergyType.Diesel,
+            EnergyType.LPG,
+            EnergyType.CNG,
+            EnergyType.Ethanol,
+            EnergyType.Biofuel
+        ];
+        
+        result.ShouldBeEquivalentTo(expectedEnergyTypes);
+    }
+    
+    [Fact]
+    public async Task GetCompatibleEnergyTypesForEngine_HybridEngineType_ReturnsExpectedEnergyTypes()
+    {
+        // Act
+        var result = await _service.GetCompatibleEnergyTypesForEngine(EngineType.Hybrid);
+
+        // Assert
+        EnergyType[] expectedEnergyTypes =
+        [
+            EnergyType.Gasoline,
+            EnergyType.Diesel,
+            EnergyType.LPG,
+            EnergyType.CNG,
+            EnergyType.Ethanol,
+            EnergyType.Biofuel,
+        ];
+        
+        result.ShouldBeEquivalentTo(expectedEnergyTypes);
+    }
+    
+    [Fact]
+    public async Task GetCompatibleEnergyTypesForEngine_PhevEngineType_ReturnsExpectedEnergyTypes()
+    {
+        // Act
+        var result = await _service.GetCompatibleEnergyTypesForEngine(EngineType.PlugInHybrid);
+
+        // Assert
+        EnergyType[] expectedEnergyTypes =
+        [
+            EnergyType.Gasoline,
+            EnergyType.Diesel,
+            EnergyType.LPG,
+            EnergyType.CNG,
+            EnergyType.Ethanol,
+            EnergyType.Biofuel,
+            EnergyType.Electric
+        ];
+        
+        result.ShouldBeEquivalentTo(expectedEnergyTypes);
+    }
+
+    [Fact]
+    public async Task GetCompatibleEnergyTypesForEngine_ElectricEngineType_ReturnsExpectedEnergyTypes()
+    {
+        // Act
+        var result = await _service.GetCompatibleEnergyTypesForEngine(EngineType.Electric);
+
+        // Assert
+        EnergyType[] expectedEnergyTypes =
+        [
+            EnergyType.Electric
+        ];
+        
+        result.ShouldBeEquivalentTo(expectedEnergyTypes);
+    }
+    
+    [Fact]
+    public async Task GetCompatibleEnergyTypesForEngine_HydrogenEngineType_ReturnsExpectedEnergyTypes()
+    {
+        // Act
+        var result = await _service.GetCompatibleEnergyTypesForEngine(EngineType.Hydrogen);
+
+        // Assert
+        EnergyType[] expectedEnergyTypes =
+        [
+            EnergyType.Hydrogen
+        ];
+        
+        result.ShouldBeEquivalentTo(expectedEnergyTypes);
+    }
+    
     private async Task<Vehicle> CreateGasolineVehicleInDb()
     {
         var vehicle = FuelVehicle;

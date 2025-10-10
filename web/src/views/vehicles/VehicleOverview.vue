@@ -3,14 +3,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { VehicleDto, EnergyEntryDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, EnergyEntryDto, UpdateVehicleRequest } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
 import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
+import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 const route = useRoute()
-const { getApiVehiclesId } = getVehicles()
+const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries } = getEnergyEntries()
 
 // Vehicle data
@@ -26,12 +27,14 @@ const timelineLoading = ref(false)
 // Dialog state
 const addDialog = ref(false)
 const bulkDeleteDialog = ref(false)
+const editVehicleDialog = ref(false)
 
 // Selection state for energy entries
 const selectedEnergyEntries = ref<string[]>([])
 
 // Component refs
 const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
+const vehicleFormDialogRef = ref<InstanceType<typeof VehicleFormDialog> | null>(null)
 
 // Load vehicle data from API
 async function loadVehicle() {
@@ -113,6 +116,43 @@ function openAddDialog() {
 
 function closeAddDialog() {
   addDialog.value = false
+}
+
+function openEditVehicleDialog() {
+  editVehicleDialog.value = true
+}
+
+function closeEditVehicleDialog() {
+  editVehicleDialog.value = false
+}
+
+// API Error Response interfaces (same as in VehicleFormDialog)
+interface ApiErrorResponse {
+  type: string
+  title: string
+  status: number
+  detail: string
+  errors?: Array<{ code: string; description: string; type: string }>
+  traceId?: string
+}
+
+async function handleVehicleUpdated(vehicleData: UpdateVehicleRequest) {
+  try {
+    // Update vehicle via API
+    await putApiVehiclesId(vehicleId.value, vehicleData)
+    closeEditVehicleDialog()
+    // Reload vehicle data to refresh the view
+    await loadVehicle()
+  } catch (error) {
+    console.error('Failed to update vehicle:', error)
+    // Pass error to the dialog for display
+    if (vehicleFormDialogRef.value && error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { data?: ApiErrorResponse } }
+      if (axiosError.response?.data) {
+        vehicleFormDialogRef.value.setApiError(axiosError.response.data)
+      }
+    }
+  }
 }
 
 function handleEntrySaved() {
@@ -317,7 +357,7 @@ onMounted(async () => {
         <v-card class="card-background" variant="flat" rounded="md-16px" height="260px">
           <template #title>{{ selectedVehicle?.brand }} {{ selectedVehicle?.model }}</template>
           <template #append>
-            <v-btn prepend-icon="mdi-pencil" variant="flat" color="primary">Edit</v-btn>
+            <v-btn prepend-icon="mdi-pencil" variant="flat" color="primary" @click="openEditVehicleDialog">Edit</v-btn>
           </template>
           <template #subtitle>
             <v-chip variant="tonal" size="small" density="comfortable" rounded="lg">
@@ -376,6 +416,7 @@ onMounted(async () => {
             <EnergyEntriesTable
               ref="energyEntriesTableRef"
               :vehicle-id="vehicleId"
+              :allowed-energy-types="selectedVehicle?.allowedEnergyTypes"
               v-model:selected="selectedEnergyEntries"
             />
           </v-card-text>
@@ -490,8 +531,18 @@ onMounted(async () => {
   <ModifyEnergyEntryDialog
     :is-open="addDialog"
     :vehicle-id="vehicleId"
+    :allowed-energy-types="selectedVehicle?.allowedEnergyTypes"
     :on-save="handleEntrySaved"
     :on-cancel="closeAddDialog"
+  />
+
+  <!-- Edit Vehicle Dialog -->
+  <VehicleFormDialog
+    ref="vehicleFormDialogRef"
+    :is-open="editVehicleDialog"
+    :vehicle="selectedVehicle"
+    @update:is-open="editVehicleDialog = $event"
+    @save="handleVehicleUpdated"
   />
 
   <!-- Bulk Delete Dialog -->

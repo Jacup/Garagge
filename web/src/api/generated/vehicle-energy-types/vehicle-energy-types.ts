@@ -6,6 +6,8 @@
  */
 import type {
   CreateVehicleEnergyTypeRequest,
+  EnergyType,
+  GetApiEnergyTypesSupportedParams,
   VehicleEnergyTypeDto
 } from '../apiV1.schemas';
 
@@ -34,6 +36,16 @@ const postApiVehiclesVehicleIdEnergyTypes = (
     },
       );
     }
-  return {postApiVehiclesVehicleIdEnergyTypes,deleteApiVehiclesVehicleIdEnergyTypesId}};
+  const getApiEnergyTypesSupported = (
+    params: GetApiEnergyTypesSupportedParams,
+ ) => {
+      return axiosInstance<EnergyType[]>(
+      {url: `/api/energy-types/supported`, method: 'GET',
+        params
+    },
+      );
+    }
+  return {postApiVehiclesVehicleIdEnergyTypes,deleteApiVehiclesVehicleIdEnergyTypesId,getApiEnergyTypesSupported}};
 export type PostApiVehiclesVehicleIdEnergyTypesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicleEnergyTypes>['postApiVehiclesVehicleIdEnergyTypes']>>>
 export type DeleteApiVehiclesVehicleIdEnergyTypesIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicleEnergyTypes>['deleteApiVehiclesVehicleIdEnergyTypesId']>>>
+export type GetApiEnergyTypesSupportedResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getVehicleEnergyTypes>['getApiEnergyTypesSupported']>>>
