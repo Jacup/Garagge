@@ -117,7 +117,6 @@ const VEHICLE_TYPE_LABELS: Record<NullableOfVehicleType2, string> = {
   [VehicleTypeEnum.Car]: 'Car',
   [VehicleTypeEnum.Motorbike]: 'Motorbike',
   [VehicleTypeEnum.Truck]: 'Truck',
-  [VehicleTypeEnum.null]: '',
 }
 
 const createEnergyTypeOptions = (energyTypes: EnergyType[]) => energyTypes.map((type) => ({ label: ENERGY_TYPE_LABELS[type], value: type }))
@@ -128,7 +127,6 @@ const engineTypeOptions: { label: string; value: EngineType }[] = Object.entries
 }))
 
 const vehicleTypeOptions: { label: string; value: NullableOfVehicleType2 }[] = Object.entries(VEHICLE_TYPE_LABELS)
-  .filter(([, label]) => label !== '') // Filter out null entry
   .map(([value, label]) => ({ label, value: value as NullableOfVehicleType2 }))
 
 async function fetchSupportedEnergyTypes(engineType: EngineType) {

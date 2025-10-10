@@ -93,24 +93,26 @@ export interface LoginUserResponse {
  * @nullable
  */
 export enum NullableOfVehicleType {
-  Bus= 'Bus',
-  Car= 'Car',
-  Motorbike= 'Motorbike',
-  Truck= 'Truck',
-  null= null,
-
+  Bus = 'Bus',
+  Car = 'Car',
+  Motorbike = 'Motorbike',
+  Truck = 'Truck',
 }
+
+export type NullableVehicleType = NullableOfVehicleType | null;
+
 /**
  * @nullable
  */
 export enum NullableOfVehicleType2 {
-  Bus= 'Bus',
-  Car= 'Car',
-  Motorbike= 'Motorbike',
-  Truck= 'Truck',
-  null= null,
-
+  Bus = 'Bus',
+  Car = 'Car',
+  Motorbike = 'Motorbike',
+  Truck = 'Truck',
 }
+
+export type NullableVehicleType2 = NullableOfVehicleType2 | null;
+
 export interface PagedListOfEnergyEntryDto {
   /** @nullable */
   items?: EnergyEntryDto[] | null;
