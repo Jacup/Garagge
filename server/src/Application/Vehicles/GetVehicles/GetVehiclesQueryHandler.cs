@@ -58,9 +58,11 @@ internal sealed class GetVehiclesQueryHandler(IApplicationDbContext context, IUs
 
         var searchTerm = request.SearchTerm.ToLower();
 
+#pragma warning disable CA1862 // EF Core translates ToLower to SQL LOWER function
         vehiclesQuery = vehiclesQuery.Where(v =>
-            v.Brand.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-            v.Model.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
+            v.Brand.ToLower().Contains(searchTerm.ToLower()) ||
+            v.Model.ToLower().Contains(searchTerm.ToLower()));
+#pragma warning restore CA1862
 
         return vehiclesQuery;
     }
