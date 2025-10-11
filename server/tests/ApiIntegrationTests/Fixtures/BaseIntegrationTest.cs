@@ -7,6 +7,8 @@ using Infrastructure.DAL;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ApiIntegrationTests.Fixtures;
 
@@ -14,9 +16,19 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 {
     private readonly CustomWebApplicationFactory _factory;
     private IServiceScope _scope = null!;
-
     protected ApplicationDbContext DbContext = null!;
+    protected static readonly JsonSerializerOptions DefaultJsonSerializerOptions;
 
+    static BaseIntegrationTest()
+    {
+        DefaultJsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true, 
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        DefaultJsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    }
+    
     protected BaseIntegrationTest(CustomWebApplicationFactory factory)
     {
         _factory = factory;
@@ -46,6 +58,15 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         await DbContext.SaveChangesAsync();
         
         return user;
+    }
+    
+    protected async Task CreateAndAuthenticateUser()
+    {
+        await CreateUserAsync();
+
+        LoginUserResponse loginResult = await LoginUser("test@garagge.app", "Password123");
+
+        Authenticate(loginResult.AccessToken);
     }
     
     protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword)

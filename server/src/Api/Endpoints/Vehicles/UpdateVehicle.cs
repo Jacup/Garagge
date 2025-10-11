@@ -41,7 +41,7 @@ internal sealed class UpdateVehicle : IEndpoint
     }
 }
 
-record UpdateVehicleRequest(
+internal record UpdateVehicleRequest(
     string Brand,
     string Model,
     EngineType EngineType,
