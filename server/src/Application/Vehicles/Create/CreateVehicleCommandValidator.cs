@@ -50,16 +50,10 @@ internal sealed class CreateVehicleCommandValidator : BaseEnergyTypeValidator<Cr
     {
         RuleFor(c => c.EnergyTypes)
             .Must(AreValidEnumValues)
-            .When(c => c.EnergyTypes is not null)
             .WithMessage($"All energy types must be valid enum values. Valid values are: {string.Join(", ", Enum.GetNames<EnergyType>())}.")
-            .Must(DoesNotExceedMaximumCount)
-            .When(c => c.EnergyTypes is not null)
-            .WithMessage("Cannot specify more energy types than available in the system.")
             .Must(AreUnique)
-            .When(c => c.EnergyTypes is not null)
             .WithMessage("Energy types must be unique")
             .Must((command, energyTypes) => energyTypes == null || AreAllCompatibleWithEngine(energyTypes, command.EngineType))
-            .When(c => c.EnergyTypes is not null)
             .WithMessage((command, energyTypes) => BuildIncompatibilityMessage(energyTypes, command.EngineType));
     }
 }
