@@ -20,7 +20,7 @@ public sealed class CreateVehicleCommandHandler(
 
         if (userId == Guid.Empty)
         {
-            logger.LogWarning("Attempt to create vehicle with empty userId");
+            logger.LogError("Attempt to create vehicle with empty userId");
             return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
         }
 

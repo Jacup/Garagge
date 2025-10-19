@@ -1,4 +1,3 @@
-using Api.Endpoints.Users;
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
@@ -23,6 +22,7 @@ internal sealed class UpdateVehicle : IEndpoint
                         request.Brand,
                         request.Model,
                         request.EngineType,
+                        request.EnergyTypes ?? [],
                         request.ManufacturedYear,
                         request.Type,
                         request.VIN
@@ -41,10 +41,11 @@ internal sealed class UpdateVehicle : IEndpoint
     }
 }
 
-internal record UpdateVehicleRequest(
+public record UpdateVehicleRequest(
     string Brand,
     string Model,
     EngineType EngineType,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
-    string? VIN = null);
+    string? VIN = null,
+    IEnumerable<EnergyType>? EnergyTypes = null);

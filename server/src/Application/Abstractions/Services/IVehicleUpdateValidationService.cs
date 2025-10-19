@@ -1,13 +1,13 @@
 ﻿using Application.Core;
-using Application.Services;
+using Application.Vehicles.Update;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 
 namespace Application.Abstractions.Services;
 
-public interface IVehicleEnergyTypesService
+public interface IVehicleUpdateValidationService
 {
-    Task<Result<VehicleEnergyTypesUpdateResult>> PrepareUpdateAsync(
+    Task<Result<VehicleEnergyTypesUpdatePlan>> ValidateEnergyTypesChangeAsync(
         Vehicle vehicle,
         IEnumerable<EnergyType> requestedEnergyTypes,
         CancellationToken cancellationToken);

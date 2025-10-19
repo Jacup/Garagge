@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Services;
 using Domain.Entities.EnergyEntries;
 
 namespace Application.Services;

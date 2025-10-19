@@ -8,6 +8,7 @@ public sealed record UpdateVehicleCommand(
     string Brand,
     string Model,
     EngineType EngineType,
+    IEnumerable<EnergyType> EnergyTypes,
     int? ManufacturedYear = null,
     VehicleType? Type = null,
     string? VIN = null)
