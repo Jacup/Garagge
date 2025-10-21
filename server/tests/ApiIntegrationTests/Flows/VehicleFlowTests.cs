@@ -31,7 +31,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         const string initialVin = "1FA6P8CF8GH123AAA";
 
         // Create Vehicle
-        var createVehicleCommand = new CreateVehicleCommand(initialBrand, initialModel, initialEngineType, initialYear, initialVehicleType, initialVin);
+        var createVehicleCommand = new CreateVehicleRequest(initialBrand, initialModel, initialEngineType, initialYear, initialVehicleType, initialVin);
 
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
 
@@ -111,7 +111,7 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         for (int i = 0; i < 15; i++)
         {
-            var command = new CreateVehicleCommand($"TestBrand X{i}", $"TestModel Y{i}", EngineType.Fuel);
+            var command = new CreateVehicleRequest($"TestBrand X{i}", $"TestModel Y{i}", EngineType.Fuel);
             var response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, command);
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -159,7 +159,7 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        List<CreateVehicleCommand> commands =
+        List<CreateVehicleRequest> commands =
         [
             new("Toyota", "Corolla", EngineType.Fuel),
             new("Audi", "A4", EngineType.Fuel),
@@ -167,7 +167,7 @@ public class VehicleFlowTests : BaseIntegrationTest
             new("Mercedes", "GLA", EngineType.Fuel),
         ];
 
-        foreach (CreateVehicleCommand createVehicleCommand in commands)
+        foreach (CreateVehicleRequest createVehicleCommand in commands)
         {
             await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
         }
@@ -200,14 +200,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         // Authenticate as User 1 and create a vehicle
         var loginUser1Response = await LoginUser(user1.Email, "password123");
         Authenticate(loginUser1Response.AccessToken);
-        var createVehicleUser1Command = new CreateVehicleCommand("User1Brand", "User1Model", EngineType.Fuel);
+        var createVehicleUser1Command = new CreateVehicleRequest("User1Brand", "User1Model", EngineType.Fuel);
         var createUser1Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser1Command);
         createUser1Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Authenticate as User 2 and create a vehicle
         var loginUser2Response = await LoginUser(user2.Email, "password345");
         Authenticate(loginUser2Response.AccessToken);
-        var createVehicleUser2Command = new CreateVehicleCommand("User2Brand", "User2Model", EngineType.Fuel);
+        var createVehicleUser2Command = new CreateVehicleRequest("User2Brand", "User2Model", EngineType.Fuel);
         var createUser2Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser2Command);
         createUser2Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
@@ -241,7 +241,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicle.Id));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var createCommand = new CreateVehicleCommand("Honda", "Civic", EngineType.Fuel);
+        var createCommand = new CreateVehicleRequest("Honda", "Civic", EngineType.Fuel);
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
@@ -261,7 +261,7 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        var invalidCreateCommands = new List<CreateVehicleCommand>
+        var invalidCreateCommands = new List<CreateVehicleRequest>
         {
             new("", "Model", EngineType.Fuel), // Empty Brand
             new("Brand", "", EngineType.Fuel), // Empty Model
@@ -285,7 +285,7 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        var createCommand = new CreateVehicleCommand("ValidBrand", "ValidModel", EngineType.Fuel);
+        var createCommand = new CreateVehicleRequest("ValidBrand", "ValidModel", EngineType.Fuel);
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
         
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);

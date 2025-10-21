@@ -165,10 +165,8 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? AuthorizedUserId,
-            VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 
-        // Add supported energy types
         foreach (var energyType in supportedEnergyTypes)
         {
             vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType

@@ -1,8 +1,11 @@
 using Application.Abstractions.Data;
+using Application.Abstractions.Services;
+using Application.Core;
 using Application.Vehicles;
 using Application.Vehicles.Update;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace ApplicationTests.Vehicles.Update;
@@ -10,10 +13,20 @@ namespace ApplicationTests.Vehicles.Update;
 public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly UpdateVehicleCommandHandler _sut;
+    private readonly Mock<IVehicleUpdateValidationService> _vehicleUpdateValidationServiceMock = new();
+    private readonly Mock<ILogger<UpdateVehicleCommandHandler>> _loggerMock = new();
+
+    private readonly Result<VehicleEnergyTypesUpdatePlan> _noChangesResult = Result.Success(VehicleEnergyTypesUpdatePlan.NoChanges());
+
+    private readonly Result<VehicleEnergyTypesUpdatePlan> _defaultUpdateValidationFailure = Result.Failure<VehicleEnergyTypesUpdatePlan>(
+        VehicleErrors.CannotRemoveEnergyTypesWithExistingEntries(
+            Guid.Empty,
+            new List<EnergyType>(),
+            0));
 
     public UpdateVehicleCommandHandlerTests()
     {
-        _sut = new UpdateVehicleCommandHandler(Context, UserContextMock.Object);
+        _sut = new UpdateVehicleCommandHandler(Context, UserContextMock.Object, _vehicleUpdateValidationServiceMock.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -21,7 +34,6 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
         var vehicleId = Guid.NewGuid();
         var existingVehicle = new Vehicle
         {
@@ -35,6 +47,12 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             VIN = "1HGBH41JXMN109111"
         };
 
+        var existingEnergyType = new VehicleEnergyType
+        {
+            Id = Guid.NewGuid(), VehicleId = vehicleId, EnergyType = EnergyType.Gasoline, Vehicle = existingVehicle
+        };
+
+        Context.VehicleEnergyTypes.Add(existingEnergyType);
         Context.Vehicles.Add(existingVehicle);
         await Context.SaveChangesAsync();
 
@@ -43,9 +61,16 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             "Audi",
             "A4",
             EngineType.Fuel,
+            [EnergyType.Diesel],
             2010,
             VehicleType.Car,
             "1HGBH41JXMN109186");
+
+
+        var changePlan = new VehicleEnergyTypesUpdatePlan([EnergyType.Diesel], [EnergyType.Gasoline], []);
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(existingVehicle, It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(changePlan);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -56,6 +81,8 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
         result.Value.Brand.ShouldBe("Audi");
         result.Value.Model.ShouldBe("A4");
         result.Value.EngineType.ShouldBe(EngineType.Fuel);
+        result.Value.AllowedEnergyTypes.Count().ShouldBe(1);
+        result.Value.AllowedEnergyTypes.ShouldContain(EnergyType.Diesel);
         result.Value.ManufacturedYear.ShouldBe(2010);
         result.Value.Type.ShouldBe(VehicleType.Car);
         result.Value.VIN.ShouldBe("1HGBH41JXMN109186");
@@ -67,7 +94,7 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         var vehicleId = Guid.NewGuid();
         var existingVehicle = new Vehicle
         {
@@ -81,6 +108,10 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             VIN = "1HGBH41JXMN109111"
         };
 
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
+
         Context.Vehicles.Add(existingVehicle);
         await Context.SaveChangesAsync();
 
@@ -88,7 +119,8 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             vehicleId,
             "BMW",
             "X3",
-            EngineType.Electric);
+            EngineType.Electric,
+            []);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -106,15 +138,56 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
+    public async Task Handle_EnergyTypeValidationFails_ReturnsSuccessWithUpdatedVehicleDto()
+    {
+        // Arrange
+        SetupAuthorizedUser();
+
+        var vehicleId = Guid.NewGuid();
+        var existingVehicle = new Vehicle
+        {
+            Id = vehicleId,
+            Brand = "OldBrand",
+            Model = "OldModel",
+            EngineType = EngineType.Fuel,
+            UserId = AuthorizedUserId
+        };
+
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_defaultUpdateValidationFailure);
+
+        Context.Vehicles.Add(existingVehicle);
+        await Context.SaveChangesAsync();
+
+        var command = new UpdateVehicleCommand(
+            vehicleId,
+            "BMW",
+            "X3",
+            EngineType.Electric,
+            []);
+
+        // Act
+        var result = await _sut.Handle(command, CancellationToken.None);
+
+        // Assert
+        result.IsFailure.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
     {
         // Arrange
         UserContextMock
             .Setup(o => o.UserId)
             .Returns(Guid.Empty);
-            
-        var command = new UpdateVehicleCommand(Guid.NewGuid(), "Audi", "A4", EngineType.Fuel, 2010);
 
+        var command = new UpdateVehicleCommand(Guid.NewGuid(), "Audi", "A4", EngineType.Fuel, [], 2010);
+        
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
+        
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
@@ -129,8 +202,12 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicleId = Guid.NewGuid();
-        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, 2010);
+        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010);
 
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
+        
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
 
@@ -144,7 +221,7 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         var otherUserId = Guid.NewGuid();
         var vehicleId = Guid.NewGuid();
         var existingVehicle = new Vehicle
@@ -159,10 +236,14 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             VIN = "1HGBH41JXMN109111"
         };
 
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
+        
         Context.Vehicles.Add(existingVehicle);
         await Context.SaveChangesAsync();
 
-        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, 2010);
+        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -177,7 +258,7 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         var vehicleId = Guid.NewGuid();
         var existingVehicle = new Vehicle
         {
@@ -194,8 +275,12 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
         Context.Vehicles.Add(existingVehicle);
         await Context.SaveChangesAsync();
 
-        var applicationDbContextMock = new Mock<IApplicationDbContext>();
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
         
+        var applicationDbContextMock = new Mock<IApplicationDbContext>();
+
         applicationDbContextMock
             .Setup(o => o.Vehicles)
             .Returns(Context.Vehicles);
@@ -203,8 +288,12 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
             .Setup(o => o.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .Throws(new Exception("Database error"));
 
-        var mockedSut = new UpdateVehicleCommandHandler(applicationDbContextMock.Object, UserContextMock.Object);
-        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, 2010);
+        var mockedSut = new UpdateVehicleCommandHandler(
+            applicationDbContextMock.Object,
+            UserContextMock.Object,
+            _vehicleUpdateValidationServiceMock.Object,
+            _loggerMock.Object);
+        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010);
 
         // Act
         var result = await mockedSut.Handle(command, CancellationToken.None);
@@ -219,7 +308,7 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         var vehicleId = Guid.NewGuid();
         var existingVehicle = new Vehicle
         {
@@ -236,7 +325,11 @@ public class UpdateVehicleCommandHandlerTests : InMemoryDbTestBase
         Context.Vehicles.Add(existingVehicle);
         await Context.SaveChangesAsync();
 
-        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, 2010, VehicleType.Car, "1HGBH41JXMN109186");
+        _vehicleUpdateValidationServiceMock
+            .Setup(v => v.ValidateEnergyTypesChangeAsync(It.IsAny<Vehicle>(), It.IsAny<IEnumerable<EnergyType>>(), CancellationToken.None))
+            .ReturnsAsync(_noChangesResult);
+        
+        var command = new UpdateVehicleCommand(vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, VehicleType.Car, "1HGBH41JXMN109186");
 
         // Act
         await _sut.Handle(command, CancellationToken.None);

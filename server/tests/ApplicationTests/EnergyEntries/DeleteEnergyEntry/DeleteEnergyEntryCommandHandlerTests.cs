@@ -30,7 +30,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsSuccess.ShouldBeTrue();
-        
+
         var deletedEntry = Context.EnergyEntries.FirstOrDefault(ee => ee.Id == energyEntry.Id);
         deletedEntry.ShouldBeNull();
     }
@@ -119,7 +119,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsSuccess.ShouldBeTrue();
-        
+
         var deletedEntry = Context.EnergyEntries.FirstOrDefault(ee => ee.Id == energyEntry.Id);
         deletedEntry.ShouldBeNull();
     }
@@ -127,7 +127,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     private async Task<Vehicle> CreateVehicleInDb(EnergyType energyType, Guid? userId = null)
     {
         var vehicleId = Guid.NewGuid();
-        
+
         var vehicle = new Vehicle
         {
             Id = vehicleId,
@@ -139,7 +139,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             UserId = userId ?? AuthorizedUserId,
             VehicleEnergyTypes = new List<VehicleEnergyType>
             {
-                new VehicleEnergyType
+                new()
                 {
                     Id = Guid.NewGuid(),
                     VehicleId = vehicleId,
@@ -147,7 +147,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
                 }
             }
         };
-
+        
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
         return vehicle;

@@ -70,8 +70,6 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var query = new GetEnergyEntriesByUserQuery(AuthorizedUserId, 2, 10, [EnergyType.Electric]);
 
-        var callSequence = new List<string>();
-
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
@@ -222,10 +220,8 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? AuthorizedUserId,
-            VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 
-        // Add supported energy types
         foreach (var energyType in supportedEnergyTypes)
         {
             vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
