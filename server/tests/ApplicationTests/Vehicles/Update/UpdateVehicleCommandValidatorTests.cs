@@ -1,4 +1,7 @@
 using Application.Abstractions;
+using Application.Abstractions.Data;
+using Application.Abstractions.Services;
+using Application.Services;
 using Application.Vehicles.Update;
 using Domain.Enums;
 using FluentValidation.TestHelper;
@@ -14,19 +17,22 @@ public class UpdateVehicleCommandValidatorTests
 
     public UpdateVehicleCommandValidatorTests()
     {
+        var mockDbContext = new Mock<IApplicationDbContext>();
+        IVehicleEngineCompatibilityService compatibilityService = new VehicleEngineCompatibilityService(mockDbContext.Object);
+        
         _dateTimeProvider = new Mock<IDateTimeProvider>();
         
         _dateTimeProvider
             .Setup(o => o.UtcNow)
             .Returns(new DateTime(2024, 01, 25));
         
-        _validator = new UpdateVehicleCommandValidator(_dateTimeProvider.Object);
+        _validator = new UpdateVehicleCommandValidator(_dateTimeProvider.Object, compatibilityService);
     }
 
     [Fact]
     public void Validate_WhenVehicleIdIsEmpty_ShouldHaveError()
     {
-        var command = new UpdateVehicleCommand(Guid.Empty, "Audi", "A4", EngineType.Fuel);
+        var command = new UpdateVehicleCommand(Guid.Empty, "Audi", "A4", EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.VehicleId);
     }
@@ -34,7 +40,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenVehicleIdIsValid_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.VehicleId);
     }
@@ -42,7 +48,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenBrandIsEmpty_ShouldHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, string.Empty, "A4", EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, string.Empty, "A4", EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -50,7 +56,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenModelIsEmpty_ShouldHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", string.Empty, EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", string.Empty, EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
     }
@@ -59,7 +65,7 @@ public class UpdateVehicleCommandValidatorTests
     public void Validate_WhenBrandIsTooLong_ShouldHaveError()
     {
         var longBrand = new string('A', 65);
-        var command = new UpdateVehicleCommand(_vehicleId, longBrand, "A4", EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, longBrand, "A4", EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Brand);
     }
@@ -68,7 +74,7 @@ public class UpdateVehicleCommandValidatorTests
     public void Validate_WhenModelIsTooLong_ShouldHaveError()
     {
         var longModel = new string('B', 65);
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", longModel, EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", longModel, EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.Model);
     }
@@ -80,7 +86,7 @@ public class UpdateVehicleCommandValidatorTests
     [InlineData(EngineType.Electric)]
     public void Validate_WhenEngineTypeIsValid_ShouldNotHaveError(EngineType engineType)
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", engineType);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", engineType, []);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.EngineType);
     }
@@ -89,7 +95,7 @@ public class UpdateVehicleCommandValidatorTests
     public void Validate_WhenManufacturedYearIsInFuture_ShouldHaveError()
     {
         var futureYear = _dateTimeProvider.Object.UtcNow.AddYears(1).Year;
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, futureYear);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], futureYear);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
     }
@@ -97,7 +103,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenManufacturedYearIsTooOld_ShouldHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 1885);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 1885);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.ManufacturedYear);
     }
@@ -105,7 +111,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenManufacturedYearIsNull_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, null);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], null);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.ManufacturedYear);
     }
@@ -117,7 +123,7 @@ public class UpdateVehicleCommandValidatorTests
     [InlineData(VehicleType.Truck)]
     public void Validate_WhenVehicleTypeIsValid_ShouldNotHaveError(VehicleType vehicleType)
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010, vehicleType);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, vehicleType);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.Type);
     }
@@ -125,7 +131,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenVehicleTypeIsNull_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010, null);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, null);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.Type);
     }
@@ -134,7 +140,7 @@ public class UpdateVehicleCommandValidatorTests
     public void Validate_WhenVINHasCorrectLength_ShouldNotHaveError()
     {
         var validVIN = "1HGBH41JXMN109186"; // 17 characters
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010, null, validVIN);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, null, validVIN);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.VIN);
     }
@@ -145,7 +151,7 @@ public class UpdateVehicleCommandValidatorTests
     [InlineData("")] // empty
     public void Validate_WhenVINHasIncorrectLength_ShouldHaveError(string invalidVIN)
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010, null, invalidVIN);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, null, invalidVIN);
         var result = _validator.TestValidate(command);
         result.ShouldHaveValidationErrorFor(c => c.VIN);
     }
@@ -153,7 +159,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenVINIsNull_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010);
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveValidationErrorFor(c => c.VIN);
     }
@@ -161,7 +167,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenCommandIsValid_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, 2010, VehicleType.Car, "1HGBH41JXMN109186");
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, [], 2010, VehicleType.Car, "1HGBH41JXMN109186");
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }
@@ -169,7 +175,7 @@ public class UpdateVehicleCommandValidatorTests
     [Fact]
     public void Validate_WhenCommandIsValidWithMinimalData_ShouldNotHaveError()
     {
-        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel);
+        var command = new UpdateVehicleCommand(_vehicleId, "Audi", "A4", EngineType.Fuel, []);
         var result = _validator.TestValidate(command);
         result.IsValid.ShouldBeTrue();
     }

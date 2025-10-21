@@ -13,7 +13,7 @@ public sealed class Vehicle : Entity
     public int? ManufacturedYear { get; set; }
     public VehicleType? Type { get; set; }
     public string? VIN { get; set; }
-    
+
     public required Guid UserId { get; set; }
     public User? User { get; set; }
 

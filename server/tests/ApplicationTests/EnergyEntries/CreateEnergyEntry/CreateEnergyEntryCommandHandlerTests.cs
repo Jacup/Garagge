@@ -267,7 +267,6 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? AuthorizedUserId,
-            VehicleEnergyTypes = new List<VehicleEnergyType>()
         };
 
         var energyTypesToAdd = supportedEnergyTypes ?? new[] { energyType };

@@ -1,7 +1,6 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Services;
 using Application.Core;
 using Domain.Entities.Vehicles;
 using Mapster;
@@ -12,7 +11,6 @@ namespace Application.Vehicles.Create;
 public sealed class CreateVehicleCommandHandler(
     IApplicationDbContext dbContext,
     IUserContext userContext,
-    IVehicleEngineCompatibilityService vehicleEngineCompatibilityService,
     ILogger<CreateVehicleCommandHandler> logger)
     : ICommandHandler<CreateVehicleCommand, VehicleDto>
 {
@@ -21,21 +19,15 @@ public sealed class CreateVehicleCommandHandler(
         var userId = userContext.UserId;
 
         if (userId == Guid.Empty)
-            return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
-
-        var energyTypes = request.EnergyTypes?.Distinct().ToList();
-
-        if (energyTypes is not null && energyTypes.Count != 0)
         {
-            var validationResult = vehicleEngineCompatibilityService.ValidateEngineCompatibility(request.EngineType, energyTypes);
-            
-            if (validationResult.IsFailure)
-                return Result.Failure<VehicleDto>(validationResult.Error);
+            logger.LogError("Attempt to create vehicle with empty userId");
+            return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
         }
-        
+
+        var vehicleId = Guid.NewGuid();
         var vehicle = new Vehicle
         {
-            Id = Guid.NewGuid(),
+            Id = vehicleId,
             Brand = request.Brand,
             Model = request.Model,
             EngineType = request.EngineType,
@@ -44,12 +36,11 @@ public sealed class CreateVehicleCommandHandler(
             VIN = request.VIN,
             UserId = userId,
         };
-        
-        var vets = energyTypes?
-            .Select(et => new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = et })
-            .ToList();
 
-        vehicle.VehicleEnergyTypes = vets ?? [];
+        foreach (var energyType in request.EnergyTypes)
+        {
+            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicleId, EnergyType = energyType });
+        }
 
         await dbContext.Vehicles.AddAsync(vehicle, cancellationToken);
 
@@ -63,6 +54,13 @@ public sealed class CreateVehicleCommandHandler(
             return Result.Failure<VehicleDto>(VehicleErrors.CreateFailed);
         }
 
-        return Result.Success(vehicle.Adapt<VehicleDto>());
+        logger.LogInformation(
+            "Vehicle created successfully. VehicleId: {VehicleId}, UserId: {UserId}, Brand: {Brand}, Model: {Model}",
+            vehicleId,
+            userId,
+            request.Brand,
+            request.Model);
+
+        return vehicle.Adapt<VehicleDto>();
     }
 }

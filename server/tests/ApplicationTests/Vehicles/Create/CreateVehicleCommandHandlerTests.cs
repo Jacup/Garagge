@@ -1,8 +1,6 @@
-using Application.Abstractions.Services;
 using Application.Core;
 using Application.Vehicles;
 using Application.Vehicles.Create;
-using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -11,9 +9,7 @@ namespace ApplicationTests.Vehicles.Create;
 
 public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
 {
-    private readonly Mock<IVehicleEngineCompatibilityService> _vehicleEngineCompatibilityServiceMock = new();
     private readonly Mock<ILogger<CreateVehicleCommandHandler>> _loggerMock = new();
-
     private readonly CreateVehicleCommandHandler _handler;
 
     public CreateVehicleCommandHandlerTests()
@@ -21,7 +17,6 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         _handler = new CreateVehicleCommandHandler(
             Context,
             UserContextMock.Object,
-            _vehicleEngineCompatibilityServiceMock.Object,
             _loggerMock.Object);
     }
 
@@ -35,15 +30,11 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
             "Audi",
             "A4",
             EngineType.Fuel,
+            new List<EnergyType>() {EnergyType.Gasoline, EnergyType.LPG},
             2010,
             VehicleType.Car,
-            "1HGBH41JXMN109186",
-            EnergyTypes: [EnergyType.Gasoline, EnergyType.LPG]);
-
-        _vehicleEngineCompatibilityServiceMock
-            .Setup(service => service.ValidateEngineCompatibility(command.EngineType, command.EnergyTypes!))
-            .Returns(Result.Success());
-
+            "1HGBH41JXMN109186");
+        
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -83,7 +74,8 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateVehicleCommand(
             "BMW",
             "X3",
-            EngineType.Fuel);
+            EngineType.Fuel,
+            new List<EnergyType>());
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -105,7 +97,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
     public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
     {
         // Arrange
-        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, 2010);
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, [], 2010);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -125,12 +117,8 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var command = new CreateVehicleCommand("Audi", "A4", engineType, 2010, EnergyTypes: [EnergyType.CNG]);
-
-        _vehicleEngineCompatibilityServiceMock
-            .Setup(service => service.ValidateEngineCompatibility(engineType, command.EnergyTypes!))
-            .Returns(Result.Success());
-
+        var command = new CreateVehicleCommand("Audi", "A4", engineType, [EnergyType.CNG], 2010);
+        
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -144,7 +132,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, 2010);
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, [], 2010);
         
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -153,31 +141,13 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Id.ShouldNotBe(Guid.Empty);
     }
-
-    [Fact]
-    public async Task Handle_WithNullEnergyTypes_DoesNotCreateVehicleEnergyTypes()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-
-        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: null);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-
-        result.Value.AllowedEnergyTypes.ShouldBeEmpty();
-        Context.Vehicles.First().AllowedEnergyTypes.ShouldBeEmpty();
-    }
-
+    
     [Fact]
     public async Task Handle_WithEmptyEnergyTypes_DoesNotCreateVehicleEnergyTypes()
     {
         // Arrange
         SetupAuthorizedUser();
-        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, EnergyTypes: new List<EnergyType>());
+        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, new List<EnergyType>());
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

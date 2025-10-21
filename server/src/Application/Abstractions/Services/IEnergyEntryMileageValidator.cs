@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.EnergyEntries;
 
-namespace Application.Abstractions;
+namespace Application.Abstractions.Services;
 
 public interface IEnergyEntryMileageValidator
 {

@@ -17,6 +17,7 @@ public static class DependencyInjection
         
         // Register services
         services.AddScoped<IVehicleEngineCompatibilityService, VehicleEngineCompatibilityService>();
+        services.AddScoped<IVehicleUpdateValidationService, VehicleUpdateValidationService>();
         services.AddScoped<IEnergyEntryFilterService, EnergyEntryFilterService>();
         services.AddScoped<IEnergyEntryMileageValidator, EnergyEntryMileageValidator>();
 
