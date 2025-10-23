@@ -3,9 +3,7 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Users;
 using Application.Users.Me.Update;
-using Infrastructure.Authentication;
 using MediatR;
-using System.Security.Claims;
 
 namespace Api.Endpoints.Users.Me;
 
@@ -29,4 +27,4 @@ internal sealed class UpdateMe : IEndpoint
     }
 }
 
-internal sealed record UpdateMeRequest(string FirstName, string LastName, string Email);
+internal sealed record UpdateMeRequest(string Email, string FirstName, string LastName);

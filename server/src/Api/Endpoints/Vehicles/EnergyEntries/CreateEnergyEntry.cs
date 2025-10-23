@@ -44,7 +44,7 @@ internal sealed class CreateEnergyEntry : IEndpoint
     }
 }
 
-public record CreateEnergyEntryRequest(
+internal sealed record CreateEnergyEntryRequest(
         DateOnly Date,
         int Mileage,
         EnergyType Type,

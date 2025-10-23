@@ -45,7 +45,7 @@ internal sealed class UpdateEnergyEntry : IEndpoint
     }
 }
 
-public record UpdateEnergyEntryRequest(
+internal sealed record UpdateEnergyEntryRequest(
         DateOnly Date,
         int Mileage,
         EnergyType Type,

@@ -1,4 +1,4 @@
-﻿using ApiIntegrationTests.Contracts.Auth;
+﻿using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth.Login;
@@ -15,7 +15,7 @@ public class AuthFlowTests : BaseIntegrationTest
     private const string FirstName = "John";
     private const string LastName = "Doe";
     private const string UserPassword = "Password123";
-    
+
     public AuthFlowTests(CustomWebApplicationFactory factory) : base(factory)
     {
     }
@@ -23,14 +23,14 @@ public class AuthFlowTests : BaseIntegrationTest
     [Fact]
     public async Task AuthFlow_RegisterThenLogin_Success()
     {
-        var registerRequest = new RegisterUserCommand("test@example.com", "John", "Doe", "Password123");
+        var registerRequest = new RegisterRequest("test@example.com", "Password123", "John", "Doe");
         var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
         registerResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var userId = await registerResponse.Content.ReadFromJsonAsync<Guid>();
         userId.ShouldNotBe(Guid.Empty);
 
-        var loginRequest = new LoginUserCommand("test@example.com", "Password123");
+        var loginRequest = new LoginRequest("test@example.com", "Password123");
         var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
         loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -41,39 +41,39 @@ public class AuthFlowTests : BaseIntegrationTest
     [Fact]
     public async Task AuthFlow_RegisterDuplicateEmailThenLogin_FirstUserCanLogin()
     {
-        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterUserCommand("duplicate@test.com", "John", "Doe", "Password123"));
+        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterRequest("duplicate@test.com", "Password123", "John", "Doe"));
 
         var duplicateResponse =
-            await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterUserCommand("duplicate@test.com", "Jane", "Smith", "Password456"));
+            await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterRequest("duplicate@test.com", "Password456", "Jane", "Smith"));
         duplicateResponse.StatusCode.ShouldBe(HttpStatusCode.Conflict);
 
-        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand("duplicate@test.com", "Password123"));
+        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest("duplicate@test.com", "Password123"));
         loginResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
     public async Task AuthFlow_RegisterWithInvalidDataThenLogin_RegisterFailsLoginUnnecessary()
     {
-        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterUserCommand("test@example.com", "John", "Doe", "123"));
+        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterRequest("test@example.com", "123", "John", "Doe"));
         registerResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
-        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand("test@example.com", "123"));
+        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest("test@example.com", "123"));
         loginResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
     public async Task AuthFlow_RegisterThenLoginWithWrongPassword_LoginFails()
     {
-        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterUserCommand("test@example.com", "John", "Doe", "Password123"));
+        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, new RegisterRequest("test@example.com", "Password123", "John", "Doe"));
 
-        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand("test@example.com", "WrongPassword"));
+        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest("test@example.com", "WrongPassword"));
         loginResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     #region ChangePassword Flow Tests
 
     private const string NewPassword = "NewPassword123";
-    
+
     [Fact]
     public async Task ChangePasswordFlow_ValidChangePasswordRequest_Success()
     {
@@ -87,11 +87,11 @@ public class AuthFlowTests : BaseIntegrationTest
         changeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Step 3: Verify the old password no longer works
-        var oldPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, UserPassword));
+        var oldPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword));
         oldPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         // Step 4: Verify the new password works
-        var newPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, NewPassword));
+        var newPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, NewPassword));
         newPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
@@ -108,7 +108,7 @@ public class AuthFlowTests : BaseIntegrationTest
         changeResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
         // Step 3: Verify the original password still works
-        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, UserPassword));
+        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword));
         originalPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
@@ -125,7 +125,7 @@ public class AuthFlowTests : BaseIntegrationTest
         changeResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
         // Step 3: Verify the original password still works
-        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, UserPassword));
+        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword));
         originalPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
@@ -153,7 +153,7 @@ public class AuthFlowTests : BaseIntegrationTest
     {
         // Step 1: Register and login user with a valid password
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
-        
+
         // Step 2: Attempt to change password with an invalid format
         var changePasswordRequest = new ChangePasswordRequest(currentPassword, newPassword);
         var changeResponse = await Client.PutAsJsonAsync(ApiV1Definition.Auth.ChangePassword, changePasswordRequest);
@@ -161,7 +161,7 @@ public class AuthFlowTests : BaseIntegrationTest
         changeResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
         // Step 3: Verify the original password still works
-        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, UserPassword));
+        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword));
         originalPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
@@ -184,14 +184,14 @@ public class AuthFlowTests : BaseIntegrationTest
         secondResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Step 4: Verify only the latest password works
-        var latestPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, thirdPassword));
+        var latestPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, thirdPassword));
         latestPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Step 5: Verify old passwords don't work
-        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, UserPassword));
+        var originalPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword));
         originalPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var secondPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginUserCommand(UserEmail, secondPassword));
+        var secondPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, secondPassword));
         secondPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
@@ -221,6 +221,6 @@ public class AuthFlowTests : BaseIntegrationTest
     //     successfulResponses.Count.ShouldBe(1);
     //     failedResponses.Count.ShouldBe(1);
     // }
-    
+
     #endregion
 }

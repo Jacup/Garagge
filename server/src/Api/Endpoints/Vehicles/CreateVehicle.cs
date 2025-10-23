@@ -26,7 +26,7 @@ internal sealed class CreateVehicle : IEndpoint
                         request.Type,
                         request.VIN
                     );
-                    
+
                     Result<VehicleDto> result = await sender.Send(command, cancellationToken);
 
                     return result.Match(
@@ -43,7 +43,7 @@ internal sealed class CreateVehicle : IEndpoint
     }
 }
 
-public record CreateVehicleRequest(
+internal sealed record CreateVehicleRequest(
     string Brand,
     string Model,
     EngineType EngineType,
