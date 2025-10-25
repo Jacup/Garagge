@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { VehicleDto, EnergyEntryDto, UpdateVehicleRequest } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
 import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
@@ -136,7 +136,7 @@ interface ApiErrorResponse {
   traceId?: string
 }
 
-async function handleVehicleUpdated(vehicleData: UpdateVehicleRequest) {
+async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
   try {
     // Update vehicle via API
     await putApiVehiclesId(vehicleId.value, vehicleData)
