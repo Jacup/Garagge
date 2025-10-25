@@ -1,9 +1,8 @@
-﻿using Api.Endpoints.Vehicles;
+﻿using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
 using Application.Vehicles;
-using Application.Vehicles.Create;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using System.Net;
@@ -31,7 +30,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         const string initialVin = "1FA6P8CF8GH123AAA";
 
         // Create Vehicle
-        var createVehicleCommand = new CreateVehicleCommand(initialBrand, initialModel, initialEngineType, [], initialYear, initialVehicleType, initialVin);
+        var createVehicleCommand = new VehicleCreateRequest(initialBrand, initialModel, initialEngineType, initialYear, initialVehicleType, initialVin, []);
 
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
 
@@ -68,7 +67,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         const VehicleType updatedVehicleType = VehicleType.Car;
         const string updatedVin = "1FA6P8CF8GH123456";
 
-        var updateVehicleRequest = new UpdateVehicleRequest(updatedBrand, updatedModel, updatedEngineType, updatedYear, updatedVehicleType, updatedVin);
+        var updateVehicleRequest = new VehicleUpdateRequest(updatedBrand, updatedModel, updatedEngineType, updatedYear, updatedVehicleType, updatedVin, null);
         var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, createContent.Id), updateVehicleRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -111,7 +110,7 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         for (int i = 0; i < 15; i++)
         {
-            var command = new CreateVehicleCommand($"TestBrand X{i}", $"TestModel Y{i}", EngineType.Fuel, []);
+            var command = new VehicleCreateRequest($"TestBrand X{i}", $"TestModel Y{i}", EngineType.Fuel, null, null, null, null);
             var response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, command);
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -159,15 +158,15 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        List<CreateVehicleCommand> commands =
+        List<VehicleCreateRequest> commands =
         [
-            new("Toyota", "Corolla", EngineType.Fuel, []),
-            new("Audi", "A4", EngineType.Fuel, []),
-            new("BMW", "X5", EngineType.Fuel, []),
-            new("Mercedes", "GLA", EngineType.Fuel, []),
+            new("Toyota", "Corolla", EngineType.Fuel, null, null, null, null),
+            new("Audi", "A4", EngineType.Fuel, null, null, null, null),
+            new("BMW", "X5", EngineType.Fuel, null, null, null, null),
+            new("Mercedes", "GLA", EngineType.Fuel, null, null, null, null),
         ];
 
-        foreach (CreateVehicleCommand createVehicleCommand in commands)
+        foreach (VehicleCreateRequest createVehicleCommand in commands)
         {
             await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
         }
@@ -200,14 +199,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         // Authenticate as User 1 and create a vehicle
         var loginUser1Response = await LoginUser(user1.Email, "password123");
         Authenticate(loginUser1Response.AccessToken);
-        var createVehicleUser1Command = new CreateVehicleCommand("User1Brand", "User1Model", EngineType.Fuel, []);
+        var createVehicleUser1Command = new VehicleCreateRequest("User1Brand", "User1Model", EngineType.Fuel, null, null, null, null);
         var createUser1Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser1Command);
         createUser1Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Authenticate as User 2 and create a vehicle
         var loginUser2Response = await LoginUser(user2.Email, "password345");
         Authenticate(loginUser2Response.AccessToken);
-        var createVehicleUser2Command = new CreateVehicleCommand("User2Brand", "User2Model", EngineType.Fuel, []);
+        var createVehicleUser2Command = new VehicleCreateRequest("User2Brand", "User2Model", EngineType.Fuel, null, null, null, null);
         var createUser2Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser2Command);
         createUser2Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
@@ -241,11 +240,11 @@ public class VehicleFlowTests : BaseIntegrationTest
         var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicle.Id));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var createCommand = new CreateVehicleCommand("Honda", "Civic", EngineType.Fuel, []);
+        var createCommand = new VehicleCreateRequest("Honda", "Civic", EngineType.Fuel, null, null, null, null);
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var updateRequest = new UpdateVehicleRequest("Honda", "Civic", EngineType.Fuel);
+        var updateRequest = new VehicleUpdateRequest("Honda", "Civic", EngineType.Fuel, null, null, null, null);
         var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicle.Id), updateRequest);
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
@@ -261,16 +260,16 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        var invalidCreateCommands = new List<CreateVehicleCommand>
+        var invalidCreateCommands = new List<VehicleCreateRequest>
         {
-            new("", "Model", EngineType.Fuel, []), // Empty Brand
-            new("Brand", "", EngineType.Fuel, []), // Empty Model
-            new("Brand", "Model", (EngineType)999, []), // Invalid EngineType
-            new("Brand", "Model", EngineType.Fuel, [], 1800), // Year too early
-            new("Brand", "Model", EngineType.Fuel, [], 3000), // Year too late
-            new("Brand", "Model", EngineType.Fuel, [], 2020, (VehicleType)999), // Invalid VehicleType
-            new("Brand", "Model", EngineType.Fuel, [], 2020, VehicleType.Car, new string('A', 16)), // VIN too short
-            new("Brand", "Model", EngineType.Fuel, [], 2020, VehicleType.Car, new string('A', 18)), // VIN too long
+            new("", "Model", EngineType.Fuel, null, null, null, null), // Empty Brand
+            new("Brand", "", EngineType.Fuel, null, null, null, null), // Empty Model
+            new("Brand", "Model", (EngineType)999, null, null, null, null), // Invalid EngineType
+            new("Brand", "Model", EngineType.Fuel, 1800, null, null, null), // Year too early
+            new("Brand", "Model", EngineType.Fuel, 3000, null, null, null), // Year too late
+            new("Brand", "Model", EngineType.Fuel, 2020, (VehicleType)999, null, null), // Invalid VehicleType
+            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 16), null), // VIN too short
+            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 18), null), // VIN too long
         };
 
         foreach (var command in invalidCreateCommands)
@@ -285,25 +284,25 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
 
-        var createCommand = new CreateVehicleCommand("ValidBrand", "ValidModel", EngineType.Fuel, []);
+        var createCommand = new VehicleCreateRequest("ValidBrand", "ValidModel", EngineType.Fuel, null, null, null, null);
         var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
-        
+
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         createResponse.Content.ShouldNotBeNull();
-        
+
         var result = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         result.ShouldNotBeNull();
-        
-        var invalidUpdateCommands = new List<UpdateVehicleRequest>
+
+        var invalidUpdateCommands = new List<VehicleUpdateRequest>
         {
-            new("", "Model", EngineType.Fuel), // Empty Brand
-            new("Brand", "", EngineType.Fuel), // Empty Model
-            new("Brand", "Model", (EngineType)999), // Invalid EngineType
-            new("Brand", "Model", EngineType.Fuel, 1800), // Year too early
-            new("Brand", "Model", EngineType.Fuel, 3000), // Year too late
-            new("Brand", "Model", EngineType.Fuel, 2020, (VehicleType)999), // Invalid VehicleType
-            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 16)), // VIN too short
-            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 18)), // VIN too long
+            new("", "Model", EngineType.Fuel, null, null, null, null), // Empty Brand
+            new("Brand", "", EngineType.Fuel, null, null, null, null), // Empty Model
+            new("Brand", "Model", (EngineType)999, null, null, null, null), // Invalid EngineType
+            new("Brand", "Model", EngineType.Fuel, 1800, null, null, null), // Year too early
+            new("Brand", "Model", EngineType.Fuel, 3000, null, null, null), // Year too late
+            new("Brand", "Model", EngineType.Fuel, 2020, (VehicleType)999, null, null), // Invalid VehicleType
+            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 16), null), // VIN too short
+            new("Brand", "Model", EngineType.Fuel, 2020, VehicleType.Car, new string('A', 18), null), // VIN too long
         };
 
         foreach (var command in invalidUpdateCommands)
@@ -318,15 +317,156 @@ public class VehicleFlowTests : BaseIntegrationTest
     {
         await CreateAndAuthenticateUser();
         var nonExistentVehicleId = Guid.NewGuid();
-        
+
         var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, nonExistentVehicleId));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        
-        var updateRequest = new UpdateVehicleRequest("Brand", "Model", EngineType.Fuel);
+
+        var updateRequest = new VehicleUpdateRequest("Brand", "Model", EngineType.Fuel, null, null, null, null);
         var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, nonExistentVehicleId), updateRequest);
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-        
+
         var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Vehicles.DeleteById, nonExistentVehicleId));
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    private readonly VehicleCreateRequest _vehicleCreateDefaultRequest =
+        new("Toyota", "Corolla", EngineType.Fuel, null, null, null, null);
+
+    [Fact]
+    public async Task EngineChangesFlow_NoEnergyEntriesExists_ShouldUpdateEngineSuccessfully()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, _vehicleCreateDefaultRequest);
+
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldBeEmpty();
+
+        // Update Vehicle EngineType to Electric
+        var updateRequest = new VehicleUpdateRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric,
+            null,
+            null,
+            null,
+            null);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        updatedVehicleDto.ShouldNotBeNull();
+        updatedVehicleDto.EngineType.ShouldBe(EngineType.Electric);
+    }
+
+    [Fact]
+    public async Task EngineChangesFlow_AllowedEnergyTypesDefinedButNoEnergyEntriesExists_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+        var createVehicleRequest = new VehicleCreateRequest("Toyota", "Corolla", EngineType.Fuel, null, null, null, [EnergyType.Gasoline]);
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+
+        // Update Vehicle EngineType to Electric
+        var updateRequest = new VehicleUpdateRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric,
+            null,
+            null,
+            null,
+            [EnergyType.Electric]);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        updatedVehicleDto.ShouldNotBeNull();
+        updatedVehicleDto.EngineType.ShouldBe(EngineType.Electric);
+    }
+
+    [Fact]
+    public async Task EngineChangesFlow_EnergyEntriesExists_ShouldReturnConflict()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+        var createVehicleRequest = new VehicleCreateRequest("Toyota", "Corolla", EngineType.Fuel, null, null, null, [EnergyType.Gasoline]);
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+
+        // Add an Energy Entry
+        var createEnergyEntryRequest = new CreateEnergyEntryRequest(
+            new DateOnly(2020, 05, 16),
+            500,
+            EnergyType.Gasoline,
+            EnergyUnit.Liter,
+            20,
+            null,
+            null);
+
+        var createEnergyEntryResponse =
+            await Client.PostAsJsonAsync(string.Format(ApiV1Definition.EnergyEntries.Create, vehicleDtoFromGet.Id), createEnergyEntryRequest);
+        createEnergyEntryResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+
+        // Try to update Vehicle EngineType to Electric
+        var updateRequest = new VehicleUpdateRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric,
+            null,
+            null,
+            null,
+            [EnergyType.Electric]);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        
+        // Vehicle EngineType should remain unchanged
+        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoAfterUpdate = await getAfterUpdateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoAfterUpdate.ShouldNotBeNull();
+        vehicleDtoAfterUpdate.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoAfterUpdate.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
     }
 }

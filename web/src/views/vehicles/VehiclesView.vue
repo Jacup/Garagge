@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { VehicleDto, CreateVehicleCommand, UpdateVehicleRequest } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 
 // API Error Response interface
@@ -141,15 +141,15 @@ function openAddVehicleDialog() {
   showVehicleDialog.value = true
 }
 
-async function saveVehicle(vehicleData: CreateVehicleCommand | UpdateVehicleRequest) {
+async function saveVehicle(vehicleData: VehicleCreateRequest | VehicleUpdateRequest) {
   savingVehicle.value = true
   try {
     if (editingVehicle.value) {
       // Update existing vehicle
-      await putApiVehiclesId(editingVehicle.value.id!, vehicleData as UpdateVehicleRequest)
+      await putApiVehiclesId(editingVehicle.value.id!, vehicleData as VehicleUpdateRequest)
     } else {
       // Create new vehicle
-      await postApiVehicles(vehicleData as CreateVehicleCommand)
+      await postApiVehicles(vehicleData as VehicleCreateRequest)
     }
     showVehicleDialog.value = false
     editingVehicle.value = null

@@ -5,8 +5,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  UpdateMeRequest,
-  UserDto
+  UserDto,
+  UserUpdateMeRequest
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -39,12 +39,12 @@ const getApiUsersUserId = (
       );
     }
   const putApiUsersMe = (
-    updateMeRequest: UpdateMeRequest,
+    userUpdateMeRequest: UserUpdateMeRequest,
  ) => {
       return axiosInstance<UserDto>(
       {url: `/api/users/me`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: updateMeRequest
+      data: userUpdateMeRequest
     },
       );
     }

@@ -1,8 +1,8 @@
-﻿using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts.V1;
+using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth.Login;
 using Application.Users;
-using Application.Users.Me.Update;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -154,7 +154,7 @@ public class UserFlowTests : BaseIntegrationTest
         const string newEmail = "jane.smith@garagge.app";
 
         // Act
-        var updateRequest = new UpdateMeCommand(newEmail, newFirstName, newLastName);
+        var updateRequest = new UserUpdateMeRequest(newEmail, newFirstName, newLastName);
         var updateResponse = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         // Assert
@@ -191,7 +191,7 @@ public class UserFlowTests : BaseIntegrationTest
         const string newFirstName = "UpdatedFirst";
 
         // Act - Update with the same email but different name
-        var updateRequest = new UpdateMeCommand(UserEmail, newFirstName, LastName);
+        var updateRequest = new UserUpdateMeRequest(UserEmail, newFirstName, LastName);
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         // Assert
@@ -212,7 +212,7 @@ public class UserFlowTests : BaseIntegrationTest
     public async Task UpdateProfile_Unauthorized_ShouldReturn401()
     {
         // Arrange
-        var updateRequest = new UpdateMeCommand("test@garagge.app", "Test", "User");
+        var updateRequest = new UserUpdateMeRequest("test@garagge.app", "Test", "User");
 
         // Act
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
@@ -226,7 +226,7 @@ public class UserFlowTests : BaseIntegrationTest
     {
         // Arrange
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
-        var updateRequest = new UpdateMeCommand("invalid-email", FirstName, LastName);
+        var updateRequest = new UserUpdateMeRequest("invalid-email", FirstName, LastName);
 
         // Act
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
@@ -248,7 +248,7 @@ public class UserFlowTests : BaseIntegrationTest
     {
         // Arrange
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
-        var updateRequest = new UpdateMeCommand(UserEmail, "", LastName);
+        var updateRequest = new UserUpdateMeRequest(UserEmail, "", LastName);
 
         // Act
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
@@ -262,7 +262,7 @@ public class UserFlowTests : BaseIntegrationTest
     {
         // Arrange
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
-        var updateRequest = new UpdateMeCommand(UserEmail, FirstName, "");
+        var updateRequest = new UserUpdateMeRequest(UserEmail, FirstName, "");
 
         // Act
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
@@ -280,7 +280,7 @@ public class UserFlowTests : BaseIntegrationTest
         await RegisterAndAuthenticateUser("user2@garagge.app", "User", "Two", UserPassword);
 
         // Act - Try to update user2's email to user1's email
-        var updateRequest = new UpdateMeCommand("user1@garagge.app", "User", "Two");
+        var updateRequest = new UserUpdateMeRequest("user1@garagge.app", "User", "Two");
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         // Assert
@@ -294,7 +294,7 @@ public class UserFlowTests : BaseIntegrationTest
         await RegisterUser(UserEmail, FirstName, LastName, UserPassword);
 
         // Act
-        var updateRequest = new UpdateMeCommand("new@garagge.app", "New", "User");
+        var updateRequest = new UserUpdateMeRequest("new@garagge.app", "New", "User");
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         // Assert
@@ -310,7 +310,7 @@ public class UserFlowTests : BaseIntegrationTest
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Act
-        var updateRequest = new UpdateMeCommand("new@garagge.app", "New", "User");
+        var updateRequest = new UserUpdateMeRequest("new@garagge.app", "New", "User");
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);
 
         // Assert
@@ -406,7 +406,7 @@ public class UserFlowTests : BaseIntegrationTest
     {
         // Arrange
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
-        var updateRequest = new UpdateMeCommand(email, firstName, lastName);
+        var updateRequest = new UserUpdateMeRequest(email, firstName, lastName);
 
         // Act
         var response = await Client.PutAsJsonAsync(ApiV1Definition.Users.UpdateMe, updateRequest);

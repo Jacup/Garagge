@@ -1,7 +1,7 @@
-﻿using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts.V1;
+using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
 using Application.Auth.Login;
-using Application.Auth.Register;
 using Domain.Entities.Users;
 using Infrastructure.DAL;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,7 +80,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
     
     protected async Task RegisterUser(string userEmail, string firstName, string lastName, string userPassword)
     {
-        var registerRequest = new RegisterUserCommand(userEmail, firstName, lastName, userPassword);
+        var registerRequest = new AuthRegisterRequest(userEmail, userPassword, firstName, lastName);
         var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
 
         registerResponse.EnsureSuccessStatusCode();
@@ -88,7 +88,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
     protected async Task<LoginUserResponse> LoginUser(string userEmail, string userPassword)
     {
-        var loginRequest = new LoginUserCommand(userEmail, userPassword);
+        var loginRequest = new AuthLoginRequest(userEmail, userPassword);
         var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
 
         loginResponse.EnsureSuccessStatusCode();

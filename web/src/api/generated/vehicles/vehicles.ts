@@ -5,11 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  CreateVehicleCommand,
   GetApiVehiclesParams,
   PagedListOfVehicleDto,
-  UpdateVehicleRequest,
-  VehicleDto
+  VehicleCreateRequest,
+  VehicleDto,
+  VehicleUpdateRequest
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -18,12 +18,12 @@ import { axiosInstance } from '../../axios-instance';
 
   export const getVehicles = () => {
 const postApiVehicles = (
-    createVehicleCommand: CreateVehicleCommand,
+    vehicleCreateRequest: VehicleCreateRequest,
  ) => {
       return axiosInstance<VehicleDto>(
       {url: `/api/vehicles`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: createVehicleCommand
+      data: vehicleCreateRequest
     },
       );
     }
@@ -54,12 +54,12 @@ const postApiVehicles = (
     }
   const putApiVehiclesId = (
     id: string,
-    updateVehicleRequest: UpdateVehicleRequest,
+    vehicleUpdateRequest: VehicleUpdateRequest,
  ) => {
       return axiosInstance<VehicleDto>(
       {url: `/api/vehicles/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: updateVehicleRequest
+      data: vehicleUpdateRequest
     },
       );
     }

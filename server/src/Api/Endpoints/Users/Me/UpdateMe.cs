@@ -3,9 +3,7 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Users;
 using Application.Users.Me.Update;
-using Infrastructure.Authentication;
 using MediatR;
-using System.Security.Claims;
 
 namespace Api.Endpoints.Users.Me;
 
@@ -13,7 +11,7 @@ internal sealed class UpdateMe : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("users/me", async (UpdateMeRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPut("users/me", async (UserUpdateMeRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new UpdateMeCommand(request.Email, request.FirstName, request.LastName);
                 
@@ -29,4 +27,4 @@ internal sealed class UpdateMe : IEndpoint
     }
 }
 
-internal sealed record UpdateMeRequest(string FirstName, string LastName, string Email);
+internal sealed record UserUpdateMeRequest(string Email, string FirstName, string LastName);

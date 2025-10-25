@@ -6,10 +6,11 @@ import FileUploadCard from '@/components/vehicles/FileUploadCard.vue'
 
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import {
-  type CreateVehicleCommand,
-  type UpdateVehicleRequest,
+  type VehicleCreateRequest,
+  type VehicleUpdateRequest,
   type VehicleDto,
   EngineType,
+  NullableOfVehicleType,
 } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
@@ -19,22 +20,24 @@ const { getApiVehiclesId, postApiVehicles, putApiVehiclesId } = getVehicles()
 const vehicleId = route.params.id as string
 const isEditMode = !!vehicleId
 
-const createVehicle = reactive<CreateVehicleCommand>({
+const createVehicle = reactive<VehicleCreateRequest>({
   brand: '',
   model: '',
   engineType: EngineType.Fuel, // Default to first option
   manufacturedYear: null,
-  type: undefined,
+  type: NullableOfVehicleType.null,
   vin: null,
+  energyTypes: null,
 })
 
-const editVehicle = reactive<UpdateVehicleRequest>({
+const editVehicle = reactive<VehicleUpdateRequest>({
   brand: '',
   model: '',
   engineType: EngineType.Fuel,
   manufacturedYear: null,
-  type: undefined,
+  type: NullableOfVehicleType.null,
   vin: null,
+  energyTypes: null,
 })
 
 // Use the appropriate vehicle object based on mode

@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, reactive, watch, nextTick } from 'vue'
 import type {
-  CreateVehicleCommand,
-  UpdateVehicleRequest,
+  VehicleCreateRequest,
+  VehicleUpdateRequest,
   VehicleDto,
   EngineType,
   EnergyType,
-  NullableOfVehicleType2,
+  NullableOfVehicleType,
 } from '@/api/generated/apiV1.schemas'
 import {
   EngineType as EngineTypeEnum,
   EnergyType as EnergyTypeEnum,
-  NullableOfVehicleType2 as VehicleTypeEnum,
+  NullableOfVehicleType as VehicleTypeEnum,
 } from '@/api/generated/apiV1.schemas'
 import { getVehicleEnergyTypes } from '@/api/generated/vehicle-energy-types/vehicle-energy-types'
 
@@ -38,7 +38,7 @@ interface Props {
 
 interface Emits {
   (e: 'update:isOpen', value: boolean): void
-  (e: 'save', vehicle: CreateVehicleCommand | UpdateVehicleRequest): void
+  (e: 'save', vehicle: VehicleCreateRequest | VehicleUpdateRequest): void
   (e: 'error', error: ApiErrorResponse): void
 }
 
@@ -65,7 +65,7 @@ interface VehicleFormData {
   model: string
   engineType: EngineType | null
   manufacturedYear: number | null
-  type: NullableOfVehicleType2 | undefined
+  type: NullableOfVehicleType | null
   vin: string | null
   energyTypes: EnergyType[]
 }
@@ -75,7 +75,7 @@ const formData = reactive<VehicleFormData>({
   model: '',
   engineType: null,
   manufacturedYear: null,
-  type: undefined,
+  type: null,
   vin: null,
   energyTypes: [],
 })
@@ -112,7 +112,7 @@ const ENGINE_TYPE_LABELS: Record<EngineType, string> = {
   [EngineTypeEnum.Hydrogen]: 'Hydrogen',
 }
 
-const VEHICLE_TYPE_LABELS: Record<NullableOfVehicleType2, string> = {
+const VEHICLE_TYPE_LABELS: Record<string, string> = {
   [VehicleTypeEnum.Bus]: 'Bus',
   [VehicleTypeEnum.Car]: 'Car',
   [VehicleTypeEnum.Motorbike]: 'Motorbike',
@@ -126,8 +126,8 @@ const engineTypeOptions: { label: string; value: EngineType }[] = Object.entries
   value: value as EngineType,
 }))
 
-const vehicleTypeOptions: { label: string; value: NullableOfVehicleType2 }[] = Object.entries(VEHICLE_TYPE_LABELS)
-  .map(([value, label]) => ({ label, value: value as NullableOfVehicleType2 }))
+const vehicleTypeOptions: { label: string; value: NullableOfVehicleType }[] = Object.entries(VEHICLE_TYPE_LABELS)
+  .map(([value, label]) => ({ label, value: value as NullableOfVehicleType }))
 
 async function fetchSupportedEnergyTypes(engineType: EngineType) {
   try {
@@ -238,9 +238,9 @@ function transformFormDataToApiFormat(formData: VehicleFormData) {
     model: formData.model,
     engineType: formData.engineType,
     manufacturedYear: formData.manufacturedYear,
-    type: formData.type,
+    type: formData.type ?? VehicleTypeEnum.null,
     vin: formData.vin,
-    energyTypes: formData.energyTypes,
+    energyTypes: formData.energyTypes.length > 0 ? formData.energyTypes : null,
   }
 }
 

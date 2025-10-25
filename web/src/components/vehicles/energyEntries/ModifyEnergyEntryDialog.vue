@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import type { EnergyEntryDto, CreateEnergyEntryRequest, UpdateEnergyEntryRequest } from '@/api/generated/apiV1.schemas'
+import type { EnergyEntryDto, EnergyEntryCreateRequest, EnergyEntryUpdateRequest } from '@/api/generated/apiV1.schemas'
 import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
@@ -187,7 +187,7 @@ async function handleSave() {
   try {
     if (isEditMode.value && props.entry?.id) {
       // Update existing entry
-      const updateCommand: UpdateEnergyEntryRequest = {
+      const updateCommand: EnergyEntryUpdateRequest = {
         date: form.value.date,
         mileage: form.value.mileage,
         type: form.value.type,
@@ -199,7 +199,7 @@ async function handleSave() {
       await putApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, props.entry.id, updateCommand)
     } else {
       // Create new entry
-      const createCommand: CreateEnergyEntryRequest = {
+      const createCommand: EnergyEntryCreateRequest = {
         date: form.value.date,
         mileage: form.value.mileage,
         type: form.value.type,

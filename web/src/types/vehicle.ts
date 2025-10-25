@@ -1,10 +1,11 @@
-import type { CreateVehicleCommand, EngineType, NullableOfVehicleType2 } from '@/api/generated/apiV1.schemas'
+import type { VehicleCreateRequest, EngineType, NullableOfVehicleType, EnergyType } from '@/api/generated/apiV1.schemas'
 
-export interface Vehicle extends CreateVehicleCommand {
+export interface Vehicle extends VehicleCreateRequest {
   brand: string
   model: string
   engineType: EngineType
-  manufacturedYear?: number | null
-  type?: NullableOfVehicleType2
-  vin?: string | null
+  manufacturedYear: number | null
+  type: NullableOfVehicleType
+  vin: string | null
+  energyTypes: EnergyType[] | null
 }

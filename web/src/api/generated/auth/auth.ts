@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  ChangePasswordRequest,
-  LoginUserCommand,
-  LoginUserResponse,
-  RegisterUserCommand
+  AuthChangePasswordRequest,
+  AuthLoginRequest,
+  AuthRegisterRequest,
+  LoginUserResponse
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -17,32 +17,32 @@ import { axiosInstance } from '../../axios-instance';
 
   export const getAuth = () => {
 const putApiAuthChangePassword = (
-    changePasswordRequest: ChangePasswordRequest,
+    authChangePasswordRequest: AuthChangePasswordRequest,
  ) => {
       return axiosInstance<unknown>(
       {url: `/api/auth/change-password`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: changePasswordRequest
+      data: authChangePasswordRequest
     },
       );
     }
   const postApiAuthLogin = (
-    loginUserCommand: LoginUserCommand,
+    authLoginRequest: AuthLoginRequest,
  ) => {
       return axiosInstance<LoginUserResponse>(
       {url: `/api/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: loginUserCommand
+      data: authLoginRequest
     },
       );
     }
   const postApiAuthRegister = (
-    registerUserCommand: RegisterUserCommand,
+    authRegisterRequest: AuthRegisterRequest,
  ) => {
       return axiosInstance<string>(
       {url: `/api/auth/register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: registerUserCommand
+      data: authRegisterRequest
     },
       );
     }
