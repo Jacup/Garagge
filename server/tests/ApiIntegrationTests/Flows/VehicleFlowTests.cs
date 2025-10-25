@@ -328,4 +328,136 @@ public class VehicleFlowTests : BaseIntegrationTest
         var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Vehicles.DeleteById, nonExistentVehicleId));
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
+
+    private readonly CreateVehicleRequest _createDefaultVehicleRequest =
+        new("Toyota", "Corolla", EngineType.Fuel);
+
+    [Fact]
+    public async Task EngineChangesFlow_NoEnergyEntriesExists_ShouldUpdateEngineSuccessfully()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, _createDefaultVehicleRequest);
+
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldBeEmpty();
+
+        // Update Vehicle EngineType to Electric
+        var updateRequest = new UpdateVehicleRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        updatedVehicleDto.ShouldNotBeNull();
+        updatedVehicleDto.EngineType.ShouldBe(EngineType.Electric);
+    }
+
+    [Fact]
+    public async Task EngineChangesFlow_AllowedEnergyTypesDefinedButNoEnergyEntriesExists_ShouldUpdateSuccessfully()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+        var createVehicleRequest = _createDefaultVehicleRequest with { EnergyTypes = [EnergyType.Gasoline] };
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+
+        // Update Vehicle EngineType to Electric
+        var updateRequest = new UpdateVehicleRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric,
+            EnergyTypes: [EnergyType.Electric]);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        updatedVehicleDto.ShouldNotBeNull();
+        updatedVehicleDto.EngineType.ShouldBe(EngineType.Electric);
+    }
+
+    [Fact]
+    public async Task EngineChangesFlow_EnergyEntriesExists_ShouldReturnConflict()
+    {
+        // Arrange
+        await CreateAndAuthenticateUser();
+        var createVehicleRequest = _createDefaultVehicleRequest with { EnergyTypes = [EnergyType.Gasoline] };
+
+        // Create a Vehicle with Fuel EngineType and no EnergyTypes
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+
+        var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        vehicleDtoFromCreate.ShouldNotBeNull();
+
+        // Get Vehicle to verify initial state
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoFromGet.ShouldNotBeNull();
+        vehicleDtoFromGet.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoFromGet.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+
+        // Add an Energy Entry
+        var createEnergyEntryRequest = new CreateEnergyEntryRequest(
+            new DateOnly(2020, 05, 16),
+            500,
+            EnergyType.Gasoline,
+            EnergyUnit.Liter,
+            20,
+            null,
+            null);
+
+        var createEnergyEntryResponse =
+            await Client.PostAsJsonAsync(string.Format(ApiV1Definition.EnergyEntries.Create, vehicleDtoFromGet.Id), createEnergyEntryRequest);
+        createEnergyEntryResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
+        
+
+        // Try to update Vehicle EngineType to Electric
+        var updateRequest = new UpdateVehicleRequest(
+            vehicleDtoFromGet.Brand,
+            vehicleDtoFromGet.Model,
+            EngineType.Electric,
+            EnergyTypes: [EnergyType.Electric]);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+
+        updateResponse.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        
+        // Vehicle EngineType should remain unchanged
+        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+
+        var vehicleDtoAfterUpdate = await getAfterUpdateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
+        vehicleDtoAfterUpdate.ShouldNotBeNull();
+        vehicleDtoAfterUpdate.EngineType.ShouldBe(EngineType.Fuel);
+        vehicleDtoAfterUpdate.AllowedEnergyTypes.ShouldContain(EnergyType.Gasoline);
+    }
 }
