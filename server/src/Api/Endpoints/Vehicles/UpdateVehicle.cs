@@ -14,7 +14,7 @@ internal sealed class UpdateVehicle : IEndpoint
     {
         app.MapPut(
                 "vehicles/{id:guid}",
-                async (Guid id, UpdateVehicleRequest request, ISender sender, CancellationToken cancellationToken) =>
+                async (Guid id, VehicleUpdateRequest request, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new UpdateVehicleCommand
                     (
@@ -41,11 +41,12 @@ internal sealed class UpdateVehicle : IEndpoint
     }
 }
 
-internal sealed record UpdateVehicleRequest(
+internal sealed record VehicleUpdateRequest(
     string Brand,
     string Model,
     EngineType EngineType,
-    int? ManufacturedYear = null,
-    VehicleType? Type = null,
-    string? VIN = null,
-    IEnumerable<EnergyType>? EnergyTypes = null);
+    int? ManufacturedYear,
+    VehicleType? Type,
+    string? VIN,
+    IEnumerable<EnergyType>? EnergyTypes);
+

@@ -10,7 +10,7 @@ internal sealed class Register : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/register", async (RegisterRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPost("auth/register", async (AuthRegisterRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new RegisterUserCommand(request.Email, request.FirstName, request.LastName, request.Password);
 
@@ -26,4 +26,4 @@ internal sealed class Register : IEndpoint
     }
 }
 
-internal sealed record RegisterRequest(string Email, string Password, string FirstName, string LastName);
+internal sealed record AuthRegisterRequest(string Email, string Password, string FirstName, string LastName);

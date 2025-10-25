@@ -11,7 +11,7 @@ internal sealed class UpdateMe : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("users/me", async (UpdateMeRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPut("users/me", async (UserUpdateMeRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new UpdateMeCommand(request.Email, request.FirstName, request.LastName);
                 
@@ -27,4 +27,4 @@ internal sealed class UpdateMe : IEndpoint
     }
 }
 
-internal sealed record UpdateMeRequest(string Email, string FirstName, string LastName);
+internal sealed record UserUpdateMeRequest(string Email, string FirstName, string LastName);

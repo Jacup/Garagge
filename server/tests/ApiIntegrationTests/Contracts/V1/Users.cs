@@ -1,3 +1,3 @@
 ﻿namespace ApiIntegrationTests.Contracts.V1;
 
-internal sealed record UpdateMeRequest(string Email, string FirstName, string LastName);
+internal sealed record UserUpdateMeRequest(string Email, string FirstName, string LastName);

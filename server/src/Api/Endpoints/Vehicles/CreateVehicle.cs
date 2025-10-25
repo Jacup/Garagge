@@ -14,7 +14,7 @@ internal sealed class CreateVehicle : IEndpoint
     {
         app.MapPost(
                 "vehicles",
-                async (CreateVehicleRequest request, ISender sender, CancellationToken cancellationToken) =>
+                async (VehicleCreateRequest request, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new CreateVehicleCommand
                     (
@@ -43,11 +43,12 @@ internal sealed class CreateVehicle : IEndpoint
     }
 }
 
-internal sealed record CreateVehicleRequest(
+internal sealed record VehicleCreateRequest(
     string Brand,
     string Model,
     EngineType EngineType,
-    int? ManufacturedYear = null,
-    VehicleType? Type = null,
-    string? VIN = null,
-    IEnumerable<EnergyType>? EnergyTypes = null);
+    int? ManufacturedYear,
+    VehicleType? Type,
+    string? VIN,
+    IEnumerable<EnergyType>? EnergyTypes);
+

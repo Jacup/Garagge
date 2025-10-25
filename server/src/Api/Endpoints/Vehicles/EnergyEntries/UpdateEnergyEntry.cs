@@ -15,7 +15,7 @@ internal sealed class UpdateEnergyEntry : IEndpoint
     {
         app.MapPut(
                 "vehicles/{vehicleId:guid}/energy-entries/{id:guid}",
-                async (UpdateEnergyEntryRequest request, Guid vehicleId, Guid id, ISender sender, CancellationToken cancellationToken) =>
+                async (EnergyEntryUpdateRequest request, Guid vehicleId, Guid id, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new UpdateEnergyEntryCommand(
                         vehicleId,
@@ -45,7 +45,7 @@ internal sealed class UpdateEnergyEntry : IEndpoint
     }
 }
 
-internal sealed record UpdateEnergyEntryRequest(
+internal sealed record EnergyEntryUpdateRequest(
         DateOnly Date,
         int Mileage,
         EnergyType Type,

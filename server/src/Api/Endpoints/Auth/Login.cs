@@ -10,7 +10,7 @@ internal sealed class Login : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/login", async (LoginRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPost("auth/login", async (AuthLoginRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new LoginUserCommand(request.Email, request.Password);
 
@@ -25,4 +25,4 @@ internal sealed class Login : IEndpoint
     }
 }
 
-internal sealed record LoginRequest(string Email, string Password);
+internal sealed record AuthLoginRequest(string Email, string Password);

@@ -15,7 +15,7 @@ internal sealed class CreateEnergyEntry : IEndpoint
     {
         app.MapPost(
                 "vehicles/{vehicleId:guid}/energy-entries",
-                async (CreateEnergyEntryRequest request, Guid vehicleId, ISender sender, CancellationToken cancellationToken) =>
+                async (EnergyEntryCreateRequest request, Guid vehicleId, ISender sender, CancellationToken cancellationToken) =>
                 {
                     var command = new CreateEnergyEntryCommand(
                         vehicleId,
@@ -44,7 +44,7 @@ internal sealed class CreateEnergyEntry : IEndpoint
     }
 }
 
-internal sealed record CreateEnergyEntryRequest(
+internal sealed record EnergyEntryCreateRequest(
         DateOnly Date,
         int Mileage,
         EnergyType Type,
