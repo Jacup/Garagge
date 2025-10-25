@@ -3,6 +3,7 @@ using Application.Abstractions.Services;
 using Application.Behaviors;
 using Application.Core;
 using Application.Services;
+using Application.Services.EnergyStats;
 using FluentValidation;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<IVehicleEngineCompatibilityService, VehicleEngineCompatibilityService>();
         services.AddScoped<IVehicleUpdateValidationService, VehicleUpdateValidationService>();
         services.AddScoped<IEnergyEntryFilterService, EnergyEntryFilterService>();
+        services.AddScoped<IEnergyStatsService, EnergyStatsService>();
         services.AddScoped<IEnergyEntryMileageValidator, EnergyEntryMileageValidator>();
 
         services.AddMediatR(config =>
