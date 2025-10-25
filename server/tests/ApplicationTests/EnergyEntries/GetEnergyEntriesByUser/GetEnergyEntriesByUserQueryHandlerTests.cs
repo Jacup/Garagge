@@ -2,7 +2,6 @@
 using Application.EnergyEntries.GetByUser;
 using Application.Services;
 using Domain.Entities.EnergyEntries;
-using Domain.Entities.Vehicles;
 using Domain.Enums;
 
 namespace ApplicationTests.EnergyEntries.GetEnergyEntriesByUser;
@@ -207,34 +206,6 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         returnedTypes.ShouldContain(EnergyType.Gasoline);
         returnedTypes.ShouldContain(EnergyType.Diesel);
         returnedTypes.ShouldNotContain(EnergyType.Electric);
-    }
-
-    private async Task<Vehicle> CreateVehicleInDb(EnergyType[] supportedEnergyTypes, Guid? userId = null)
-    {
-        var vehicle = new Vehicle
-        {
-            Id = Guid.NewGuid(),
-            Brand = "Toyota",
-            Model = "Corolla",
-            EngineType = EngineType.Fuel,
-            ManufacturedYear = 2020,
-            Type = VehicleType.Car,
-            UserId = userId ?? AuthorizedUserId,
-        };
-
-        foreach (var energyType in supportedEnergyTypes)
-        {
-            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
-            {
-                Id = Guid.NewGuid(),
-                VehicleId = vehicle.Id,
-                EnergyType = energyType
-            });
-        }
-
-        Context.Vehicles.Add(vehicle);
-        await Context.SaveChangesAsync();
-        return vehicle;
     }
 
     private async Task<EnergyEntry> CreateEnergyEntryInDb(Guid vehicleId, EnergyType energyType, DateOnly date, int mileage)
