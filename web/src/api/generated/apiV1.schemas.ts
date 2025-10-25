@@ -4,12 +4,24 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-export interface ChangePasswordRequest {
+export interface AuthChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
 }
 
-export interface CreateEnergyEntryRequest {
+export interface AuthLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AuthRegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface EnergyEntryCreateRequest {
   date: string;
   mileage: number;
   type: EnergyType;
@@ -21,28 +33,23 @@ export interface CreateEnergyEntryRequest {
   pricePerUnit: number | null;
 }
 
-export interface CreateVehicleCommand {
-  brand: string;
-  model: string;
-  engineType: EngineType;
-  /** @nullable */
-  manufacturedYear?: number | null;
-  type?: NullableOfVehicleType2;
-  /** @nullable */
-  vin?: string | null;
-  /** @nullable */
-  energyTypes?: EnergyType[] | null;
-}
-
-export interface CreateVehicleEnergyTypeRequest {
-  type: EnergyType;
-}
-
 export interface EnergyEntryDto {
   id: string;
   vehicleId: string;
   createdDate: string;
   updatedDate: string;
+  date: string;
+  mileage: number;
+  type: EnergyType;
+  energyUnit: EnergyUnit;
+  volume: number;
+  /** @nullable */
+  cost: number | null;
+  /** @nullable */
+  pricePerUnit: number | null;
+}
+
+export interface EnergyEntryUpdateRequest {
   date: string;
   mileage: number;
   type: EnergyType;
@@ -80,11 +87,6 @@ export enum EngineType {
   Hydrogen= 'Hydrogen',
 
 }
-export interface LoginUserCommand {
-  email: string;
-  password: string;
-}
-
 export interface LoginUserResponse {
   accessToken: string;
 }
@@ -93,80 +95,29 @@ export interface LoginUserResponse {
  * @nullable
  */
 export enum NullableOfVehicleType {
-  Bus = 'Bus',
-  Car = 'Car',
-  Motorbike = 'Motorbike',
-  Truck = 'Truck',
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+  null= null,
+
 }
-
-export type NullableVehicleType = NullableOfVehicleType | null;
-
-/**
- * @nullable
- */
-export enum NullableOfVehicleType2 {
-  Bus = 'Bus',
-  Car = 'Car',
-  Motorbike = 'Motorbike',
-  Truck = 'Truck',
-}
-
-export type NullableVehicleType2 = NullableOfVehicleType2 | null;
-
 export interface PagedListOfEnergyEntryDto {
-  /** @nullable */
-  items?: EnergyEntryDto[] | null;
-  page?: number;
-  pageSize?: number;
-  totalCount?: number;
+  items: EnergyEntryDto[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
   hasNextPage?: boolean;
   hasPreviousPage?: boolean;
 }
 
 export interface PagedListOfVehicleDto {
-  /** @nullable */
-  items?: VehicleDto[] | null;
-  page?: number;
-  pageSize?: number;
-  totalCount?: number;
+  items: VehicleDto[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
   hasNextPage?: boolean;
   hasPreviousPage?: boolean;
-}
-
-export interface RegisterUserCommand {
-  email: string;
-  firstName: string;
-  lastName: string;
-  password: string;
-}
-
-export interface UpdateEnergyEntryRequest {
-  date: string;
-  mileage: number;
-  type: EnergyType;
-  energyUnit: EnergyUnit;
-  volume: number;
-  /** @nullable */
-  cost: number | null;
-  /** @nullable */
-  pricePerUnit: number | null;
-}
-
-export interface UpdateMeRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
-export interface UpdateVehicleRequest {
-  brand: string;
-  model: string;
-  engineType: EngineType;
-  /** @nullable */
-  manufacturedYear?: number | null;
-  type?: NullableOfVehicleType2;
-  /** @nullable */
-  vin?: string | null;
 }
 
 export interface UserDto {
@@ -174,6 +125,25 @@ export interface UserDto {
   email: string;
   firstName: string;
   lastName: string;
+}
+
+export interface UserUpdateMeRequest {
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface VehicleCreateRequest {
+  brand: string;
+  model: string;
+  engineType: EngineType;
+  /** @nullable */
+  manufacturedYear: number | null;
+  type: NullableOfVehicleType;
+  /** @nullable */
+  vin: string | null;
+  /** @nullable */
+  energyTypes: EnergyType[] | null;
 }
 
 export interface VehicleDto {
@@ -192,12 +162,17 @@ export interface VehicleDto {
   allowedEnergyTypes?: EnergyType[];
 }
 
-export interface VehicleEnergyTypeDto {
-  id: string;
-  vehicleId: string;
-  createdDate?: string;
-  updatedDate?: string;
-  energyType: EnergyType;
+export interface VehicleUpdateRequest {
+  brand: string;
+  model: string;
+  engineType: EngineType;
+  /** @nullable */
+  manufacturedYear: number | null;
+  type: NullableOfVehicleType;
+  /** @nullable */
+  vin: string | null;
+  /** @nullable */
+  energyTypes: EnergyType[] | null;
 }
 
 export type GetApiVehiclesParams = {

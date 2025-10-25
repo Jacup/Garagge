@@ -5,12 +5,12 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  CreateEnergyEntryRequest,
+  EnergyEntryCreateRequest,
   EnergyEntryDto,
+  EnergyEntryUpdateRequest,
   GetApiUsersUserIdEnergyEntriesParams,
   GetApiVehiclesVehicleIdEnergyEntriesParams,
-  PagedListOfEnergyEntryDto,
-  UpdateEnergyEntryRequest
+  PagedListOfEnergyEntryDto
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -20,12 +20,12 @@ import { axiosInstance } from '../../axios-instance';
   export const getEnergyEntries = () => {
 const postApiVehiclesVehicleIdEnergyEntries = (
     vehicleId: string,
-    createEnergyEntryRequest: CreateEnergyEntryRequest,
+    energyEntryCreateRequest: EnergyEntryCreateRequest,
  ) => {
       return axiosInstance<EnergyEntryDto>(
       {url: `/api/vehicles/${vehicleId}/energy-entries`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: createEnergyEntryRequest
+      data: energyEntryCreateRequest
     },
       );
     }
@@ -51,12 +51,12 @@ const postApiVehiclesVehicleIdEnergyEntries = (
   const putApiVehiclesVehicleIdEnergyEntriesId = (
     vehicleId: string,
     id: string,
-    updateEnergyEntryRequest: UpdateEnergyEntryRequest,
+    energyEntryUpdateRequest: EnergyEntryUpdateRequest,
  ) => {
       return axiosInstance<EnergyEntryDto>(
       {url: `/api/vehicles/${vehicleId}/energy-entries/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: updateEnergyEntryRequest
+      data: energyEntryUpdateRequest
     },
       );
     }
