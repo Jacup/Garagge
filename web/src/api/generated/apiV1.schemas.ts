@@ -61,6 +61,13 @@ export interface EnergyEntryUpdateRequest {
   pricePerUnit: number | null;
 }
 
+export interface EnergyStatsDto {
+  vehicleId: string;
+  totalCost: number;
+  totalEntries: number;
+  energyUnitStats: EnergyUnitStats[];
+}
+
 export enum EnergyType {
   Gasoline= 'Gasoline',
   Diesel= 'Diesel',
@@ -79,6 +86,17 @@ export enum EnergyUnit {
   kWh= 'kWh',
 
 }
+export interface EnergyUnitStats {
+  unit?: EnergyUnit;
+  energyTypes?: EnergyType[];
+  entriesCount?: number;
+  totalVolume?: number;
+  totalCost?: number;
+  averageConsumption?: number;
+  averagePricePerUnit?: number;
+  averageCostPer100km?: number;
+}
+
 export enum EngineType {
   Fuel= 'Fuel',
   Hybrid= 'Hybrid',
@@ -94,16 +112,14 @@ export interface LoginUserResponse {
 /**
  * @nullable
  */
-export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export enum NullableOfVehicleType {
+  Bus= 'Bus',
+  Car= 'Car',
+  Motorbike= 'Motorbike',
+  Truck= 'Truck',
+  null= null,
 
-export const NullableOfVehicleType = {
-  Bus: 'Bus' as const,
-  Car: 'Car' as const,
-  Motorbike: 'Motorbike' as const,
-  Truck: 'Truck' as const,
-  null: null as null,
-};
-
+}
 export interface PagedListOfEnergyEntryDto {
   items: EnergyEntryDto[];
   page: number;
@@ -192,6 +208,10 @@ energyTypes?: EnergyType[];
 export type GetApiUsersUserIdEnergyEntriesParams = {
 page?: number;
 pageSize?: number;
+energyTypes?: EnergyType[];
+};
+
+export type GetApiVehiclesVehicleIdEnergyEntriesStatsParams = {
 energyTypes?: EnergyType[];
 };
 

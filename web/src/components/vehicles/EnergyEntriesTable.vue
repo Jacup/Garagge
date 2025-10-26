@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 // Define emits
 const emit = defineEmits<{
   'update:selected': [value: string[]]
+  'entry-changed': []
 }>()
 
 const { getApiVehiclesVehicleIdEnergyEntries, deleteApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
@@ -88,6 +89,7 @@ async function remove(id: string) {
   try {
     await deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, id)
     loadEnergyEntries()
+    emit('entry-changed')
   } catch (err) {
     console.error('Failed to delete energy entry:', err)
   }
@@ -100,6 +102,7 @@ async function removeMultiple(ids: string[]) {
     // Clear selection after successful delete
     selectedItems.value = []
     loadEnergyEntries()
+    emit('entry-changed')
   } catch (err) {
     console.error('Failed to delete energy entries:', err)
   }
@@ -136,6 +139,7 @@ function closeEditDialog() {
 function handleEntrySaved() {
   closeEditDialog()
   loadEnergyEntries()
+  emit('entry-changed')
 }
 
 function handlePageUpdate(page: number) {

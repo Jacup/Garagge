@@ -3,16 +3,17 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
 import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
+import EnergyStatisticsCard from '@/components/vehicles/EnergyStatisticsCard.vue'
 
 const route = useRoute()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
-const { getApiVehiclesVehicleIdEnergyEntries } = getEnergyEntries()
+const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 
 // Vehicle data
 const vehicleId = computed(() => route.params.id as string)
@@ -23,6 +24,40 @@ const error = ref<string | null>(null)
 // Energy entries for timeline
 const energyEntries = ref<EnergyEntryDto[]>([])
 const timelineLoading = ref(false)
+
+const energystats = ref<EnergyStatsDto | null>(null)
+const statsLoading = ref(false)
+
+// Global stats for summary cards (always unfiltered)
+const globalStats = ref<EnergyStatsDto | null>(null)
+
+// Computed: Get unit label with proper formatting (used in summary cards)
+const getUnitLabel = (unit: string | undefined): string => {
+  if (!unit) return ''
+  switch (unit) {
+    case 'Liter': return 'L'
+    case 'Gallon': return 'gal'
+    case 'CubicMeter': return 'm³'
+    case 'kWh': return 'kWh'
+    default: return unit
+  }
+}
+
+// Computed: Summary card stats (aggregated from first unit or totals)
+const summaryStats = computed(() => {
+  if (!globalStats.value) return null
+
+  const firstUnit = globalStats.value.energyUnitStats[0]
+  return {
+    totalEntries: globalStats.value.totalEntries,
+    totalCost: globalStats.value.totalCost,
+    // Use first unit's volume and consumption, or 0 if none
+    totalVolume: firstUnit?.totalVolume ?? 0,
+    volumeUnit: getUnitLabel(firstUnit?.unit),
+    averageConsumption: firstUnit?.averageConsumption ?? 0,
+    consumptionUnit: firstUnit?.unit === 'kWh' ? 'kWh/100km' : 'L/100km'
+  }
+})
 
 // Dialog state
 const addDialog = ref(false)
@@ -51,6 +86,8 @@ async function loadVehicle() {
     selectedVehicle.value = response.data
     // Load energy entries for timeline
     await loadEnergyEntries()
+    // Load global stats (also sets initial energystats since no filters at start)
+    await loadGlobalStats()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
     error.value = 'Failed to load vehicle data'
@@ -76,6 +113,42 @@ async function loadEnergyEntries() {
     energyEntries.value = []
   } finally {
     timelineLoading.value = false
+  }
+}
+
+// Load energy statistics (called on initial load and when filters change in child component)
+async function loadEnergyStats() {
+  if (!vehicleId.value) return
+
+  try {
+    statsLoading.value = true
+    // Always fetch all stats (filtering happens in EnergyStatisticsCard component)
+    const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
+      energyTypes: undefined,
+    })
+    energystats.value = response.data
+  } catch (err) {
+    console.error('Failed to load energy stats:', err)
+    energystats.value = null
+  } finally {
+    statsLoading.value = false
+  }
+}
+
+// Load global statistics for summary cards (always unfiltered)
+async function loadGlobalStats() {
+  if (!vehicleId.value) return
+
+  try {
+    const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
+      energyTypes: undefined, // Always get all stats for summary cards
+    })
+    globalStats.value = response.data
+    // Also set energystats to the same value initially
+    energystats.value = response.data
+  } catch (err) {
+    console.error('Failed to load global stats:', err)
+    globalStats.value = null
   }
 }
 
@@ -107,6 +180,12 @@ const formatDate = (dateString: string) => {
     month: 'short',
     day: 'numeric',
   })
+}
+
+// Handler for energy entry changes (edit/delete from table)
+function handleEnergyEntryChanged() {
+  loadEnergyStats()
+  loadGlobalStats()
 }
 
 // Dialog functions
@@ -158,6 +237,8 @@ async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
 function handleEntrySaved() {
   closeAddDialog()
   loadEnergyEntries()
+  loadEnergyStats()
+  loadGlobalStats() // Refresh summary cards
   // Refresh the energy entries table
   energyEntriesTableRef.value?.loadEnergyEntries()
 }
@@ -175,6 +256,9 @@ async function confirmBulkDelete() {
   if (selectedEnergyEntries.value.length > 0) {
     await energyEntriesTableRef.value?.removeMultiple(selectedEnergyEntries.value)
     selectedEnergyEntries.value = []
+    // Refresh stats after deletion
+    await loadEnergyStats()
+    await loadGlobalStats() // Refresh summary cards
   }
   bulkDeleteDialog.value = false
 }
@@ -319,8 +403,10 @@ onMounted(async () => {
                 class="position-absolute text-secondary"
                 style="top: 12px; right: 16px; opacity: 0.6"
               />
-              <div class="text-caption text-on-secondary-container">Total Distance</div>
-              <div class="text-h6 font-weight-bold text-on-secondary-container">{{ mockStats.totalDistance.toLocaleString() }} km</div>
+              <div class="text-caption text-on-secondary-container">Total Entries</div>
+              <div class="text-h6 font-weight-bold text-on-secondary-container">
+                {{ summaryStats ? summaryStats.totalEntries : 'N/A' }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -334,8 +420,10 @@ onMounted(async () => {
                 class="position-absolute text-tertiary"
                 style="top: 12px; right: 16px; opacity: 0.6"
               />
-              <div class="text-caption text-on-tertiary-container">Fuel Cost</div>
-              <div class="text-h6 font-weight-bold text-on-tertiary-container">${{ mockStats.totalFuelCost }}</div>
+              <div class="text-caption text-on-tertiary-container">Total Cost</div>
+              <div class="text-h6 font-weight-bold text-on-tertiary-container">
+                ${{ globalStats ? globalStats.totalCost.toFixed(2) : 'N/A' }}
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -345,7 +433,10 @@ onMounted(async () => {
             <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
               <v-icon icon="mdi-car-info" size="32" class="position-absolute text-primary" style="top: 12px; right: 16px; opacity: 0.6" />
               <div class="text-caption text-on-surface">Avg. Consumption</div>
-              <div class="text-h6 font-weight-bold text-on-surface">{{ mockStats.avgConsumption }} L/100km</div>
+              <div class="text-h6 font-weight-bold text-on-surface">
+                {{ summaryStats && summaryStats.averageConsumption > 0 ? summaryStats.averageConsumption.toFixed(2) : 'N/A' }}
+                <span v-if="summaryStats && summaryStats.averageConsumption > 0" class="text-body-2"> {{ summaryStats.consumptionUnit }}</span>
+              </div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -393,7 +484,7 @@ onMounted(async () => {
       </v-col>
     </v-row>
 
-    <!-- Fuel & Service Section -->
+    <!-- Fuel Section -->
     <v-row class="equal-height-row">
       <v-col cols="12" md="8">
         <v-card class="card-background" variant="flat" rounded="md-16px" height="520px">
@@ -410,7 +501,9 @@ onMounted(async () => {
             >
               Delete ({{ selectedEnergyEntries.length }})
             </v-btn>
-            <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" size="small" @click="openAddDialog"> Add </v-btn>
+            <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" size="small" @click="openAddDialog">
+              Add
+            </v-btn>
           </template>
           <v-card-text>
             <EnergyEntriesTable
@@ -418,36 +511,19 @@ onMounted(async () => {
               :vehicle-id="vehicleId"
               :allowed-energy-types="selectedVehicle?.allowedEnergyTypes"
               v-model:selected="selectedEnergyEntries"
+              @entry-changed="handleEnergyEntryChanged"
             />
           </v-card-text>
         </v-card>
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card class="fuel-stats-card card-background" height="400" variant="flat">
-          <v-card-title>Fuel Statistics</v-card-title>
-          <v-card-text>
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="text-body-2 text-medium-emphasis">Last Fill-up</div>
-                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.lastFuelCost.toFixed(2) }}</div>
-                <div class="text-caption text-medium-emphasis">{{ mockStats.lastFuelDate }}</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-body-2 text-medium-emphasis">Average Price</div>
-                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.avgFuelPrice.toFixed(2) }}/L</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-body-2 text-medium-emphasis">Monthly Average</div>
-                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.monthlyFuelCost.toFixed(2) }}</div>
-              </div>
-              <div class="stat-item">
-                <div class="text-body-2 text-medium-emphasis">Total Spent</div>
-                <div class="text-h6 font-weight-bold text-on-surface">${{ mockStats.totalFuelCost.toFixed(2) }}</div>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
+        <EnergyStatisticsCard
+          :vehicle-id="vehicleId"
+          :allowed-energy-types="selectedVehicle?.allowedEnergyTypes"
+          :energystats="energystats"
+          :stats-loading="statsLoading"
+        />
       </v-col>
     </v-row>
 
@@ -461,19 +537,19 @@ onMounted(async () => {
               <div class="stats-grid">
                 <div class="stat-item">
                   <div class="text-body-2 text-medium-emphasis">Total Cost</div>
-                  <div class="text-h6 font-weight-bold text-on-surface">{{ mockStats.totalServiceCost.toFixed(2) }} PLN</div>
+                  <div class="text-body-2 font-weight-bold text-on-surface">{{ mockStats.totalServiceCost.toFixed(2) }} PLN</div>
                 </div>
                 <div class="stat-item">
                   <div class="text-body-2 text-medium-emphasis">Last Service</div>
-                  <div class="text-h6">{{ formatDate('2024-11-15') }}</div>
+                  <div class="text-body-2 font-weight-bold text-on-surface">{{ formatDate('2024-11-15') }}</div>
                 </div>
                 <div class="stat-item">
                   <div class="text-body-2 text-medium-emphasis">Next Service</div>
-                  <div class="text-h6">{{ formatDate('2025-03-15') }}</div>
+                  <div class="text-body-2 font-weight-bold text-on-surface">{{ formatDate('2025-03-15') }}</div>
                 </div>
                 <div class="stat-item">
                   <div class="text-body-2 text-medium-emphasis">Average Cost</div>
-                  <div class="text-h6">{{ (mockStats.totalServiceCost / 8).toFixed(2) }} PLN</div>
+                  <div class="text-body-2 font-weight-bold text-on-surface">{{ (mockStats.totalServiceCost / 8).toFixed(2) }} PLN</div>
                 </div>
               </div>
             </v-card-text>
@@ -653,7 +729,6 @@ onMounted(async () => {
 .fuel-history-card,
 .service-stats-card,
 .service-timeline-card {
-  border-radius: 16px;
   min-height: fit-content;
 }
 
@@ -682,7 +757,10 @@ onMounted(async () => {
 
 /* Stats grid for info cards */
 .stats-grid .stat-item {
-  padding: 8px 0;
+  padding: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid rgba(var(--v-theme-outline), 0.12);
 }
 
