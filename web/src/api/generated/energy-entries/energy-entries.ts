@@ -8,8 +8,10 @@ import type {
   EnergyEntryCreateRequest,
   EnergyEntryDto,
   EnergyEntryUpdateRequest,
+  EnergyStatsDto,
   GetApiUsersUserIdEnergyEntriesParams,
   GetApiVehiclesVehicleIdEnergyEntriesParams,
+  GetApiVehiclesVehicleIdEnergyEntriesStatsParams,
   PagedListOfEnergyEntryDto
 } from '../apiV1.schemas';
 
@@ -70,9 +72,20 @@ const postApiVehiclesVehicleIdEnergyEntries = (
     },
       );
     }
-  return {postApiVehiclesVehicleIdEnergyEntries,getApiVehiclesVehicleIdEnergyEntries,deleteApiVehiclesVehicleIdEnergyEntriesId,putApiVehiclesVehicleIdEnergyEntriesId,getApiUsersUserIdEnergyEntries}};
+  const getApiVehiclesVehicleIdEnergyEntriesStats = (
+    vehicleId: string,
+    params?: GetApiVehiclesVehicleIdEnergyEntriesStatsParams,
+ ) => {
+      return axiosInstance<EnergyStatsDto>(
+      {url: `/api/vehicles/${vehicleId}/energy-entries/stats`, method: 'GET',
+        params
+    },
+      );
+    }
+  return {postApiVehiclesVehicleIdEnergyEntries,getApiVehiclesVehicleIdEnergyEntries,deleteApiVehiclesVehicleIdEnergyEntriesId,putApiVehiclesVehicleIdEnergyEntriesId,getApiUsersUserIdEnergyEntries,getApiVehiclesVehicleIdEnergyEntriesStats}};
 export type PostApiVehiclesVehicleIdEnergyEntriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['postApiVehiclesVehicleIdEnergyEntries']>>>
 export type GetApiVehiclesVehicleIdEnergyEntriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['getApiVehiclesVehicleIdEnergyEntries']>>>
 export type DeleteApiVehiclesVehicleIdEnergyEntriesIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['deleteApiVehiclesVehicleIdEnergyEntriesId']>>>
 export type PutApiVehiclesVehicleIdEnergyEntriesIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['putApiVehiclesVehicleIdEnergyEntriesId']>>>
 export type GetApiUsersUserIdEnergyEntriesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['getApiUsersUserIdEnergyEntries']>>>
+export type GetApiVehiclesVehicleIdEnergyEntriesStatsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getEnergyEntries>['getApiVehiclesVehicleIdEnergyEntriesStats']>>>

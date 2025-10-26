@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { VehicleCreateRequest, EngineType, NullableOfVehicleType } from '@/api/generated/apiV1.schemas'
-import { EngineType as EngineTypeEnum, NullableOfVehicleType as VehicleTypeEnum } from '@/api/generated/apiV1.schemas'
+import { EngineType as EngineTypeEnum } from '@/api/generated/apiV1.schemas'
 
 defineProps<{
   vehicle: VehicleCreateRequest
@@ -28,10 +28,10 @@ const engineTypeOptions: { label: string; value: EngineType }[] = [
 ]
 
 const typeOptions: { label: string; value: NullableOfVehicleType }[] = [
-  { label: 'Bus', value: VehicleTypeEnum.Bus },
-  { label: 'Car', value: VehicleTypeEnum.Car },
-  { label: 'Motorbike', value: VehicleTypeEnum.Motorbike },
-  { label: 'Truck', value: VehicleTypeEnum.Truck },
+  { label: 'Bus', value: 'Bus' },
+  { label: 'Car', value: 'Car' },
+  { label: 'Motorbike', value: 'Motorbike' },
+  { label: 'Truck', value: 'Truck' },
 ]
 </script>
 

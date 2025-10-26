@@ -1,6 +1,6 @@
 <template>
   <div class="system-navigation">
-    <v-list nav class="px-4" base-color="on-surface-variant" active-color="secondary">
+    <v-list nav class="px-4" base-color="on-surface-variant" color="secondary">
       <v-list-item
         :key="'Server Online'"
         :title="'Server Online'"
@@ -8,7 +8,7 @@
         rounded="pill"
         class="px-4 server-status-item"
         base-color="on-surface-variant"
-        active-color="secondary"
+        color="secondary"
         :ripple="false"
         link
         variant="tonal"

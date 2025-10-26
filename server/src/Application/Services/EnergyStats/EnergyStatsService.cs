@@ -1,9 +1,57 @@
 ﻿using Domain.Entities.EnergyEntries;
+using Domain.Enums;
 
 namespace Application.Services.EnergyStats;
 
 internal sealed class EnergyStatsService : IEnergyStatsService
 {
+    public EnergyUnitStats CalculateStatisticsForUnit(EnergyUnit unit, IReadOnlyCollection<EnergyEntry> entries)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+        
+        var includedTypes = entries
+            .Select(e => e.Type)
+            .Distinct()
+            .OrderBy(t => t)
+            .ToList();
+
+        if (entries.Count < 2)
+        {
+            return new EnergyUnitStats
+            {
+                Unit = unit,
+                EnergyTypes = includedTypes,
+                EntriesCount = entries.Count,
+                TotalVolume = CalculateTotalVolume(entries),
+                TotalCost = CalculateTotalCost(entries),
+                AverageConsumption = 0,
+                AveragePricePerUnit = CalculateAveragePricePerUnit(entries),
+                AverageCostPer100km = 0
+            };
+        }
+
+        var avgConsumption = CalculateAverageConsumption(entries);
+        var avgPricePerUnit = CalculateAveragePricePerUnit(entries);
+
+        var stats = new EnergyUnitStats
+        {
+            Unit = unit,
+            EnergyTypes = includedTypes,
+            
+            EntriesCount = entries.Count,
+            TotalVolume = CalculateTotalVolume(entries),
+            TotalCost = CalculateTotalCost(entries),
+            
+            AverageConsumption = avgConsumption,
+            AveragePricePerUnit = avgPricePerUnit,
+            AverageCostPer100km = avgConsumption > 0 && avgPricePerUnit > 0
+                ? (avgConsumption / 100) * avgPricePerUnit
+                : 0
+        };
+
+        return stats;
+    }
+
     public decimal CalculateAverageConsumption(IReadOnlyCollection<EnergyEntry> entries)
     {
         var sortedEntries = entries.OrderBy(e => e.Mileage).ToList();

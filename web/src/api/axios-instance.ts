@@ -6,6 +6,9 @@ const axiosClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  paramsSerializer: {
+    indexes: null, // This makes arrays serialize as: param=value1&param=value2
+  },
 })
 
 axiosClient.interceptors.request.use(

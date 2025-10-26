@@ -11,7 +11,6 @@ import type {
 import {
   EngineType as EngineTypeEnum,
   EnergyType as EnergyTypeEnum,
-  NullableOfVehicleType as VehicleTypeEnum,
 } from '@/api/generated/apiV1.schemas'
 import { getVehicleEnergyTypes } from '@/api/generated/vehicle-energy-types/vehicle-energy-types'
 
@@ -113,10 +112,10 @@ const ENGINE_TYPE_LABELS: Record<EngineType, string> = {
 }
 
 const VEHICLE_TYPE_LABELS: Record<string, string> = {
-  [VehicleTypeEnum.Bus]: 'Bus',
-  [VehicleTypeEnum.Car]: 'Car',
-  [VehicleTypeEnum.Motorbike]: 'Motorbike',
-  [VehicleTypeEnum.Truck]: 'Truck',
+  'Bus': 'Bus',
+  'Car': 'Car',
+  'Motorbike': 'Motorbike',
+  'Truck': 'Truck',
 }
 
 const createEnergyTypeOptions = (energyTypes: EnergyType[]) => energyTypes.map((type) => ({ label: ENERGY_TYPE_LABELS[type], value: type }))
@@ -238,7 +237,7 @@ function transformFormDataToApiFormat(formData: VehicleFormData) {
     model: formData.model,
     engineType: formData.engineType,
     manufacturedYear: formData.manufacturedYear,
-    type: formData.type ?? VehicleTypeEnum.null,
+    type: formData.type ?? null,
     vin: formData.vin,
     energyTypes: formData.energyTypes.length > 0 ? formData.energyTypes : null,
   }

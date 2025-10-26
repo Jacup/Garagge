@@ -1,11 +1,10 @@
-﻿using Domain.Enums;
+﻿using Domain.Entities.EnergyEntries;
 
 namespace Application.EnergyEntries;
 
 public record EnergyStatsDto(
-    decimal TotalVolume,
-    decimal AverageConsumption,
+    Guid VehicleId,
     decimal TotalCost,
-    decimal AveragePricePerUnit,
-    EnergyType[] EnergyTypes
+    int TotalEntries,
+    EnergyUnitStats[] EnergyUnitStats
 );

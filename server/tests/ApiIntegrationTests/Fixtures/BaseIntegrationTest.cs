@@ -2,7 +2,10 @@
 using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
 using Application.Auth.Login;
+using Application.Vehicles;
 using Domain.Entities.Users;
+using Domain.Entities.Vehicles;
+using Domain.Enums;
 using Infrastructure.DAL;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
@@ -97,6 +100,49 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         loginResult.ShouldNotBeNull();
         loginResult.AccessToken.ShouldNotBeNull();
         return loginResult;
+    }
+    
+    protected async Task<Vehicle> CreateVehicleAsync(
+        User owner,
+        string brand = "Toyota",
+        string model = "Corolla",
+        EngineType engineType = EngineType.Fuel,
+        int? manufacturedYear = 2020,
+        VehicleType? type = VehicleType.Car,
+        string? vin = null,
+        IEnumerable<EnergyType>? energyTypes = null)
+    {
+        var vehicle = new Vehicle
+        {
+            Id = Guid.NewGuid(),
+            UserId = owner.Id,
+            Brand = brand,
+            Model = model,
+            EngineType = engineType,
+            ManufacturedYear = manufacturedYear,
+            Type = type,
+            VIN = vin
+        };
+        
+        DbContext.Vehicles.Add(vehicle);
+        await DbContext.SaveChangesAsync();
+        
+        // Add energy types if provided
+        var energyTypesToAdd = energyTypes ?? [EnergyType.Gasoline];
+        foreach (var energyType in energyTypesToAdd)
+        {
+            var vehicleEnergyType = new VehicleEnergyType
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle.Id,
+                EnergyType = energyType
+            };
+            DbContext.VehicleEnergyTypes.Add(vehicleEnergyType);
+        }
+        
+        await DbContext.SaveChangesAsync();
+        
+        return vehicle;
     }
     
     protected void Authenticate(string accessToken)
