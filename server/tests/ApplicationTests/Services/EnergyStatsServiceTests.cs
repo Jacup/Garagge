@@ -216,11 +216,8 @@ public class EnergyStatsServiceTests
     [Fact]
     public void CalculateStatisticsForUnit_WithEmptyList_ShouldReturnZeroStats()
     {
-        // Arrange
-        var entries = new List<EnergyEntry>();
-
         // Act
-        var result = _sut.CalculateStatisticsForUnit(EnergyUnit.Liter, entries);
+        var result = _sut.CalculateStatisticsForUnit(EnergyUnit.Liter, []);
 
         // Assert
         result.Unit.ShouldBe(EnergyUnit.Liter);
@@ -248,20 +245,15 @@ public class EnergyStatsServiceTests
         result.EnergyTypes.ShouldContain(EnergyType.Gasoline);
         result.TotalVolume.ShouldBe(50);
         result.TotalCost.ShouldBe(250);
-        result.AverageConsumption.ShouldBe(0); // Can't calculate with single entry
+        result.AverageConsumption.ShouldBe(0);
         result.AveragePricePerUnit.ShouldBe(5m);
-        result.AverageCostPer100km.ShouldBe(0); // No consumption = no cost per 100km
+        result.AverageCostPer100km.ShouldBe(0);
     }
 
     [Fact]
     public void CalculateStatisticsForUnit_WithTwoEntries_ShouldCalculateAllMetrics()
     {
         // Arrange
-        // Mileage: 1000 -> 1500 (500 km)
-        // Volume: 50 -> 60 liters
-        // Consumption: (60/500)*100 = 12 l/100km
-        // Price: 5 PLN/liter
-        // Cost per 100km: (12/100)*5 = 0.6 PLN/km
         var entries = new List<EnergyEntry>
         {
             CreateEnergyEntry(mileage: 1000, volume: 50, cost: 250, pricePerUnit: 5m),
@@ -287,12 +279,6 @@ public class EnergyStatsServiceTests
     public void CalculateStatisticsForUnit_WithMultipleEntries_ShouldCalculateAverages()
     {
         // Arrange
-        // Entry 1: 1000 km, 50 l, 250 PLN, 5 PLN/l
-        // Entry 2: 1500 km, 30 l, 150 PLN, 5 PLN/l -> consumption: (30/500)*100 = 6 l/100km
-        // Entry 3: 2000 km, 35 l, 175 PLN, 5 PLN/l -> consumption: (35/500)*100 = 7 l/100km
-        // Average consumption: (6+7)/2 = 6.5 l/100km
-        // Average price: 5 PLN/l
-        // Cost per 100km: (6.5/100)*5 = 0.325 PLN/km
         var entries = new List<EnergyEntry>
         {
             CreateEnergyEntry(mileage: 1000, volume: 50, cost: 250, pricePerUnit: 5m),
@@ -350,16 +336,16 @@ public class EnergyStatsServiceTests
 
         // Assert
         result.TotalVolume.ShouldBe(100);
-        result.TotalCost.ShouldBe(300); // Only counts non-null costs
-        result.AveragePricePerUnit.ShouldBe(5m); // Only counts non-null prices
-        result.AverageConsumption.ShouldBe(12m); // (60/500)*100
-        result.AverageCostPer100km.ShouldBe(0.6m); // (12/100)*5
+        result.TotalCost.ShouldBe(300);
+        result.AveragePricePerUnit.ShouldBe(5m);
+        result.AverageConsumption.ShouldBe(12m);
+        result.AverageCostPer100km.ShouldBe(0.6m);
     }
 
     [Fact]
     public void CalculateStatisticsForUnit_WithZeroConsumption_ShouldReturnZeroCostPer100km()
     {
-        // Arrange - single entry means zero consumption
+        // Arrange
         var entries = new List<EnergyEntry> { CreateEnergyEntry(mileage: 1000, volume: 50, cost: 250, pricePerUnit: 5m) };
 
         // Act
@@ -368,7 +354,7 @@ public class EnergyStatsServiceTests
         // Assert
         result.AverageConsumption.ShouldBe(0);
         result.AveragePricePerUnit.ShouldBe(5m);
-        result.AverageCostPer100km.ShouldBe(0); // No consumption = no cost per 100km
+        result.AverageCostPer100km.ShouldBe(0);
     }
 
     [Fact]
@@ -384,9 +370,9 @@ public class EnergyStatsServiceTests
         var result = _sut.CalculateStatisticsForUnit(EnergyUnit.Liter, entries);
 
         // Assert
-        result.AverageConsumption.ShouldBe(12m); // (60/500)*100
+        result.AverageConsumption.ShouldBe(12m); 
         result.AveragePricePerUnit.ShouldBe(0);
-        result.AverageCostPer100km.ShouldBe(0); // Price is 0, so cost per 100km is 0
+        result.AverageCostPer100km.ShouldBe(0); 
     }
 
     [Fact]
@@ -405,7 +391,7 @@ public class EnergyStatsServiceTests
         // Assert
         result.Unit.ShouldBe(EnergyUnit.Gallon);
         result.TotalVolume.ShouldBe(25);
-        result.AverageConsumption.ShouldBe(3m); // (15/500)*100 = 3 gallons/100km
+        result.AverageConsumption.ShouldBe(3m);
     }
 
     [Fact]
@@ -428,9 +414,9 @@ public class EnergyStatsServiceTests
         result.EnergyTypes.ShouldContain(EnergyType.Electric);
         result.TotalVolume.ShouldBe(110);
         result.TotalCost.ShouldBe(220);
-        result.AverageConsumption.ShouldBe(12m); // (60/500)*100 = 12 kWh/100km
+        result.AverageConsumption.ShouldBe(12m);
         result.AveragePricePerUnit.ShouldBe(2m);
-        result.AverageCostPer100km.ShouldBe(0.24m); // (12/100)*2 = 0.24
+        result.AverageCostPer100km.ShouldBe(0.24m);
     }
 
     [Fact]
@@ -439,9 +425,9 @@ public class EnergyStatsServiceTests
         // Arrange - Add types in random order
         var entries = new List<EnergyEntry>
         {
-            CreateEnergyEntry(mileage: 1000, volume: 40, energyType: EnergyType.Electric), // 8
-            CreateEnergyEntry(mileage: 1500, volume: 60, energyType: EnergyType.Gasoline), // 1
-            CreateEnergyEntry(mileage: 2000, volume: 50, energyType: EnergyType.Diesel) // 2
+            CreateEnergyEntry(mileage: 1000, volume: 40, energyType: EnergyType.Electric), 
+            CreateEnergyEntry(mileage: 1500, volume: 60, energyType: EnergyType.Gasoline), 
+            CreateEnergyEntry(mileage: 2000, volume: 50, energyType: EnergyType.Diesel) 
         };
 
         // Act
@@ -450,9 +436,9 @@ public class EnergyStatsServiceTests
         // Assert
         result.EnergyTypes.Count.ShouldBe(3);
         // Should be ordered by enum value
-        result.EnergyTypes.ElementAt(0).ShouldBe(EnergyType.Gasoline); // 1
-        result.EnergyTypes.ElementAt(1).ShouldBe(EnergyType.Diesel); // 2
-        result.EnergyTypes.ElementAt(2).ShouldBe(EnergyType.Electric); // 8
+        result.EnergyTypes.ElementAt(0).ShouldBe(EnergyType.Gasoline);
+        result.EnergyTypes.ElementAt(1).ShouldBe(EnergyType.Diesel);
+        result.EnergyTypes.ElementAt(2).ShouldBe(EnergyType.Electric);
     }
 
     [Fact]
@@ -472,12 +458,9 @@ public class EnergyStatsServiceTests
         // Assert
         result.TotalVolume.ShouldBe(160);
         result.TotalCost.ShouldBe(810);
-        result.AveragePricePerUnit.ShouldBe(5.0m); // (5+6+4)/3 = 5
-        // Consumption 1: (60/500)*100 = 12 l/100km
-        // Consumption 2: (50/500)*100 = 10 l/100km
-        // Average: (12+10)/2 = 11 l/100km
+        result.AveragePricePerUnit.ShouldBe(5.0m);
         result.AverageConsumption.ShouldBe(11m);
-        result.AverageCostPer100km.ShouldBe(0.55m); // (11/100)*5 = 0.55
+        result.AverageCostPer100km.ShouldBe(0.55m);
     }
 
     private static EnergyEntry CreateEnergyEntry(
