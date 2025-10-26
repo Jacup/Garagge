@@ -22,7 +22,7 @@ const emit = defineEmits<{
     <DrawerFab />
 
     <div class="main-nav">
-      <v-list nav class="px-4" base-color="on-surface-variant" active-color="secondary">
+      <v-list nav class="px-4" base-color="on-surface-variant" color="secondary">
         <component
           :is="isRail ? NavigationButton : DrawerNavigationItem"
           v-for="item in MAIN_NAVIGATION_ITEMS"

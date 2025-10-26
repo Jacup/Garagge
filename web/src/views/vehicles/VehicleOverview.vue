@@ -48,15 +48,35 @@ const summaryStats = computed(() => {
   if (!globalStats.value) return null
 
   const firstUnit = globalStats.value.energyUnitStats[0]
+
+  // Get all consumption data for display
+  const consumptions = globalStats.value.energyUnitStats
+    .filter(stat => stat.averageConsumption && stat.averageConsumption > 0)
+    .map(stat => ({
+      value: stat.averageConsumption,
+      unit: stat.unit === 'kWh' ? 'kWh/100km' : 'L/100km'
+    }))
+
   return {
     totalEntries: globalStats.value.totalEntries,
     totalCost: globalStats.value.totalCost,
     // Use first unit's volume and consumption, or 0 if none
     totalVolume: firstUnit?.totalVolume ?? 0,
     volumeUnit: getUnitLabel(firstUnit?.unit),
-    averageConsumption: firstUnit?.averageConsumption ?? 0,
-    consumptionUnit: firstUnit?.unit === 'kWh' ? 'kWh/100km' : 'L/100km'
+    consumptions: consumptions
   }
+})
+
+// Computed: Last entered mileage from energy entries
+const lastEnteredMileage = computed(() => {
+  if (!energyEntries.value || energyEntries.value.length === 0) return null
+
+  // Sort by date descending and get the first entry (most recent)
+  const sortedEntries = [...energyEntries.value].sort((a, b) =>
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  return sortedEntries[0]?.mileage ?? null
 })
 
 // Dialog state
@@ -403,9 +423,10 @@ onMounted(async () => {
                 class="position-absolute text-secondary"
                 style="top: 12px; right: 16px; opacity: 0.6"
               />
-              <div class="text-caption text-on-secondary-container">Total Entries</div>
+              <div class="text-caption text-on-secondary-container">Last entered mileage</div>
               <div class="text-h6 font-weight-bold text-on-secondary-container">
-                {{ summaryStats ? summaryStats.totalEntries : 'N/A' }}
+                {{ lastEnteredMileage !== null ? lastEnteredMileage.toLocaleString() : 'N/A' }}
+                <span v-if="lastEnteredMileage !== null" class="text-body-2">km</span>
               </div>
             </v-card-text>
           </v-card>
@@ -420,7 +441,7 @@ onMounted(async () => {
                 class="position-absolute text-tertiary"
                 style="top: 12px; right: 16px; opacity: 0.6"
               />
-              <div class="text-caption text-on-tertiary-container">Total Cost</div>
+              <div class="text-caption text-on-tertiary-container">Total fuel cost</div>
               <div class="text-h6 font-weight-bold text-on-tertiary-container">
                 ${{ globalStats ? globalStats.totalCost.toFixed(2) : 'N/A' }}
               </div>
@@ -433,10 +454,13 @@ onMounted(async () => {
             <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
               <v-icon icon="mdi-car-info" size="32" class="position-absolute text-primary" style="top: 12px; right: 16px; opacity: 0.6" />
               <div class="text-caption text-on-surface">Avg. Consumption</div>
-              <div class="text-h6 font-weight-bold text-on-surface">
-                {{ summaryStats && summaryStats.averageConsumption > 0 ? summaryStats.averageConsumption.toFixed(2) : 'N/A' }}
-                <span v-if="summaryStats && summaryStats.averageConsumption > 0" class="text-body-2"> {{ summaryStats.consumptionUnit }}</span>
+              <div v-if="summaryStats && summaryStats.consumptions.length > 0" class="consumption-values">
+                <div v-for="(consumption, index) in summaryStats.consumptions" :key="index" class="consumption-item">
+                  <span class="text-h6 font-weight-bold text-on-surface">{{ consumption.value?.toFixed(2) }}</span>
+                  <span class="text-body-2 text-on-surface ml-1">{{ consumption.unit }}</span>
+                </div>
               </div>
+              <div v-else class="text-h6 font-weight-bold text-on-surface">N/A</div>
             </v-card-text>
           </v-card>
         </v-col>
@@ -697,6 +721,17 @@ onMounted(async () => {
 
 .stat-value {
   margin-top: 8px;
+}
+
+/* Consumption display for multiple values */
+.consumption-values {
+  display: flex;
+  flex-direction: column;
+}
+
+.consumption-item {
+  display: flex;
+  align-items: baseline;
 }
 
 /* Enhanced buttons */

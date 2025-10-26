@@ -21,7 +21,7 @@ const { currentIcon } = useNavigationItem(item)
     rounded="pill"
     class="px-4"
     base-color="on-surface-variant"
-    active-color="secondary"
+    color="secondary"
     link
     @click="emit('navigate')"
   >
