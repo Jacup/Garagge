@@ -10,12 +10,11 @@ namespace ApplicationTests.EnergyEntries.GetStats;
 public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
 {
     private readonly GetEnergyStatsQueryHandler _handler;
-    private readonly IEnergyStatsService _energyStatsService;
 
     public GetEnergyStatsQueryHandlerTests()
     {
-        _energyStatsService = new EnergyStatsService();
-        _handler = new GetEnergyStatsQueryHandler(Context, UserContextMock.Object, _energyStatsService);
+        IEnergyStatsService energyStatsService = new EnergyStatsService();
+        _handler = new GetEnergyStatsQueryHandler(Context, UserContextMock.Object, energyStatsService);
     }
 
     [Fact]
@@ -509,8 +508,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
 
         var literStats = result.Value.EnergyUnitStats[0];
         literStats.EntriesCount.ShouldBe(1);
-        literStats.AverageConsumption.ShouldBe(0); // Can't calculate with single entry
-        literStats.AverageCostPer100km.ShouldBe(0); // No consumption = no cost per 100km
+        literStats.AverageConsumption.ShouldBe(0);
+        literStats.AverageCostPer100km.ShouldBe(0);
     }
 
     [Fact]
