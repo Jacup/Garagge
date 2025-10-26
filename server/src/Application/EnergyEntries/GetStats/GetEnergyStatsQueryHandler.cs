@@ -42,28 +42,27 @@ internal sealed class GetEnergyStatsQueryHandler(
         if (entries.Count == 0)
         {
             return Result.Success(new EnergyStatsDto(
-                TotalVolume: 0,
-                AverageConsumption: 0,
-                TotalCost: 0,
-                AveragePricePerUnit: 0,
-                EnergyTypes: []
-            ));
+                vehicle.Id,
+                0,
+                0,
+                []));
         }
-        
-        var totalVolume = energyStatsService.CalculateTotalVolume(entries);
-        var averageConsumption = energyStatsService.CalculateAverageConsumption(entries);
+
+        var statisticsByUnit = entries
+            .GroupBy(e => e.EnergyUnit)
+            .Select(g => energyStatsService.CalculateStatisticsForUnit(
+                unit: g.Key,
+                entries: g.ToList()))
+            .ToArray();
+
         var totalCost = energyStatsService.CalculateTotalCost(entries);
-        var averagePricePerUnit = energyStatsService.CalculateAveragePricePerUnit(entries);
-        var energyTypes = entries.Select(e => e.Type).Distinct().ToArray();
-
-        var statsDto = new EnergyStatsDto(
-            TotalVolume: totalVolume,
-            AverageConsumption: averageConsumption,
-            TotalCost: totalCost,
-            AveragePricePerUnit: averagePricePerUnit,
-            EnergyTypes: energyTypes
+        
+        return Result.Success(new EnergyStatsDto
+            (
+                vehicle.Id,
+                totalCost,
+                entries.Count,
+                statisticsByUnit)
         );
-
-        return Result.Success(statsDto);
     }
 }
