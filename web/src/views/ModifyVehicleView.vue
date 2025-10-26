@@ -10,7 +10,6 @@ import {
   type VehicleUpdateRequest,
   type VehicleDto,
   EngineType,
-  NullableOfVehicleType,
 } from '@/api/generated/apiV1.schemas'
 
 const route = useRoute()
@@ -25,7 +24,7 @@ const createVehicle = reactive<VehicleCreateRequest>({
   model: '',
   engineType: EngineType.Fuel, // Default to first option
   manufacturedYear: null,
-  type: NullableOfVehicleType.null,
+  type: null,
   vin: null,
   energyTypes: null,
 })
@@ -35,7 +34,7 @@ const editVehicle = reactive<VehicleUpdateRequest>({
   model: '',
   engineType: EngineType.Fuel,
   manufacturedYear: null,
-  type: NullableOfVehicleType.null,
+  type: null,
   vin: null,
   energyTypes: null,
 })

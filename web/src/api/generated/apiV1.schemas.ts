@@ -112,14 +112,8 @@ export interface LoginUserResponse {
 /**
  * @nullable
  */
-export enum NullableOfVehicleType {
-  Bus= 'Bus',
-  Car= 'Car',
-  Motorbike= 'Motorbike',
-  Truck= 'Truck',
-  null= null,
+export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
 
-}
 export interface PagedListOfEnergyEntryDto {
   items: EnergyEntryDto[];
   page: number;

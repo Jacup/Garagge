@@ -11,7 +11,6 @@ export default defineConfig({
       client: 'axios',
       fileExtension: '.ts',
       override: {
-        enumGenerationType: 'enum',
         mutator: {
           path: 'src/api/axios-instance.ts',
           name: 'axiosInstance'
