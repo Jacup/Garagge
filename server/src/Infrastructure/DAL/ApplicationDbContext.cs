@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Domain.Abstractions;
 using Domain.Entities;
 using Domain.Entities.EnergyEntries;
+using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using MediatR;
@@ -19,6 +20,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<EnergyEntry> EnergyEntries { get; set; }
     public DbSet<VehicleEnergyType> VehicleEnergyTypes { get; set; }
+    
+    public DbSet<ServiceType> ServiceTypes { get; set; }
+    // public DbSet<ServiceRecord> ServiceRecords { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

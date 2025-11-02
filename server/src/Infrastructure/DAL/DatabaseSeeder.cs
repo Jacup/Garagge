@@ -1,5 +1,6 @@
 using Application.Abstractions.Authentication;
 using Domain.Entities.EnergyEntries;
+using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
@@ -120,7 +121,7 @@ public static class DatabaseSeeder
 
         await context.VehicleEnergyTypes.AddRangeAsync(vets);
         await context.SaveChangesAsync();
-        
+
         var energyEntries = new List<EnergyEntry>
         {
             // first vehicle (gasoline entries only)
@@ -205,6 +206,32 @@ public static class DatabaseSeeder
         };
 
         await context.EnergyEntries.AddRangeAsync(energyEntries);
+        await context.SaveChangesAsync();
+    }
+
+    public static async Task SeedServiceTypes(ApplicationDbContext context)
+    {
+        if (await context.ServiceTypes.AnyAsync())
+            return;
+        
+        var types = new List<ServiceType>
+        {
+            new() { Id = Guid.NewGuid(), Name = "General" },
+            new() { Id = Guid.NewGuid(), Name = "OilChange" },
+            new() { Id = Guid.NewGuid(), Name = "Brakes" },
+            new() { Id = Guid.NewGuid(), Name = "Tires" },
+            new() { Id = Guid.NewGuid(), Name = "Engine" },
+            new() { Id = Guid.NewGuid(), Name = "Transmission" },
+            new() { Id = Guid.NewGuid(), Name = "Suspension" },
+            new() { Id = Guid.NewGuid(), Name = "Electrical" },
+            new() { Id = Guid.NewGuid(), Name = "Bodywork" },
+            new() { Id = Guid.NewGuid(), Name = "Interior" },
+            new() { Id = Guid.NewGuid(), Name = "Inspection " },
+            new() { Id = Guid.NewGuid(), Name = "Emergency" },
+            new() { Id = Guid.NewGuid(), Name = "Other" },
+        };
+
+        await context.ServiceTypes.AddRangeAsync(types);
         await context.SaveChangesAsync();
     }
 }

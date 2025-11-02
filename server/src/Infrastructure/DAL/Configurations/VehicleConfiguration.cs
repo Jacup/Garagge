@@ -1,4 +1,3 @@
-using Domain.Entities;
 using Domain.Entities.Vehicles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
