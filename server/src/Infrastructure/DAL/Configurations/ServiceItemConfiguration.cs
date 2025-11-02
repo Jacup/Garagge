@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.DAL;
+namespace Infrastructure.DAL.Configurations;
 
 public class ServiceItemConfiguration : IEntityTypeConfiguration<ServiceItem>
 {

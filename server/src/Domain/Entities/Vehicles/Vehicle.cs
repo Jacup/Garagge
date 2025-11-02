@@ -23,5 +23,5 @@ public sealed class Vehicle : Entity
 
     public IEnumerable<EnergyType> AllowedEnergyTypes => VehicleEnergyTypes.Select(vet => vet.EnergyType);
     
-    public ICollection<ServiceRecord> ServiceRecords { get; set; } = new List<ServiceRecord>();
+    public ICollection<ServiceRecord> ServiceRecords { get; set; } = [];
 }
