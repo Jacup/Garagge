@@ -3,6 +3,7 @@ using System;
 using Infrastructure.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251102173816_AddServiceTypes")]
+    partial class AddServiceTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,123 +82,6 @@ namespace Infrastructure.DAL.Migrations
                         .HasDatabaseName("ix_energy_entries_vehicle_id");
 
                     b.ToTable("energy_entries", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Services.ServiceItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("notes");
-
-                    b.Property<string>("PartNumber")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("part_number");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("numeric(10,3)")
-                        .HasColumnName("quantity");
-
-                    b.Property<Guid>("ServiceRecordId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("service_record_id");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer")
-                        .HasColumnName("type");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("unit_price");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_date");
-
-                    b.HasKey("Id")
-                        .HasName("pk_service_items");
-
-                    b.HasIndex("ServiceRecordId")
-                        .HasDatabaseName("ix_service_items_service_record_id");
-
-                    b.ToTable("service_items", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.Services.ServiceRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_date");
-
-                    b.Property<decimal?>("ManualCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)")
-                        .HasColumnName("manual_cost");
-
-                    b.Property<int?>("Mileage")
-                        .HasColumnType("integer")
-                        .HasColumnName("mileage");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("notes");
-
-                    b.Property<DateTime>("ServiceDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("service_date");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("title");
-
-                    b.Property<Guid>("TypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("type_id");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_date");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("vehicle_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_service_records");
-
-                    b.HasIndex("TypeId")
-                        .HasDatabaseName("ix_service_records_type_id");
-
-                    b.HasIndex("VehicleId")
-                        .HasDatabaseName("ix_service_records_vehicle_id");
-
-                    b.ToTable("service_records", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Services.ServiceType", b =>
@@ -374,39 +260,6 @@ namespace Infrastructure.DAL.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Services.ServiceItem", b =>
-                {
-                    b.HasOne("Domain.Entities.Services.ServiceRecord", "ServiceRecord")
-                        .WithMany("Items")
-                        .HasForeignKey("ServiceRecordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_service_items_service_records_service_record_id");
-
-                    b.Navigation("ServiceRecord");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Services.ServiceRecord", b =>
-                {
-                    b.HasOne("Domain.Entities.Services.ServiceType", "Type")
-                        .WithMany("ServiceRecords")
-                        .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_service_records_service_types_type_id");
-
-                    b.HasOne("Domain.Entities.Vehicles.Vehicle", "Vehicle")
-                        .WithMany("ServiceRecords")
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_service_records_vehicles_vehicle_id");
-
-                    b.Navigation("Type");
-
-                    b.Navigation("Vehicle");
-                });
-
             modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.HasOne("Domain.Entities.Users.User", "User")
@@ -431,16 +284,6 @@ namespace Infrastructure.DAL.Migrations
                     b.Navigation("Vehicle");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Services.ServiceRecord", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Services.ServiceType", b =>
-                {
-                    b.Navigation("ServiceRecords");
-                });
-
             modelBuilder.Entity("Domain.Entities.Users.User", b =>
                 {
                     b.Navigation("Vehicles");
@@ -449,8 +292,6 @@ namespace Infrastructure.DAL.Migrations
             modelBuilder.Entity("Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.Navigation("EnergyEntries");
-
-                    b.Navigation("ServiceRecords");
 
                     b.Navigation("VehicleEnergyTypes");
                 });
