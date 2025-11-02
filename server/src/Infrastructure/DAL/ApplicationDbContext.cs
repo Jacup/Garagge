@@ -21,8 +21,9 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     public DbSet<EnergyEntry> EnergyEntries { get; set; }
     public DbSet<VehicleEnergyType> VehicleEnergyTypes { get; set; }
     
+    public DbSet<ServiceRecord> ServiceRecords { get; set; }
     public DbSet<ServiceType> ServiceTypes { get; set; }
-    // public DbSet<ServiceRecord> ServiceRecords { get; set; }
+    public DbSet<ServiceItem> ServiceItems { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

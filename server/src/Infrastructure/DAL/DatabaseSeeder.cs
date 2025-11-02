@@ -226,7 +226,7 @@ public static class DatabaseSeeder
             new() { Id = Guid.NewGuid(), Name = "Electrical" },
             new() { Id = Guid.NewGuid(), Name = "Bodywork" },
             new() { Id = Guid.NewGuid(), Name = "Interior" },
-            new() { Id = Guid.NewGuid(), Name = "Inspection " },
+            new() { Id = Guid.NewGuid(), Name = "Inspection" },
             new() { Id = Guid.NewGuid(), Name = "Emergency" },
             new() { Id = Guid.NewGuid(), Name = "Other" },
         };
