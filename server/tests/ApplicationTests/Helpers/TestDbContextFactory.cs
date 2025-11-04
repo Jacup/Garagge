@@ -16,6 +16,7 @@ public static class TestDbContextFactory
             .Options;
         
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
+        dateTimeProviderMock.Setup(x => x.UtcNow).Returns(() => DateTime.UtcNow);
         
         var context = new ApplicationDbContext(options, publisherMock.Object, dateTimeProviderMock.Object);
         context.Database.EnsureCreated();

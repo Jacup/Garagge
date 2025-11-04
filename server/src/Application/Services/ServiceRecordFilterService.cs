@@ -10,39 +10,49 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
     {
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
-            query = query.Where(sr => 
-                sr.Title.Contains(request.SearchTerm) || 
-                (sr.Notes != null && sr.Notes.Contains(request.SearchTerm)));
+            var searchTerm = request.SearchTerm.ToLower().Trim();
+
+            query = query.Where(sr =>
+                sr.Title.ToLower().Contains(searchTerm) ||
+                (sr.Notes != null && sr.Notes.ToLower().Contains(searchTerm)));
         }
-        
+
         if (request.ServiceTypeId.HasValue)
         {
             query = query.Where(sr => sr.TypeId == request.ServiceTypeId.Value);
         }
-        
+
         if (request.DateFrom.HasValue)
         {
-            query = query.Where(sr => sr.ServiceDate >= request.DateFrom.Value);
+            var dateFromUtc = request.DateFrom.Value.Kind == DateTimeKind.Utc
+                ? request.DateFrom.Value
+                : DateTime.SpecifyKind(request.DateFrom.Value, DateTimeKind.Utc);
+
+            query = query.Where(sr => sr.ServiceDate >= dateFromUtc);
         }
-        
+
         if (request.DateTo.HasValue)
         {
-            query = query.Where(sr => sr.ServiceDate <= request.DateTo.Value);
+            var dateFromUtc = request.DateTo.Value.Kind == DateTimeKind.Utc
+                ? request.DateTo.Value
+                : DateTime.SpecifyKind(request.DateTo.Value, DateTimeKind.Utc);
+            
+            query = query.Where(sr => sr.ServiceDate <= dateFromUtc);
         }
-        
+
         return query;
     }
-    
+
     public IQueryable<ServiceRecord> ApplySorting(IQueryable<ServiceRecord> query, string? sortBy, bool descending)
     {
         if (string.IsNullOrWhiteSpace(sortBy))
         {
             return query.OrderByDescending(sr => sr.ServiceDate);
         }
-        
+
         return sortBy.ToLowerInvariant() switch
         {
-            "servicedate" => descending 
+            "servicedate" => descending
                 ? query.OrderByDescending(sr => sr.ServiceDate)
                 : query.OrderBy(sr => sr.ServiceDate),
             "totalcost" => descending
@@ -58,4 +68,3 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
         };
     }
 }
-

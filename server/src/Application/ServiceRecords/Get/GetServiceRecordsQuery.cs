@@ -12,5 +12,5 @@ public sealed record GetServiceRecordsQuery(
     DateTime? DateFrom = null,
     DateTime? DateTo = null,
     string? SortBy = null,
-    bool SortDescending = false
-) : IQuery<PagedList<ServiceRecordDto>>;
+    bool SortDescending = false)
+    : IQuery<PagedList<ServiceRecordDto>>;
