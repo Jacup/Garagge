@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Services;
+﻿using Application.ServiceItems;
 
 namespace Application.ServiceRecords;
 
@@ -11,6 +11,7 @@ public record ServiceRecordDto(
     decimal TotalCost,
     Guid TypeId,
     string Type,
+    ICollection<ServiceItemDto> ServiceItems,
     Guid VehicleId,
     DateTime CreatedDate,
     DateTime UpdatedDate
