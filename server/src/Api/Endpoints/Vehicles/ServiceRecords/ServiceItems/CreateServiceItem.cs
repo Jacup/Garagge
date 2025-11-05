@@ -43,7 +43,7 @@ internal sealed class CreateServiceItem : IEndpoint
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.ServiceItems);
     }
 }
 

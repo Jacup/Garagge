@@ -44,6 +44,6 @@ internal sealed class GetServiceRecords : IEndpoint
             .Produces<PagedList<ServiceRecordDto>>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.ServiceRecords);
     }
 }

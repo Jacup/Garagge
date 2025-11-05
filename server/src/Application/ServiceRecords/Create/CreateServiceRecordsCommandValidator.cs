@@ -25,7 +25,7 @@ internal sealed class CreateServiceRecordsCommandValidator : AbstractValidator<C
 
         RuleFor(x => x.ServiceDate)
             .NotEmpty()
-            .LessThanOrEqualTo(dateTimeProvider.UtcNow.Date)
+            .LessThanOrEqualTo(dateTimeProvider.UtcNow)
             .WithMessage("Service date cannot be in the future.");
         
         RuleFor(x => x.ManualCost)

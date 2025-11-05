@@ -42,14 +42,17 @@ internal sealed class CreateServiceRecord : IEndpoint
 
                     Result<ServiceRecordDto> result = await sender.Send(query, cancellationToken);
 
-                    return result.Match(Results.Ok, CustomResults.Problem);
+                    return result.Match(
+                        dto => Results.Created($"/api/vehicles/{vehicleId}/service-records/{dto.Id}", dto),
+                        CustomResults.Problem);
                 })
             .RequireAuthorization()
-            .Produces<ServiceRecordDto>()
+            .Produces<ServiceRecordDto>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError)
-            .WithTags(Tags.Vehicles);
+            .WithTags(Tags.ServiceRecords);
     }
 }
 

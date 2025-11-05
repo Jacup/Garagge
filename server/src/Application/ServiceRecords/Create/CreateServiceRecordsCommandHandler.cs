@@ -33,12 +33,17 @@ internal sealed class CreateServiceRecordsCommandHandler(
         if (!typeExists)
             return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.ServiceTypeNotFound(request.ServiceTypeId));
 
+        // Load the service type for mapping
+        var serviceType = await dbContext.ServiceTypes
+            .FirstAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
+
         var serviceRecordId = Guid.NewGuid();
         var record = new ServiceRecord
         {
             Id = serviceRecordId,
             VehicleId = request.VehicleId,
             TypeId = request.ServiceTypeId,
+            Type = serviceType,
             ServiceDate = request.ServiceDate,
             Title = request.Title,
             Notes = request.Notes,
