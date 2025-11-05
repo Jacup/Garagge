@@ -3,6 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
+using Application.ServiceItems;
 using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ internal sealed class GetServiceRecordsQueryHandler(
         var serviceRecordsQuery = dbContext.ServiceRecords
             .AsNoTracking()
             .Include(sr => sr.Type)
+            .Include(sr => sr.Items)
             .Where(sr => sr.VehicleId == request.VehicleId);
 
         serviceRecordsQuery = filterService.ApplyFilters(serviceRecordsQuery, request);
@@ -45,7 +47,19 @@ internal sealed class GetServiceRecordsQueryHandler(
                 sr.ServiceDate,
                 sr.TotalCost,
                 sr.TypeId,
-                sr.Type.Name,
+                sr.Type!.Name,
+                sr.Items.Select(si => new ServiceItemDto(
+                    si.Id, 
+                    si.Name, 
+                    si.Type, 
+                    si.UnitPrice, 
+                    si.Quantity, 
+                    si.TotalPrice, 
+                    si.PartNumber, 
+                    si.Notes, 
+                    si.ServiceRecordId, 
+                    si.CreatedDate,
+                    si.UpdatedDate)).ToList(),
                 sr.VehicleId,
                 sr.CreatedDate,
                 sr.UpdatedDate

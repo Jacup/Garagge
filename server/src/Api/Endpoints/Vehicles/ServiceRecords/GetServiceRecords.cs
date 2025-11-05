@@ -14,7 +14,7 @@ internal sealed class GetServiceRecords : IEndpoint
     {
         app.MapGet("vehicles/{vehicleId:guid}/service-records", async (
                 [FromRoute] Guid vehicleId,
-                ISender sender,
+                [FromServices] ISender sender,
                 CancellationToken cancellationToken,
                 [FromQuery] int page = 1,
                 [FromQuery] int pageSize = 10,
@@ -26,8 +26,8 @@ internal sealed class GetServiceRecords : IEndpoint
                 [FromQuery] bool sortDescending = false) =>
             {
                 var query = new GetServiceRecordsQuery(
-                    vehicleId, 
-                    page, 
+                    vehicleId,
+                    page,
                     pageSize,
                     searchTerm,
                     serviceTypeId,

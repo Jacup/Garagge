@@ -18,7 +18,7 @@ public sealed class ServiceRecord : Entity
     public ICollection<ServiceItem> Items { get; set; } = new List<ServiceItem>();
 
     public required Guid TypeId { get; set; }
-    public required ServiceType Type { get; set; }
+    public ServiceType? Type { get; set; }
     
     public required Guid VehicleId { get; set; }
     public Vehicle? Vehicle { get; set; }
