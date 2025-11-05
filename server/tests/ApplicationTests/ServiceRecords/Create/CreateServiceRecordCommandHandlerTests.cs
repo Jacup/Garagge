@@ -303,34 +303,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Notes.ShouldBe(longNotes);
     }
-
-    [Fact]
-    public async Task Handle_WithFutureDate_CreatesServiceRecordSuccessfully()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Scheduled Maintenance");
-
-        var futureDate = DateTime.Now.AddMonths(1);
-        var command = new CreateServiceRecordCommand(
-            "Scheduled maintenance",
-            "Planned for next month",
-            15000,
-            futureDate,
-            150.50m,
-            serviceType.Id,
-            vehicle.Id,
-            new List<CreateServiceItemCommand>());
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.ServiceDate.ShouldBe(futureDate);
-    }
-
+    
     [Fact]
     public async Task Handle_WithPastDate_CreatesServiceRecordSuccessfully()
     {

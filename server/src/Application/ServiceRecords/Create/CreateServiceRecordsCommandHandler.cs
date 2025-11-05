@@ -27,15 +27,11 @@ internal sealed class CreateServiceRecordsCommandHandler(
         if (vehicle.UserId != userContext.UserId)
             return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.Unauthorized);
 
-        var typeExists = await dbContext.ServiceTypes
-            .AnyAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
-        
-        if (!typeExists)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.ServiceTypeNotFound(request.ServiceTypeId));
-
-        // Load the service type for mapping
         var serviceType = await dbContext.ServiceTypes
-            .FirstAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
+            .FirstOrDefaultAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
+
+        if (serviceType is null)
+            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.ServiceTypeNotFound(request.ServiceTypeId));
 
         var serviceRecordId = Guid.NewGuid();
         var record = new ServiceRecord
@@ -50,26 +46,22 @@ internal sealed class CreateServiceRecordsCommandHandler(
             Mileage = request.Mileage,
             ManualCost = request.ManualCost
         };
-        
-        if (request.ServiceItems.Count > 0)
-        {
-            foreach (var itemCommand in request.ServiceItems)
-            {
-                var serviceItem = new ServiceItem
-                {
-                    ServiceRecordId = serviceRecordId,
-                    Name = itemCommand.Name,
-                    Type = itemCommand.Type,
-                    UnitPrice = itemCommand.UnitPrice,
-                    Quantity = itemCommand.Quantity,
-                    PartNumber = itemCommand.PartNumber,
-                    Notes = itemCommand.Notes
-                };
-                
-                record.Items.Add(serviceItem);
-            }
-        }
 
+        var items = request.ServiceItems.Select(item =>
+            new ServiceItem
+            {
+                ServiceRecordId = serviceRecordId,
+                Name = item.Name,
+                Type = item.Type,
+                UnitPrice = item.UnitPrice,
+                Quantity = item.Quantity,
+                PartNumber = item.PartNumber,
+                Notes = item.Notes
+            });
+
+        foreach (ServiceItem serviceItem in items)
+            record.Items.Add(serviceItem);
+        
         try
         {
             await dbContext.ServiceRecords.AddAsync(record, cancellationToken);
