@@ -291,69 +291,69 @@ public static class ApiV1Definition
         /// <summary>
         /// Get service records. Use: string.Format(Services.GetAll, vehicleId)
         /// </summary>
-        public static string GetAll = $"{ApiBase}/vehicles/{{0}}/services";
+        public static string GetAll = $"{ApiBase}/vehicles/{{0}}/service-records";
         
         /// <summary>
         /// Create service record. Use: string.Format(Services.Create, vehicleId)
         /// </summary>
-        public static string Create = $"{ApiBase}/vehicles/{{0}}/services";
+        public static string Create = $"{ApiBase}/vehicles/{{0}}/service-records";
         
         /// <summary>
         /// Get specific service. Use: string.Format(Services.GetById, vehicleId, serviceId)
         /// </summary>
-        public static string GetById = $"{ApiBase}/vehicles/{{0}}/services/{{1}}";
+        public static string GetById = $"{ApiBase}/vehicles/{{0}}/service-records/{{1}}";
         
         /// <summary>
         /// Update service record. Use: string.Format(Services.UpdateById, vehicleId, serviceId)
         /// </summary>
-        public static string UpdateById = $"{ApiBase}/vehicles/{{0}}/services/{{1}}";
+        public static string UpdateById = $"{ApiBase}/vehicles/{{0}}/service-records/{{1}}";
         
         /// <summary>
         /// Delete service record. Use: string.Format(Services.DeleteById, vehicleId, serviceId)
         /// </summary>
-        public static string DeleteById = $"{ApiBase}/vehicles/{{0}}/services/{{1}}";
+        public static string DeleteById = $"{ApiBase}/vehicles/{{0}}/service-records/{{1}}";
 
         // Scheduled services
         /// <summary>
         /// Get scheduled services. Use: string.Format(Services.GetScheduled, vehicleId)
         /// </summary>
-        public static string GetScheduled = $"{ApiBase}/vehicles/{{0}}/services/scheduled";
+        public static string GetScheduled = $"{ApiBase}/vehicles/{{0}}/service-records/scheduled";
         
         /// <summary>
         /// Schedule service. Use: string.Format(Services.Schedule, vehicleId)
         /// </summary>
-        public static string Schedule = $"{ApiBase}/vehicles/{{0}}/services/scheduled";
+        public static string Schedule = $"{ApiBase}/vehicles/{{0}}/service-records/scheduled";
         
         /// <summary>
         /// Update scheduled service. Use: string.Format(Services.UpdateScheduled, vehicleId, serviceId)
         /// </summary>
-        public static string UpdateScheduled = $"{ApiBase}/vehicles/{{0}}/services/scheduled/{{1}}";
+        public static string UpdateScheduled = $"{ApiBase}/vehicles/{{0}}/service-records/scheduled/{{1}}";
         
         /// <summary>
         /// Cancel scheduled service. Use: string.Format(Services.CancelScheduled, vehicleId, serviceId)
         /// </summary>
-        public static string CancelScheduled = $"{ApiBase}/vehicles/{{0}}/services/scheduled/{{1}}";
+        public static string CancelScheduled = $"{ApiBase}/vehicles/{{0}}/service-records/scheduled/{{1}}";
 
         // Service templates
         /// <summary>
         /// Get service templates. Use: string.Format(Services.GetTemplates, vehicleId)
         /// </summary>
-        public static string GetTemplates = $"{ApiBase}/vehicles/{{0}}/service-templates";
+        public static string GetTemplates = $"{ApiBase}/vehicles/{{0}}/service-records-templates";
         
         /// <summary>
         /// Create service template. Use: string.Format(Services.CreateTemplate, vehicleId)
         /// </summary>
-        public static string CreateTemplate = $"{ApiBase}/vehicles/{{0}}/service-templates";
+        public static string CreateTemplate = $"{ApiBase}/vehicles/{{0}}/service-records-templates";
         
         /// <summary>
         /// Update service template. Use: string.Format(Services.UpdateTemplate, vehicleId, templateId)
         /// </summary>
-        public static string UpdateTemplate = $"{ApiBase}/vehicles/{{0}}/service-templates/{{1}}";
+        public static string UpdateTemplate = $"{ApiBase}/vehicles/{{0}}/service-records-templates/{{1}}";
         
         /// <summary>
         /// Delete service template. Use: string.Format(Services.DeleteTemplate, vehicleId, templateId)
         /// </summary>
-        public static string DeleteTemplate = $"{ApiBase}/vehicles/{{0}}/service-templates/{{1}}";
+        public static string DeleteTemplate = $"{ApiBase}/vehicles/{{0}}/service-records-templates/{{1}}";
     }
 
     // ==================== INSURANCE MANAGEMENT ====================

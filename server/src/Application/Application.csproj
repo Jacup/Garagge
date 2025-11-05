@@ -19,4 +19,10 @@
         <InternalsVisibleTo Include="$(AssemblyName)Tests" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ServiceRecords\Create\" />
+      <Folder Include="ServiceRecords\Delete\" />
+      <Folder Include="ServiceRecords\GetById\" />
+    </ItemGroup>
+
 </Project>

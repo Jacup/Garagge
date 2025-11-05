@@ -3,6 +3,7 @@ using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
 using Application.Auth.Login;
 using Application.Vehicles;
+using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
@@ -143,6 +144,54 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         await DbContext.SaveChangesAsync();
         
         return vehicle;
+    }
+
+    protected async Task<ServiceType> CreateServiceTypeAsync(string name = "Maintenance")
+    {
+        var serviceType = new ServiceType
+        {
+            Id = Guid.NewGuid(),
+            Name = name
+        };
+
+        DbContext.ServiceTypes.Add(serviceType);
+        await DbContext.SaveChangesAsync();
+
+        return serviceType;
+    }
+
+    protected async Task<ServiceRecord> CreateServiceRecordAsync(
+        Guid vehicleId,
+        Guid typeId,
+        string title = "Oil Change",
+        DateTime? serviceDate = null,
+        int? mileage = null,
+        decimal? cost = null,
+        string? notes = null)
+    {
+        var serviceType = await DbContext.ServiceTypes.FindAsync(typeId);
+        if (serviceType == null)
+        {
+            throw new InvalidOperationException($"ServiceType with Id {typeId} not found");
+        }
+
+        var serviceRecord = new ServiceRecord
+        {
+            Id = Guid.NewGuid(),
+            VehicleId = vehicleId,
+            TypeId = typeId,
+            Type = serviceType,
+            Title = title,
+            ServiceDate = serviceDate.HasValue ? DateTime.SpecifyKind(serviceDate.Value, DateTimeKind.Utc) : DateTime.UtcNow.AddDays(-1),
+            Mileage = mileage,
+            ManualCost = cost,
+            Notes = notes
+        };
+
+        DbContext.ServiceRecords.Add(serviceRecord);
+        await DbContext.SaveChangesAsync();
+
+        return serviceRecord;
     }
     
     protected void Authenticate(string accessToken)

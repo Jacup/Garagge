@@ -1,13 +1,13 @@
-﻿using Application.Abstractions.Messaging;
-using Application.Core;
+﻿using Application.Core;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using System.Reflection;
+using IBaseRequest = Application.Abstractions.Messaging.IBaseRequest;
 
 namespace Application.Behaviors;
 
-internal sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IBaseCommand
+internal sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IBaseRequest
 {
     private readonly IEnumerable<IValidator<TRequest>> _validators;
 
