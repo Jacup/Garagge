@@ -1,3 +1,5 @@
-﻿namespace Application.ServiceItems.Delete;
+﻿using Application.Abstractions.Messaging;
 
-public record DeleteServiceItemCommand();
+namespace Application.ServiceItems.Delete;
+
+public sealed record DeleteServiceItemCommand(Guid ServiceItemId, Guid ServiceRecordId, Guid VehicleId) : ICommand;
