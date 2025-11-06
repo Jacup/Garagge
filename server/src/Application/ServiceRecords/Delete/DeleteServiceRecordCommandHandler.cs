@@ -29,7 +29,7 @@ internal sealed class DeleteServiceRecordCommandHandler(IApplicationDbContext db
             dbContext.ServiceRecords.Remove(serviceRecord);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (DbUpdateException)
         {
             return Result.Failure(ServiceRecordErrors.DeleteFailed(request.ServiceRecordId));
         }

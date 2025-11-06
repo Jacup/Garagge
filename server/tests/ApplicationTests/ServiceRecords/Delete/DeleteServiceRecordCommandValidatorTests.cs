@@ -23,7 +23,7 @@ public class DeleteServiceRecordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.ServiceRecordId)
-            .WithErrorMessage("ServiceRecordId must be a valid GUID.");
+            .WithErrorMessage("ServiceRecordId is required.");
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class DeleteServiceRecordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.VehicleId)
-            .WithErrorMessage("VehicleId must be a valid GUID.");
+            .WithErrorMessage("VehicleId is required.");
     }
 
     [Fact]
@@ -65,6 +65,6 @@ public class DeleteServiceRecordCommandValidatorTests
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.ServiceRecordId);
         result.ShouldHaveValidationErrorFor(x => x.VehicleId);
-        result.Errors.Count.ShouldBe(4);
+        result.Errors.Count.ShouldBe(2);
     }
 }

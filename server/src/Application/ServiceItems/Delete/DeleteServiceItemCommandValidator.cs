@@ -2,26 +2,20 @@
 
 namespace Application.ServiceItems.Delete;
 
-public class DeleteServiceItemCommandValidator : AbstractValidator<DeleteServiceItemCommand>
+internal sealed class DeleteServiceItemCommandValidator : AbstractValidator<DeleteServiceItemCommand>
 {
     public DeleteServiceItemCommandValidator()
     {
         RuleFor(sr => sr.ServiceItemId)
             .NotEmpty()
-            .WithMessage("ServiceItemId is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("ServiceItemId must be a valid GUID.");
-        
+            .WithMessage("ServiceItemId is required.");
+
         RuleFor(sr => sr.ServiceRecordId)
             .NotEmpty()
-            .WithMessage("ServiceRecordId is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("ServiceRecordId must be a valid GUID.");
-        
+            .WithMessage("ServiceRecordId is required.");
+
         RuleFor(sr => sr.VehicleId)
             .NotEmpty()
-            .WithMessage("VehicleId is required.")
-            .Must(id => id != Guid.Empty)
-            .WithMessage("VehicleId must be a valid GUID.");
+            .WithMessage("VehicleId is required.");
     }
 }

@@ -3,11 +3,12 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Application.ServiceRecords;
+using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.ServiceItems.Delete;
 
-public class DeleteServiceItemCommandHandler(IApplicationDbContext dbContext, IUserContext userContext) : ICommandHandler<DeleteServiceItemCommand>
+internal sealed class DeleteServiceItemCommandHandler(IApplicationDbContext dbContext, IUserContext userContext) : ICommandHandler<DeleteServiceItemCommand>
 {
     public async Task<Result> Handle(DeleteServiceItemCommand request, CancellationToken cancellationToken)
     {
@@ -27,7 +28,7 @@ public class DeleteServiceItemCommandHandler(IApplicationDbContext dbContext, IU
             return Result.Failure(ServiceRecordErrors.NotFound(request.ServiceRecordId));
         
         if (serviceItem.ServiceRecord.Vehicle is null)
-            return Result.Failure(ServiceRecordErrors.NotFound(request.VehicleId));
+            return Result.Failure(VehicleErrors.NotFound(request.VehicleId));
         
         if (serviceItem.ServiceRecord.Vehicle.UserId != userContext.UserId)
             return Result.Failure(ServiceRecordErrors.Unauthorized);
@@ -37,7 +38,7 @@ public class DeleteServiceItemCommandHandler(IApplicationDbContext dbContext, IU
             dbContext.ServiceItems.Remove(serviceItem);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception)
+        catch (DbUpdateException)
         {
             return Result.Failure(ServiceItemsErrors.DeleteFailed(request.ServiceItemId));
         }
