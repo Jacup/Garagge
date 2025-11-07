@@ -161,7 +161,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]

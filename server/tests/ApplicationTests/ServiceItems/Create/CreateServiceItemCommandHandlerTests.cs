@@ -1,4 +1,5 @@
-﻿using Application.ServiceItems.Create;
+﻿using Application.ServiceItems;
+using Application.ServiceItems.Create;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
 using Domain.Enums;
@@ -143,7 +144,7 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]
@@ -168,7 +169,7 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]
