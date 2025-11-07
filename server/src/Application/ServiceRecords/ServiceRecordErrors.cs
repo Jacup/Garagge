@@ -20,6 +20,10 @@ public static class ServiceRecordErrors
         "ServiceRecords.DeleteFailed",
         "Failed to delete service record.");
 
+    public static Error UpdateFailed(Guid serviceRecordId) => Error.Failure(
+        "ServiceRecords.UpdateFailed",
+        $"Failed to update service record with Id = '{serviceRecordId}'.");
+
     public static Error ServiceTypeNotFound(Guid serviceTypeTypeId) => Error.NotFound(
         "ServiceRecords.ServiceTypeNotFound",
         $"Service Type with Id = '{serviceTypeTypeId}' was not found.");

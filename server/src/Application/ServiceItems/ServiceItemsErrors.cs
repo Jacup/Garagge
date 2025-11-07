@@ -19,4 +19,8 @@ public static class ServiceItemsErrors
     public static Error DeleteFailed(Guid requestServiceItemId) => Error.Failure(
         "ServiceItems.DeleteFailed",
         $"Failed to delete service item with Id = '{requestServiceItemId}'.");
+
+    public static Error UpdateFailed(Guid serviceItemId) => Error.Failure(
+        "ServiceItems.UpdateFailed",
+        $"Failed to update service item with Id = '{serviceItemId}'.");
 }
