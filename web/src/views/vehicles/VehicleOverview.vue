@@ -17,7 +17,7 @@ const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 
 // Vehicle data
-const vehicleId = computed(() => route.params.id as string)
+const vehicleId = ref(route.params.id as string)
 const selectedVehicle = ref<VehicleDto | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
@@ -132,7 +132,7 @@ async function loadEnergyEntries() {
     // Get all energy entries (high page size to get full timeline)
     const response = await getApiVehiclesVehicleIdEnergyEntries(vehicleId.value, {
       page: 1,
-      pageSize: 1000, // Get all entries for timeline
+      pageSize: 100, // Get all entries for timeline
     })
     energyEntries.value = response.data.items ?? []
   } catch (err) {

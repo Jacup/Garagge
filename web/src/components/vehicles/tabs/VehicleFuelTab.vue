@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { EnergyStatsDto, EnergyType } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import EnergyStatisticsCard from '@/components/vehicles/EnergyStatisticsCard.vue'
@@ -20,9 +21,12 @@ const emit = defineEmits<{
   'bulk-delete': []
 }>()
 
-// Expose energyEntriesTableRef to parent
-const energyEntriesTableRef = defineExpose({
-  energyEntriesTableRef: null as InstanceType<typeof EnergyEntriesTable> | null
+// Ref to EnergyEntriesTable component
+const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
+
+// Expose ref to parent
+defineExpose({
+  energyEntriesTableRef
 })
 </script>
 
