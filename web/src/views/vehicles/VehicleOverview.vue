@@ -5,6 +5,7 @@ import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
+import ServiceRecordsTable from '@/components/vehicles/ServiceRecordsTable.vue'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
 import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
@@ -87,8 +88,12 @@ const editVehicleDialog = ref(false)
 // Selection state for energy entries
 const selectedEnergyEntries = ref<string[]>([])
 
+// Selection state for service records
+const selectedServiceRecords = ref<string[]>([])
+
 // Component refs
 const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
+const serviceRecordsTableRef = ref<InstanceType<typeof ServiceRecordsTable> | null>(null)
 const vehicleFormDialogRef = ref<InstanceType<typeof VehicleFormDialog> | null>(null)
 
 // Load vehicle data from API
@@ -183,15 +188,6 @@ const mockStats = {
   monthlyFuelCost: 650.0,
   totalServiceCost: 2350.0,
 }
-
-// Mock service history data
-const mockServiceHistory = ref([
-  { date: '2025-03-15', service: 'Przegląd okresowy', description: 'Zaplanowany przegląd roczny', type: 'upcoming', cost: null },
-  { date: '2024-11-15', service: 'Wymiana oleju', description: 'Wymiana oleju silnikowego i filtra', type: 'completed', cost: 180.0 },
-  { date: '2024-08-22', service: 'Wymiana klocków', description: 'Wymiana klocków hamulcowych przód', type: 'completed', cost: 450.0 },
-  { date: '2024-06-10', service: 'Przegląd AC', description: 'Serwis klimatyzacji', type: 'completed', cost: 220.0 },
-  { date: '2024-03-15', service: 'Przegląd okresowy', description: 'Przegląd roczny + wymiana świec', type: 'completed', cost: 520.0 },
-])
 
 // Utility functions
 const formatDate = (dateString: string) => {
@@ -581,38 +577,17 @@ onMounted(async () => {
         </v-col>
 
         <v-col cols="12" md="8">
-          <v-card class="service-timeline-card card-background" height="400" variant="flat">
-            <template #title>Service History</template>
+          <v-card class="service-timeline-card card-background" height="500" variant="flat">
+            <template #title>Service Records</template>
             <template #append>
               <v-btn class="text-none" prepend-icon="mdi-plus" variant="flat" color="primary" disabled>Add</v-btn>
             </template>
-            <v-card-text class="pa-4" style="height: 320px; overflow-y: auto">
-              <v-timeline density="compact">
-                <v-timeline-item
-                  v-for="entry in mockServiceHistory"
-                  :key="entry.date"
-                  :dot-color="entry.type === 'upcoming' ? 'warning' : 'success'"
-                  size="small"
-                >
-                  <template #default>
-                    <div class="timeline-card pa-3">
-                      <div class="d-flex justify-space-between align-center mb-2">
-                        <h4 class="text-subtitle-1 font-weight-medium">{{ entry.service }}</h4>
-                        <span class="text-body-2 text-medium-emphasis">{{ formatDate(entry.date) }}</span>
-                      </div>
-                      <p class="text-body-2 mb-2">{{ entry.description }}</p>
-                      <div class="d-flex justify-space-between">
-                        <span class="text-body-2 font-weight-medium">
-                          <v-chip size="x-small" :color="entry.type === 'upcoming' ? 'warning' : 'success'" variant="tonal">
-                            {{ entry.type === 'upcoming' ? 'Upcoming' : 'Completed' }}
-                          </v-chip>
-                        </span>
-                        <span v-if="entry.cost" class="text-subtitle-2 font-weight-bold"> {{ entry.cost.toFixed(2) }} PLN </span>
-                      </div>
-                    </div>
-                  </template>
-                </v-timeline-item>
-              </v-timeline>
+            <v-card-text class="pa-4">
+              <ServiceRecordsTable
+                ref="serviceRecordsTableRef"
+                :vehicle-id="vehicleId"
+                v-model:selected="selectedServiceRecords"
+              />
             </v-card-text>
           </v-card>
         </v-col>
