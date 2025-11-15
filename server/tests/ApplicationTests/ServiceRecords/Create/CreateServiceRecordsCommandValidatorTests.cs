@@ -1,4 +1,4 @@
-﻿using Application.Abstractions;
+﻿﻿using Application.Abstractions;
 using Application.ServiceRecords.Create;
 using Application.ServiceItems.Create;
 using Domain.Enums.Services;
@@ -364,12 +364,12 @@ public class CreateServiceRecordsCommandValidatorTests
         // Arrange
         var command = new CreateServiceRecordCommand(
             "Basic service",
-            null,
-            null,
             _currentDateTime.Date,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             null,
-            Guid.NewGuid(),
-            Guid.NewGuid(),
+            null,
+            null,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -383,12 +383,12 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         return new CreateServiceRecordCommand(
             "Oil Change",
+            _currentDateTime.Date,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             "Regular maintenance",
             15000,
-            _currentDateTime.Date,
             150.00m,
-            Guid.NewGuid(),
-            Guid.NewGuid(),
             new List<CreateServiceItemCommand>());
     }
 }

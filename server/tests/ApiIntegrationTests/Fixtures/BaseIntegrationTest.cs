@@ -146,6 +146,17 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         return vehicle;
     }
 
+    protected async Task<Vehicle> CreateVehicleAsync(string brand = "Toyota", string model = "Corolla")
+    {
+        var user = DbContext.Users.FirstOrDefault(u => u.Email == "test@garagge.app");
+        if (user == null)
+        {
+            throw new InvalidOperationException("No authenticated user found. Call CreateAndAuthenticateUser() first.");
+        }
+        
+        return await CreateVehicleAsync(user, brand, model);
+    }
+
     protected async Task<ServiceType> CreateServiceTypeAsync(string name = "Maintenance")
     {
         var serviceType = new ServiceType
@@ -192,6 +203,32 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         await DbContext.SaveChangesAsync();
 
         return serviceRecord;
+    }
+
+    protected async Task<ServiceItem> CreateServiceItemAsync(
+        Guid serviceRecordId,
+        string name = "Service Item",
+        decimal unitPrice = 100m,
+        decimal quantity = 1,
+        string? partNumber = null,
+        string? notes = null)
+    {
+        var serviceItem = new ServiceItem
+        {
+            Id = Guid.NewGuid(),
+            ServiceRecordId = serviceRecordId,
+            Name = name,
+            Type = Domain.Enums.Services.ServiceItemType.Part,
+            UnitPrice = unitPrice,
+            Quantity = quantity,
+            PartNumber = partNumber,
+            Notes = notes
+        };
+
+        DbContext.ServiceItems.Add(serviceItem);
+        await DbContext.SaveChangesAsync();
+
+        return serviceItem;
     }
     
     protected void Authenticate(string accessToken)

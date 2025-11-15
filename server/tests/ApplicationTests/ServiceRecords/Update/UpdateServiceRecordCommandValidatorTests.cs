@@ -1,4 +1,4 @@
-﻿using Application.Abstractions;
+﻿﻿using Application.Abstractions;
 using Application.ServiceRecords.Update;
 using FluentValidation.TestHelper;
 using Moq;
@@ -379,12 +379,12 @@ public class UpdateServiceRecordCommandValidatorTests
         var command = new UpdateServiceRecordCommand(
             Guid.NewGuid(),
             "Basic service",
-            null,
-            null,
             _currentDateTime.Date,
-            null,
             Guid.NewGuid(),
-            Guid.NewGuid());
+            Guid.NewGuid(),
+            null,
+            null,
+            null);
 
         // Act
         var result = _validator.TestValidate(command);
@@ -400,12 +400,12 @@ public class UpdateServiceRecordCommandValidatorTests
         var command = new UpdateServiceRecordCommand(
             Guid.Empty,
             "",
+            _currentDateTime.AddDays(1),
+            Guid.Empty,
+            Guid.Empty,
             new string('A', 501),
             -1,
-            _currentDateTime.AddDays(1),
-            -10m,
-            Guid.Empty,
-            Guid.Empty);
+            -10m);
 
         // Act
         var result = _validator.TestValidate(command);
@@ -427,11 +427,11 @@ public class UpdateServiceRecordCommandValidatorTests
         return new UpdateServiceRecordCommand(
             Guid.NewGuid(),
             "Oil Change",
+            _currentDateTime.Date,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
             "Regular maintenance",
             15000,
-            _currentDateTime.Date,
-            150.00m,
-            Guid.NewGuid(),
-            Guid.NewGuid());
+            150.00m);
     }
 }

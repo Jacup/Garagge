@@ -1,6 +1,5 @@
 ﻿using Application.ServiceRecords;
 using Application.ServiceRecords.Update;
-using Domain.Entities.Services;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,12 +27,12 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Updated Oil Change",
+            new DateTime(2024, 11, 1),
+            newServiceType.Id,
+            vehicle.Id,
             "Updated notes",
             20000,
-            new DateTime(2024, 11, 1),
-            200.00m,
-            newServiceType.Id,
-            vehicle.Id);
+            200.00m);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -76,17 +75,15 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
             vehicle.Id,
             serviceType.Id,
             "Old Title",
-            "Old notes",
+            new DateTime(2024, 10, 1),
             15000,
-            100.00m);
+            100.00m,
+            "Old notes");
 
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Inspection",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
             serviceType.Id,
             vehicle.Id);
 
@@ -121,12 +118,9 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             nonExistentServiceRecordId,
             "Test Title",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
-            serviceType.Id,
-            vehicle.Id);
+            vehicle.Id,
+            serviceType.Id);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -149,10 +143,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Test Title",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
             serviceType.Id,
             nonExistentVehicleId);
 
@@ -177,10 +168,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Test Title",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
             serviceType.Id,
             vehicle2.Id);
 
@@ -205,10 +193,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Test Title",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
             serviceType.Id,
             vehicle.Id);
 
@@ -233,10 +218,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Test Title",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            null,
             nonExistentServiceTypeId,
             vehicle.Id);
 
@@ -259,19 +241,20 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
             vehicle.Id,
             serviceType.Id,
             "Original Title",
-            "Original notes",
+            new DateTime(2020, 5, 1),
             15000,
-            100.00m);
+            100.00m,
+            "Original notes");
 
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Updated Title Only",
+            serviceRecord.ServiceDate,
+            serviceType.Id,
+            vehicle.Id,
             "Original notes",
             15000,
-            serviceRecord.ServiceDate,
-            100.00m,
-            serviceType.Id,
-            vehicle.Id);
+            100.00m);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -295,19 +278,20 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
             vehicle.Id,
             oldServiceType.Id,
             "Old Title",
-            "Old notes",
+            new DateTime(2024, 10, 10),
             10000,
-            50.00m);
+            50.00m,
+            "Old notes");
 
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Completely New Title",
+            new DateTime(2024, 10, 15),
+            newServiceType.Id,
+            vehicle.Id,
             "Brand new notes",
             25000,
-            new DateTime(2024, 10, 15),
-            500.00m,
-            newServiceType.Id,
-            vehicle.Id);
+            500.00m);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -344,12 +328,11 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Updated Title",
-            "Updated notes",
-            20000,
             new DateTime(2024, 11, 1),
-            null,
             serviceType.Id,
-            vehicle.Id);
+            vehicle.Id,
+            "Updated notes",
+            20000);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -381,12 +364,10 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new UpdateServiceRecordCommand(
             serviceRecord.Id,
             "Free Service",
-            null,
-            null,
             new DateTime(2024, 11, 1),
-            0m,
             serviceType.Id,
-            vehicle.Id);
+            vehicle.Id,
+            ManualCost: 0m);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -395,62 +376,4 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.TotalCost.ShouldBe(0m);
     }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
-
-    private async Task<ServiceRecord> CreateServiceRecordInDb(
-        Guid vehicleId,
-        Guid serviceTypeId,
-        string title = "Test Service Record",
-        string? notes = null,
-        int? mileage = 15000,
-        decimal? manualCost = null)
-    {
-        var serviceRecord = new ServiceRecord
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            TypeId = serviceTypeId,
-            Title = title,
-            ServiceDate = DateTime.UtcNow.Date,
-            Notes = notes,
-            Mileage = mileage,
-            ManualCost = manualCost
-        };
-
-        Context.ServiceRecords.Add(serviceRecord);
-        await Context.SaveChangesAsync();
-        return serviceRecord;
-    }
-
-    private async Task CreateServiceItemInDb(Guid serviceRecordId,
-        string name = "Test Item")
-    {
-        var serviceItem = new ServiceItem
-        {
-            Id = Guid.NewGuid(),
-            ServiceRecordId = serviceRecordId,
-            Name = name,
-            Type = Domain.Enums.Services.ServiceItemType.Part,
-            UnitPrice = 100.00m,
-            Quantity = 1,
-            PartNumber = null,
-            Notes = null
-        };
-
-        Context.ServiceItems.Add(serviceItem);
-        await Context.SaveChangesAsync();
-    }
 }
-

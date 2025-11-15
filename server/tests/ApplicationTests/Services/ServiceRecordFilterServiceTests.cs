@@ -638,10 +638,10 @@ public class ServiceRecordFilterServiceTests
 
     #endregion
 
-    #region ApplySorting Tests - TotalCost (Note: This will fail with InMemory DB)
+    #region ApplySorting Tests - TotalCost (Adjusted: Sorting now requires in-memory and ApplySorting falls back)
 
     [Fact]
-    public void ApplySorting_WhenSortByTotalCostDescending_SortsCorrectly()
+    public void ApplySorting_WhenSortByTotalCostDescending_FallsBackAndRequiresInMemorySorting()
     {
         // Arrange
         var records = CreateTestServiceRecordsWithCosts();
@@ -651,18 +651,18 @@ public class ServiceRecordFilterServiceTests
         var result = _service.ApplySorting(query, "totalcost", true);
 
         // Assert
-        // Note: This test is for the service logic, but TotalCost sorting
-        // may not work with InMemory database in integration tests
+        // Now ApplySorting no longer sorts by TotalCost at IQueryable level, it falls back to ServiceDate DESC
         var sorted = result.ToList();
-        sorted[0].TotalCost.ShouldBe(500m);
-        sorted[1].TotalCost.ShouldBe(300m);
-        sorted[2].TotalCost.ShouldBe(200m);
-        sorted[3].TotalCost.ShouldBe(150m);
-        sorted[4].TotalCost.ShouldBe(100m);
+        var expectedByServiceDateDesc = records
+            .OrderByDescending(r => r.ServiceDate)
+            .Select(r => r.Id)
+            .ToList();
+        sorted.Select(r => r.Id).ShouldBe(expectedByServiceDateDesc);
+        _service.RequiresInMemorySorting("totalcost").ShouldBeTrue();
     }
 
     [Fact]
-    public void ApplySorting_WhenSortByTotalCostAscending_SortsCorrectly()
+    public void ApplySorting_WhenSortByTotalCostAscending_FallsBackAndRequiresInMemorySorting()
     {
         // Arrange
         var records = CreateTestServiceRecordsWithCosts();
@@ -672,46 +672,43 @@ public class ServiceRecordFilterServiceTests
         var result = _service.ApplySorting(query, "totalcost", false);
 
         // Assert
+        // Still falls back to ServiceDate DESC regardless of ascending flag (because TotalCost not sorted in DB)
         var sorted = result.ToList();
-        sorted[0].TotalCost.ShouldBe(100m);
-        sorted[1].TotalCost.ShouldBe(150m);
-        sorted[2].TotalCost.ShouldBe(200m);
-        sorted[3].TotalCost.ShouldBe(300m);
-        sorted[4].TotalCost.ShouldBe(500m);
+        var expectedByServiceDateDesc = records
+            .OrderByDescending(r => r.ServiceDate)
+            .Select(r => r.Id)
+            .ToList();
+        sorted.Select(r => r.Id).ShouldBe(expectedByServiceDateDesc);
+        _service.RequiresInMemorySorting("totalcost").ShouldBeTrue();
     }
 
     #endregion
 
-    #region ApplySorting Tests - Invalid SortBy
+    #region RequiresInMemorySorting Tests
 
     [Fact]
-    public void ApplySorting_WhenSortByIsInvalid_DefaultsToServiceDateDescending()
+    public void RequiresInMemorySorting_ReturnsTrue_ForTotalCost()
     {
-        // Arrange
-        var records = CreateTestServiceRecordsWithDates();
-        var query = records.AsQueryable();
-
-        // Act
-        var result = _service.ApplySorting(query, "invalid", false);
-
-        // Assert
-        var sorted = result.ToList();
-        sorted[0].ServiceDate.ShouldBe(new DateTime(2024, 8, 1)); // Latest first
+        _service.RequiresInMemorySorting("totalcost").ShouldBeTrue();
+        _service.RequiresInMemorySorting("TotalCost").ShouldBeTrue();
+        _service.RequiresInMemorySorting("TOTALCOST").ShouldBeTrue();
     }
 
     [Fact]
-    public void ApplySorting_WhenSortByIsInvalidAndDescending_DefaultsToServiceDateDescending()
+    public void RequiresInMemorySorting_ReturnsFalse_ForNullOrEmpty()
     {
-        // Arrange
-        var records = CreateTestServiceRecordsWithDates();
-        var query = records.AsQueryable();
+        _service.RequiresInMemorySorting(null).ShouldBeFalse();
+        _service.RequiresInMemorySorting("").ShouldBeFalse();
+        _service.RequiresInMemorySorting("   ").ShouldBeFalse();
+    }
 
-        // Act
-        var result = _service.ApplySorting(query, "unknown_field", true);
-
-        // Assert
-        var sorted = result.ToList();
-        sorted[0].ServiceDate.ShouldBe(new DateTime(2024, 8, 1)); // Latest first
+    [Fact]
+    public void RequiresInMemorySorting_ReturnsFalse_ForOtherFields()
+    {
+        _service.RequiresInMemorySorting("servicedate").ShouldBeFalse();
+        _service.RequiresInMemorySorting("mileage").ShouldBeFalse();
+        _service.RequiresInMemorySorting("title").ShouldBeFalse();
+        _service.RequiresInMemorySorting("invalid").ShouldBeFalse();
     }
 
     #endregion

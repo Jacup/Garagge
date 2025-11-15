@@ -2,7 +2,6 @@
 using Application.ServiceRecords;
 using Application.ServiceRecords.Create;
 using Application.Vehicles;
-using Domain.Entities.Services;
 using Domain.Enums;
 using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
@@ -28,12 +27,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            "Used synthetic oil",
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             vehicle.Id,
+            "Used synthetic oil",
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -73,12 +72,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Basic inspection",
-            null,
-            null,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            null,
+            null,
+            null,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -104,12 +103,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             nonExistentVehicleId,
+            null,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -131,12 +130,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             vehicle.Id,
+            null,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -157,12 +156,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             nonExistentServiceTypeId,
             vehicle.Id,
+            null,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -182,12 +181,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             vehicle.Id,
+            null,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -208,12 +207,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             vehicle.Id,
+            null,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -234,12 +233,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Major Service at 500K",
-            "High mileage service",
-            500000,
             new DateTime(2024, 11, 5),
-            1500.00m,
             serviceType.Id,
             vehicle.Id,
+            "High mileage service",
+            500000,
+            1500.00m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -261,12 +260,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Engine replacement",
-            "Full engine swap",
-            150000,
             new DateTime(2024, 11, 5),
-            15000.99m,
             serviceType.Id,
             vehicle.Id,
+            "Full engine swap",
+            150000,
+            15000.99m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -288,12 +287,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var longNotes = new string('A', 1000);
         var command = new CreateServiceRecordCommand(
             "Detailed maintenance",
-            longNotes,
-            15000,
             new DateTime(2024, 11, 5),
-            150.50m,
             serviceType.Id,
             vehicle.Id,
+            longNotes,
+            15000,
+            150.50m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -315,12 +314,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var pastDate = new DateTime(2020, 1, 1);
         var command = new CreateServiceRecordCommand(
             "Historical maintenance",
-            "Service from 2020",
-            10000,
             pastDate,
-            100.00m,
             serviceType.Id,
             vehicle.Id,
+            "Service from 2020",
+            10000,
+            100.00m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -341,22 +340,22 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command1 = new CreateServiceRecordCommand(
             "First oil change",
-            null,
-            10000,
             new DateTime(2024, 1, 1),
-            100.00m,
             serviceType.Id,
             vehicle.Id,
+            null,
+            10000,
+            100.00m,
             new List<CreateServiceItemCommand>());
 
         var command2 = new CreateServiceRecordCommand(
             "Second oil change",
-            null,
-            20000,
             new DateTime(2024, 6, 1),
-            100.00m,
             serviceType.Id,
             vehicle.Id,
+            null,
+            20000,
+            100.00m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -382,12 +381,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Initial setup",
-            "Brand new car",
-            0,
             new DateTime(2024, 11, 5),
-            50.00m,
             serviceType.Id,
             vehicle.Id,
+            "Brand new car",
+            0,
+            50.00m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -408,12 +407,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Warranty repair",
-            "Covered under warranty",
-            15000,
             new DateTime(2024, 11, 5),
-            0.00m,
             serviceType.Id,
             vehicle.Id,
+            "Covered under warranty",
+            15000,
+            0.00m,
             new List<CreateServiceItemCommand>());
 
         // Act
@@ -462,12 +461,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Complete oil change",
-            "Full service with premium oil",
-            15000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            "Full service with premium oil",
+            15000,
+            null,
             serviceItems);
 
         // Act
@@ -522,12 +521,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Tire rotation",
-            null,
-            20000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            null,
+            20000,
+            null,
             serviceItems);
 
         // Act
@@ -569,12 +568,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Brake replacement",
-            "Front brake pads",
-            25000,
             new DateTime(2024, 11, 5),
-            500.00m, // This should be ignored when Items exist
             serviceType.Id,
             vehicle.Id,
+            "Front brake pads",
+            25000,
+            500.00m, // This should be ignored when Items exist
             serviceItems);
 
         // Act
@@ -657,12 +656,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Comprehensive service",
-            "Complete checkup with filters",
-            30000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            "Complete checkup with filters",
+            30000,
+            null,
             serviceItems);
 
         // Act
@@ -708,12 +707,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Custom repair",
-            null,
-            15000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            null,
+            15000,
+            null,
             serviceItems);
 
         // Act
@@ -750,12 +749,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Service quote",
-            "Just a quote, no work done yet",
-            15000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            "Just a quote, no work done yet",
+            15000,
+            null,
             serviceItems);
 
         // Act
@@ -777,12 +776,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Quick fix",
-            "Minor adjustment",
-            15000,
             new DateTime(2024, 11, 5),
-            25.00m,
             serviceType.Id,
             vehicle.Id,
+            "Minor adjustment",
+            15000,
+            25.00m,
             new List<CreateServiceItemCommand>()); // Empty list
 
         // Act
@@ -817,12 +816,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         var command = new CreateServiceRecordCommand(
             "Complex repair with many parts",
-            "Multiple component replacement",
-            50000,
             new DateTime(2024, 11, 5),
-            null,
             serviceType.Id,
             vehicle.Id,
+            "Multiple component replacement",
+            50000,
+            null,
             serviceItems);
 
         // Act
@@ -840,13 +839,5 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         recordInDb.ShouldNotBeNull();
         recordInDb.Items.Count.ShouldBe(20);
     }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType { Id = Guid.NewGuid(), Name = name };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
 }
+

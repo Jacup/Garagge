@@ -5,10 +5,10 @@ namespace Application.ServiceRecords.Update;
 public record UpdateServiceRecordCommand(
     Guid ServiceRecordId,
     string Title,
-    string? Notes,
-    int? Mileage,
     DateTime ServiceDate,
-    decimal? ManualCost,
     Guid ServiceTypeId,
-    Guid VehicleId)
+    Guid VehicleId,
+    string? Notes = null,
+    int? Mileage = null,
+    decimal? ManualCost = null)
     : ICommand<ServiceRecordDto>;

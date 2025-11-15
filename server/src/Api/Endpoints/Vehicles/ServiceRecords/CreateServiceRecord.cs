@@ -24,12 +24,12 @@ internal sealed class CreateServiceRecord : IEndpoint
                 {
                     var query = new CreateServiceRecordCommand(
                         request.Title,
-                        request.Notes,
-                        request.Mileage,
                         request.ServiceDate,
-                        request.ManualCost,
                         request.ServiceTypeId,
                         vehicleId,
+                        request.Notes,
+                        request.Mileage,
+                        request.ManualCost,
                         request.ServiceItems.Select(serviceItemRequest => new CreateServiceItemCommand(
                             Guid.Empty,
                             serviceItemRequest.Name,
@@ -58,9 +58,9 @@ internal sealed class CreateServiceRecord : IEndpoint
 
 internal sealed record ServiceRecordCreateRequest(
     string Title,
+    DateTime ServiceDate,
+    Guid ServiceTypeId,
     string? Notes,
     int? Mileage,
-    DateTime ServiceDate,
     decimal? ManualCost,
-    Guid ServiceTypeId,
     ICollection<ServiceItemCreateRequest> ServiceItems);

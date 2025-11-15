@@ -8,3 +8,11 @@ internal sealed record ServiceRecordCreateRequest(
     decimal? ManualCost,
     Guid ServiceTypeId,
     ICollection<ServiceItemCreateRequest> ServiceItems);
+    
+internal sealed record ServiceRecordUpdateRequest(
+    string Title,
+    string? Notes,
+    int? Mileage,
+    DateTime ServiceDate,
+    decimal? ManualCost,
+    Guid ServiceTypeId);

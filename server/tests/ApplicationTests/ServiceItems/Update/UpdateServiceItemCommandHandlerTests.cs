@@ -1,4 +1,4 @@
-﻿using Application.ServiceItems;
+using Application.ServiceItems;
 using Application.ServiceItems.Update;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
@@ -76,6 +76,8 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
             serviceRecord.Id,
             "Old Name",
             ServiceItemType.Part,
+            100.00m,
+            1,
             "OLD-PART",
             "Old notes");
 
@@ -237,6 +239,8 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
             serviceRecord.Id,
             "Original Name",
             ServiceItemType.Part,
+            100.00m,
+            1,
             "PART-123",
             "Original notes");
 
@@ -273,6 +277,8 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
             serviceRecord.Id,
             "Original Name",
             ServiceItemType.Part,
+            100.00m,
+            1,
             "OLD-123",
             "Old notes");
 
@@ -331,61 +337,5 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.UnitPrice.ShouldBe(0m);
         result.Value.TotalPrice.ShouldBe(0m);
-    }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
-
-    private async Task<ServiceRecord> CreateServiceRecordInDb(Guid vehicleId, Guid serviceTypeId)
-    {
-        var serviceRecord = new ServiceRecord
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            TypeId = serviceTypeId,
-            Title = "Test Service Record",
-            ServiceDate = DateTime.UtcNow.Date,
-            Notes = null,
-            Mileage = 15000,
-            ManualCost = null
-        };
-
-        Context.ServiceRecords.Add(serviceRecord);
-        await Context.SaveChangesAsync();
-        return serviceRecord;
-    }
-
-    private async Task<ServiceItem> CreateServiceItemInDb(
-        Guid serviceRecordId,
-        string name = "Test Item",
-        ServiceItemType type = ServiceItemType.Part,
-        string? partNumber = null,
-        string? notes = null)
-    {
-        var serviceItem = new ServiceItem
-        {
-            Id = Guid.NewGuid(),
-            ServiceRecordId = serviceRecordId,
-            Name = name,
-            Type = type,
-            UnitPrice = 100.00m,
-            Quantity = 1,
-            PartNumber = partNumber,
-            Notes = notes
-        };
-
-        Context.ServiceItems.Add(serviceItem);
-        await Context.SaveChangesAsync();
-        return serviceItem;
     }
 }

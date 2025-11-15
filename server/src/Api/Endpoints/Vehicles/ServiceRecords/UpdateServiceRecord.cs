@@ -1,4 +1,4 @@
-﻿using Api.Extensions;
+﻿﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
 using Application.ServiceRecords;
@@ -24,12 +24,12 @@ internal sealed class UpdateServiceRecord : IEndpoint
                     var command = new UpdateServiceRecordCommand(
                         serviceRecordId,
                         request.Title,
+                        request.ServiceDate,
+                        request.ServiceTypeId,
+                        vehicleId,
                         request.Notes,
                         request.Mileage,
-                        request.ServiceDate,
-                        request.ManualCost,
-                        request.ServiceTypeId,
-                        vehicleId);
+                        request.ManualCost);
 
                     Result<ServiceRecordDto> result = await sender.Send(command, cancellationToken);
 
@@ -47,8 +47,8 @@ internal sealed class UpdateServiceRecord : IEndpoint
 
 internal sealed record ServiceRecordUpdateRequest(
     string Title,
+    DateTime ServiceDate,
+    Guid ServiceTypeId,
     string? Notes,
     int? Mileage,
-    DateTime ServiceDate,
-    decimal? ManualCost,
-    Guid ServiceTypeId);
+    decimal? ManualCost);

@@ -36,7 +36,7 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
             var dateFromUtc = request.DateTo.Value.Kind == DateTimeKind.Utc
                 ? request.DateTo.Value
                 : DateTime.SpecifyKind(request.DateTo.Value, DateTimeKind.Utc);
-            
+
             query = query.Where(sr => sr.ServiceDate <= dateFromUtc);
         }
 
@@ -55,9 +55,7 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
             "servicedate" => descending
                 ? query.OrderByDescending(sr => sr.ServiceDate)
                 : query.OrderBy(sr => sr.ServiceDate),
-            "totalcost" => descending
-                ? query.OrderByDescending(sr => sr.TotalCost)
-                : query.OrderBy(sr => sr.TotalCost),
+            "totalcost" => query.OrderByDescending(sr => sr.ServiceDate), // TotalCost sorting handled in memory
             "mileage" => descending
                 ? query.OrderByDescending(sr => sr.Mileage)
                 : query.OrderBy(sr => sr.Mileage),
@@ -66,5 +64,10 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
                 : query.OrderBy(sr => sr.Title),
             _ => query.OrderByDescending(sr => sr.ServiceDate)
         };
+    }
+
+    public bool RequiresInMemorySorting(string? sortBy)
+    {
+        return !string.IsNullOrWhiteSpace(sortBy) && sortBy.Equals("totalcost", StringComparison.OrdinalIgnoreCase);
     }
 }
