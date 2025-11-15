@@ -31,7 +31,7 @@ internal sealed class DeleteServiceItemCommandHandler(IApplicationDbContext dbCo
             return Result.Failure(VehicleErrors.NotFound(request.VehicleId));
         
         if (serviceItem.ServiceRecord.Vehicle.UserId != userContext.UserId)
-            return Result.Failure(ServiceRecordErrors.Unauthorized);
+            return Result.Failure(ServiceItemsErrors.Unauthorized);
 
         try
         {

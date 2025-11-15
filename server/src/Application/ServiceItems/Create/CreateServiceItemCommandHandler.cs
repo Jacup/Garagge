@@ -24,7 +24,7 @@ internal sealed class CreateServiceItemCommandHandler(
             return Result.Failure<ServiceItemDto>(ServiceRecordErrors.NotFound(request.ServiceRecordId));
 
         if (serviceRecord.Vehicle?.UserId != userContext.UserId)
-            return Result.Failure<ServiceItemDto>(ServiceRecordErrors.Unauthorized);
+            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.Unauthorized);
 
         var serviceItem = new ServiceItem
         {

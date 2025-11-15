@@ -523,44 +523,4 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items[0].Mileage.ShouldBeNull();
     }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
-
-    private async Task<ServiceRecord> CreateServiceRecordInDb(
-        Guid vehicleId, 
-        Guid typeId, 
-        string title, 
-        DateTime serviceDate, 
-        int? mileage, 
-        decimal totalCost,
-        string? notes = null)
-    {
-        var serviceRecord = new ServiceRecord
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            TypeId = typeId,
-            Type = await Context.ServiceTypes.FindAsync(typeId) ?? throw new InvalidOperationException("Service type not found"),
-            Title = title,
-            Notes = notes,
-            ServiceDate = serviceDate,
-            Mileage = mileage,
-            ManualCost = totalCost
-        };
-
-        Context.ServiceRecords.Add(serviceRecord);
-        await Context.SaveChangesAsync();
-        return serviceRecord;
-    }
 }

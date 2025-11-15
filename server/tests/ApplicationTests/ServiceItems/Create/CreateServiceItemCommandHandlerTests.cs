@@ -1,4 +1,5 @@
-﻿using Application.ServiceItems.Create;
+﻿using Application.ServiceItems;
+using Application.ServiceItems.Create;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
 using Domain.Enums;
@@ -143,7 +144,7 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]
@@ -168,7 +169,7 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]
@@ -471,37 +472,4 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
         result.Value.UpdatedDate.ShouldBeGreaterThanOrEqualTo(beforeCreation);
         result.Value.UpdatedDate.ShouldBeLessThanOrEqualTo(afterCreation);
     }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
-
-    private async Task<ServiceRecord> CreateServiceRecordInDb(Guid vehicleId, Guid serviceTypeId)
-    {
-        var serviceRecord = new ServiceRecord
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            TypeId = serviceTypeId,
-            Title = "Test Service Record",
-            ServiceDate = DateTime.UtcNow.Date,
-            Notes = null,
-            Mileage = 15000,
-            ManualCost = 100.00m
-        };
-
-        Context.ServiceRecords.Add(serviceRecord);
-        await Context.SaveChangesAsync();
-        return serviceRecord;
-    }
 }
-

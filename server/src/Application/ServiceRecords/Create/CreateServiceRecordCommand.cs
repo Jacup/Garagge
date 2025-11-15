@@ -7,11 +7,11 @@ namespace Application.ServiceRecords.Create;
 
 public sealed record CreateServiceRecordCommand(
     string Title,
-    string? Notes,
-    int? Mileage,
     DateTime ServiceDate,
-    decimal? ManualCost,
     Guid ServiceTypeId,
     Guid VehicleId,
+    string? Notes,
+    int? Mileage,
+    decimal? ManualCost,
     ICollection<CreateServiceItemCommand> ServiceItems)
     : ICommand<ServiceRecordDto>;

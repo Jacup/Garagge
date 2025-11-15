@@ -1,4 +1,4 @@
-﻿using Application.Abstractions.Authentication;
+﻿using Application.Abstractions.Authentication; 
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
@@ -65,10 +65,31 @@ internal sealed class GetServiceRecordsQueryHandler(
                 sr.UpdatedDate
             ));
 
-        var serviceRecordsDto = await PagedList<ServiceRecordDto>.CreateAsync(
-            serviceRecordsDtoQuery,
-            request.Page,
-            request.PageSize);
+        PagedList<ServiceRecordDto> serviceRecordsDto;
+        
+        if (filterService.RequiresInMemorySorting(request.SortBy))
+        {
+            var totalCount = await serviceRecordsDtoQuery.CountAsync(cancellationToken);
+            var allItems = await serviceRecordsDtoQuery.ToListAsync(cancellationToken);
+            
+            var sortedItems = request.SortDescending
+                ? allItems.OrderByDescending(sr => sr.TotalCost).ToList()
+                : allItems.OrderBy(sr => sr.TotalCost).ToList();
+            
+            var pagedItems = sortedItems
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            serviceRecordsDto = new PagedList<ServiceRecordDto>(pagedItems, request.Page, request.PageSize, totalCount);
+        }
+        else
+        {
+            serviceRecordsDto = await PagedList<ServiceRecordDto>.CreateAsync(
+                serviceRecordsDtoQuery,
+                request.Page,
+                request.PageSize);
+        }
 
         return Result.Success(serviceRecordsDto);
     }

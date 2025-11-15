@@ -1,22 +1,62 @@
 ﻿﻿using Application.Abstractions;
-using Application.ServiceRecords.Create;
-using Application.ServiceItems.Create;
-using Domain.Enums.Services;
+using Application.ServiceRecords.Update;
 using FluentValidation.TestHelper;
 using Moq;
 
-namespace ApplicationTests.ServiceRecords.Create;
+namespace ApplicationTests.ServiceRecords.Update;
 
-public class CreateServiceRecordsCommandValidatorTests
+public class UpdateServiceRecordCommandValidatorTests
 {
-    private readonly CreateServiceRecordsCommandValidator _validator;
+    private readonly UpdateServiceRecordCommandValidator _validator;
     private readonly DateTime _currentDateTime = new(2024, 11, 5, 12, 0, 0, DateTimeKind.Utc);
 
-    public CreateServiceRecordsCommandValidatorTests()
+    public UpdateServiceRecordCommandValidatorTests()
     {
         var dateTimeProviderMock = new Mock<IDateTimeProvider>();
         dateTimeProviderMock.Setup(x => x.UtcNow).Returns(_currentDateTime);
-        _validator = new CreateServiceRecordsCommandValidator(dateTimeProviderMock.Object);
+        _validator = new UpdateServiceRecordCommandValidator(dateTimeProviderMock.Object);
+    }
+
+    [Fact]
+    public void ServiceRecordId_IsEmpty_HasValidationError()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { ServiceRecordId = Guid.Empty };
+
+        // Act
+        var result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.ServiceRecordId)
+            .WithErrorMessage("ServiceRecordId is required.");
+    }
+
+    [Fact]
+    public void VehicleId_IsEmpty_HasValidationError()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { VehicleId = Guid.Empty };
+
+        // Act
+        var result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.VehicleId)
+            .WithErrorMessage("VehicleId is required.");
+    }
+
+    [Fact]
+    public void ServiceTypeId_IsEmpty_HasValidationError()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { ServiceTypeId = Guid.Empty };
+
+        // Act
+        var result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.ServiceTypeId)
+            .WithErrorMessage("ServiceTypeId is required.");
     }
 
     [Fact]
@@ -77,19 +117,6 @@ public class CreateServiceRecordsCommandValidatorTests
     }
 
     [Fact]
-    public void Title_IsValid_PassesValidation()
-    {
-        // Arrange
-        var command = CreateValidCommand();
-
-        // Act
-        var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Title);
-    }
-
-    [Fact]
     public void Notes_ExceedsMaxLength_HasValidationError()
     {
         // Arrange
@@ -123,19 +150,6 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var command = CreateValidCommand() with { Notes = null };
-
-        // Act
-        var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.Notes);
-    }
-
-    [Fact]
-    public void Notes_IsEmpty_PassesValidation()
-    {
-        // Arrange
-        var command = CreateValidCommand() with { Notes = string.Empty };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -362,15 +376,15 @@ public class CreateServiceRecordsCommandValidatorTests
     public void CommandWithMinimalData_PassesValidation()
     {
         // Arrange
-        var command = new CreateServiceRecordCommand(
+        var command = new UpdateServiceRecordCommand(
+            Guid.NewGuid(),
             "Basic service",
             _currentDateTime.Date,
             Guid.NewGuid(),
             Guid.NewGuid(),
             null,
             null,
-            null,
-            new List<CreateServiceItemCommand>());
+            null);
 
         // Act
         var result = _validator.TestValidate(command);
@@ -379,17 +393,45 @@ public class CreateServiceRecordsCommandValidatorTests
         result.ShouldNotHaveAnyValidationErrors();
     }
 
-    private CreateServiceRecordCommand CreateValidCommand()
+    [Fact]
+    public void MultipleFields_AreInvalid_HasAllValidationErrors()
     {
-        return new CreateServiceRecordCommand(
+        // Arrange
+        var command = new UpdateServiceRecordCommand(
+            Guid.Empty,
+            "",
+            _currentDateTime.AddDays(1),
+            Guid.Empty,
+            Guid.Empty,
+            new string('A', 501),
+            -1,
+            -10m);
+
+        // Act
+        var result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(x => x.ServiceRecordId);
+        result.ShouldHaveValidationErrorFor(x => x.Title);
+        result.ShouldHaveValidationErrorFor(x => x.Notes);
+        result.ShouldHaveValidationErrorFor(x => x.Mileage);
+        result.ShouldHaveValidationErrorFor(x => x.ServiceDate);
+        result.ShouldHaveValidationErrorFor(x => x.ManualCost);
+        result.ShouldHaveValidationErrorFor(x => x.ServiceTypeId);
+        result.ShouldHaveValidationErrorFor(x => x.VehicleId);
+        result.Errors.Count.ShouldBe(8);
+    }
+
+    private UpdateServiceRecordCommand CreateValidCommand()
+    {
+        return new UpdateServiceRecordCommand(
+            Guid.NewGuid(),
             "Oil Change",
             _currentDateTime.Date,
             Guid.NewGuid(),
             Guid.NewGuid(),
             "Regular maintenance",
             15000,
-            150.00m,
-            new List<CreateServiceItemCommand>());
+            150.00m);
     }
 }
-

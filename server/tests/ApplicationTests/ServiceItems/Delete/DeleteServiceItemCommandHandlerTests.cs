@@ -1,4 +1,4 @@
-﻿using Application.ServiceItems;
+using Application.ServiceItems;
 using Application.ServiceItems.Delete;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
@@ -161,7 +161,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
     }
 
     [Fact]
@@ -278,61 +278,4 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
         var deletedItem = await Context.ServiceItems.FirstOrDefaultAsync(si => si.Id == serviceItem.Id);
         deletedItem.ShouldBeNull();
     }
-
-    private async Task<ServiceType> CreateServiceTypeInDb(string name)
-    {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
-
-    private async Task<ServiceRecord> CreateServiceRecordInDb(Guid vehicleId, Guid serviceTypeId)
-    {
-        var serviceRecord = new ServiceRecord
-        {
-            Id = Guid.NewGuid(),
-            VehicleId = vehicleId,
-            TypeId = serviceTypeId,
-            Title = "Test Service Record",
-            ServiceDate = DateTime.UtcNow.Date,
-            Notes = null,
-            Mileage = 15000,
-            ManualCost = null
-        };
-
-        Context.ServiceRecords.Add(serviceRecord);
-        await Context.SaveChangesAsync();
-        return serviceRecord;
-    }
-
-    private async Task<ServiceItem> CreateServiceItemInDb(
-        Guid serviceRecordId, 
-        string name = "Test Item",
-        ServiceItemType type = ServiceItemType.Part,
-        string? partNumber = null,
-        string? notes = null)
-    {
-        var serviceItem = new ServiceItem
-        {
-            Id = Guid.NewGuid(),
-            ServiceRecordId = serviceRecordId,
-            Name = name,
-            Type = type,
-            UnitPrice = 100.00m,
-            Quantity = 1,
-            PartNumber = partNumber,
-            Notes = notes
-        };
-
-        Context.ServiceItems.Add(serviceItem);
-        await Context.SaveChangesAsync();
-        return serviceItem;
-    }
 }
-
