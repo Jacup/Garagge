@@ -33,24 +33,6 @@ const handleToggleDrawer = () => {
   max-width: none !important;
 }
 
-.app-container .v-row {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-.app-container .v-col {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.app-container .v-row > .v-col:not(:last-child) {
-  margin-right: 16px;
-}
-
-.app-container .v-row:not(:last-child) {
-  margin-bottom: 16px;
-}
-
 /* Add bottom layout offset for mobile view when bottom navigation is present */
 @media (max-width: 959px) {
   .v-main {

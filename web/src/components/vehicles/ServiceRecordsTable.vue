@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { getServiceRecords } from '@/api/generated/service-records/service-records'
+import { ref, computed } from 'vue'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   vehicleId: string
   selected?: string[]
+  items: ServiceRecordDto[]
+  itemsLength: number
+  loading: boolean
+  page: number
+  itemsPerPage: number
+  error: string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,22 +21,11 @@ const props = withDefaults(defineProps<Props>(), {
 // Define emits
 const emit = defineEmits<{
   'update:selected': [value: string[]]
-  'record-changed': []
+  'update:page': [value: number]
+  'update:items-per-page': [value: number]
+  'update:sort-by': [value: { key: string; order: string }[]]
+  'delete': [id: string]
 }>()
-
-const { getApiVehiclesVehicleIdServiceRecords, deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId } = getServiceRecords()
-
-// Service records data
-const serviceRecords = ref<ServiceRecordDto[]>([])
-const serviceRecordsLoading = ref(false)
-const serviceRecordsPage = ref(1)
-const serviceRecordsPageSize = ref(10)
-const serviceRecordsTotal = ref(0)
-const error = ref<string | null>(null)
-
-// Sorting state
-const sortBy = ref<string | undefined>(undefined)
-const sortDescending = ref(false)
 
 // Selection state - computed to sync with parent
 const selectedItems = computed({
@@ -62,56 +56,8 @@ const formatDate = (dateString: string) => {
   })
 }
 
-// Load service records from API
-async function loadServiceRecords() {
-  if (!props.vehicleId) return
-
-  serviceRecordsLoading.value = true
-  error.value = null
-  try {
-    const response = await getApiVehiclesVehicleIdServiceRecords(props.vehicleId, {
-      page: serviceRecordsPage.value,
-      pageSize: serviceRecordsPageSize.value,
-      sortBy: sortBy.value,
-      sortDescending: sortDescending.value,
-    })
-    serviceRecords.value = response.data.items ?? []
-    serviceRecordsTotal.value = response.data.totalCount ?? 0
-  } catch (err) {
-    console.error('Failed to load service records:', err)
-    error.value = 'Failed to load service records'
-    serviceRecords.value = []
-    serviceRecordsTotal.value = 0
-  } finally {
-    serviceRecordsLoading.value = false
-  }
-}
-
-async function remove(id: string) {
-  try {
-    await deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId(props.vehicleId, id)
-    loadServiceRecords()
-    emit('record-changed')
-  } catch (err) {
-    console.error('Failed to delete service record:', err)
-  }
-}
-
-// Bulk delete function
-async function removeMultiple(ids: string[]) {
-  try {
-    await Promise.all(ids.map(id => deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId(props.vehicleId, id)))
-    // Clear selection after successful delete
-    selectedItems.value = []
-    loadServiceRecords()
-    emit('record-changed')
-  } catch (err) {
-    console.error('Failed to delete service records:', err)
-  }
-}
-
 function openDeleteDialog(id: string) {
-  selectedRecord.value = serviceRecords.value.find((record) => record.id === id) || null
+  selectedRecord.value = props.items.find((record) => record.id === id) || null
   deleteDialog.value = true
 }
 
@@ -120,45 +66,13 @@ function closeDeleteDialog() {
   selectedRecord.value = null
 }
 
-async function confirmDelete() {
+function confirmDelete() {
   if (selectedRecord.value?.id) {
-    await remove(selectedRecord.value.id)
+    emit('delete', selectedRecord.value.id)
     deleteDialog.value = false
     selectedRecord.value = null
   }
 }
-
-function handlePageUpdate(page: number) {
-  serviceRecordsPage.value = page
-  loadServiceRecords()
-}
-
-function handlePageSizeUpdate(pageSize: number) {
-  serviceRecordsPageSize.value = pageSize
-  loadServiceRecords()
-}
-
-function handleSortUpdate(sortOptions: { key: string; order: string }[]) {
-  if (sortOptions && sortOptions.length > 0) {
-    const sort = sortOptions[0]
-    sortBy.value = sort.key
-    sortDescending.value = sort.order === 'desc'
-  } else {
-    sortBy.value = undefined
-    sortDescending.value = false
-  }
-  loadServiceRecords()
-}
-
-onMounted(() => {
-  loadServiceRecords()
-})
-
-// Expose loadServiceRecords function to parent components
-defineExpose({
-  loadServiceRecords,
-  removeMultiple
-})
 
 </script>
 
@@ -170,22 +84,21 @@ defineExpose({
       density="compact"
       class="mb-4"
       closable
-      @click:close="error = null"
     >
       {{ error }}
     </v-alert>
 
     <v-data-table-server
-      v-model:items-per-page="serviceRecordsPageSize"
       v-model="selectedItems"
       :headers="serviceHeaders"
-      :items="serviceRecords"
-      :items-length="serviceRecordsTotal"
-      :loading="serviceRecordsLoading"
-      :page="serviceRecordsPage"
-      @update:page="handlePageUpdate"
-      @update:items-per-page="handlePageSizeUpdate"
-      @update:sort-by="handleSortUpdate"
+      :items="items"
+      :items-length="itemsLength"
+      :loading="loading"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      @update:page="(value) => emit('update:page', value)"
+      @update:items-per-page="(value) => emit('update:items-per-page', value)"
+      @update:sort-by="(value) => emit('update:sort-by', value)"
       show-select
       density="compact"
       fixed-header

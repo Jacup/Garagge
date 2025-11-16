@@ -4,6 +4,7 @@ using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
+using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -207,14 +208,8 @@ public static class DatabaseSeeder
 
         await context.EnergyEntries.AddRangeAsync(energyEntries);
         await context.SaveChangesAsync();
-    }
 
-    public static async Task SeedServiceTypes(ApplicationDbContext context)
-    {
-        if (await context.ServiceTypes.AnyAsync())
-            return;
-        
-        var types = new List<ServiceType>
+        var serviceTypes = new List<ServiceType>
         {
             new() { Id = Guid.NewGuid(), Name = "General" },
             new() { Id = Guid.NewGuid(), Name = "OilChange" },
@@ -231,7 +226,57 @@ public static class DatabaseSeeder
             new() { Id = Guid.NewGuid(), Name = "Other" },
         };
 
-        await context.ServiceTypes.AddRangeAsync(types);
+        await context.ServiceTypes.AddRangeAsync(serviceTypes);
+        await context.SaveChangesAsync();
+
+        var serviceRecords = new List<ServiceRecord>
+        {
+            // Toyota Corolla service records
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2022, 1, 15, 0, 0, 0, DateTimeKind.Utc), Mileage = 10000 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[0].Id, Title = "Regular Service", ServiceDate = new DateTime(2022, 2, 10, 0, 0, 0, DateTimeKind.Utc), Mileage = 11000, Notes = "Full inspection", ManualCost = 150.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[2].Id, Title = "Brake Pads Replacement", ServiceDate = new DateTime(2022, 3, 5, 0, 0, 0, DateTimeKind.Utc) },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[3].Id, Title = "Tire Rotation", ServiceDate = new DateTime(2022, 4, 12, 0, 0, 0, DateTimeKind.Utc), Mileage = 12500, ManualCost = 50.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2022, 5, 20, 0, 0, 0, DateTimeKind.Utc), Mileage = 13000 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[7].Id, Title = "Battery Check", ServiceDate = new DateTime(2022, 6, 8, 0, 0, 0, DateTimeKind.Utc), Notes = "Battery OK", ManualCost = 0m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[10].Id, Title = "Annual Inspection", ServiceDate = new DateTime(2022, 7, 1, 0, 0, 0, DateTimeKind.Utc), Mileage = 13800, ManualCost = 120.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[3].Id, Title = "New Tires", ServiceDate = new DateTime(2022, 8, 15, 0, 0, 0, DateTimeKind.Utc), Mileage = 14200 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil and Filter Change", ServiceDate = new DateTime(2022, 9, 10, 0, 0, 0, DateTimeKind.Utc), Mileage = 14800, ManualCost = 80.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[6].Id, Title = "Suspension Check", ServiceDate = new DateTime(2022, 10, 5, 0, 0, 0, DateTimeKind.Utc) },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[0].Id, Title = "General Maintenance", ServiceDate = new DateTime(2022, 11, 12, 0, 0, 0, DateTimeKind.Utc), Mileage = 15200, Notes = "All good" },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[2].Id, Title = "Brake Fluid Change", ServiceDate = new DateTime(2022, 12, 3, 0, 0, 0, DateTimeKind.Utc), Mileage = 15600, ManualCost = 65.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2023, 1, 8, 0, 0, 0, DateTimeKind.Utc), Mileage = 16000 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[7].Id, Title = "Headlight Replacement", ServiceDate = new DateTime(2023, 2, 14, 0, 0, 0, DateTimeKind.Utc), ManualCost = 45.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[9].Id, Title = "Interior Cleaning", ServiceDate = new DateTime(2023, 3, 7, 0, 0, 0, DateTimeKind.Utc), Mileage = 16800 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[4].Id, Title = "Engine Diagnostics", ServiceDate = new DateTime(2023, 4, 11, 0, 0, 0, DateTimeKind.Utc), Mileage = 17200, Notes = "No issues found", ManualCost = 90.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2023, 5, 15, 0, 0, 0, DateTimeKind.Utc), Mileage = 17800 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[3].Id, Title = "Tire Pressure Check", ServiceDate = new DateTime(2023, 6, 2, 0, 0, 0, DateTimeKind.Utc) },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[8].Id, Title = "Paint Touch Up", ServiceDate = new DateTime(2023, 7, 9, 0, 0, 0, DateTimeKind.Utc), ManualCost = 200.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[10].Id, Title = "Safety Inspection", ServiceDate = new DateTime(2023, 8, 5, 0, 0, 0, DateTimeKind.Utc), Mileage = 18500, ManualCost = 100.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2023, 9, 12, 0, 0, 0, DateTimeKind.Utc), Mileage = 19000 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[6].Id, Title = "Shock Absorbers", ServiceDate = new DateTime(2023, 10, 8, 0, 0, 0, DateTimeKind.Utc), Notes = "Replaced rear shocks" },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[0].Id, Title = "General Service", ServiceDate = new DateTime(2023, 11, 3, 0, 0, 0, DateTimeKind.Utc), Mileage = 19600, ManualCost = 175.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[11].Id, Title = "Emergency Repair", ServiceDate = new DateTime(2023, 12, 1, 0, 0, 0, DateTimeKind.Utc), Mileage = 20000 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2024, 1, 10, 0, 0, 0, DateTimeKind.Utc), Mileage = 20500 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[2].Id, Title = "Brake Inspection", ServiceDate = new DateTime(2024, 2, 5, 0, 0, 0, DateTimeKind.Utc), ManualCost = 30.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[5].Id, Title = "Transmission Fluid", ServiceDate = new DateTime(2024, 3, 12, 0, 0, 0, DateTimeKind.Utc), Mileage = 21200 },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[12].Id, Title = "Misc Service", ServiceDate = new DateTime(2024, 4, 8, 0, 0, 0, DateTimeKind.Utc), Notes = "Various small fixes" },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[1].Id, Title = "Oil Change", ServiceDate = new DateTime(2024, 5, 15, 0, 0, 0, DateTimeKind.Utc), Mileage = 22000, ManualCost = 75.00m },
+            new() { Id = Guid.NewGuid(), VehicleId = vehicles[0].Id, TypeId = serviceTypes[0].Id, Title = "Full Service", ServiceDate = new DateTime(2024, 6, 10, 0, 0, 0, DateTimeKind.Utc), Mileage = 22500 },
+        };
+
+        await context.ServiceRecords.AddRangeAsync(serviceRecords);
+        await context.SaveChangesAsync();
+
+        var serviceItems = new List<ServiceItem>
+        {
+            new() { Id = Guid.NewGuid(), ServiceRecordId = serviceRecords[1].Id, Name = "Oil Filter", Type = ServiceItemType.Part, UnitPrice = 15.00m, Quantity = 1, PartNumber = "OF-123" },
+            new() { Id = Guid.NewGuid(), ServiceRecordId = serviceRecords[1].Id, Name = "Labor", Type = ServiceItemType.Labor, UnitPrice = 50.00m, Quantity = 2 },
+            new() { Id = Guid.NewGuid(), ServiceRecordId = serviceRecords[7].Id, Name = "Tire Set", Type = ServiceItemType.Part, UnitPrice = 120.00m, Quantity = 4, PartNumber = "TR-456" },
+            new() { Id = Guid.NewGuid(), ServiceRecordId = serviceRecords[7].Id, Name = "Installation", Type = ServiceItemType.Labor, UnitPrice = 25.00m, Quantity = 4 },
+            new() { Id = Guid.NewGuid(), ServiceRecordId = serviceRecords[15].Id, Name = "Diagnostic", Type = ServiceItemType.Labor, UnitPrice = 90.00m, Quantity = 1, Notes = "Computer scan" },
+        };
+
+        await context.ServiceItems.AddRangeAsync(serviceItems);
         await context.SaveChangesAsync();
     }
 }

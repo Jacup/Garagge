@@ -27,6 +27,5 @@ public static class DbExtensions
         await using ApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
         await DatabaseSeeder.SeedAsync(dbContext, scope.ServiceProvider);
-        await DatabaseSeeder.SeedServiceTypes(dbContext);
     }
 }

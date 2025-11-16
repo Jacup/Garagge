@@ -535,10 +535,6 @@ watch(activeTab, () => {
 
 <style scoped>
 /* Layout */
-.page-content {
-  margin-left: -12px;
-  margin-right: -12px;
-}
 
 .details-container {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
@@ -577,7 +573,6 @@ watch(activeTab, () => {
 
 /* Tab navigation styling */
 .tabs-container {
-  margin: 0px 12px;
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
   border-radius: 9999px;
 }
