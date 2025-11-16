@@ -59,14 +59,14 @@ const fabMenuItems: FabMenuItem[] = [
   {
     key: 'add',
     icon: 'mdi-plus',
-    text: 'Add Item',
+    text: 'Add Item Long text',
     color: 'primary',
     action: () => console.log('Add clicked'),
   },
   {
     key: 'edit',
     icon: 'mdi-pencil',
-    text: 'Edit Item',
+    text: 'Edit',
     color: 'secondary',
     action: () => console.log('Edit clicked'),
   },
