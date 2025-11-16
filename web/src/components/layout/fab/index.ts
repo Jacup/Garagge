@@ -1,3 +1,3 @@
-// FAB Components - Floating Action Buttons
-export { default as DrawerFab } from './DrawerFab.vue'
-export { default as FloatingFab } from './FloatingFab.vue'
+export { default as FloatingActionButton } from './FloatingActionButton.vue'
+export { default as RegularFab } from './RegularFab.vue'
+export { default as FabMenu } from './FabMenu.vue'

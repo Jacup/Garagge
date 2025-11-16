@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
@@ -11,10 +11,12 @@ import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyE
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
+import { useLayoutFab } from '@/composables/useLayoutFab'
 
 const route = useRoute()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
+const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
 
 // Vehicle data
 const vehicleId = ref(route.params.id as string)
@@ -275,8 +277,68 @@ async function confirmBulkDelete() {
   bulkDeleteDialog.value = false
 }
 
+// Component refs for FAB actions
+const fuelTabRef = ref<InstanceType<typeof VehicleFuelTab> | null>(null)
+
+// FAB configuration per tab
+const updateFabForTab = () => {
+  if (activeTab.value === 'overview') {
+    registerFabMenu({
+      icon: 'mdi-plus',
+      text: 'Add',
+      menuItems: [
+        {
+          key: 'fuel',
+          icon: 'mdi-gas-station',
+          text: 'Add Fuel',
+          action: () => {
+            activeTab.value = 'fuel'
+            nextTick(() => {
+              // Open add dialog in fuel tab
+              addDialog.value = true
+            })
+          },
+        },
+        {
+          key: 'service',
+          icon: 'mdi-wrench',
+          text: 'Add Service',
+          color: 'secondary',
+          action: () => {
+            activeTab.value = 'service'
+            nextTick(() => {
+              console.log('Open add service dialog')
+            })
+          },
+        },
+      ],
+    })
+  } else if (activeTab.value === 'fuel') {
+    registerFab({
+      icon: 'mdi-gas-station',
+      text: 'Add Fuel',
+      action: () => addDialog.value = true,
+    })
+  } else if (activeTab.value === 'service') {
+    registerFab({
+      icon: 'mdi-wrench',
+      text: 'Add Service',
+      action: () => console.log('Add service record'),
+    })
+  }
+}
+
 onMounted(async () => {
   await loadVehicle()
+  updateFabForTab()
+})
+
+onUnmounted(() => {
+  unregisterFab()
+})
+
+watch(activeTab, () => {
+  updateFabForTab()
 })
 </script>
 
