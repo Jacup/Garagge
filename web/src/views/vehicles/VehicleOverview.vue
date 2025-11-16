@@ -36,11 +36,16 @@ const globalStats = ref<EnergyStatsDto | null>(null)
 const getUnitLabel = (unit: string | undefined): string => {
   if (!unit) return ''
   switch (unit) {
-    case 'Liter': return 'L'
-    case 'Gallon': return 'gal'
-    case 'CubicMeter': return 'm³'
-    case 'kWh': return 'kWh'
-    default: return unit
+    case 'Liter':
+      return 'L'
+    case 'Gallon':
+      return 'gal'
+    case 'CubicMeter':
+      return 'm³'
+    case 'kWh':
+      return 'kWh'
+    default:
+      return unit
   }
 }
 
@@ -52,10 +57,10 @@ const summaryStats = computed(() => {
 
   // Get all consumption data for display
   const consumptions = globalStats.value.energyUnitStats
-    .filter(stat => stat.averageConsumption && stat.averageConsumption > 0)
-    .map(stat => ({
+    .filter((stat) => stat.averageConsumption && stat.averageConsumption > 0)
+    .map((stat) => ({
       value: stat.averageConsumption,
-      unit: stat.unit === 'kWh' ? 'kWh/100km' : 'L/100km'
+      unit: stat.unit === 'kWh' ? 'kWh/100km' : 'L/100km',
     }))
 
   return {
@@ -64,7 +69,7 @@ const summaryStats = computed(() => {
     // Use first unit's volume and consumption, or 0 if none
     totalVolume: firstUnit?.totalVolume ?? 0,
     volumeUnit: getUnitLabel(firstUnit?.unit),
-    consumptions: consumptions
+    consumptions: consumptions,
   }
 })
 
@@ -73,9 +78,7 @@ const lastEnteredMileage = computed(() => {
   if (!energyEntries.value || energyEntries.value.length === 0) return null
 
   // Sort by date descending and get the first entry (most recent)
-  const sortedEntries = [...energyEntries.value].sort((a, b) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  )
+  const sortedEntries = [...energyEntries.value].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return sortedEntries[0]?.mileage ?? null
 })
@@ -377,25 +380,31 @@ onMounted(async () => {
 
   <!-- Main Content -->
   <div v-else-if="selectedVehicle" class="page-content">
-    <!-- Navigation Header -->
-    <v-breadcrumbs
-      :items="[
-        { title: 'Vehicles', to: '/vehicles' },
-        { title: `${selectedVehicle.brand} ${selectedVehicle.model}`, disabled: true },
-      ]"
-      class="mt-4 mb-4"
-    />
-
-    <!-- Secondary Vehicle Navigation (SVN) - Tabs -->
-    <v-tabs v-model="activeTab" bg-color="surface" class="mb-4">
-      <v-tab value="overview">Overview</v-tab>
-      <v-tab value="fuel">Fuel</v-tab>
-      <v-tab value="service">Service</v-tab>
+    <v-tabs
+      v-model="activeTab"
+      align-tabs="center"
+      hide-slider
+      mandatory
+      grow
+      selected-class="selected-tab"
+      height="64"
+      class="mb-4 tabs-container">
+      <v-tab value="overview" rounded="pill">
+        <v-icon :icon="activeTab === 'overview' ? 'mdi-information' : 'mdi-information-outline'" start size="24" />
+        <span class="tab-text">Overview</span>
+      </v-tab>
+      <v-tab value="fuel" rounded="pill">
+        <v-icon :icon="activeTab === 'fuel' ? 'mdi-gas-station' : 'mdi-gas-station-outline'" start size="24" />
+        <span class="tab-text">Fuel</span>
+      </v-tab>
+      <v-tab value="service" rounded="pill">
+        <v-icon :icon="activeTab === 'service' ? 'mdi-wrench' : 'mdi-wrench-outline'" start size="24" />
+        <span class="tab-text">Service</span>
+      </v-tab>
     </v-tabs>
 
     <!-- Tab Content -->
     <v-window v-model="activeTab">
-      <!-- Overview Tab -->
       <v-window-item value="overview">
         <VehicleOverviewTab
           :vehicle="selectedVehicle"
@@ -406,7 +415,6 @@ onMounted(async () => {
         />
       </v-window-item>
 
-      <!-- Fuel Tab -->
       <v-window-item value="fuel">
         <VehicleFuelTab
           :vehicle-id="vehicleId"
@@ -421,7 +429,6 @@ onMounted(async () => {
         />
       </v-window-item>
 
-      <!-- Service Tab -->
       <v-window-item value="service">
         <VehicleServiceTab
           :vehicle-id="vehicleId"
@@ -440,7 +447,6 @@ onMounted(async () => {
     <p class="text-body-1 text-medium-emphasis">The requested vehicle could not be found.</p>
   </div>
 
-  <!-- Add Energy Entry Dialog -->
   <ModifyEnergyEntryDialog
     :is-open="addDialog"
     :vehicle-id="vehicleId"
@@ -449,7 +455,6 @@ onMounted(async () => {
     :on-cancel="closeAddDialog"
   />
 
-  <!-- Edit Vehicle Dialog -->
   <VehicleFormDialog
     ref="vehicleFormDialogRef"
     :is-open="editVehicleDialog"
@@ -458,7 +463,6 @@ onMounted(async () => {
     @save="handleVehicleUpdated"
   />
 
-  <!-- Bulk Delete Dialog -->
   <DeleteDialog
     :is-open="bulkDeleteDialog"
     :item-to-delete="`${selectedEnergyEntries.length} energy entries`"
@@ -507,6 +511,17 @@ onMounted(async () => {
 
 .details-item-label {
   font-weight: 400;
+}
+
+/* Tab navigation styling */
+.tabs-container {
+  margin: 0px 12px;
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  border-radius: 9999px;
+}
+
+.selected-tab {
+  background-color: rgb(var(--v-theme-secondary-container));
 }
 
 /* Equal height rows */
@@ -657,6 +672,16 @@ onMounted(async () => {
     border-left: none;
     padding-left: 0 !important;
   }
+}
+
+/* Tab styling */
+.tab-text {
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  height: 24px;
+  letter-spacing: normal;
 }
 
 /* Mobile optimizations */
