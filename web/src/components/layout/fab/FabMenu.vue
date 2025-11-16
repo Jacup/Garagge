@@ -12,7 +12,7 @@ interface Props {
   menuItems: readonly FabMenuItem[]
 }
 
-defineProps<Props>()
+const { menuItems } = defineProps<Props>()
 
 const speedDialOpen = ref(false)
 </script>
@@ -21,14 +21,14 @@ const speedDialOpen = ref(false)
   <div class="fab-menu-container">
     <v-speed-dial
       v-model="speedDialOpen"
-      transition="slide-y-reverse-transition"
+      transition="none"
       location="top end"
     >
       <template v-slot:activator="{ props: activatorProps, isActive }">
         <v-fab
           v-bind="activatorProps"
           :icon="isActive ? 'mdi-close' : icon"
-          color="tertiary-container"
+          :color="isActive ? 'tertiary' : 'tertiary-container'"
           :size="isActive ? 56 : 80"
           :rounded="isActive ? 'circle' : 'xl'"
           :aria-label="`${text} button`"
@@ -37,15 +37,17 @@ const speedDialOpen = ref(false)
       </template>
 
       <v-btn
-        v-for="item in menuItems"
+        v-for="(item, index) in menuItems"
         :key="item.key"
         :prepend-icon="item.icon"
         :text="item.text"
-        :color="item.color || 'secondary-container'"
+        color="tertiary-container"
         :aria-label="item.text"
         height="56"
         rounded="pill"
         class="menu-item-btn"
+        :class="{ 'menu-item-exit': !speedDialOpen }"
+        :style="{ '--item-index': menuItems.length - 1 - index }"
         @click="item.action"
       />
     </v-speed-dial>
@@ -71,14 +73,10 @@ const speedDialOpen = ref(false)
 
 // Close button (active state) - 56x56, circle, icon 20px, aligned to top-right
 .fab-menu-active {
-  transition: border-radius 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-
   :deep(.v-icon) {
     font-size: 20px !important;
   }
-}
-
-// Align all wrappers to top-right corner of 80x80 container
+}// Align all wrappers to top-right corner of 80x80 container
 :deep(.v-speed-dial),
 :deep(.v-speed-dial > div),
 :deep(.v-fab) {
@@ -95,9 +93,7 @@ const speedDialOpen = ref(false)
   align-items: flex-start !important;
   justify-content: flex-end !important;
   align-self: flex-start !important;
-}
-
-:deep(.v-fab .v-btn) {
+}:deep(.v-fab .v-btn) {
   margin: 0 !important;
 }
 
@@ -116,6 +112,11 @@ const speedDialOpen = ref(false)
   padding-inline: 24px !important;
   flex: 0 0 auto !important;
   display: inline-flex !important;
+  transform-origin: right center;
+
+  // Enter animation - expand from right, staggered from bottom
+  animation: fab-item-enter 0.2s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation-delay: calc(var(--item-index) * 0.05s);
 
   :deep(.v-icon) {
     font-size: 24px !important;
@@ -128,6 +129,41 @@ const speedDialOpen = ref(false)
 
   :deep(.v-btn__content) {
     white-space: nowrap;
+  }
+}
+
+// Exit animation - reverse of enter, collapse to right
+.menu-item-exit {
+  animation: fab-item-exit 0.15s cubic-bezier(0.4, 0, 0.2, 1) both;
+  // Reverse stagger - top items exit first
+  animation-delay: calc((var(--item-index)) * 0.03s);
+}
+
+@keyframes fab-item-enter {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.3) translateY(8px);
+  }
+  50% {
+    opacity: 1;
+  }
+  70% {
+    transform: scaleX(1.02) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1) translateY(0);
+  }
+}
+
+@keyframes fab-item-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
   }
 }
 </style>
