@@ -46,6 +46,39 @@ const formatDate = (dateString: string) => {
   })
 }
 
+const getIconForServiceType = (type: string | undefined): string => {
+  switch (type) {
+    case 'General':
+      return 'mdi-cog'
+    case 'OilChange':
+      return 'mdi-oil'
+    case 'Brakes':
+      return 'mdi-car-brake-abs'
+    case 'Tires':
+      return 'mdi-tire'
+    case 'Engine':
+      return 'mdi-engine'
+    case 'Transmission':
+      return 'mdi-car-shift-pattern'
+    case 'Suspension':
+      return 'mdi-car-esp'
+    case 'Electrical':
+      return 'mdi-flash'
+    case 'Bodywork':
+      return 'mdi-hammer-wrench'
+    case 'Interior':
+      return 'mdi-car-seat'
+    case 'Inspection':
+      return 'mdi-clipboard-check-outline'
+    case 'Emergency':
+      return 'mdi-alert-decagram'
+    case 'Other':
+      return 'mdi-help-circle-outline'
+    default:
+      return 'mdi-tools'
+  }
+}
+
 // Load service records from API
 async function loadServiceRecords() {
   if (!props.vehicleId) return
@@ -269,20 +302,26 @@ defineExpose({
 
       <!-- Service Records List -->
       <v-list lines="two">
-        <v-list-item
-          v-for="record in serviceRecords"
-          :key="record.id"
-          :title="record.title"
-          class="list-item"
-        >
+        <v-list-item v-for="record in serviceRecords" :key="record.id" :title="record.title" class="list-item">
+          <template #prepend>
+            <v-badge
+              color="info"
+              :model-value="record.serviceItems && record.serviceItems.length > 0"
+              :content="record.serviceItems.length"
+            >
+              <v-avatar color="primary-container">
+                <v-icon :icon="getIconForServiceType(record.type)" color="on-primary-container"></v-icon>
+              </v-avatar>
+            </v-badge>
+          </template>
           <template v-slot:subtitle>
-            <v-chip-group column>
-              <v-chip class="subtitle-chip" variant="outlined" density="compact" size="small" disabled>{{ formatDate(record.serviceDate) }}</v-chip>
-              <v-chip class="subtitle-chip" variant="outlined" density="compact" size="small" disabled>{{ record.mileage }} km</v-chip>
-            </v-chip-group>
+            {{ formatDate(record.serviceDate) }}
+            <span v-if="record.mileage"> • {{ record.mileage }} km</span>
           </template>
           <template v-slot:append>
-            <v-btn color="grey-lighten-1" icon="mdi-information" variant="text"></v-btn>
+            <div v-if="record.totalCost" class="trailing-supporting-text">
+              {{ new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(record.totalCost) }}
+            </div>
           </template>
         </v-list-item>
       </v-list>
@@ -291,11 +330,9 @@ defineExpose({
 </template>
 
 <style scoped>
-/* Mobile: Extend summary cards to container edges */
 .mobile-summary-cards {
   padding: 12px;
 }
-
 
 .list-item {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
@@ -313,26 +350,11 @@ defineExpose({
   margin-bottom: 0 !important;
 }
 
-.subtitle-chip {
-  /* Non-interactive info chip */
-  background-color: transparent !important;
-  border-color: rgb(var(--v-theme-outline)) !important;
-  color: rgb(var(--v-theme-on-surface-variant)) !important;
-  border-radius: 8px !important;
-  pointer-events: none !important;
-  opacity: 1 !important;
-}
-
-.filter-chip-selected {
-  /* Selected state - flat variant with secondary-container */
-  background-color: rgb(var(--v-theme-secondary-container)) !important;
-  border-width: 0 !important;
-  color: rgb(var(--v-theme-on-secondary-container)) !important;
-  border-radius: 8px !important;
-}
-
-/* Ensure filter icon inherits correct color */
-.subtitle-chip :deep(.v-icon) {
-  color: rgb(var(--v-theme-on-surface-variant)) !important;
+.trailing-supporting-text {
+  color: rgb(var(--v-theme-on-surface-variant));
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.5px;
 }
 </style>
