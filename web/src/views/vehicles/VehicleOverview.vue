@@ -12,8 +12,10 @@ import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
+import { useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
@@ -305,9 +307,13 @@ const updateFabForTab = () => {
           text: 'Add Service',
           color: 'secondary',
           action: () => {
-            activeTab.value = 'service'
-            nextTick(() => {
-              console.log('Open add service dialog')
+            router.push({
+              name: 'AddServiceRecord',
+              params: { id: vehicleId.value },
+              query: {
+                brand: selectedVehicle.value?.brand,
+                model: selectedVehicle.value?.model,
+              },
             })
           },
         },
@@ -323,7 +329,16 @@ const updateFabForTab = () => {
     registerFab({
       icon: 'mdi-wrench',
       text: 'Add Service',
-      action: () => console.log('Add service record'),
+      action: () => {
+        router.push({
+          name: 'AddServiceRecord',
+          params: { id: vehicleId.value },
+          query: {
+            brand: selectedVehicle.value?.brand,
+            model: selectedVehicle.value?.model,
+          },
+        })
+      },
     })
   }
 }

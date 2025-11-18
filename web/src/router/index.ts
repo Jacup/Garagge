@@ -9,6 +9,7 @@ import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
 import ComponentGalleryView from '@/views/ComponentGalleryView.vue'
 import CardGalleryView from '@/views/CardGalleryView.vue'
 import VehicleOverview from '@/views/vehicles/VehicleOverview.vue'
+import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
 
 const routes = [
   {
@@ -40,6 +41,13 @@ const routes = [
     name: 'VehicleOverview',
     component: VehicleOverview,
     meta: { requiresAuth: true },
+  },
+  {
+    path: '/vehicles/:id/services/add',
+    name: 'AddServiceRecord',
+    component: AddServiceRecordView,
+    meta: { requiresAuth: true },
+    props: true,
   },
   {
     path: '/components',
