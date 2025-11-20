@@ -8,6 +8,11 @@
   'md-16px': 16px
 ),
   $btn-group-height: 40px,
+
+  // tooltip
+  $tooltip-text-color: rgb(var(--v-theme-inverse-on-surface)),
+  $tooltip-background-color: rgb(var(--v-theme-inverse-surface)),
+  $tooltip-padding: 2px 8px,
 );
 
 // Custom utility classes
