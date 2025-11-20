@@ -71,7 +71,7 @@ export interface EnergyStatsDto {
 export type EnergyType = typeof EnergyType[keyof typeof EnergyType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const EnergyType = {
   Gasoline: 'Gasoline',
   Diesel: 'Diesel',
@@ -86,7 +86,7 @@ export const EnergyType = {
 export type EnergyUnit = typeof EnergyUnit[keyof typeof EnergyUnit];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const EnergyUnit = {
   Liter: 'Liter',
   Gallon: 'Gallon',
@@ -108,7 +108,7 @@ export interface EnergyUnitStats {
 export type EngineType = typeof EngineType[keyof typeof EngineType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const EngineType = {
   Fuel: 'Fuel',
   Hybrid: 'Hybrid',
@@ -127,7 +127,7 @@ export interface LoginUserResponse {
 export type NullableOfVehicleType = typeof NullableOfVehicleType[keyof typeof NullableOfVehicleType] | null;
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const NullableOfVehicleType = {
   Bus: 'Bus',
   Car: 'Car',
@@ -192,7 +192,7 @@ export interface ServiceItemDto {
 export type ServiceItemType = typeof ServiceItemType[keyof typeof ServiceItemType];
 
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
+ 
 export const ServiceItemType = {
   Other: 'Other',
   Labor: 'Labor',

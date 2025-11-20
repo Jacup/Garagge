@@ -279,9 +279,6 @@ async function confirmBulkDelete() {
   bulkDeleteDialog.value = false
 }
 
-// Component refs for FAB actions
-const fuelTabRef = ref<InstanceType<typeof VehicleFuelTab> | null>(null)
-
 // FAB configuration per tab
 const updateFabForTab = () => {
   if (activeTab.value === 'overview') {
