@@ -253,6 +253,11 @@ export interface ServiceRecordUpdateRequest {
   manualCost: number | null;
 }
 
+export interface ServiceTypeDto {
+  id: string;
+  name: string;
+}
+
 export interface UserDto {
   id?: string;
   email: string;

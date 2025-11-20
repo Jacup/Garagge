@@ -9,7 +9,8 @@ import type {
   PagedListOfServiceRecordDto,
   ServiceRecordCreateRequest,
   ServiceRecordDto,
-  ServiceRecordUpdateRequest
+  ServiceRecordUpdateRequest,
+  ServiceTypeDto
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -68,9 +69,18 @@ const postApiVehiclesVehicleIdServiceRecords = (
     },
       );
     }
-  return {postApiVehiclesVehicleIdServiceRecords,getApiVehiclesVehicleIdServiceRecords,deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId,getApiVehiclesVehicleIdServiceRecordsServiceRecordId,putApiVehiclesVehicleIdServiceRecordsServiceRecordId}};
+  const getApiVehiclesServiceRecordsTypes = (
+    
+ ) => {
+      return axiosInstance<ServiceTypeDto[]>(
+      {url: `/api/vehicles/service-records/types`, method: 'GET'
+    },
+      );
+    }
+  return {postApiVehiclesVehicleIdServiceRecords,getApiVehiclesVehicleIdServiceRecords,deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId,getApiVehiclesVehicleIdServiceRecordsServiceRecordId,putApiVehiclesVehicleIdServiceRecordsServiceRecordId,getApiVehiclesServiceRecordsTypes}};
 export type PostApiVehiclesVehicleIdServiceRecordsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['postApiVehiclesVehicleIdServiceRecords']>>>
 export type GetApiVehiclesVehicleIdServiceRecordsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['getApiVehiclesVehicleIdServiceRecords']>>>
 export type DeleteApiVehiclesVehicleIdServiceRecordsServiceRecordIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['deleteApiVehiclesVehicleIdServiceRecordsServiceRecordId']>>>
 export type GetApiVehiclesVehicleIdServiceRecordsServiceRecordIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['getApiVehiclesVehicleIdServiceRecordsServiceRecordId']>>>
 export type PutApiVehiclesVehicleIdServiceRecordsServiceRecordIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['putApiVehiclesVehicleIdServiceRecordsServiceRecordId']>>>
+export type GetApiVehiclesServiceRecordsTypesResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getServiceRecords>['getApiVehiclesServiceRecordsTypes']>>>
