@@ -8,6 +8,11 @@
   'md-16px': 16px
 ),
   $btn-group-height: 40px,
+
+  // tooltip
+  $tooltip-text-color: rgb(var(--v-theme-inverse-on-surface)),
+  $tooltip-background-color: rgb(var(--v-theme-inverse-surface)),
+  $tooltip-padding: 2px 8px,
 );
 
 // Custom utility classes
@@ -34,6 +39,15 @@
   font-size: 28px !important;
 }
 
+/* M3E Extended FAB - Override Vuetify's 9999px pill shape */
+.v-fab--extended.extended-fab .v-btn {
+  border-radius: 20px !important;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+  border-bottom-right-radius: 20px !important;
+  border-bottom-left-radius: 20px !important;
+}
+
 /* MD3 Expressive Tooltips */
 .v-tooltip.tooltip-plain .v-overlay__content {
   background-color: rgb(var(--v-theme-inverse-surface)) !important;
@@ -45,4 +59,14 @@
   color: rgb(var(--v-theme-on-surface-variant)) !important;
   padding: 12px 16px !important;
   border-radius: 8px !important;
+}
+
+/* MD3 Speed Dial */
+.v-speed-dial__content {
+  gap: 4px !important; // Gap between menu items
+  row-gap: 4px !important;
+}
+
+.v-menu > .v-overlay__content {
+  align-items: flex-end !important; // Align menu items to the right
 }

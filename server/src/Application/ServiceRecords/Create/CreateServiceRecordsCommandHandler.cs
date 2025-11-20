@@ -40,7 +40,7 @@ internal sealed class CreateServiceRecordsCommandHandler(
             VehicleId = request.VehicleId,
             TypeId = request.ServiceTypeId,
             Type = serviceType,
-            ServiceDate = request.ServiceDate,
+            ServiceDate = DateTime.SpecifyKind(request.ServiceDate, DateTimeKind.Utc),
             Title = request.Title,
             Notes = request.Notes,
             Mileage = request.Mileage,
@@ -50,6 +50,7 @@ internal sealed class CreateServiceRecordsCommandHandler(
         var items = request.ServiceItems.Select(item =>
             new ServiceItem
             {
+                Id = Guid.NewGuid(),
                 ServiceRecordId = serviceRecordId,
                 Name = item.Name,
                 Type = item.Type,
@@ -61,7 +62,7 @@ internal sealed class CreateServiceRecordsCommandHandler(
 
         foreach (ServiceItem serviceItem in items)
             record.Items.Add(serviceItem);
-        
+
         try
         {
             await dbContext.ServiceRecords.AddAsync(record, cancellationToken);

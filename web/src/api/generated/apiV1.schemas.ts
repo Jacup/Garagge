@@ -68,24 +68,32 @@ export interface EnergyStatsDto {
   energyUnitStats: EnergyUnitStats[];
 }
 
-export enum EnergyType {
-  Gasoline= 'Gasoline',
-  Diesel= 'Diesel',
-  LPG= 'LPG',
-  CNG= 'CNG',
-  Ethanol= 'Ethanol',
-  Biofuel= 'Biofuel',
-  Hydrogen= 'Hydrogen',
-  Electric= 'Electric',
+export type EnergyType = typeof EnergyType[keyof typeof EnergyType];
 
-}
-export enum EnergyUnit {
-  Liter= 'Liter',
-  Gallon= 'Gallon',
-  CubicMeter= 'CubicMeter',
-  kWh= 'kWh',
 
-}
+ 
+export const EnergyType = {
+  Gasoline: 'Gasoline',
+  Diesel: 'Diesel',
+  LPG: 'LPG',
+  CNG: 'CNG',
+  Ethanol: 'Ethanol',
+  Biofuel: 'Biofuel',
+  Hydrogen: 'Hydrogen',
+  Electric: 'Electric',
+} as const;
+
+export type EnergyUnit = typeof EnergyUnit[keyof typeof EnergyUnit];
+
+
+ 
+export const EnergyUnit = {
+  Liter: 'Liter',
+  Gallon: 'Gallon',
+  CubicMeter: 'CubicMeter',
+  kWh: 'kWh',
+} as const;
+
 export interface EnergyUnitStats {
   unit?: EnergyUnit;
   energyTypes?: EnergyType[];
@@ -97,14 +105,18 @@ export interface EnergyUnitStats {
   averageCostPer100km?: number;
 }
 
-export enum EngineType {
-  Fuel= 'Fuel',
-  Hybrid= 'Hybrid',
-  PlugInHybrid= 'PlugInHybrid',
-  Electric= 'Electric',
-  Hydrogen= 'Hydrogen',
+export type EngineType = typeof EngineType[keyof typeof EngineType];
 
-}
+
+ 
+export const EngineType = {
+  Fuel: 'Fuel',
+  Hybrid: 'Hybrid',
+  PlugInHybrid: 'PlugInHybrid',
+  Electric: 'Electric',
+  Hydrogen: 'Hydrogen',
+} as const;
+
 export interface LoginUserResponse {
   accessToken: string;
 }
@@ -112,10 +124,28 @@ export interface LoginUserResponse {
 /**
  * @nullable
  */
-export type NullableOfVehicleType = 'Bus' | 'Car' | 'Motorbike' | 'Truck' | null;
+export type NullableOfVehicleType = typeof NullableOfVehicleType[keyof typeof NullableOfVehicleType] | null;
+
+
+ 
+export const NullableOfVehicleType = {
+  Bus: 'Bus',
+  Car: 'Car',
+  Motorbike: 'Motorbike',
+  Truck: 'Truck',
+} as const;
 
 export interface PagedListOfEnergyEntryDto {
   items: EnergyEntryDto[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
+export interface PagedListOfServiceRecordDto {
+  items: ServiceRecordDto[];
   page: number;
   pageSize: number;
   totalCount: number;
@@ -130,6 +160,102 @@ export interface PagedListOfVehicleDto {
   totalCount: number;
   hasNextPage?: boolean;
   hasPreviousPage?: boolean;
+}
+
+export interface ServiceItemCreateRequest {
+  name: string;
+  type: ServiceItemType;
+  unitPrice: number;
+  quantity: number;
+  /** @nullable */
+  partNumber: string | null;
+  /** @nullable */
+  notes: string | null;
+}
+
+export interface ServiceItemDto {
+  id: string;
+  name: string;
+  type: ServiceItemType;
+  unitPrice: number;
+  quantity: number;
+  totalPrice: number;
+  /** @nullable */
+  partNumber: string | null;
+  /** @nullable */
+  notes: string | null;
+  serviceRecordId: string;
+  createdDate: string;
+  updatedDate: string;
+}
+
+export type ServiceItemType = typeof ServiceItemType[keyof typeof ServiceItemType];
+
+
+ 
+export const ServiceItemType = {
+  Other: 'Other',
+  Labor: 'Labor',
+  Part: 'Part',
+  Tax: 'Tax',
+} as const;
+
+export interface ServiceItemUpdateRequest {
+  name: string;
+  type: ServiceItemType;
+  unitPrice: number;
+  quantity: number;
+  /** @nullable */
+  partNumber: string | null;
+  /** @nullable */
+  notes: string | null;
+}
+
+export interface ServiceRecordCreateRequest {
+  title: string;
+  serviceDate: string;
+  serviceTypeId: string;
+  /** @nullable */
+  notes: string | null;
+  /** @nullable */
+  mileage: number | null;
+  /** @nullable */
+  manualCost: number | null;
+  serviceItems: ServiceItemCreateRequest[];
+}
+
+export interface ServiceRecordDto {
+  id: string;
+  title: string;
+  /** @nullable */
+  notes: string | null;
+  /** @nullable */
+  mileage: number | null;
+  serviceDate: string;
+  totalCost: number;
+  typeId: string;
+  type: string;
+  serviceItems: ServiceItemDto[];
+  vehicleId: string;
+  createdDate: string;
+  updatedDate: string;
+}
+
+export interface ServiceRecordUpdateRequest {
+  title: string;
+  serviceDate: string;
+  serviceTypeId: string;
+  /** @nullable */
+  notes: string | null;
+  /** @nullable */
+  mileage: number | null;
+  /** @nullable */
+  manualCost: number | null;
+}
+
+export interface ServiceTypeDto {
+  id: string;
+  name: string;
 }
 
 export interface UserDto {
@@ -191,6 +317,17 @@ export type GetApiVehiclesParams = {
 searchTerm?: string;
 pageSize?: number;
 page?: number;
+};
+
+export type GetApiVehiclesVehicleIdServiceRecordsParams = {
+page?: number;
+pageSize?: number;
+searchTerm?: string;
+serviceTypeId?: string;
+dateFrom?: string;
+dateTo?: string;
+sortBy?: string;
+sortDescending?: boolean;
 };
 
 export type GetApiVehiclesVehicleIdEnergyEntriesParams = {

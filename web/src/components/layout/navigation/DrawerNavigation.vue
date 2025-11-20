@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { MAIN_NAVIGATION_ITEMS } from '@/constants/navigation'
-import { DrawerFab } from '../fab'
 import { DrawerNavigationItem, NavigationButton, ServerStatus } from '.'
 
 interface Props {
@@ -16,10 +15,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="drawer-navigation" :class="{ 'drawer-navigation--rail': isRail }">
-        <div class="nav-logo"></div>
-
-    <!-- FAB Component - automatically detects display mode -->
-    <DrawerFab />
+    <div class="nav-logo"></div>
 
     <div class="main-nav">
       <v-list nav class="px-4" base-color="on-surface-variant" color="secondary">

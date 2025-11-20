@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import SectionCard from '@/components/gallery/SectionCard.vue'
 import ComponentDemoCard from '@/components/gallery/ComponentDemoCard.vue'
+import RegularFab from '@/components/layout/fab/RegularFab.vue'
+import FabMenu from '@/components/layout/fab/FabMenu.vue'
+import type { FabMenuItem } from '@/composables/useLayoutFab'
 
 // Component demo states
 const textInput = ref('Sample text')
@@ -45,6 +48,35 @@ const expansionItems = [
   { title: 'Expansion Panel 1', text: 'Content for panel 1' },
   { title: 'Expansion Panel 2', text: 'Content for panel 2' },
   { title: 'Expansion Panel 3', text: 'Content for panel 3' },
+]
+
+// FAB demo
+const handleFabClick = (type: string) => {
+  console.log(`${type} FAB clicked`)
+}
+
+const fabMenuItems: FabMenuItem[] = [
+  {
+    key: 'add',
+    icon: 'mdi-plus',
+    text: 'Add Item Long text',
+    color: 'primary',
+    action: () => console.log('Add clicked'),
+  },
+  {
+    key: 'edit',
+    icon: 'mdi-pencil',
+    text: 'Edit',
+    color: 'secondary',
+    action: () => console.log('Edit clicked'),
+  },
+  {
+    key: 'delete',
+    icon: 'mdi-delete',
+    text: 'Delete Item',
+    color: 'error',
+    action: () => console.log('Delete clicked'),
+  },
 ]
 </script>
 
@@ -552,6 +584,38 @@ const expansionItems = [
                   </v-card>
                 </v-col>
               </v-row>
+            </component-demo-card>
+          </v-col>
+        </v-row>
+      </section-card>
+
+      <!-- FAB Section -->
+      <section-card title="🎯 Floating Action Buttons">
+        <v-row>
+          <v-col cols="12" md="4">
+            <component-demo-card title="Regular FAB">
+              <p class="mb-4">Icon only, size 80px</p>
+              <div style="position: relative; height: 200px; display: flex; align-items: center; justify-content: center;">
+                <RegularFab icon="mdi-plus" text="Add" @click="handleFabClick('Regular')" />
+              </div>
+            </component-demo-card>
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <component-demo-card title="Extended FAB">
+              <p class="mb-4">Icon + text, size large</p>
+              <div style="position: relative; height: 200px; display: flex; align-items: center; justify-content: center;">
+                <RegularFab icon="mdi-pencil" text="Edit" :is-extended="true" @click="handleFabClick('Extended')" />
+              </div>
+            </component-demo-card>
+          </v-col>
+
+          <v-col cols="12" md="4">
+            <component-demo-card title="FAB Menu">
+              <p class="mb-4">Speed dial with multiple actions</p>
+              <div style="position: relative; height: 200px; display: flex; align-items: center; justify-content: center;">
+                <FabMenu icon="mdi-menu" text="Menu" :menu-items="fabMenuItems" />
+              </div>
             </component-demo-card>
           </v-col>
         </v-row>
