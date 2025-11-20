@@ -4,6 +4,10 @@ namespace Application.ServiceRecords;
 
 public static class ServiceRecordErrors
 {
+    public static Error GetTypesFailed => Error.Failure(
+        "ServiceRecords.GetTypesFailed",
+        "Failed to retrieve service types.");
+    
     public static Error Unauthorized => Error.Unauthorized(
         "ServiceRecords.Unauthorized",
         "You are not authorized to perform this action.");
