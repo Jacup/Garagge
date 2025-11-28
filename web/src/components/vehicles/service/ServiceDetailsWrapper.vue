@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useDisplay } from 'vuetify'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
+import ServiceDetails from './ServiceDetails.vue';
 
 const props = defineProps<{
   modelValue: boolean
@@ -26,40 +27,31 @@ const close = () => {
 
 <template>
   <v-dialog v-if="mobile" v-model="isOpen" fullscreen transition="dialog-bottom-transition" scrollable>
-    <v-card rounded="0">
-      <v-toolbar density="compact" color="surface">
+    <v-card rounded="0" class="d-flex flex-column h-100">
+      <v-toolbar class="toolbar">
         <v-btn icon="mdi-close" @click="close" />
-        <v-toolbar-title>Service Details (Mobile)</v-toolbar-title>
+        <v-toolbar-title class="text-body-1 font-weight-medium">Service Details</v-toolbar-title>
       </v-toolbar>
-      <v-card-text class="pa-4">
-        <h3 class="text-h6">Rekord ID: {{ record?.id }}</h3>
-        <p>
-          Tytuł: <strong>{{ record?.title }}</strong>
-        </p>
-        <p v-if="!record">Ładowanie danych lub brak rekordu...</p>
-      </v-card-text>
+
+      <ServiceDetails :record="record" />
     </v-card>
   </v-dialog>
 
   <v-navigation-drawer v-else v-model="isOpen" location="right" width="450" temporary elevation="4" class="rounded-s-xl">
     <div class="d-flex flex-column h-100">
-      <div class="d-flex align-center pa-2 border-b">
-        <span class="text-subtitle-1 font-weight-bold ml-2">Details (Desktop)</span>
+      <div class="d-flex align-center pa-2 pl-4 border-b">
+        <span class="text-subtitle-1 font-weight-medium">Service Details</span>
         <v-spacer />
         <v-btn icon="mdi-close" variant="text" @click="close" />
       </div>
 
-      <v-card-text class="pa-4 flex-grow-1 overflow-y-auto">
-        <h3 class="text-h6">Rekord ID: {{ record?.id }}</h3>
-        <p>
-          Tytuł: <strong>{{ record?.title }}</strong>
-        </p>
-        <p v-if="!record">Ładowanie danych lub brak rekordu...</p>
-      </v-card-text>
+      <ServiceDetails :record="record" />
     </div>
   </v-navigation-drawer>
 </template>
 
 <style scoped>
-/* Opcjonalne style dla wrappera */
+.toolbar {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+}
 </style>

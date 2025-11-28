@@ -5,7 +5,15 @@ interface Props {
   items: ServiceRecordDto[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  select: [record: ServiceRecordDto]
+}>()
+
+const handleRowClick = (item: ServiceRecordDto) => {
+  emit('select', item)
+}
 
 const getIconForServiceType = (type: string | undefined): string => {
   switch (type) {
@@ -51,7 +59,7 @@ const formatDate = (dateString: string) => {
 
 <template>
   <v-list lines="two">
-    <v-list-item v-for="record in items" :key="record.id" :title="record.title" class="list-item">
+    <v-list-item v-for="record in items" :key="record.id" :title="record.title" class="list-item" @click="handleRowClick(record)">
       <template #prepend>
         <v-badge color="info" :model-value="record.serviceItems && record.serviceItems.length > 0" :content="record.serviceItems.length">
           <v-avatar color="primary-container">
