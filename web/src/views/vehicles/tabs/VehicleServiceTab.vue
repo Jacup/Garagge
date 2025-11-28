@@ -200,11 +200,11 @@ defineExpose({
               :selected-id="detailsState.selectedRecord.value?.id"
               @update:page="
                 serviceRecordsPage = $event;
-                loadServiceRecords()
+                loadServiceRecords();
               "
               @update:items-per-page="
                 serviceRecordsPageSize = $event;
-                loadServiceRecords()
+                loadServiceRecords();
               "
               @update:sort-by="handleSortUpdate"
               @select="detailsState.open"
@@ -224,7 +224,11 @@ defineExpose({
       </v-infinite-scroll>
     </template>
 
-    <ServiceDetailsWrapper v-model="detailsState.isOpen.value" :record="detailsState.selectedRecord.value" />
+    <ServiceDetailsWrapper
+      v-if="detailsState.selectedRecord.value"
+      v-model="detailsState.isOpen.value"
+      :record="detailsState.selectedRecord.value"
+    />
   </div>
 </template>
 

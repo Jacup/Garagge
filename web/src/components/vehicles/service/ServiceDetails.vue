@@ -18,7 +18,7 @@ const wasUpdated = computed(() => {
 </script>
 
 <template>
-  <div class="d-flex flex-column h-100 overflow-y-auto bg-surface font-responsive">
+  <div class="d-flex flex-column h-100 overflow-y-auto bg-surface font-responsive scroll-container px-4">
     <template v-if="!record">
       <div class="pa-6">
         <v-skeleton-loader type="avatar, text, heading, text, divider, list-item-three-line@3" />
@@ -26,7 +26,7 @@ const wasUpdated = computed(() => {
     </template>
 
     <template v-else>
-      <div class="hero-section bg-primary-container text-on-primary-container pt-8 pb-10 px-6 text-center rounded-b-xl mb-6 elevation-2">
+      <div class="hero-section bg-primary-container text-on-primary-container pt-8 pb-10 text-center rounded-xl mt-4 mb-6 elevation-2">
         <h1 class="text-h3 font-weight-black mb-2">
           {{ formatCurrency(record.totalCost) }}
         </h1>
@@ -47,7 +47,7 @@ const wasUpdated = computed(() => {
         </div>
       </div>
 
-      <div class="px-4 pb-6 mx-auto" style="max-width: 900px; width: 100%">
+      <div class="pb-6 mx-auto" style="max-width: 900px; width: 100%">
         <v-alert v-if="record.notes" icon="mdi-note-text-outline" color="tertiary-container" rounded="md-medium" class="mb-6" title="Notes">
           <div class="text-body-2 text-medium-emphasis" style="white-space: pre-line">
             {{ record.notes }}
@@ -138,5 +138,14 @@ const wasUpdated = computed(() => {
   border-bottom-left-radius: 12px !important;
   border-bottom-right-radius: 12px !important;
   margin-bottom: 0 !important;
+}
+
+.scroll-container {
+  scrollbar-width: none;
+  overflow-y: auto;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
 }
 </style>

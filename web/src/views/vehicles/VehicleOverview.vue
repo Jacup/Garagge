@@ -13,12 +13,15 @@ import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
 import { useRouter } from 'vue-router'
+import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState';
 
 const route = useRoute()
 const router = useRouter()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
+const { close: closeServiceDetailsSheet } = useServiceDetailsState();
+
 
 // Vehicle data
 const vehicleId = ref(route.params.id as string)
@@ -351,6 +354,7 @@ onUnmounted(() => {
 
 watch(activeTab, () => {
   updateFabForTab()
+  closeServiceDetailsSheet()
 })
 </script>
 
