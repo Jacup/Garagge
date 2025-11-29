@@ -225,9 +225,11 @@ defineExpose({
     </template>
 
     <ServiceDetailsWrapper
-      v-if="detailsState.selectedRecord.value"
+      v-if="detailsState.selectedRecord.value || detailsState.mode.value === 'create'"
       v-model="detailsState.isOpen.value"
       :record="detailsState.selectedRecord.value"
+      :vehicle-id="vehicleId"
+      @refresh-data="loadServiceRecords"
     />
   </div>
 </template>

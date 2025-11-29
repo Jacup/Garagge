@@ -21,7 +21,7 @@ const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
 const { close: closeServiceDetailsSheet } = useServiceDetailsState();
-
+const detailsState = useServiceDetailsState();
 
 // Vehicle data
 const vehicleId = ref(route.params.id as string)
@@ -282,9 +282,11 @@ async function confirmBulkDelete() {
   bulkDeleteDialog.value = false
 }
 
+
 // FAB configuration per tab
 const updateFabForTab = () => {
   if (activeTab.value === 'overview') {
+    // --- ZAKŁADKA OVERVIEW (Menu FAB) ---
     registerFabMenu({
       icon: 'mdi-plus',
       text: 'Add',
@@ -296,7 +298,6 @@ const updateFabForTab = () => {
           action: () => {
             activeTab.value = 'fuel'
             nextTick(() => {
-              // Open add dialog in fuel tab
               addDialog.value = true
             })
           },
@@ -306,38 +307,35 @@ const updateFabForTab = () => {
           icon: 'mdi-wrench',
           text: 'Add Service',
           color: 'secondary',
+          // --- ZMIANA TUTAJ ---
           action: () => {
-            router.push({
-              name: 'AddServiceRecord',
-              params: { id: vehicleId.value },
-              query: {
-                brand: selectedVehicle.value?.brand,
-                model: selectedVehicle.value?.model,
-              },
+            // 1. Przełączamy zakładkę na 'service'
+            activeTab.value = 'service'
+            // 2. Czekamy na przerysowanie DOM (nextTick), aby upewnić się,
+            // że Wrapper jest gotowy, a następnie otwieramy tryb tworzenia.
+            nextTick(() => {
+              detailsState.create()
             })
           },
         },
       ],
     })
   } else if (activeTab.value === 'fuel') {
+    // --- ZAKŁADKA FUEL (Bez zmian) ---
     registerFab({
       icon: 'mdi-gas-station',
       text: 'Add Fuel',
-      action: () => addDialog.value = true,
+      action: () => (addDialog.value = true),
     })
   } else if (activeTab.value === 'service') {
+    // --- ZAKŁADKA SERVICE (Pojedynczy FAB) ---
     registerFab({
-      icon: 'mdi-wrench',
+      icon: 'mdi-plus', // Zmieniamy ikonę na 'plus', bo to główna akcja dodawania
       text: 'Add Service',
+      // --- ZMIANA TUTAJ ---
       action: () => {
-        router.push({
-          name: 'AddServiceRecord',
-          params: { id: vehicleId.value },
-          query: {
-            brand: selectedVehicle.value?.brand,
-            model: selectedVehicle.value?.model,
-          },
-        })
+        // Jesteśmy już na dobrej zakładce, więc po prostu wywołujemy create()
+        detailsState.create()
       },
     })
   }
