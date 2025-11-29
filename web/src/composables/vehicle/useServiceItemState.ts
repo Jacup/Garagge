@@ -4,9 +4,13 @@ import type { ServiceItemDto } from '@/api/generated/apiV1.schemas'
 export type ItemMode = 'create' | 'edit'
 
 const isOpen = ref(false)
-const selectedItem = ref<ServiceItemDto | null>(null)
 const mode = ref<ItemMode>('create')
 const parentRecordId = ref<string | null>(null)
+
+const selectedItem = ref<ServiceItemDto | null>(null)
+
+const isDeleteOpen = ref(false)
+const itemToDelete = ref<ServiceItemDto | null>(null)
 
 export function useServiceItemState() {
   const create = (recordId: string) => {
@@ -23,6 +27,19 @@ export function useServiceItemState() {
     isOpen.value = true
   }
 
+  const openDeleteDialog = (item: ServiceItemDto, recordId: string) => {
+    itemToDelete.value = item
+    parentRecordId.value = recordId
+    isDeleteOpen.value = true
+  }
+
+  const cancelDelete = () => {
+    isDeleteOpen.value = false
+    setTimeout(() => {
+      itemToDelete.value = null
+      parentRecordId.value = null
+    }, 300)
+  }
   const close = () => {
     isOpen.value = false
     setTimeout(() => {
@@ -37,8 +54,12 @@ export function useServiceItemState() {
     selectedItem: computed(() => selectedItem.value),
     mode: computed(() => mode.value),
     parentRecordId: computed(() => parentRecordId.value),
+    isDeleteOpen: computed(() => isDeleteOpen.value),
+    itemToDelete: computed(() => itemToDelete.value),
     create,
     edit,
+    openDeleteDialog,
+    cancelDelete,
     close,
   }
 }

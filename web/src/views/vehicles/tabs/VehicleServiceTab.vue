@@ -48,9 +48,7 @@ const hasMoreRecords = ref(true)
 const sortBy = ref<string | undefined>(undefined)
 const sortDescending = ref(false)
 
-// Load service records from API
 async function loadServiceRecords() {
-  // Jeśli nie mamy ID pojazdu, nie ma sensu nic ładować.
   if (!props.vehicleId) return
 
   serviceRecordsLoading.value = true
@@ -78,10 +76,10 @@ async function loadServiceRecords() {
 
     if (detailsState.isOpen.value && detailsState.mode.value === 'view' && detailsState.selectedRecord.value) {
       const currentRecordId = detailsState.selectedRecord.value.id
-      const freshRecordFromList = fetchedItems.find((r) => r.id === currentRecordId)
+      const freshRecord = fetchedItems.find((r) => r.id === currentRecordId)
 
-      if (freshRecordFromList) {
-        detailsState.updateSelectedRecord(freshRecordFromList)
+      if (freshRecord) {
+        detailsState.updateSelectedRecord(freshRecord)
       }
     }
   } catch (err) {
@@ -248,6 +246,7 @@ defineExpose({
 </template>
 
 <style scoped>
+
 .mobile-summary-cards {
   padding: 12px;
 }

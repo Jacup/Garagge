@@ -60,14 +60,7 @@ const wasUpdated = computed(() => {
           <h3 class="ml-2 text-h6 font-weight-bold">Items Breakdown</h3>
           <v-spacer />
           <v-chip class="suggestion-chip mr-2" variant="flat" size="small" color="surface-variant">{{ itemCount }} items</v-chip>
-          <v-btn
-            v-if="record?.id"
-            size="small"
-            prepend-icon="mdi-plus"
-            @click="itemState.create(record.id)"
-          >
-            Add Item
-          </v-btn>
+          <v-btn v-if="record?.id" size="small" prepend-icon="mdi-plus" @click="itemState.create(record.id)"> Add Item </v-btn>
         </div>
 
         <v-list density="comfortable" class="pa-0 mb-4">
@@ -96,11 +89,15 @@ const wasUpdated = computed(() => {
                     icon="mdi-pencil-outline"
                     variant="text"
                     density="comfortable"
-                    color="primary"
                     @click="itemState.edit(item, record.id)"
-                  >
-                    <v-tooltip activator="parent" location="bottom">Edit Item</v-tooltip>
-                  </v-btn>
+                  />
+                  <v-btn
+                    v-if="record?.id"
+                    icon="mdi-delete"
+                    variant="text"
+                    density="comfortable"
+                    @click="itemState.openDeleteDialog(item, record.id)"
+                  />
                 </div>
               </template>
             </v-list-item>

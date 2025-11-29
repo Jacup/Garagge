@@ -12,6 +12,7 @@ import { getServiceRecords } from '@/api/generated/service-records/service-recor
 import ServiceDetails from './ServiceDetails.vue'
 import ServiceRecordForm from './ServiceRecordForm.vue'
 import ServiceItemFormDialog from './ServiceItemFormDialog.vue'
+import ServiceItemDeleteDialog from './ServiceItemDeleteDialog.vue'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState'
@@ -162,6 +163,7 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
   </v-navigation-drawer>
 
   <ServiceItemFormDialog :vehicle-id="vehicleId" @refresh-data="emit('refresh-data')" />
+  <ServiceItemDeleteDialog :vehicle-id="vehicleId" @success="emit('refresh-data')" />
 </template>
 
 <style scoped>
