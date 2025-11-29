@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 
-import type { ServiceRecordDto, ServiceTypeDto, ServiceRecordCreateRequest } from '@/api/generated/apiV1.schemas'
+import type {
+  ServiceRecordDto,
+  ServiceTypeDto,
+  ServiceRecordCreateRequest,
+  ServiceRecordUpdateRequest,
+} from '@/api/generated/apiV1.schemas'
 import { getServiceRecords } from '@/api/generated/service-records/service-records'
 
 import ServiceDetails from './ServiceDetails.vue'
@@ -21,7 +26,8 @@ const emit = defineEmits<{
   'refresh-data': []
 }>()
 
-const { getApiVehiclesServiceRecordsTypes, postApiVehiclesVehicleIdServiceRecords } = getServiceRecords()
+const { getApiVehiclesServiceRecordsTypes, postApiVehiclesVehicleIdServiceRecords, putApiVehiclesVehicleIdServiceRecordsServiceRecordId } =
+  getServiceRecords()
 const { isMobile } = useResponsiveLayout()
 const { mode, editMetadata, cancelAction, close: closeSheet } = useServiceDetailsState()
 
@@ -64,8 +70,23 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
       emit('refresh-data')
       closeSheet()
     } else if (mode.value === 'edit-metadata') {
-      // TODO: Faza 2
-      cancelAction()
+      if (!props.record?.id) {
+        throw new Error('Missing record ID for update')
+      }
+
+      const updatePayload: ServiceRecordUpdateRequest = {
+        title: payload.title,
+        serviceDate: payload.serviceDate,
+        serviceTypeId: payload.serviceTypeId,
+        notes: payload.notes,
+        mileage: payload.mileage,
+        manualCost: payload.manualCost,
+      }
+
+      await putApiVehiclesVehicleIdServiceRecordsServiceRecordId(props.vehicleId, props.record.id, updatePayload)
+
+      emit('refresh-data')
+      closeSheet()
     }
   } catch (error) {
     console.error('Error saving record:', error)
