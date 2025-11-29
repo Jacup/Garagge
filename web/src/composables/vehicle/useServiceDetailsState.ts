@@ -26,6 +26,14 @@ export function useServiceDetailsState() {
     }
   }
 
+  const updateSelectedRecord = (record: ServiceRecordDto) => {
+    if (selectedRecord.value?.id === record.id) {
+      selectedRecord.value = record
+    } else {
+      console.warn('[useServiceDetailsState] updateSelectedRecord called with mismatching record ID. Ignoring.')
+    }
+  }
+
   const cancelAction = () => {
     if (mode.value === 'create') {
       close()
@@ -49,6 +57,7 @@ export function useServiceDetailsState() {
     open,
     create,
     editMetadata,
+    updateSelectedRecord,
     cancelAction,
     close,
   }

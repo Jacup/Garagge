@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 import { useFormatting } from '@/composables/useFormatting'
+import { useServiceItemState } from '@/composables/vehicle/useServiceItemState'
 
 const props = defineProps<{
   record: ServiceRecordDto | null
@@ -9,6 +10,7 @@ const props = defineProps<{
 
 const { formatCurrency, formatDate, formatMileage, formatDateTime } = useFormatting()
 
+const itemState = useServiceItemState()
 const itemCount = computed(() => props.record?.serviceItems.length ?? 0)
 
 const wasUpdated = computed(() => {
@@ -75,8 +77,21 @@ const wasUpdated = computed(() => {
               </v-list-item-subtitle>
 
               <template #append>
-                <div class="text-body-1 font-weight-black text-high-emphasis ml-4">
-                  {{ formatCurrency(item.totalPrice) }}
+                <div class="d-flex align-center">
+                    <div class="text-body-1 font-weight-black text-high-emphasis mx-4">
+                      {{ formatCurrency(item.totalPrice) }}
+                    </div>
+
+                    <v-btn
+                        v-if="record?.id"
+                        icon="mdi-pencil-outline"
+                        variant="text"
+                        density="comfortable"
+                        color="primary"
+                        @click="itemState.edit(item, record.id)"
+                    >
+                        <v-tooltip activator="parent" location="bottom">Edit Item</v-tooltip>
+                    </v-btn>
                 </div>
               </template>
             </v-list-item>

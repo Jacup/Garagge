@@ -50,10 +50,12 @@ const sortDescending = ref(false)
 
 // Load service records from API
 async function loadServiceRecords() {
+  // Jeśli nie mamy ID pojazdu, nie ma sensu nic ładować.
   if (!props.vehicleId) return
 
   serviceRecordsLoading.value = true
   error.value = null
+
   try {
     const response = await getApiVehiclesVehicleIdServiceRecords(props.vehicleId, {
       page: serviceRecordsPage.value,
@@ -62,18 +64,29 @@ async function loadServiceRecords() {
       sortDescending: sortDescending.value,
     })
 
-    // For mobile infinite scroll - append items
+    const fetchedItems = response.data.items ?? []
+    const totalCount = response.data.totalCount ?? 0
+
     if (isMobile.value && serviceRecordsPage.value > 1) {
-      serviceRecords.value = [...serviceRecords.value, ...(response.data.items ?? [])]
+      serviceRecords.value = [...serviceRecords.value, ...fetchedItems]
     } else {
-      serviceRecords.value = response.data.items ?? []
+      serviceRecords.value = fetchedItems
     }
 
-    serviceRecordsTotal.value = response.data.totalCount ?? 0
+    serviceRecordsTotal.value = totalCount
     hasMoreRecords.value = serviceRecords.value.length < serviceRecordsTotal.value
+
+    if (detailsState.isOpen.value && detailsState.mode.value === 'view' && detailsState.selectedRecord.value) {
+      const currentRecordId = detailsState.selectedRecord.value.id
+      const freshRecordFromList = fetchedItems.find((r) => r.id === currentRecordId)
+
+      if (freshRecordFromList) {
+        detailsState.updateSelectedRecord(freshRecordFromList)
+      }
+    }
   } catch (err) {
     console.error('Failed to load service records:', err)
-    error.value = 'Failed to load service records'
+    error.value = 'Failed to load service records. Please try again.'
     serviceRecords.value = []
     serviceRecordsTotal.value = 0
     hasMoreRecords.value = false
