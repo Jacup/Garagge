@@ -56,9 +56,18 @@ const wasUpdated = computed(() => {
           </div>
         </v-alert>
 
-        <div class="mb-2 d-flex align-center justify-space-between">
+        <div class="mb-2 d-flex align-center">
           <h3 class="ml-2 text-h6 font-weight-bold">Items Breakdown</h3>
-          <v-chip class="mr-2 suggestion-chip" variant="flat" size="small" color="surface-variant">{{ itemCount }} items</v-chip>
+          <v-spacer />
+          <v-chip class="suggestion-chip mr-2" variant="flat" size="small" color="surface-variant">{{ itemCount }} items</v-chip>
+          <v-btn
+            v-if="record?.id"
+            size="small"
+            prepend-icon="mdi-plus"
+            @click="itemState.create(record.id)"
+          >
+            Add Item
+          </v-btn>
         </div>
 
         <v-list density="comfortable" class="pa-0 mb-4">
@@ -78,20 +87,20 @@ const wasUpdated = computed(() => {
 
               <template #append>
                 <div class="d-flex align-center">
-                    <div class="text-body-1 font-weight-black text-high-emphasis mx-4">
-                      {{ formatCurrency(item.totalPrice) }}
-                    </div>
+                  <div class="text-body-1 font-weight-black text-high-emphasis mx-4">
+                    {{ formatCurrency(item.totalPrice) }}
+                  </div>
 
-                    <v-btn
-                        v-if="record?.id"
-                        icon="mdi-pencil-outline"
-                        variant="text"
-                        density="comfortable"
-                        color="primary"
-                        @click="itemState.edit(item, record.id)"
-                    >
-                        <v-tooltip activator="parent" location="bottom">Edit Item</v-tooltip>
-                    </v-btn>
+                  <v-btn
+                    v-if="record?.id"
+                    icon="mdi-pencil-outline"
+                    variant="text"
+                    density="comfortable"
+                    color="primary"
+                    @click="itemState.edit(item, record.id)"
+                  >
+                    <v-tooltip activator="parent" location="bottom">Edit Item</v-tooltip>
+                  </v-btn>
                 </div>
               </template>
             </v-list-item>
