@@ -4,39 +4,36 @@ import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
-import VehicleOverviewTab from '@/components/vehicles/tabs/VehicleOverviewTab.vue'
-import VehicleFuelTab from '@/components/vehicles/tabs/VehicleFuelTab.vue'
-import VehicleServiceTab from '@/components/vehicles/tabs/VehicleServiceTab.vue'
+import VehicleOverviewTab from '@/views/vehicles/tabs/VehicleOverviewTab.vue'
+import VehicleFuelTab from '@/views/vehicles/tabs/VehicleFuelTab.vue'
+import VehicleServiceTab from '@/views/vehicles/tabs/VehicleServiceTab.vue'
 import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import { useRouter } from 'vue-router'
+import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState';
 
 const route = useRoute()
-const router = useRouter()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
+const { close: closeServiceDetailsSheet } = useServiceDetailsState();
+const detailsState = useServiceDetailsState();
 
-// Vehicle data
 const vehicleId = ref(route.params.id as string)
 const selectedVehicle = ref<VehicleDto | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-// Energy entries for timeline
 const energyEntries = ref<EnergyEntryDto[]>([])
 const timelineLoading = ref(false)
 
 const energystats = ref<EnergyStatsDto | null>(null)
 const statsLoading = ref(false)
 
-// Global stats for summary cards (always unfiltered)
 const globalStats = ref<EnergyStatsDto | null>(null)
 
-// Computed: Get unit label with proper formatting (used in summary cards)
 const getUnitLabel = (unit: string | undefined): string => {
   if (!unit) return ''
   switch (unit) {
@@ -53,13 +50,11 @@ const getUnitLabel = (unit: string | undefined): string => {
   }
 }
 
-// Computed: Summary card stats (aggregated from first unit or totals)
 const summaryStats = computed(() => {
   if (!globalStats.value) return null
 
   const firstUnit = globalStats.value.energyUnitStats[0]
 
-  // Get all consumption data for display
   const consumptions = globalStats.value.energyUnitStats
     .filter((stat) => stat.averageConsumption && stat.averageConsumption > 0)
     .map((stat) => ({
@@ -70,42 +65,33 @@ const summaryStats = computed(() => {
   return {
     totalEntries: globalStats.value.totalEntries,
     totalCost: globalStats.value.totalCost,
-    // Use first unit's volume and consumption, or 0 if none
     totalVolume: firstUnit?.totalVolume ?? 0,
     volumeUnit: getUnitLabel(firstUnit?.unit),
     consumptions: consumptions,
   }
 })
 
-// Computed: Last entered mileage from energy entries
 const lastEnteredMileage = computed(() => {
   if (!energyEntries.value || energyEntries.value.length === 0) return null
 
-  // Sort by date descending and get the first entry (most recent)
   const sortedEntries = [...energyEntries.value].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return sortedEntries[0]?.mileage ?? null
 })
 
-// Tab navigation state
 const activeTab = ref('overview')
 
-// Dialog state
 const addDialog = ref(false)
 const bulkDeleteDialog = ref(false)
 const editVehicleDialog = ref(false)
 
-// Selection state for energy entries
 const selectedEnergyEntries = ref<string[]>([])
 
-// Selection state for service records
 const selectedServiceRecords = ref<string[]>([])
 
-// Component refs
 const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
 const vehicleFormDialogRef = ref<InstanceType<typeof VehicleFormDialog> | null>(null)
 
-// Load vehicle data from API
 async function loadVehicle() {
   if (!vehicleId.value) {
     error.value = 'No vehicle ID provided'
@@ -118,9 +104,7 @@ async function loadVehicle() {
     error.value = null
     const response = await getApiVehiclesId(vehicleId.value)
     selectedVehicle.value = response.data
-    // Load energy entries for timeline
     await loadEnergyEntries()
-    // Load global stats (also sets initial energystats since no filters at start)
     await loadGlobalStats()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
@@ -130,16 +114,14 @@ async function loadVehicle() {
   }
 }
 
-// Load energy entries for timeline
 async function loadEnergyEntries() {
   if (!vehicleId.value) return
 
   try {
     timelineLoading.value = true
-    // Get all energy entries (high page size to get full timeline)
     const response = await getApiVehiclesVehicleIdEnergyEntries(vehicleId.value, {
       page: 1,
-      pageSize: 100, // Get all entries for timeline
+      pageSize: 100,
     })
     energyEntries.value = response.data.items ?? []
   } catch (err) {
@@ -150,13 +132,11 @@ async function loadEnergyEntries() {
   }
 }
 
-// Load energy statistics (called on initial load and when filters change in child component)
 async function loadEnergyStats() {
   if (!vehicleId.value) return
 
   try {
     statsLoading.value = true
-    // Always fetch all stats (filtering happens in EnergyStatisticsCard component)
     const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
       energyTypes: undefined,
     })
@@ -169,16 +149,14 @@ async function loadEnergyStats() {
   }
 }
 
-// Load global statistics for summary cards (always unfiltered)
 async function loadGlobalStats() {
   if (!vehicleId.value) return
 
   try {
     const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
-      energyTypes: undefined, // Always get all stats for summary cards
+      energyTypes: undefined,
     })
     globalStats.value = response.data
-    // Also set energystats to the same value initially
     energystats.value = response.data
   } catch (err) {
     console.error('Failed to load global stats:', err)
@@ -186,7 +164,6 @@ async function loadGlobalStats() {
   }
 }
 
-// Mock statistics data (to be replaced with API calls)
 const mockStats = {
   totalDistance: 12450,
   totalFuelCost: 2340,
@@ -198,13 +175,11 @@ const mockStats = {
   totalServiceCost: 2350.0,
 }
 
-// Handler for energy entry changes (edit/delete from table)
 function handleEnergyEntryChanged() {
   loadEnergyStats()
   loadGlobalStats()
 }
 
-// Dialog functions
 function openAddDialog() {
   addDialog.value = true
 }
@@ -221,7 +196,6 @@ function closeEditVehicleDialog() {
   editVehicleDialog.value = false
 }
 
-// API Error Response interfaces (same as in VehicleFormDialog)
 interface ApiErrorResponse {
   type: string
   title: string
@@ -233,14 +207,11 @@ interface ApiErrorResponse {
 
 async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
   try {
-    // Update vehicle via API
     await putApiVehiclesId(vehicleId.value, vehicleData)
     closeEditVehicleDialog()
-    // Reload vehicle data to refresh the view
     await loadVehicle()
   } catch (error) {
     console.error('Failed to update vehicle:', error)
-    // Pass error to the dialog for display
     if (vehicleFormDialogRef.value && error && typeof error === 'object' && 'response' in error) {
       const axiosError = error as { response?: { data?: ApiErrorResponse } }
       if (axiosError.response?.data) {
@@ -254,12 +225,10 @@ function handleEntrySaved() {
   closeAddDialog()
   loadEnergyEntries()
   loadEnergyStats()
-  loadGlobalStats() // Refresh summary cards
-  // Refresh the energy entries table
+  loadGlobalStats()
   energyEntriesTableRef.value?.loadEnergyEntries()
 }
 
-// Bulk delete functions
 function openBulkDeleteDialog() {
   bulkDeleteDialog.value = true
 }
@@ -272,14 +241,13 @@ async function confirmBulkDelete() {
   if (selectedEnergyEntries.value.length > 0) {
     await energyEntriesTableRef.value?.removeMultiple(selectedEnergyEntries.value)
     selectedEnergyEntries.value = []
-    // Refresh stats after deletion
     await loadEnergyStats()
-    await loadGlobalStats() // Refresh summary cards
+    await loadGlobalStats()
   }
   bulkDeleteDialog.value = false
 }
 
-// FAB configuration per tab
+
 const updateFabForTab = () => {
   if (activeTab.value === 'overview') {
     registerFabMenu({
@@ -293,7 +261,6 @@ const updateFabForTab = () => {
           action: () => {
             activeTab.value = 'fuel'
             nextTick(() => {
-              // Open add dialog in fuel tab
               addDialog.value = true
             })
           },
@@ -304,13 +271,9 @@ const updateFabForTab = () => {
           text: 'Add Service',
           color: 'secondary',
           action: () => {
-            router.push({
-              name: 'AddServiceRecord',
-              params: { id: vehicleId.value },
-              query: {
-                brand: selectedVehicle.value?.brand,
-                model: selectedVehicle.value?.model,
-              },
+            activeTab.value = 'service'
+            nextTick(() => {
+              detailsState.create()
             })
           },
         },
@@ -320,21 +283,14 @@ const updateFabForTab = () => {
     registerFab({
       icon: 'mdi-gas-station',
       text: 'Add Fuel',
-      action: () => addDialog.value = true,
+      action: () => (addDialog.value = true),
     })
   } else if (activeTab.value === 'service') {
     registerFab({
-      icon: 'mdi-wrench',
+      icon: 'mdi-plus',
       text: 'Add Service',
       action: () => {
-        router.push({
-          name: 'AddServiceRecord',
-          params: { id: vehicleId.value },
-          query: {
-            brand: selectedVehicle.value?.brand,
-            model: selectedVehicle.value?.model,
-          },
-        })
+        detailsState.create()
       },
     })
   }
@@ -351,6 +307,7 @@ onUnmounted(() => {
 
 watch(activeTab, () => {
   updateFabForTab()
+  closeServiceDetailsSheet()
 })
 </script>
 
@@ -462,7 +419,8 @@ watch(activeTab, () => {
       grow
       selected-class="selected-tab"
       height="64"
-      class="mb-4 tabs-container">
+      class="mb-4 tabs-container"
+    >
       <v-tab value="overview" rounded="pill">
         <v-icon :icon="activeTab === 'overview' ? 'mdi-information' : 'mdi-information-outline'" start size="24" />
         <span class="tab-text">Overview</span>
@@ -583,7 +541,6 @@ watch(activeTab, () => {
   font-weight: 400;
 }
 
-/* Tab navigation styling */
 .tabs-container {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
   border-radius: 9999px;
@@ -593,7 +550,6 @@ watch(activeTab, () => {
   background-color: rgb(var(--v-theme-secondary-container));
 }
 
-/* Equal height rows */
 .equal-height-row {
   align-items: stretch;
 }
@@ -606,12 +562,10 @@ watch(activeTab, () => {
   flex: 1;
 }
 
-/* Consistent card background matching navigation */
 .card-background {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
 }
 
-/* Enhanced summary cards */
 .summary-card {
   border-radius: 16px;
 }
@@ -620,7 +574,6 @@ watch(activeTab, () => {
   margin-top: 8px;
 }
 
-/* Consumption display for multiple values */
 .consumption-values {
   display: flex;
   flex-direction: column;
@@ -631,7 +584,6 @@ watch(activeTab, () => {
   align-items: baseline;
 }
 
-/* Enhanced buttons */
 .action-btn {
   text-transform: none;
   font-weight: 500;
@@ -645,7 +597,6 @@ watch(activeTab, () => {
   font-size: 0.875rem;
 }
 
-/* Section spacing */
 .summary-section,
 .details-section,
 .fuel-section,
@@ -654,7 +605,6 @@ watch(activeTab, () => {
   margin-bottom: 24px; /* Consistent spacing between sections */
 }
 
-/* Vehicle cards */
 .vehicle-image-card,
 .vehicle-details-card,
 .fuel-stats-card,
@@ -677,7 +627,6 @@ watch(activeTab, () => {
   justify-content: center;
 }
 
-/* Card titles with action buttons */
 .v-card-title {
   padding-left: 16px;
   padding-right: 16px;
@@ -687,7 +636,6 @@ watch(activeTab, () => {
   padding-right: 8px;
 }
 
-/* Stats grid for info cards */
 .stats-grid .stat-item {
   padding: 12px 0;
   display: flex;
@@ -700,13 +648,11 @@ watch(activeTab, () => {
   border-bottom: none;
 }
 
-/* Timeline customization */
 .timeline-card {
   border-left: 2px solid rgba(var(--v-theme-primary), 0.12);
   margin-left: 8px;
 }
 
-/* Table styling - full container height */
 .fuel-table {
   height: 100% !important;
   background-color: transparent !important;
@@ -720,7 +666,6 @@ watch(activeTab, () => {
   height: calc(400px - 56px) !important;
 }
 
-/* Scrollable timeline */
 .service-timeline-card .v-card-text {
   padding: 0 !important;
 }
@@ -729,7 +674,6 @@ watch(activeTab, () => {
   padding: 16px;
 }
 
-/* Responsive improvements */
 @media (max-width: 959px) {
   .stats-grid .stat-item {
     text-align: center;
@@ -743,9 +687,8 @@ watch(activeTab, () => {
   }
 }
 
-/* Tab styling */
 .tab-text {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
@@ -753,7 +696,6 @@ watch(activeTab, () => {
   letter-spacing: normal;
 }
 
-/* Mobile optimizations */
 @media (max-width: 599px) {
   .summary-card {
     margin-bottom: 8px;
@@ -765,7 +707,6 @@ watch(activeTab, () => {
   }
 }
 
-/* Tablet optimizations */
 @media (min-width: 600px) and (max-width: 959px) {
   .summary-card {
     margin-bottom: 12px;
@@ -775,6 +716,4 @@ watch(activeTab, () => {
 .energy-entries-card .v-card-text {
   overflow: hidden;
 }
-
-/* Desktop optimizations */
 </style>

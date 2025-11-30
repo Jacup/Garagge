@@ -21,12 +21,10 @@ const emit = defineEmits<{
   'bulk-delete': []
 }>()
 
-// Ref to EnergyEntriesTable component
 const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
 
-// Expose ref to parent
 defineExpose({
-  energyEntriesTableRef
+  energyEntriesTableRef,
 })
 </script>
 
