@@ -2,16 +2,13 @@
 import { ref, onMounted, onUnmounted } from 'vue' // Dodane onUnmounted
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 
-// --- Importy API ---
 import { getServiceRecords } from '@/api/generated/service-records/service-records'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 
-// --- Importy Komponentów ---
 import ServiceRecordsTable from '@/components/vehicles/service/ServiceRecordsTable.vue'
 import ServiceRecordsList from '@/components/vehicles/service/ServiceRecordsList.vue'
 import ServiceDetailsWrapper from '@/components/vehicles/service/ServiceDetailsWrapper.vue'
 
-// --- Importy Composable ---
 import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState'
 
 const { isMobile } = useResponsiveLayout()
@@ -27,11 +24,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-
-const emit = defineEmits<{
-  'update:selectedServiceRecords': [value: string[]]
-  'record-changed': []
-}>()
 
 const { getApiVehiclesVehicleIdServiceRecords } = getServiceRecords()
 

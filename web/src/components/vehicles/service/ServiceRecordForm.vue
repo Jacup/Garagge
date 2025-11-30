@@ -2,7 +2,6 @@
 import { ref, reactive, watch, computed } from 'vue'
 import { ServiceItemType } from '@/types/serviceItemType'
 
-// --- IMPORTY TYPÓW API ---
 import type {
   ServiceTypeDto,
   ServiceRecordCreateRequest,
@@ -10,26 +9,18 @@ import type {
   ServiceRecordDto,
 } from '@/api/generated/apiV1.schemas'
 
-// --- INTERFEJS KOMPONENTU ---
 const props = defineProps<{
-  /** Opcjonalne dane początkowe (dla trybu edycji). */
   initialData?: ServiceRecordDto | null
-  /** Lista dostępnych typów serwisów. */
   serviceTypes: ServiceTypeDto[]
-  /** Stan ładowania przycisku zapisu. */
   loading?: boolean
-  /** Tryb pracy formularza. 'create' pokazuje sekcję itemów. 'edit-metadata' ukrywa ją. */
   mode: 'create' | 'edit-metadata'
 }>()
 
 const emit = defineEmits<{
-  /** Emitowane, gdy formularz jest poprawny. Payload jest gotowy do wysłania. */
   (e: 'submit', payload: ServiceRecordCreateRequest): void
-  /** Emitowane po kliknięciu Anuluj. */
   (e: 'cancel'): void
 }>()
 
-// --- STAN I WALIDACJA ---
 interface ValidateResult {
   valid: boolean
 }
@@ -37,9 +28,8 @@ type FormRefType = { validate: () => Promise<ValidateResult> } | null
 const formRef = ref<FormRefType>(null)
 const errorMessage = ref('')
 
-// Definicja stanu itemu w formularzu
 interface FormItem {
-  id?: string // Opcjonalne ID (tylko w trybie edycji)
+  id?: string
   name: string
   type: ServiceItemType | null
   partNumber: string
@@ -47,7 +37,6 @@ interface FormItem {
   unitPrice: number | null
 }
 
-// Domyślny stan formularza
 const getDefaultFormState = () => ({
   title: '',
   recordType: null as string | null,
@@ -58,24 +47,19 @@ const getDefaultFormState = () => ({
   items: [] as FormItem[],
 })
 
-// Reaktywny model formularza
 const form = reactive(getDefaultFormState())
 
-// --- INICJALIZACJA ---
-// Wypełnia formularz danymi, jeśli initialData jest dostępne.
 watch(
   () => props.initialData,
   (newData) => {
     if (newData) {
-      // TRYB EDYCJI (Wypełnienie danych)
       form.title = newData.title
       form.recordType = newData.typeId
       form.notes = newData.notes || ''
       form.serviceDate = newData.serviceDate.split('T')[0]
       form.mileage = newData.mileage
-      // Mapowanie itemów (tylko w trybie create, ale dla bezpieczeństwa robimy zawsze)
       form.items = newData.serviceItems.map((i) => ({
-        id: i.id, // Ważne: zapamiętujemy ID
+        id: i.id,
         name: i.name,
         type: i.type as unknown as ServiceItemType,
         partNumber: i.partNumber || '',
@@ -83,9 +67,7 @@ watch(
         unitPrice: i.unitPrice,
       }))
     } else {
-      // TRYB TWORZENIA (Reset)
       Object.assign(form, getDefaultFormState())
-      // Dodajemy jeden pusty item na start dla wygody (tylko w trybie create)
       if (props.mode === 'create') {
         addItem()
       }
@@ -94,7 +76,6 @@ watch(
   { immediate: true, deep: true },
 )
 
-// --- REGUŁY WALIDACJI ---
 const MAX_FIELD_LENGTH = 64
 const MAX_NOTES_LENGTH = 500
 const rules = {
@@ -109,7 +90,6 @@ const serviceItemTypeOptions = Object.keys(ServiceItemType)
   .filter((k) => isNaN(Number(k)))
   .map((k) => ({ label: k, value: ServiceItemType[k as keyof typeof ServiceItemType] }))
 
-// --- OPERACJE NA ITEMACH ---
 function addItem() {
   form.items.push({ name: '', type: null, partNumber: '', quantity: null, unitPrice: null })
 }
@@ -120,37 +100,32 @@ function removeAllItems() {
   form.items.splice(0, form.items.length)
 }
 
-// --- SUBMIT ---
 async function submit() {
   const result = await formRef.value?.validate()
   if (!result?.valid) {
     errorMessage.value = 'Please correct all form errors before submitting'
-    // Scroll do góry kontenera
     document.querySelector('.v-navigation-drawer__content, .v-dialog__content')?.scrollTo({ top: 0, behavior: 'smooth' })
     return
   }
   errorMessage.value = ''
 
-  // Przygotowanie payloadu dla API (ServiceRecordCreateRequest)
   const payload: ServiceRecordCreateRequest = {
     title: form.title,
     serviceDate: form.serviceDate,
     serviceTypeId: form.recordType!,
     mileage: form.mileage,
     manualCost: form.manualCost,
-    // Mapujemy itemy formularza na format API
     serviceItems: form.items.map((i) => ({
       name: i.name,
       type: i.type! as unknown as ApiServiceItemType,
       partNumber: i.partNumber || null,
       quantity: i.quantity!,
       unitPrice: i.unitPrice!,
-      notes: null, // Notatki do itemów są usunięte z UI
+      notes: null,
     })),
     notes: form.notes || null,
   }
 
-  // Emitujemy gotowy payload do rodzica
   emit('submit', payload)
 }
 
@@ -382,15 +357,12 @@ const submitButtonLabel = computed(() => (props.mode === 'create' ? 'Create Reco
   gap: 12px;
 }
 
-/* Style dla v-number-input żeby wyglądały spójnie */
 :deep(.v-number-input__control) {
   height: 40px;
 }
-/* Subtelny separator dla przycisku usuwania */
 .border-s {
   border-left: 1px solid rgba(var(--v-border-color), 0.12);
 }
-/* Efekt hover na przycisku usuwania */
 .hover-opacity-100 {
   transition: opacity 0.2s;
 }
@@ -398,7 +370,6 @@ const submitButtonLabel = computed(() => (props.mode === 'create' ? 'Create Reco
   opacity: 1 !important;
 }
 
-/* Dostosowanie bordera dla stanu pustego */
 .border-dashed {
   border: 2px dashed rgba(var(--v-border-color), 0.25);
 }

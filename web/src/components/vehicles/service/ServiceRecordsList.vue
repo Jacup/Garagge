@@ -5,7 +5,7 @@ interface Props {
   items: ServiceRecordDto[]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const emit = defineEmits<{
   select: [record: ServiceRecordDto]
