@@ -80,24 +80,27 @@ const wasUpdated = computed(() => {
 
               <template #append>
                 <div class="d-flex align-center">
-                  <div class="text-body-1 font-weight-black text-high-emphasis mx-4">
+                  <div class="text-body-1 font-weight-black text-high-emphasis mx-2">
                     {{ formatCurrency(item.totalPrice) }}
                   </div>
 
-                  <v-btn
-                    v-if="record?.id"
-                    icon="mdi-pencil-outline"
-                    variant="text"
-                    density="comfortable"
-                    @click="itemState.edit(item, record.id)"
-                  />
-                  <v-btn
-                    v-if="record?.id"
-                    icon="mdi-delete"
-                    variant="text"
-                    density="comfortable"
-                    @click="itemState.openDeleteDialog(item, record.id)"
-                  />
+                  <v-menu v-if="record?.id" location="bottom end">
+                    <template v-slot:activator="{ props: menuProps }">
+                      <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" color="medium-emphasis" v-bind="menuProps" />
+                    </template>
+
+                    <v-list density="compact" width="150" class="menu-container pa-1" rounded="md-16px">
+                      <v-list-item class="menu-item" rounded="md-medium" prepend-icon="mdi-pencil-outline" title="Edit" @click="itemState.edit(item, record.id)"></v-list-item>
+
+                      <v-list-item
+                        class="menu-item text-error"
+                        rounded="md-medium"
+                        prepend-icon="mdi-delete-outline"
+                        title="Delete"
+                        @click="itemState.openDeleteDialog(item, record.id)"
+                      ></v-list-item>
+                    </v-list>
+                  </v-menu>
                 </div>
               </template>
             </v-list-item>
@@ -125,6 +128,14 @@ const wasUpdated = computed(() => {
 </template>
 
 <style scoped>
+.menu-container {
+  background-color: rgba(var(--v-theme-surface-container-low)) !important;
+}
+
+.menu-item {
+  color: rgba(var(--v-theme-on-surface));
+}
+
 .font-mono {
   font-family: 'Roboto Mono', monospace;
   letter-spacing: -0.5px;
