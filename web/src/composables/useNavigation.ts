@@ -6,7 +6,14 @@ export function useNavigationItem(item: NavigationItem) {
   const router = useRouter()
 
   const currentRoute = computed(() => router.currentRoute.value.path)
-  const isActive = computed(() => currentRoute.value === item.link)
+  const isActive = computed(() => {
+    if (item.link === '/') {
+      return currentRoute.value === item.link
+    }
+    console.log(currentRoute.value, item.link)
+    console.log(currentRoute.value.startsWith(item.link))
+    return currentRoute.value.startsWith(item.link)
+  })
 
   const currentIcon = computed(() => {
     return isActive.value ? item.activeIcon || item.icon : item.icon
