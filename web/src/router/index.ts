@@ -10,6 +10,7 @@ import ComponentGalleryView from '@/views/ComponentGalleryView.vue'
 import CardGalleryView from '@/views/CardGalleryView.vue'
 import VehicleOverview from '@/views/vehicles/VehicleOverview.vue'
 import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
+import SettingsView from '@/views/settings/SettingsView.vue'
 
 const routes = [
   {
@@ -48,6 +49,12 @@ const routes = [
     component: AddServiceRecordView,
     meta: { requiresAuth: true },
     props: true,
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: SettingsView,
+    meta: { requiresAuth: true },
   },
   {
     path: '/components',

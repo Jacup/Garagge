@@ -10,20 +10,25 @@ const { item } = defineProps<Props>()
 
 const emit = defineEmits<{ navigate: [] }>()
 
-const { currentIcon } = useNavigationItem(item)
+const { currentIcon, isActive, navigate } = useNavigationItem(item)
+
+const handleClick = () => {
+  emit('navigate')
+  navigate()
+}
 </script>
 
 <template>
   <v-list-item
     :title="item.title"
-    :to="item.link"
     :min-height="56"
+    :active="isActive"
     rounded="pill"
     class="px-4"
     base-color="on-surface-variant"
     color="secondary"
     link
-    @click="emit('navigate')"
+    @click="handleClick"
   >
     <template #prepend>
       <v-icon :size="24" class="mr-2">
