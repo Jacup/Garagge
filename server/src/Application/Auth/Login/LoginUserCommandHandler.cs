@@ -2,6 +2,7 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
+using Application.Abstractions.Services;
 using Application.Core;
 using Domain.Entities.Auth;
 using Domain.Entities.Users;
@@ -9,7 +10,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Auth.Login;
 
-internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPasswordHasher passwordHasher, ITokenProvider tokenProvider, IDateTimeProvider dateTimeProvider)
+internal sealed class LoginUserCommandHandler(
+    IApplicationDbContext context,
+    IPasswordHasher passwordHasher,
+    ITokenProvider tokenProvider,
+    IDateTimeProvider dateTimeProvider,
+    IUserAgentHelper userAgentHelper)
     : ICommandHandler<LoginUserCommand, LoginUserResponse>
 {
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
@@ -27,14 +33,22 @@ internal sealed class LoginUserCommandHandler(IApplicationDbContext context, IPa
 
         string token = tokenProvider.Create(user);
 
+        var deviceName = userAgentHelper.ParseDeviceName(command.UserAgent);
+        var refreshTokenExpiration = dateTimeProvider.UtcNow.AddDays(command.RememberMe ? 30 : 1);
+        
         var refreshToken = new RefreshToken
         {
-            Id = Guid.NewGuid(), UserId = user.Id, Token = tokenProvider.GenerateRefreshToken(), ExpiresAt = dateTimeProvider.UtcNow.AddDays(7)
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = tokenProvider.GenerateRefreshToken(),
+            ExpiresAt = refreshTokenExpiration,
+            DeviceName = deviceName,
+            IsRevoked = false
         };
 
         context.RefreshTokens.Add(refreshToken);
         await context.SaveChangesAsync(cancellationToken);
         
-        return Result.Success(new LoginUserResponse(token, refreshToken.Token));
+        return Result.Success(new LoginUserResponse(token, refreshToken.Token, refreshTokenExpiration));
     }
 }

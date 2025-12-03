@@ -1,6 +1,7 @@
 ﻿using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
+using Application.Auth;
 using Application.Auth.Login;
 using Application.Vehicles;
 using Domain.Entities.Services;
