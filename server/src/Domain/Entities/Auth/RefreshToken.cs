@@ -5,7 +5,7 @@ namespace Domain.Entities.Auth;
 public class RefreshToken : Entity
 {
     public required string Token { get; init; }
-    public required DateTime ExpiresAt { get; set; }
+    public required DateTimeOffset ExpiresAt { get; set; }
     public required int SessionDurationDays { get; init; }
     
     public bool IsRevoked { get; set; }

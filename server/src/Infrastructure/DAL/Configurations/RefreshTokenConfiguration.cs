@@ -16,10 +16,6 @@ internal sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refre
             .IsUnique();
         
         builder
-            .Property(rt => rt.ExpiresAt)
-            .HasMaxLength(200);
-        
-        builder
             .HasOne(rt => rt.User)
             .WithMany()
             .HasForeignKey(rt => rt.UserId);

@@ -12,8 +12,11 @@ namespace ApiIntegrationTests.Endpoints.Auth;
 [Collection("RefreshTests")]
 public class RefreshTests : BaseIntegrationTest
 {
+    private readonly CustomWebApplicationFactory _factory;
+
     public RefreshTests(CustomWebApplicationFactory factory) : base(factory)
     {
+        _factory = factory;
     }
 
     [Fact]
@@ -86,13 +89,17 @@ public class RefreshTests : BaseIntegrationTest
         (_, string refreshToken1) = await LoginUser("test@garagge.app", "Password123");
 
         // First refresh (legitimate user)
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken1}");
-        await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
-        Client.DefaultRequestHeaders.Clear();
+        using var legitimateClient = _factory.CreateClient();
+        using var request1 = new HttpRequestMessage(HttpMethod.Post, ApiV1Definition.Auth.Refresh);
+        request1.Headers.Add("Cookie", $"refreshToken={refreshToken1}");
+        var response1 = await legitimateClient.SendAsync(request1);
+        response1.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Act: Second refresh with the old token (attacker)
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken1}");
-        var response2 = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        using var attackerClient = _factory.CreateClient();
+        using var request2 = new HttpRequestMessage(HttpMethod.Post, ApiV1Definition.Auth.Refresh);
+        request2.Headers.Add("Cookie", $"refreshToken={refreshToken1}");
+        var response2 = await attackerClient.SendAsync(request2);
 
         // Assert
         response2.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
