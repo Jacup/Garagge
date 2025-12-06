@@ -1,4 +1,5 @@
-﻿using Domain.Entities.EnergyEntries;
+﻿using Domain.Entities.Auth;
+using Domain.Entities.EnergyEntries;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
@@ -10,6 +11,7 @@ namespace Application.Abstractions.Data;
 public interface IApplicationDbContext
 {
     DbSet<User> Users { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
     
     DbSet<Vehicle> Vehicles { get; }
     DbSet<VehicleEnergyType> VehicleEnergyTypes { get; }

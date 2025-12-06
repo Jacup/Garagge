@@ -71,17 +71,17 @@ public class UserFlowTests : BaseIntegrationTest
     {
         // Arrange
         await RegisterUser("usera@garagge.app", "User", "A", UserPassword);
-        var tokenA = (await LoginUser("usera@garagge.app", UserPassword)).AccessToken;
+        var tokenA = (await LoginUser("usera@garagge.app", UserPassword));
         
         await RegisterAndAuthenticateUser("userb@garagge.app", "User", "B", UserPassword);
-        var tokenB = (await LoginUser("userb@garagge.app", UserPassword)).AccessToken;
+        var tokenB = (await LoginUser("userb@garagge.app", UserPassword));
 
         // Act
-        Authenticate(tokenA);
+        Authenticate(tokenA.Response.AccessToken);
         var responseA = await Client.GetAsync(ApiV1Definition.Users.GetMe);
         var dataA = await responseA.Content.ReadFromJsonAsync<UserDto>();
 
-        Authenticate(tokenB);
+        Authenticate(tokenB.Response.AccessToken);
         var responseB = await Client.GetAsync(ApiV1Definition.Users.GetMe);
         var dataB = await responseB.Content.ReadFromJsonAsync<UserDto>();
 
@@ -386,7 +386,7 @@ public class UserFlowTests : BaseIntegrationTest
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // Act
-        var loginRequest = new LoginUserCommand(UserEmail, UserPassword);
+        var loginRequest = new LoginRequest(UserEmail, UserPassword, false);
         var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
 
         // Assert

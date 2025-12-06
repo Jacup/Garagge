@@ -880,7 +880,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         // Setup User1
         var user1 = await CreateUserAsync("user1@garagge.app");
         var loginUser1Response = await LoginUser(user1.Email, "Password123");
-        Authenticate(loginUser1Response.AccessToken);
+        Authenticate(loginUser1Response.Response.AccessToken);
 
         var serviceType = await CreateServiceTypeAsync();
         var vehicle1 = await CreateVehicleAsync(user1, "User1 Car", "Model1"); // Use user object
@@ -912,7 +912,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         // Setup User2
         var user2 = await CreateUserAsync("user2@garagge.app", "Password456");
         var loginUser2Response = await LoginUser(user2.Email, "Password456");
-        Authenticate(loginUser2Response.AccessToken);
+        Authenticate(loginUser2Response.Response.AccessToken);
 
         // TRY GET as User2 (using User1's vehicle/SR) - should fail
         var getAsUser2Response = await Client.GetAsync(
@@ -942,7 +942,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         deleteAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         // Authenticate back as User1
-        Authenticate(loginUser1Response.AccessToken);
+        Authenticate(loginUser1Response.Response.AccessToken);
 
         // GET as User1 again - data should be intact
         var getFinalResponse = await Client.GetAsync(

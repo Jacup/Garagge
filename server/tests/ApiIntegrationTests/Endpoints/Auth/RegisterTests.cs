@@ -170,9 +170,8 @@ public class RegisterTests : BaseIntegrationTest
     [Fact]
     public async Task Register_DuplicateEmail_ReturnsConflict()
     {
-        // Act
+        // Arrange
         var request = new RegisterUserCommand("test-conflict@garagge.app", "John", "Doe", "Password123");
-
         await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
         
         // Act
@@ -183,5 +182,47 @@ public class RegisterTests : BaseIntegrationTest
         
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
         problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
+    }
+
+    [Fact]
+    public async Task Register_DuplicateEmailCaseInsensitive_ReturnsConflict()
+    {
+        // Arrange
+        var initialRequest = new RegisterUserCommand("test-case@garagge.app", "John", "Doe", "Password123");
+        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, initialRequest);
+        
+        var duplicateRequest = new RegisterUserCommand("TEST-CASE@GARAGGE.APP", "Jane", "Smith", "Password456");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, duplicateRequest);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        
+        CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
+        problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
+    }
+
+    [Theory]
+    [InlineData("  test-whitespace@garagge.app", "John", "Doe")]
+    [InlineData("test-whitespace@garagge.app  ", "John", "Doe")]
+    public async Task Register_WithWhitespace_ReturnsOkAndTrimsData(string email, string firstName, string lastName)
+    {
+        // Arrange
+        var request = new RegisterUserCommand(email, firstName, lastName, "Password123");
+
+        // Act
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var userId = await response.Content.ReadFromJsonAsync<Guid>();
+        var user = await DbContext.Users.FindAsync(userId);
+
+        user.ShouldNotBeNull();
+        user.Email.ShouldBe(email.Trim());
+        user.FirstName.ShouldBe(firstName.Trim());
+        user.LastName.ShouldBe(lastName.Trim());
     }
 }

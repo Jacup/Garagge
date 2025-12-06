@@ -10,7 +10,7 @@ internal sealed class ChangePassword : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("auth/change-password", async (AuthChangePasswordRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPut("auth/change-password", async (ChangePasswordRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new ChangePasswordCommand(request.CurrentPassword, request.NewPassword);
                 
@@ -24,4 +24,4 @@ internal sealed class ChangePassword : IEndpoint
     }
 }
 
-internal sealed record AuthChangePasswordRequest(string CurrentPassword, string NewPassword);
+internal sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);
