@@ -2,6 +2,7 @@
 using Application.Abstractions.Data;
 using Domain.Abstractions;
 using Domain.Entities;
+using Domain.Entities.Auth;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
@@ -16,6 +17,7 @@ public sealed class ApplicationDbContext(DbContextOptions<ApplicationDbContext> 
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<EnergyEntry> EnergyEntries { get; set; }

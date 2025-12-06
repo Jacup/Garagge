@@ -1,18 +1,17 @@
-﻿using ApiIntegrationTests.Contracts.V1;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
-using Application.Auth.Login;
-using Application.Vehicles;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Infrastructure.DAL;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ApiIntegrationTests.Fixtures;
 
@@ -64,43 +63,64 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         return user;
     }
     
-    protected async Task CreateAndAuthenticateUser()
+    protected async Task CreateAndAuthenticateUser(bool rememberMe = false)
     {
         await CreateUserAsync();
 
-        LoginUserResponse loginResult = await LoginUser("test@garagge.app", "Password123");
+        var (loginResponse, _) = await LoginUser("test@garagge.app", "Password123", rememberMe);
 
-        Authenticate(loginResult.AccessToken);
+        Authenticate(loginResponse.AccessToken);
     }
     
-    protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword)
+    protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword, bool rememberMe = false)
     {
         await RegisterUser(userEmail, firstName, lastName, userPassword);
 
-        LoginUserResponse loginResult = await LoginUser(userEmail, userPassword);
+        var (loginResponse, _) = await LoginUser(userEmail, userPassword, rememberMe);
 
-        Authenticate(loginResult.AccessToken);
+        Authenticate(loginResponse.AccessToken);
     }
     
     protected async Task RegisterUser(string userEmail, string firstName, string lastName, string userPassword)
     {
-        var registerRequest = new AuthRegisterRequest(userEmail, userPassword, firstName, lastName);
+        var registerRequest = new RegisterRequest(userEmail, userPassword, firstName, lastName);
         var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
 
         registerResponse.EnsureSuccessStatusCode();
     }
 
-    protected async Task<LoginUserResponse> LoginUser(string userEmail, string userPassword)
+    protected async Task<(LoginResponse Response, string RefreshToken)> LoginUser(string userEmail, string userPassword, bool rememberMe = false)
     {
-        var loginRequest = new AuthLoginRequest(userEmail, userPassword);
-        var loginResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
+        var loginRequest = new LoginRequest(userEmail, userPassword, rememberMe);
+        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
 
-        loginResponse.EnsureSuccessStatusCode();
+        response.EnsureSuccessStatusCode();
 
-        var loginResult = await loginResponse.Content.ReadFromJsonAsync<LoginUserResponse>();
-        loginResult.ShouldNotBeNull();
-        loginResult.AccessToken.ShouldNotBeNull();
-        return loginResult;
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        loginResponse.ShouldNotBeNull();
+        loginResponse.AccessToken.ShouldNotBeNull();
+
+        var refreshToken = ParseRefreshTokenFromCookie(response.Headers);
+        refreshToken.ShouldNotBeNullOrEmpty();
+        
+        return (loginResponse, refreshToken);
+    }
+    
+    protected static string? ParseRefreshTokenFromCookie(HttpResponseHeaders headers, bool expired = false)
+    {
+        var cookieHeader = headers.GetValues("Set-Cookie").FirstOrDefault();
+        if (cookieHeader is null) 
+            return null;
+
+        if (expired)
+            return cookieHeader.StartsWith("refreshToken=;") ? "" : null;
+
+        var parts = cookieHeader.Split(';')[0].Split('=');
+        if (parts.Length != 2)
+            return null;
+
+        var encodedValue = parts[1];
+        return WebUtility.UrlDecode(encodedValue);
     }
     
     protected async Task<Vehicle> CreateVehicleAsync(

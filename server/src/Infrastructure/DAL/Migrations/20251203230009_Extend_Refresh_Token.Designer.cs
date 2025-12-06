@@ -3,6 +3,7 @@ using System;
 using Infrastructure.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251203230009_Extend_Refresh_Token")]
+    partial class Extend_Refresh_Token
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,8 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("text")
                         .HasColumnName("device_name");
 
-                    b.Property<DateTimeOffset>("ExpiresAt")
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasMaxLength(200)
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
@@ -52,10 +56,6 @@ namespace Infrastructure.DAL.Migrations
                     b.Property<string>("ReplacedByToken")
                         .HasColumnType("text")
                         .HasColumnName("replaced_by_token");
-
-                    b.Property<int>("SessionDurationDays")
-                        .HasColumnType("integer")
-                        .HasColumnName("session_duration_days");
 
                     b.Property<string>("Token")
                         .IsRequired()

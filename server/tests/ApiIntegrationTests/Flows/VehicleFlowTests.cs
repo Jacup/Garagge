@@ -198,14 +198,14 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         // Authenticate as User 1 and create a vehicle
         var loginUser1Response = await LoginUser(user1.Email, "password123");
-        Authenticate(loginUser1Response.AccessToken);
+        Authenticate(loginUser1Response.Response.AccessToken);
         var createVehicleUser1Command = new VehicleCreateRequest("User1Brand", "User1Model", EngineType.Fuel, null, null, null, null);
         var createUser1Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser1Command);
         createUser1Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Authenticate as User 2 and create a vehicle
         var loginUser2Response = await LoginUser(user2.Email, "password345");
-        Authenticate(loginUser2Response.AccessToken);
+        Authenticate(loginUser2Response.Response.AccessToken);
         var createVehicleUser2Command = new VehicleCreateRequest("User2Brand", "User2Model", EngineType.Fuel, null, null, null, null);
         var createUser2Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser2Command);
         createUser2Response.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -219,7 +219,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         user2Vehicles.Items[0].Brand.ShouldBe("User2Brand");
 
         // Retrieve vehicles as User 1
-        Authenticate(loginUser1Response.AccessToken);
+        Authenticate(loginUser1Response.Response.AccessToken);
         var getUser1VehiclesResponse = await Client.GetAsync(ApiV1Definition.Vehicles.GetAll);
         getUser1VehiclesResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var user1Vehicles = await getUser1VehiclesResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
