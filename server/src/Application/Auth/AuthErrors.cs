@@ -59,4 +59,8 @@ public static class AuthErrors
     public static readonly Error TokenExpired = Error.Unauthorized(
         "Auth.TokenExpired",
         "The provided token has expired");
+    
+    public static readonly Error UserNotFound = Error.Unauthorized(
+        "Auth.UserNotFound",
+        "The user associated with the provided token was not found");
 }

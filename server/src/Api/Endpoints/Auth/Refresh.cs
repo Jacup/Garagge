@@ -40,7 +40,7 @@ internal sealed class Refresh : IEndpoint
 
                 httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, cookieOptions);
 
-                return Results.Ok(new AuthLoginResponse(result.Value.AccessToken));
+                return Results.Ok(new LoginResponse(result.Value.AccessToken));
             })
             .AllowAnonymous()
             .WithTags(Tags.Auth);

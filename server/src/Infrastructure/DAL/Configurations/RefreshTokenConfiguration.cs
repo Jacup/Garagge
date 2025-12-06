@@ -12,13 +12,13 @@ internal sealed class RefreshTokenConfiguration : IEntityTypeConfiguration<Refre
             .HasKey(rt => rt.Id);
 
         builder
-            .Property(rt => rt.ExpiresAt)
-            .HasMaxLength(200);
-
-        builder
             .HasIndex(rt => rt.Token)
             .IsUnique();
-
+        
+        builder
+            .Property(rt => rt.ExpiresAt)
+            .HasMaxLength(200);
+        
         builder
             .HasOne(rt => rt.User)
             .WithMany()

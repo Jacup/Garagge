@@ -4,17 +4,19 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
+using Application.Users;
 using Domain.Entities.Auth;
+using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Auth.Refresh;
 
-internal sealed class RefreshTokenCommandHandler(
-    IApplicationDbContext context, 
-    ITokenProvider tokenProvider, 
-    IDateTimeProvider dateTimeProvider, 
-    ILogger<RefreshTokenCommandHandler> logger, 
+public sealed class RefreshTokenCommandHandler(
+    IApplicationDbContext context,
+    ITokenProvider tokenProvider,
+    IDateTimeProvider dateTimeProvider,
+    ILogger<RefreshTokenCommandHandler> logger,
     IUserAgentHelper userAgentHelper)
     : ICommandHandler<RefreshTokenCommand, LoginUserResponse>
 {
@@ -26,12 +28,19 @@ internal sealed class RefreshTokenCommandHandler(
 
         if (currentToken is null)
             return Result.Failure<LoginUserResponse>(AuthErrors.InvalidToken);
-        
+
+        if (currentToken.User is null)
+        {
+            await RevokeAllUserTokens(currentToken.UserId, cancellationToken);
+
+            return Result.Failure<LoginUserResponse>(AuthErrors.UserNotFound);
+        }
+
         if (currentToken.IsRevoked)
         {
             logger.LogWarning("Potential token theft detected for user {UserId}", currentToken.UserId);
             await RevokeAllUserTokens(currentToken.UserId, cancellationToken);
-            
+
             return Result.Failure<LoginUserResponse>(AuthErrors.TokenRevoked);
         }
 
@@ -39,43 +48,34 @@ internal sealed class RefreshTokenCommandHandler(
         {
             currentToken.IsRevoked = true;
             await context.SaveChangesAsync(cancellationToken);
-            
+
             return Result.Failure<LoginUserResponse>(AuthErrors.TokenExpired);
         }
 
-        var user = currentToken.User!;
+        var user = currentToken.User;
         var newAccessToken = tokenProvider.Create(user);
         var newRefreshTokenValue = tokenProvider.GenerateRefreshToken();
 
         currentToken.IsRevoked = true;
         currentToken.ReplacedByToken = newRefreshTokenValue;
 
-        var deviceName = userAgentHelper.ParseDeviceName(command.UserAgent);
-        var newExpiresAt = dateTimeProvider.UtcNow.AddDays(7);
-        
         var newRefreshToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
             Token = newRefreshTokenValue,
+            ExpiresAt = dateTimeProvider.UtcNow.AddDays(currentToken.SessionDurationDays),
+            SessionDurationDays = currentToken.SessionDurationDays,
             IsRevoked = false,
-            ExpiresAt = newExpiresAt,
-            DeviceName = deviceName
+            IpAddress = command.IpAddress,
+            UserAgent = command.UserAgent,
+            DeviceName = userAgentHelper.ParseDeviceName(command.UserAgent)
         };
 
         context.RefreshTokens.Add(newRefreshToken);
-        
-        var tokensToDelete = await context.RefreshTokens
-            .Where(rt => rt.UserId == user.Id && 
-                         (rt.ExpiresAt <= dateTimeProvider.UtcNow || 
-                          (rt.IsRevoked && rt.Id != currentToken.Id)))
-            .ToListAsync(cancellationToken);
 
-        if (tokensToDelete.Count != 0)
-        {
-            context.RefreshTokens.RemoveRange(tokensToDelete);
-        }
-        
+        await DeleteExpiredAndRevokedTokens(user.Id, currentToken, cancellationToken);
+
         await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new LoginUserResponse(newAccessToken, newRefreshToken.Token, newRefreshToken.ExpiresAt));
@@ -91,7 +91,17 @@ internal sealed class RefreshTokenCommandHandler(
         {
             token.IsRevoked = true;
         }
-        
+
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task DeleteExpiredAndRevokedTokens(Guid userId, RefreshToken currentToken, CancellationToken cancellationToken)
+    {
+        await context.RefreshTokens
+            .Where(rt => rt.UserId == userId &&
+                         (rt.ExpiresAt <= dateTimeProvider.UtcNow || 
+                          (rt.IsRevoked && 
+                           rt.Id != currentToken.Id)))
+            .ExecuteDeleteAsync(cancellationToken);
     }
 }

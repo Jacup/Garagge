@@ -7,11 +7,13 @@ public static class ApiV1Definition
     // ==================== AUTHENTICATION & AUTHORIZATION ====================
     public static class Auth
     {
-        public static string Login = $"{ApiBase}/auth/login";
-        public static string Register = $"{ApiBase}/auth/register";
-        public static string Refresh = $"{ApiBase}/auth/refresh";
-        public static string Logout = $"{ApiBase}/auth/logout";
-        public static string ChangePassword = $"{ApiBase}/auth/change-password";
+        private const string AuthBase = "auth";
+
+        public const string Login = $"{ApiBase}/{AuthBase}/login";
+        public const string Register = $"{ApiBase}/{AuthBase}/register";
+        public const string Refresh = $"{ApiBase}/{AuthBase}/refresh";
+        public const string Logout = $"{ApiBase}/{AuthBase}/logout";
+        public const string ChangePassword = $"{ApiBase}/{AuthBase}/change-password";
     }
 
     // ==================== USERS MANAGEMENT ====================

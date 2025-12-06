@@ -18,6 +18,9 @@ internal sealed class LoginUserCommandHandler(
     IUserAgentHelper userAgentHelper)
     : ICommandHandler<LoginUserCommand, LoginUserResponse>
 {
+    private const int ShortSessionDurationDays = 1;
+    private const int LongSessionDurationDays = 30;
+    
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
         var normalizedEmail = command.Email.Trim().ToLowerInvariant();
@@ -27,23 +30,28 @@ internal sealed class LoginUserCommandHandler(
             .SingleOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
-        {
             return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
-        }
 
         string token = tokenProvider.Create(user);
 
+        var sessionDuration = command.RememberMe ? LongSessionDurationDays : ShortSessionDurationDays;
+        var refreshTokenExpiration = dateTimeProvider.UtcNow.AddDays(sessionDuration);
+        
         var deviceName = userAgentHelper.ParseDeviceName(command.UserAgent);
-        var refreshTokenExpiration = dateTimeProvider.UtcNow.AddDays(command.RememberMe ? 30 : 1);
         
         var refreshToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
             UserId = user.Id,
+            
             Token = tokenProvider.GenerateRefreshToken(),
             ExpiresAt = refreshTokenExpiration,
+            SessionDurationDays = sessionDuration,
+            IsRevoked = false,
+            
+            IpAddress = command.IpAddress,
+            UserAgent = command.UserAgent,
             DeviceName = deviceName,
-            IsRevoked = false
         };
 
         context.RefreshTokens.Add(refreshToken);

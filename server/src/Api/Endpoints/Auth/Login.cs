@@ -10,7 +10,7 @@ internal sealed class Login : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/login", async (AuthLoginRequest request, ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
+        app.MapPost("auth/login", async (LoginRequest request, ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
             {
                 var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
                 var userAgent = httpContext.Request.Headers.UserAgent.ToString();
@@ -36,15 +36,15 @@ internal sealed class Login : IEndpoint
 
                 httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, cookieOptions);
 
-                return Results.Ok(Result.Success(new AuthLoginResponse(result.Value.AccessToken)));
+                return Results.Ok(new LoginResponse(result.Value.AccessToken));
             })
             .AllowAnonymous()
-            .Produces<AuthLoginResponse>()
+            .Produces<LoginResponse>()
             .Produces(StatusCodes.Status401Unauthorized)
             .WithTags(Tags.Auth);
     }
 }
 
-internal sealed record AuthLoginRequest(string Email, string Password, bool RememberMe);
+internal sealed record LoginRequest(string Email, string Password, bool RememberMe);
 
-internal sealed record AuthLoginResponse(string AccessToken);
+internal sealed record LoginResponse(string AccessToken);
