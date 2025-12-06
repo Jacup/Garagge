@@ -4,49 +4,41 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type {
-  AuthChangePasswordRequest,
-  AuthLoginRequest,
-  AuthRegisterRequest,
-  LoginUserResponse
-} from '../apiV1.schemas';
+import type { ChangePasswordRequest, LoginRequest, LoginResponse, RegisterRequest } from '../apiV1.schemas'
 
-import { axiosInstance } from '../../axios-instance';
+import { axiosInstance } from '../../axios-instance'
 
-
-
-  export const getAuth = () => {
-const putApiAuthChangePassword = (
-    authChangePasswordRequest: AuthChangePasswordRequest,
- ) => {
-      return axiosInstance<unknown>(
-      {url: `/api/auth/change-password`, method: 'PUT',
-      headers: {'Content-Type': 'application/json', },
-      data: authChangePasswordRequest
-    },
-      );
-    }
-  const postApiAuthLogin = (
-    authLoginRequest: AuthLoginRequest,
- ) => {
-      return axiosInstance<LoginUserResponse>(
-      {url: `/api/auth/login`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: authLoginRequest
-    },
-      );
-    }
-  const postApiAuthRegister = (
-    authRegisterRequest: AuthRegisterRequest,
- ) => {
-      return axiosInstance<string>(
-      {url: `/api/auth/register`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: authRegisterRequest
-    },
-      );
-    }
-  return {putApiAuthChangePassword,postApiAuthLogin,postApiAuthRegister}};
+export const getAuth = () => {
+  const putApiAuthChangePassword = (changePasswordRequest: ChangePasswordRequest) => {
+    return axiosInstance<unknown>({
+      url: `/api/auth/change-password`,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      data: changePasswordRequest,
+    })
+  }
+  const postApiAuthLogin = (loginRequest: LoginRequest) => {
+    return axiosInstance<LoginResponse>({
+      url: `/api/auth/login`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: loginRequest,
+    })
+  }
+  const postApiAuthRefresh = () => {
+    return axiosInstance<null>({ url: `/api/auth/refresh`, method: 'POST' })
+  }
+  const postApiAuthRegister = (registerRequest: RegisterRequest) => {
+    return axiosInstance<string>({
+      url: `/api/auth/register`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      data: registerRequest,
+    })
+  }
+  return { putApiAuthChangePassword, postApiAuthLogin, postApiAuthRefresh, postApiAuthRegister }
+}
 export type PutApiAuthChangePasswordResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['putApiAuthChangePassword']>>>
 export type PostApiAuthLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthLogin']>>>
+export type PostApiAuthRefreshResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRefresh']>>>
 export type PostApiAuthRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRegister']>>>

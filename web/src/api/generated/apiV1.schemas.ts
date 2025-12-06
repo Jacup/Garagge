@@ -4,21 +4,9 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-export interface AuthChangePasswordRequest {
+export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-}
-
-export interface AuthLoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface AuthRegisterRequest {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
 }
 
 export interface EnergyEntryCreateRequest {
@@ -71,7 +59,7 @@ export interface EnergyStatsDto {
 export type EnergyType = typeof EnergyType[keyof typeof EnergyType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EnergyType = {
   Gasoline: 'Gasoline',
   Diesel: 'Diesel',
@@ -86,7 +74,7 @@ export const EnergyType = {
 export type EnergyUnit = typeof EnergyUnit[keyof typeof EnergyUnit];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EnergyUnit = {
   Liter: 'Liter',
   Gallon: 'Gallon',
@@ -108,7 +96,7 @@ export interface EnergyUnitStats {
 export type EngineType = typeof EngineType[keyof typeof EngineType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EngineType = {
   Fuel: 'Fuel',
   Hybrid: 'Hybrid',
@@ -117,7 +105,13 @@ export const EngineType = {
   Hydrogen: 'Hydrogen',
 } as const;
 
-export interface LoginUserResponse {
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface LoginResponse {
   accessToken: string;
 }
 
@@ -127,7 +121,7 @@ export interface LoginUserResponse {
 export type NullableOfVehicleType = typeof NullableOfVehicleType[keyof typeof NullableOfVehicleType] | null;
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NullableOfVehicleType = {
   Bus: 'Bus',
   Car: 'Car',
@@ -162,6 +156,13 @@ export interface PagedListOfVehicleDto {
   hasPreviousPage?: boolean;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface ServiceItemCreateRequest {
   name: string;
   type: ServiceItemType;
@@ -192,7 +193,7 @@ export interface ServiceItemDto {
 export type ServiceItemType = typeof ServiceItemType[keyof typeof ServiceItemType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ServiceItemType = {
   Other: 'Other',
   Labor: 'Labor',
