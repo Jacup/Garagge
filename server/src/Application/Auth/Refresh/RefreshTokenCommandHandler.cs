@@ -97,11 +97,14 @@ public sealed class RefreshTokenCommandHandler(
 
     private async Task DeleteExpiredAndRevokedTokens(Guid userId, RefreshToken currentToken, CancellationToken cancellationToken)
     {
-        await context.RefreshTokens
+        var tokensToDelete = await context.RefreshTokens
             .Where(rt => rt.UserId == userId &&
-                         (rt.ExpiresAt <= dateTimeProvider.UtcNow || 
-                          (rt.IsRevoked && 
+                         (rt.ExpiresAt <= dateTimeProvider.UtcNow ||
+                          (rt.IsRevoked &&
                            rt.Id != currentToken.Id)))
-            .ExecuteDeleteAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
+
+        if (tokensToDelete.Count != 0)
+            context.RefreshTokens.RemoveRange(tokensToDelete);
     }
 }
