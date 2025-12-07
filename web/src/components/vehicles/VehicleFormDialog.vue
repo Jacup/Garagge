@@ -134,7 +134,7 @@ async function fetchSupportedEnergyTypes(engineType: EngineType) {
     const api = getVehicleEnergyTypes()
     const result = await api.getApiEnergyTypesSupported({ engineType })
 
-    availableEnergyTypes.value = createEnergyTypeOptions(result.data)
+    availableEnergyTypes.value = createEnergyTypeOptions(result)
   } catch (error) {
     console.error('Failed to fetch supported energy types:', error)
     availableEnergyTypes.value = []

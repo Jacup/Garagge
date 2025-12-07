@@ -73,8 +73,8 @@ async function loadEnergyEntries() {
       page: energyEntriesPage.value,
       pageSize: energyEntriesPageSize.value,
     })
-    energyEntries.value = response.data.items ?? []
-    energyEntriesTotal.value = response.data.totalCount ?? 0
+    energyEntries.value = response.items ?? []
+    energyEntriesTotal.value = response.totalCount ?? 0
   } catch (err) {
     console.error('Failed to load energy entries:', err)
     error.value = 'Nie udało się załadować danych tankowania'

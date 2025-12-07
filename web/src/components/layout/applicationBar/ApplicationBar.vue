@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 import { useTheme } from 'vuetify'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
-import { useUserStore } from '@/stores/userStore'
+import { useSettingsStore } from '@/stores/settings'
 import AccountMenu from '@/components/layout/applicationBar/AccountMenu.vue'
 import SearchBox from '@/components/layout/applicationBar/SearchBox.vue'
 import { computed, watch, onMounted, onUnmounted, ref } from 'vue'
 
 const theme = useTheme()
-const userStore = useUserStore()
+const settingsStore = useSettingsStore()
 
 const systemTheme = ref<'light' | 'dark'>(
   window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 )
 
 const activeTheme = computed(() => {
-  if (userStore.settings.theme === 'system') {
+  if (settingsStore.currentTheme === 'system') {
     return systemTheme.value
   }
-  return userStore.settings.theme
+  return settingsStore.currentTheme
 })
 
 watch(
@@ -29,7 +29,7 @@ watch(
 )
 
 const toggleTheme = () => {
-  const currentTheme = userStore.settings.theme
+  const currentTheme = settingsStore.currentTheme
   let newTheme: 'light' | 'dark' | 'system'
   if (currentTheme === 'light') {
     newTheme = 'dark'
@@ -38,11 +38,11 @@ const toggleTheme = () => {
   } else {
     newTheme = 'light'
   }
-  userStore.updateSettings({ theme: newTheme })
+  settingsStore.setTheme(newTheme)
 }
 
 const themeIcon = computed(() => {
-  switch (userStore.settings.theme) {
+  switch (settingsStore.currentTheme) {
     case 'light':
       return 'mdi-weather-sunny'
     case 'dark':

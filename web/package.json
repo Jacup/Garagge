@@ -21,6 +21,7 @@
     "axios": "^1.11.0",
     "perfect-scrollbar": "^1.5.6",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.7.1",
     "vite-plugin-pwa": "^1.0.1",
     "vite-plugin-vuetify": "^2.1.2",
     "vue": "^3.5.17",

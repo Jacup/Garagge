@@ -29,7 +29,7 @@ const vehicleName = computed(() => {
 async function loadServiceTypes() {
   try {
     const res = await getApiVehiclesServiceRecordsTypes()
-    serviceTypes.value = res.data ?? []
+    serviceTypes.value = res ?? []
   } catch (error) {
     console.error('Error loading service types:', error)
     serviceTypes.value = []

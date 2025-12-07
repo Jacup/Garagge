@@ -1,38 +1,27 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-import { getAuth } from '@/api/generated/auth/auth'
-import { getUsers } from '@/api/generated/users/users'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/auth'
 
 const email = ref('')
 const password = ref('')
+const rememberMe = ref(false)
 const error = ref('')
 const loading = ref(false)
-const userStore = useUserStore()
-const router = useRouter()
 
-const { postApiAuthLogin } = getAuth()
-const { getApiUsersMe } = getUsers()
+const authStore = useAuthStore()
+const router = useRouter()
 
 async function onSubmit() {
   error.value = ''
   loading.value = true
   try {
-    const loginRes = await postApiAuthLogin({ email: email.value, password: password.value })
+    await authStore.login({
+      email: email.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
+    })
 
-    if (!loginRes.data.accessToken) {
-      throw new Error('Missing access token in login response')
-    }
-
-    userStore.setToken(loginRes.data.accessToken)
-
-    const profileRes = await getApiUsersMe()
-    if (!profileRes.data) {
-      throw new Error('Failed to fetch user profile')
-    }
-    userStore.setProfile(profileRes.data)
     router.push('/')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Login failed'
@@ -51,6 +40,8 @@ async function onSubmit() {
         <v-text-field v-model="email" label="Email" type="email" variant="outlined" required class="form-field" :disabled="loading" />
 
         <v-text-field v-model="password" label="Hasło" type="password" variant="outlined" required class="form-field" :disabled="loading" />
+
+        <v-checkbox v-model="rememberMe" label="Nie wylogowuj mnie" :disabled="loading" />
 
         <v-btn type="submit" color="primary" variant="elevated" block size="large" class="mt-4" :loading="loading" :disabled="loading">
           Zaloguj

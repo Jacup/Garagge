@@ -98,8 +98,8 @@ async function loadItems() {
       pageSize: itemsPerPage.value,
       page: page.value,
     })
-    serverItems.value = res.data.items ?? []
-    totalItems.value = res.data.totalCount ?? 0
+    serverItems.value = res.items ?? []
+    totalItems.value = res.totalCount ?? 0
   } catch (error) {
     console.error('Fetching data failed: ', error)
     serverItems.value = []
@@ -110,19 +110,15 @@ async function loadItems() {
 }
 
 async function remove(id: string | undefined) {
-  const res = await deleteApiVehiclesId(id ?? '')
-  if (res.status === 204) {
-    loadItems()
-  } else {
-    console.error('Failed to delete vehicle:', res)
-  }
+  await deleteApiVehiclesId(id ?? '')
+  loadItems()
 }
 
 async function edit(id: string | undefined) {
   if (id) {
     try {
       const res = await getApiVehiclesId(id)
-      editingVehicle.value = res.data
+      editingVehicle.value = res
       showVehicleDialog.value = true
     } catch (error) {
       console.error('Failed to fetch vehicle for editing:', error)
@@ -265,7 +261,7 @@ onUnmounted(() => {
   </div>
 
   <!-- Vehicle Form Dialog -->
-    <!-- Vehicle Form Dialog -->
+  <!-- Vehicle Form Dialog -->
   <VehicleFormDialog
     ref="vehicleFormDialogRef"
     :is-open="showVehicleDialog"
