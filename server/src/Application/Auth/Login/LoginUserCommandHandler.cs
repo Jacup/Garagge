@@ -2,11 +2,11 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Services;
 using Application.Core;
 using Domain.Entities.Auth;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
+using UAParser;
 
 namespace Application.Auth.Login;
 
@@ -14,8 +14,7 @@ internal sealed class LoginUserCommandHandler(
     IApplicationDbContext context,
     IPasswordHasher passwordHasher,
     ITokenProvider tokenProvider,
-    IDateTimeProvider dateTimeProvider,
-    IUserAgentHelper userAgentHelper)
+    IDateTimeProvider dateTimeProvider)
     : ICommandHandler<LoginUserCommand, LoginUserResponse>
 {
     private const int ShortSessionDurationDays = 1;
@@ -32,30 +31,36 @@ internal sealed class LoginUserCommandHandler(
         if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
             return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
 
-        string token = tokenProvider.Create(user);
-
+        var sessionId = Guid.NewGuid();
         var sessionDuration = command.RememberMe ? LongSessionDurationDays : ShortSessionDurationDays;
         var refreshTokenExpiration = dateTimeProvider.UtcNow.AddDays(sessionDuration);
         
-        var deviceName = userAgentHelper.ParseDeviceName(command.UserAgent);
-        
+        var uaParser = Parser.GetDefault();
+        var clientInfo = uaParser.Parse(command.UserAgent ?? "");
+
         var refreshToken = new RefreshToken
         {
-            Id = Guid.NewGuid(),
+            Id = sessionId,
             UserId = user.Id,
             
             Token = tokenProvider.GenerateRefreshToken(),
             ExpiresAt = refreshTokenExpiration,
             SessionDurationDays = sessionDuration,
+            
             IsRevoked = false,
             
-            IpAddress = command.IpAddress,
             UserAgent = command.UserAgent,
-            DeviceName = deviceName,
+            DeviceOs = clientInfo?.OS.ToString(),
+            DeviceBrowser = clientInfo?.UA.Family,
+            DeviceType = clientInfo?.Device.ToString(),
+            
+            IpAddress = command.IpAddress
         };
-
+        
         context.RefreshTokens.Add(refreshToken);
         await context.SaveChangesAsync(cancellationToken);
+        
+        string token = tokenProvider.Create(user, sessionId);
         
         return Result.Success(new LoginUserResponse(token, refreshToken.Token, refreshTokenExpiration));
     }

@@ -19,33 +19,39 @@ public static class ApiV1Definition
     // ==================== USERS MANAGEMENT ====================
     public static class Users
     {
+        private const string UsersBase = "users";
         // Current user endpoints
-        public static string GetMe = $"{ApiBase}/users/me";
-        public static string UpdateMe = $"{ApiBase}/users/me";
-        public static string DeleteMe = $"{ApiBase}/users/me";
+        public static string GetMe = $"{ApiBase}/{UsersBase}/me";
+        public static string UpdateMe = $"{ApiBase}/{UsersBase}/me";
+        public static string DeleteMe = $"{ApiBase}/{UsersBase}/me";
 
         // Admin only - User management
-        public static string GetAll = $"{ApiBase}/users";
-        public static string Create = $"{ApiBase}/users";
+        public static string GetAll = $"{ApiBase}/{UsersBase}";
+        public static string Create = $"{ApiBase}/{UsersBase}";
         
         /// <summary>
         /// Get user by ID. Use: string.Format(Users.GetById, userId)
         /// </summary>
-        public static string GetById = $"{ApiBase}/users/{{0}}";
+        public static string GetById = $"{ApiBase}/{UsersBase}/{{0}}";
         
         /// <summary>
         /// Update user by ID. Use: string.Format(Users.UpdateById, userId)
         /// </summary>
-        public static string UpdateById = $"{ApiBase}/users/{{0}}";
+        public static string UpdateById = $"{ApiBase}/{UsersBase}/{{0}}";
         
         /// <summary>
         /// Delete user by ID. Use: string.Format(Users.DeleteById, userId)
         /// </summary>
-        public static string DeleteById = $"{ApiBase}/users/{{0}}";
+        public static string DeleteById = $"{ApiBase}/{UsersBase}/{{0}}";
 
         // Reminder settings
-        public static string GetReminderSettings = $"{ApiBase}/users/me/reminder-settings";
-        public static string UpdateReminderSettings = $"{ApiBase}/users/me/reminder-settings";
+        public static string GetReminderSettings = $"{ApiBase}/{UsersBase}/me/reminder-settings";
+        public static string UpdateReminderSettings = $"{ApiBase}/{UsersBase}/me/reminder-settings";
+        
+        // Session Management
+        public static string GetMeSessions = $"{ApiBase}/{UsersBase}/me/sessions";
+        public static string DeleteMeSession = $"{ApiBase}/{UsersBase}/me/sessions/{{0}}";
+        public static string DeleteAllSessions = $"{ApiBase}/{UsersBase}/me/sessions";
     }
 
     // ==================== ORGANIZATIONS (FLEET/SAAS) ====================
