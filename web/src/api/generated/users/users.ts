@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
+  SessionsDto,
   UserDto,
   UserUpdateMeRequest
 } from '../apiV1.schemas';
@@ -23,7 +24,7 @@ const getApiUsersUserId = (
       );
     }
   const deleteApiUsersMe = (
-    
+
  ) => {
       return axiosInstance<null>(
       {url: `/api/users/me`, method: 'DELETE'
@@ -31,7 +32,7 @@ const getApiUsersUserId = (
       );
     }
   const getApiUsersMe = (
-    
+
  ) => {
       return axiosInstance<UserDto>(
       {url: `/api/users/me`, method: 'GET'
@@ -48,8 +49,26 @@ const getApiUsersUserId = (
     },
       );
     }
-  return {getApiUsersUserId,deleteApiUsersMe,getApiUsersMe,putApiUsersMe}};
+  const deleteApiUsersMeSessionsId = (
+    id: string,
+ ) => {
+      return axiosInstance<null>(
+      {url: `/api/users/me/sessions/${id}`, method: 'DELETE'
+    },
+      );
+    }
+  const getApiUsersMeSessions = (
+
+ ) => {
+      return axiosInstance<SessionsDto>(
+      {url: `/api/users/me/sessions`, method: 'GET'
+    },
+      );
+    }
+  return {getApiUsersUserId,deleteApiUsersMe,getApiUsersMe,putApiUsersMe,deleteApiUsersMeSessionsId,getApiUsersMeSessions}};
 export type GetApiUsersUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersUserId']>>>
 export type DeleteApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['deleteApiUsersMe']>>>
 export type GetApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersMe']>>>
 export type PutApiUsersMeResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['putApiUsersMe']>>>
+export type DeleteApiUsersMeSessionsIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['deleteApiUsersMeSessionsId']>>>
+export type GetApiUsersMeSessionsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUsers>['getApiUsersMeSessions']>>>

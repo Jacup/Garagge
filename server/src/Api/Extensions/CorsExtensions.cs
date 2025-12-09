@@ -1,6 +1,4 @@
-﻿using Api.Infrastructure;
-
-namespace Api.Extensions;
+﻿namespace Api.Extensions;
 
 public static class CorsExtensions
 {
@@ -8,7 +6,18 @@ public static class CorsExtensions
     {
         services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+
+                if (allowedOrigins.Length > 0)
+                    policy.WithOrigins(allowedOrigins);
+            });
         });
 
         return services;

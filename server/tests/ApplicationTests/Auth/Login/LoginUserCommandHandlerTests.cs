@@ -1,6 +1,5 @@
 using Application.Abstractions;
 using Application.Abstractions.Authentication;
-using Application.Abstractions.Services;
 using Application.Auth;
 using Application.Auth.Login;
 using Domain.Entities.Auth;
@@ -14,7 +13,6 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
 {
     private readonly Mock<IPasswordHasher> _passwordHasherMock = new();
     private readonly Mock<ITokenProvider> _tokenProviderMock = new();
-    private readonly Mock<IUserAgentHelper> _userAgentHelperMock = new();
     private readonly LoginUserCommandHandler _sut;
 
     private readonly DateTime _fixedUtcNow = new(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -26,7 +24,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
     {
         IDateTimeProvider dateTimeProvider = new TestDateTimeProvider(_fixedUtcNow);
 
-        _sut = new LoginUserCommandHandler(Context, _passwordHasherMock.Object, _tokenProviderMock.Object, dateTimeProvider, _userAgentHelperMock.Object);
+        _sut = new LoginUserCommandHandler(Context, _passwordHasherMock.Object, _tokenProviderMock.Object, dateTimeProvider);
     }
 
     [Fact]
@@ -112,7 +110,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
             .Returns(true);
 
         _tokenProviderMock
-            .Setup(x => x.Create(It.IsAny<User>()))
+            .Setup(x => x.Create(It.IsAny<User>(), It.IsAny<Guid>()))
             .Returns(expectedToken);
 
         _tokenProviderMock
@@ -130,7 +128,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         result.Value.RefreshToken.ShouldBe(refreshToken.Token);
 
         _passwordHasherMock.Verify(x => x.Verify(password, hashedPassword), Times.Once);
-        _tokenProviderMock.Verify(x => x.Create(It.IsAny<User>()), Times.Once);
+        _tokenProviderMock.Verify(x => x.Create(It.IsAny<User>(), It.IsAny<Guid>()), Times.Once);
         _tokenProviderMock.Verify(x => x.GenerateRefreshToken(), Times.Once);
 
         var storedRefreshToken = Context.RefreshTokens.SingleOrDefault(rt => rt.Token == refreshToken.Token);
@@ -175,7 +173,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
             .Returns(true);
 
         _tokenProviderMock
-            .Setup(x => x.Create(It.IsAny<User>()))
+            .Setup(x => x.Create(It.IsAny<User>(), It.IsAny<Guid>()))
             .Returns(expectedToken);
 
         _tokenProviderMock
@@ -205,24 +203,10 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         const string password = "correct-password";
         const string hashedPassword = "hashed-password";
         const string expectedToken = "jwt-token-123";
-        const string ipAddress = "IP-ADDRESS";
-        const string userAgent = "USER-AGENT";
-        const string deviceName = "DEVICE-NAME";
-        
+        const string ipAddress = "127.0.0.1";
+        const string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
         
         var userId = Guid.NewGuid();
-
-        var refreshToken = new RefreshToken
-        {
-            UserId = userId,
-            Token = "example-refresh-token", 
-            ExpiresAt = _fixedUtcNow.AddDays(TokenValidityDefaultDays),
-            SessionDurationDays = TokenValidityDefaultDays,
-            
-            IpAddress = ipAddress,
-            UserAgent = userAgent,
-            DeviceName = deviceName
-        };
 
         var user = new User
         {
@@ -241,16 +225,12 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
             .Returns(true);
 
         _tokenProviderMock
-            .Setup(x => x.Create(It.IsAny<User>()))
+            .Setup(x => x.Create(It.IsAny<User>(), It.IsAny<Guid>()))
             .Returns(expectedToken);
 
         _tokenProviderMock
             .Setup(x => x.GenerateRefreshToken())
-            .Returns(refreshToken.Token);
-
-        _userAgentHelperMock
-            .Setup(x => x.ParseDeviceName(It.IsAny<string>()))
-            .Returns(deviceName);
+            .Returns("example-refresh-token");
 
         var command = new LoginUserCommand(email, password, false, ipAddress, userAgent);
 
@@ -260,16 +240,17 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
 
-        result.Value.RefreshToken.ShouldBe(refreshToken.Token);
+        result.Value.RefreshToken.ShouldBe("example-refresh-token");
         
-        var storedRefreshToken = Context.RefreshTokens.SingleOrDefault(rt => rt.Token == refreshToken.Token);
+        var storedRefreshToken = Context.RefreshTokens.SingleOrDefault(rt => rt.Token == "example-refresh-token");
         storedRefreshToken.ShouldNotBeNull();
-        storedRefreshToken.Token.ShouldBe(refreshToken.Token);
-        storedRefreshToken.ExpiresAt.ShouldBe(refreshToken.ExpiresAt);
+        storedRefreshToken.ExpiresAt.ShouldBe(_fixedUtcNow.AddDays(TokenValidityDefaultDays));
         storedRefreshToken.IsRevoked.ShouldBe(false);
-        storedRefreshToken.IpAddress.ShouldBe(refreshToken.IpAddress);
-        storedRefreshToken.UserAgent.ShouldBe(refreshToken.UserAgent);
-        storedRefreshToken.DeviceName.ShouldBe(refreshToken.DeviceName);
-        storedRefreshToken.UserId.ShouldBe(refreshToken.UserId);
+        storedRefreshToken.IpAddress.ShouldBe(ipAddress);
+        storedRefreshToken.UserAgent.ShouldBe(userAgent);
+        storedRefreshToken.UserId.ShouldBe(userId);
+        storedRefreshToken.DeviceOs.ShouldBe("Windows 10");
+        storedRefreshToken.DeviceBrowser.ShouldBe("Chrome");
+        storedRefreshToken.DeviceType.ShouldBe("Other");
     }
 }

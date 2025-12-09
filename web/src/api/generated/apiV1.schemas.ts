@@ -4,21 +4,9 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
-export interface AuthChangePasswordRequest {
+export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-}
-
-export interface AuthLoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface AuthRegisterRequest {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
 }
 
 export interface EnergyEntryCreateRequest {
@@ -117,7 +105,13 @@ export const EngineType = {
   Hydrogen: 'Hydrogen',
 } as const;
 
-export interface LoginUserResponse {
+export interface LoginRequest {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
+export interface LoginResponse {
   accessToken: string;
 }
 
@@ -160,6 +154,13 @@ export interface PagedListOfVehicleDto {
   totalCount: number;
   hasNextPage?: boolean;
   hasPreviousPage?: boolean;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface ServiceItemCreateRequest {
@@ -256,6 +257,28 @@ export interface ServiceRecordUpdateRequest {
 export interface ServiceTypeDto {
   id: string;
   name: string;
+}
+
+export interface SessionDto {
+  id?: string;
+  createdDate?: string;
+  isCurrent?: boolean;
+  /** @nullable */
+  deviceName?: string | null;
+  /** @nullable */
+  deviceOs?: string | null;
+  /** @nullable */
+  deviceBrowser?: string | null;
+  /** @nullable */
+  deviceType?: string | null;
+  /** @nullable */
+  ipAddress?: string | null;
+  /** @nullable */
+  location?: string | null;
+}
+
+export interface SessionsDto {
+  items: SessionDto[];
 }
 
 export interface UserDto {

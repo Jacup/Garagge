@@ -12,4 +12,13 @@ public static class ClaimsPrincipalExtensions
             ? parsedUserId
             : throw new ApplicationException("User id is unavailable");
     }
+
+    public static Guid GetSessionId(this ClaimsPrincipal? principal)
+    {
+        string? sessionId = principal?.FindFirstValue("sessionId");
+
+        return Guid.TryParse(sessionId, out Guid parsedSessionId)
+            ? parsedSessionId
+            : throw new ApplicationException("Session id is unavailable");
+    }
 }

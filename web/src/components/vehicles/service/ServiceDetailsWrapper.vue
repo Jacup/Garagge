@@ -57,7 +57,7 @@ const saveError = ref<string | null>(null)
 onMounted(async () => {
   try {
     const res = await getApiVehiclesServiceRecordsTypes()
-    serviceTypes.value = res.data ?? []
+    serviceTypes.value = res ?? []
   } catch (e) {
     console.error('Failed to load service types', e)
   }

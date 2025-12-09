@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
-  AuthChangePasswordRequest,
-  AuthLoginRequest,
-  AuthRegisterRequest,
-  LoginUserResponse
+  ChangePasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest
 } from '../apiV1.schemas';
 
 import { axiosInstance } from '../../axios-instance';
@@ -17,36 +17,45 @@ import { axiosInstance } from '../../axios-instance';
 
   export const getAuth = () => {
 const putApiAuthChangePassword = (
-    authChangePasswordRequest: AuthChangePasswordRequest,
+    changePasswordRequest: ChangePasswordRequest,
  ) => {
       return axiosInstance<unknown>(
       {url: `/api/auth/change-password`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
-      data: authChangePasswordRequest
+      data: changePasswordRequest
     },
       );
     }
   const postApiAuthLogin = (
-    authLoginRequest: AuthLoginRequest,
+    loginRequest: LoginRequest,
  ) => {
-      return axiosInstance<LoginUserResponse>(
+      return axiosInstance<LoginResponse>(
       {url: `/api/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: authLoginRequest
+      data: loginRequest
+    },
+      );
+    }
+  const postApiAuthRefresh = (
+    
+ ) => {
+      return axiosInstance<null>(
+      {url: `/api/auth/refresh`, method: 'POST'
     },
       );
     }
   const postApiAuthRegister = (
-    authRegisterRequest: AuthRegisterRequest,
+    registerRequest: RegisterRequest,
  ) => {
       return axiosInstance<string>(
       {url: `/api/auth/register`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
-      data: authRegisterRequest
+      data: registerRequest
     },
       );
     }
-  return {putApiAuthChangePassword,postApiAuthLogin,postApiAuthRegister}};
+  return {putApiAuthChangePassword,postApiAuthLogin,postApiAuthRefresh,postApiAuthRegister}};
 export type PutApiAuthChangePasswordResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['putApiAuthChangePassword']>>>
 export type PostApiAuthLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthLogin']>>>
+export type PostApiAuthRefreshResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRefresh']>>>
 export type PostApiAuthRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRegister']>>>

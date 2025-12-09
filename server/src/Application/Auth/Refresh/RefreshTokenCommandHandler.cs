@@ -2,13 +2,11 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
-using Application.Abstractions.Services;
 using Application.Core;
-using Application.Users;
 using Domain.Entities.Auth;
-using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using UAParser;
 
 namespace Application.Auth.Refresh;
 
@@ -16,8 +14,7 @@ public sealed class RefreshTokenCommandHandler(
     IApplicationDbContext context,
     ITokenProvider tokenProvider,
     IDateTimeProvider dateTimeProvider,
-    ILogger<RefreshTokenCommandHandler> logger,
-    IUserAgentHelper userAgentHelper)
+    ILogger<RefreshTokenCommandHandler> logger)
     : ICommandHandler<RefreshTokenCommand, LoginUserResponse>
 {
     public async Task<Result<LoginUserResponse>> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
@@ -53,30 +50,35 @@ public sealed class RefreshTokenCommandHandler(
         }
 
         var user = currentToken.User;
-        var newAccessToken = tokenProvider.Create(user);
+        var sessionId = Guid.NewGuid();
         var newRefreshTokenValue = tokenProvider.GenerateRefreshToken();
 
         currentToken.IsRevoked = true;
         currentToken.ReplacedByToken = newRefreshTokenValue;
 
+        var uaParser = Parser.GetDefault();
+        var clientInfo = uaParser.Parse(command.UserAgent ?? "");
+
         var newRefreshToken = new RefreshToken
         {
-            Id = Guid.NewGuid(),
+            Id = sessionId,
             UserId = user.Id,
             Token = newRefreshTokenValue,
             ExpiresAt = dateTimeProvider.UtcNow.AddDays(currentToken.SessionDurationDays),
             SessionDurationDays = currentToken.SessionDurationDays,
             IsRevoked = false,
-            IpAddress = command.IpAddress,
             UserAgent = command.UserAgent,
-            DeviceName = userAgentHelper.ParseDeviceName(command.UserAgent)
+            DeviceOs = clientInfo.OS.ToString(),
+            DeviceBrowser = clientInfo.UA.Family,
+            DeviceType = clientInfo.Device.ToString(),
+            IpAddress = command.IpAddress
         };
 
         context.RefreshTokens.Add(newRefreshToken);
-
         await DeleteExpiredAndRevokedTokens(user.Id, currentToken, cancellationToken);
-
         await context.SaveChangesAsync(cancellationToken);
+
+        var newAccessToken = tokenProvider.Create(user, sessionId);
 
         return Result.Success(new LoginUserResponse(newAccessToken, newRefreshToken.Token, newRefreshToken.ExpiresAt));
     }

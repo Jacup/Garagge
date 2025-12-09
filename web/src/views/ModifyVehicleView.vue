@@ -49,7 +49,7 @@ onMounted(async () => {
   if (isEditMode) {
     try {
       const res = await getApiVehiclesId(vehicleId)
-      const vehicleData = res.data as VehicleDto
+      const vehicleData = res as VehicleDto
 
       Object.assign(editVehicle, {
         brand: vehicleData.brand || '',

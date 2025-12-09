@@ -54,8 +54,8 @@ async function loadServiceRecords() {
       sortDescending: sortDescending.value,
     })
 
-    const fetchedItems = response.data.items ?? []
-    const totalCount = response.data.totalCount ?? 0
+    const fetchedItems = response.items ?? []
+    const totalCount = response.totalCount ?? 0
 
     if (isMobile.value && serviceRecordsPage.value > 1) {
       serviceRecords.value = [...serviceRecords.value, ...fetchedItems]

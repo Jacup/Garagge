@@ -33,9 +33,17 @@ namespace Infrastructure.DAL.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
 
-                    b.Property<string>("DeviceName")
+                    b.Property<string>("DeviceBrowser")
                         .HasColumnType("text")
-                        .HasColumnName("device_name");
+                        .HasColumnName("device_browser");
+
+                    b.Property<string>("DeviceOs")
+                        .HasColumnType("text")
+                        .HasColumnName("device_os");
+
+                    b.Property<string>("DeviceType")
+                        .HasColumnType("text")
+                        .HasColumnName("device_type");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("timestamp with time zone")
@@ -48,6 +56,10 @@ namespace Infrastructure.DAL.Migrations
                     b.Property<bool>("IsRevoked")
                         .HasColumnType("boolean")
                         .HasColumnName("is_revoked");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("text")
+                        .HasColumnName("location");
 
                     b.Property<string>("ReplacedByToken")
                         .HasColumnType("text")

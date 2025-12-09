@@ -1,12 +1,8 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAuth } from '@/api/generated/auth/auth'
-import { getUsers } from '@/api/generated/users/users'
-import { useUserStore } from '@/stores/userStore'
+import { useAuthStore } from '@/stores/auth'
 
-const { getApiUsersMe } = getUsers()
-const { postApiAuthLogin, postApiAuthRegister } = getAuth()
 
 const email = ref('')
 const firstName = ref('')
@@ -14,7 +10,8 @@ const lastName = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
-const userStore = useUserStore()
+
+const authStore = useAuthStore()
 const router = useRouter()
 
 async function onSubmit() {
@@ -22,44 +19,13 @@ async function onSubmit() {
   loading.value = true
 
   try {
-    const registerRes = await postApiAuthRegister({
+    authStore.register({
       email: email.value,
       firstName: firstName.value,
       lastName: lastName.value,
       password: password.value,
     })
-
-    if (registerRes.status === 409) {
-      error.value = 'Email already exists.'
-      loading.value = false
-      return
-    }
-    if (registerRes.status >= 400) {
-      error.value = 'Registration failed: ' + (registerRes.statusText || 'Unknown error')
-      loading.value = false
-      return
-    }
-
-    const loginRes = await postApiAuthLogin({
-      email: email.value,
-      password: password.value,
-    })
-
-    if (loginRes.status !== 200 || !loginRes.data?.accessToken) {
-      error.value = 'Login failed: ' + (loginRes.statusText || 'Unknown error')
-      loading.value = false
-      return
-    }
-    userStore.setToken(loginRes.data.accessToken)
-
-    const profileRes = await getApiUsersMe()
-    if (profileRes.status !== 200 || !profileRes.data) {
-      error.value = 'Failed to fetch profile: ' + (profileRes.statusText || 'Unknown error')
-      loading.value = false
-      return
-    }
-    userStore.setProfile(profileRes.data)
-    router.push('/')
+    router.push('/login')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'An error occurred during registration'
   } finally {

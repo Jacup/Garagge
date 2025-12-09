@@ -15,19 +15,19 @@ public static class UserErrors
     public static readonly Error MissingEmail = Error.Problem(
         "User.MissingEmail",
         "Email is required");
-    
+
     public static readonly Error InvalidEmail = Error.Problem(
         "User.InvalidEmail",
         "Email is not valid");
-    
+
     public static readonly Error UpdateFailed = Error.Problem(
         "User.UpdateFailed",
-        "Update user failed");  
-    
+        "Update user failed");
+
     public static readonly Error DeleteFailed = Error.Problem(
         "User.DeleteFailed",
         "Delete user failed");
-    
+
     public static Error NotFound(Guid userId) => Error.NotFound(
         "Users.NotFound",
         $"The user with the Id = '{userId}' was not found");
@@ -47,4 +47,16 @@ public static class UserErrors
     public static readonly Error EmailNotUnique = Error.Conflict(
         "Users.EmailNotUnique",
         "The provided email is not unique");
+
+    public static Error DeleteCurrentSessionFailed => Error.Problem(
+        "Users.Sessions.DeleteCurrentSessionFailed",
+        "Cannot delete current session.");
+
+    public static Error DeleteSessionFailed(Guid sessionId) => Error.Failure(
+        "Users.Sessions.DeleteSessionFailed",
+        $"Delete session {sessionId} failed");
+
+    public static Error SessionNotFound(Guid sessionId) => Error.NotFound(
+        "Users.Sessions.SessionNotFound",
+        $"Session {sessionId} not found");
 }

@@ -103,7 +103,7 @@ async function loadVehicle() {
     loading.value = true
     error.value = null
     const response = await getApiVehiclesId(vehicleId.value)
-    selectedVehicle.value = response.data
+    selectedVehicle.value = response
     await loadEnergyEntries()
     await loadGlobalStats()
   } catch (err) {
@@ -123,7 +123,7 @@ async function loadEnergyEntries() {
       page: 1,
       pageSize: 100,
     })
-    energyEntries.value = response.data.items ?? []
+    energyEntries.value = response.items ?? []
   } catch (err) {
     console.error('Failed to load energy entries for timeline:', err)
     energyEntries.value = []
@@ -140,7 +140,7 @@ async function loadEnergyStats() {
     const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
       energyTypes: undefined,
     })
-    energystats.value = response.data
+    energystats.value = response
   } catch (err) {
     console.error('Failed to load energy stats:', err)
     energystats.value = null
@@ -156,8 +156,8 @@ async function loadGlobalStats() {
     const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
       energyTypes: undefined,
     })
-    globalStats.value = response.data
-    energystats.value = response.data
+    globalStats.value = response
+    energystats.value = response
   } catch (err) {
     console.error('Failed to load global stats:', err)
     globalStats.value = null

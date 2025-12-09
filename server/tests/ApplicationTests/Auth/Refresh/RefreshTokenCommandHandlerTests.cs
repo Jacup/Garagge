@@ -1,6 +1,5 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Authentication;
-using Application.Abstractions.Services;
 using Application.Auth;
 using Application.Auth.Refresh;
 using Domain.Entities.Auth;
@@ -16,7 +15,6 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
     private readonly Mock<ITokenProvider> _tokenProviderMock = new();
     private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
     private readonly Mock<ILogger<RefreshTokenCommandHandler>> _loggerMock = new();
-    private readonly Mock<IUserAgentHelper> _userAgentHelperMock = new();
     private readonly RefreshTokenCommandHandler _sut;
 
     private readonly DateTime _fixedUtcNow = new(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -30,8 +28,7 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
             Context,
             _tokenProviderMock.Object,
             _dateTimeProviderMock.Object,
-            _loggerMock.Object,
-            _userAgentHelperMock.Object);
+            _loggerMock.Object);
     }
 
     [Fact]
@@ -109,13 +106,11 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
 
         const string newAccessToken = "new-access-token";
         const string newRefreshToken = "new-refresh-token";
-        const string deviceName = "Test Device";
         const string ipAddress = "127.0.0.1";
-        const string userAgent = "Test Agent";
+        const string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
 
-        _tokenProviderMock.Setup(x => x.Create(_user)).Returns(newAccessToken);
+        _tokenProviderMock.Setup(x => x.Create(_user, It.IsAny<Guid>())).Returns(newAccessToken);
         _tokenProviderMock.Setup(x => x.GenerateRefreshToken()).Returns(newRefreshToken);
-        _userAgentHelperMock.Setup(x => x.ParseDeviceName(userAgent)).Returns(deviceName);
 
         var command = new RefreshTokenCommand(oldToken.Token, ipAddress, userAgent);
 
@@ -135,9 +130,11 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
         newTokenInDb.ShouldNotBeNull();
         newTokenInDb.IsRevoked.ShouldBeFalse();
         newTokenInDb.UserId.ShouldBe(_user.Id);
-        newTokenInDb.DeviceName.ShouldBe(deviceName);
         newTokenInDb.IpAddress.ShouldBe(ipAddress);
         newTokenInDb.UserAgent.ShouldBe(userAgent);
+        newTokenInDb.DeviceOs.ShouldBe("Windows 10");
+        newTokenInDb.DeviceBrowser.ShouldBe("Chrome");
+        newTokenInDb.DeviceType.ShouldBe("Other");
         
         var shouldBeDeletedToken = await Context.RefreshTokens.SingleOrDefaultAsync(t => t.Id == otherExpiredToken.Id);
         shouldBeDeletedToken.ShouldBeNull();
@@ -176,7 +173,7 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
         Context.RefreshTokens.Add(oldToken);
         await Context.SaveChangesAsync();
 
-        _tokenProviderMock.Setup(x => x.Create(_user)).Returns("new-access-token");
+        _tokenProviderMock.Setup(x => x.Create(_user, It.IsAny<Guid>())).Returns("new-access-token");
         _tokenProviderMock.Setup(x => x.GenerateRefreshToken()).Returns("new-refresh-token");
 
         var command = new RefreshTokenCommand(oldToken.Token, "some-ip", "some-user-agent");
