@@ -10,8 +10,6 @@ export function useNavigationItem(item: NavigationItem) {
     if (item.link === '/') {
       return currentRoute.value === item.link
     }
-    console.log(currentRoute.value, item.link)
-    console.log(currentRoute.value.startsWith(item.link))
     return currentRoute.value.startsWith(item.link)
   })
 

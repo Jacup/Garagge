@@ -97,13 +97,12 @@ axiosClient.interceptors.response.use(
   },
 )
 
-export const axiosInstance = <T = unknown>(config: AxiosRequestConfig, options?: AxiosRequestConfig): Promise<T> => {
+export const axiosInstance = <T = unknown>(config: AxiosRequestConfig): Promise<T> => {
   const controller = new AbortController()
 
   const promise = axiosClient({
     ...config,
-    ...options,
-    signal: controller.signal,
+    signal: config.signal || controller.signal,
   }).then(({ data }) => data)
 
   // @ts-expect-error custom cancel method
