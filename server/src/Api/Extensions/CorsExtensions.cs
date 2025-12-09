@@ -6,11 +6,18 @@ public static class CorsExtensions
     {
         services.AddCors(options =>
         {
-            options.AddDefaultPolicy(policy => policy
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .WithOrigins("http://localhost:5173")
-            .AllowCredentials());
+            var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+
+            options.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+
+                if (allowedOrigins.Length > 0)
+                    policy.WithOrigins(allowedOrigins);
+            });
         });
 
         return services;
