@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/user'
-import StatCard from '@/components/dashboard/StatCard.vue'
+import SummaryGrid from '@/components/dashboard/SummaryGrid.vue'
+import RecentActivity from '@/components/dashboard/RecentActivity.vue'
+
 const userStore = useUserStore()
 
 const username = ref('')
@@ -11,6 +13,7 @@ const recentActivity = ref([
   {
     title: 'Honda Civic - Fuel Added',
     subtitle: '$45.20 • 2 hours ago',
+    date: '2024-06-10T14:30:00Z',
     icon: 'mdi-gas-station',
     color: 'primary',
   },
@@ -66,83 +69,17 @@ const quickActions = ref([
   </div>
 
   <!-- Stats Cards -->
+  <SummaryGrid />
+
+  <!-- Recent Activity -->
   <v-row>
-    <v-col cols="12" sm="6" md="3">
-      <StatCard
-        title="Fuel Expenses"
-        title-helper="This Month"
-        value="$1,284"
-        trend-value="+12%"
-        trend-mode="bad"
-        value-helper="vs last month"
-        icon="mdi-gas-station"
-        accent-color="primary"
-      />
-    </v-col>
-
-    <v-col cols="12" sm="6" md="3">
-      <StatCard
-        title="Maintenance"
-        title-helper="Active alerts"
-        value="3"
-        icon="mdi-wrench"
-        accent-color="warning"
-      />
-    </v-col>
-
-    <v-col cols="12" sm="6" md="3">
-      <StatCard
-        title="Distance"
-        value="2,400 km"
-        trend-value="+50 km"
-        trend-mode="neutral"
-        value-helper="this week"
-        icon="mdi-map-marker"
-        accent-color="tertiary"
-      />
-    </v-col>
-
-    <v-col cols="12" sm="6" md="3">
-      <StatCard
-        title="Fleet Status"
-        value="Optimal"
-        trend-value="100% Active"
-        trend-mode="good"
-        icon="mdi-check-circle"
-        accent-color="success"
-      />
+    <v-col cols="12" md="4">
+    <RecentActivity :recentActivity="recentActivity" />
     </v-col>
   </v-row>
 
+
   <v-row>
-    <!-- Recent Activity -->
-    <v-col cols="12" md="8">
-      <v-card elevation="2" class="h-100">
-        <v-card-title class="d-flex align-center">
-          <v-icon icon="mdi-history" class="me-2" />
-          Recent Activity
-        </v-card-title>
-        <v-card-text>
-          <v-list class="py-0">
-            <v-list-item v-for="(item, index) in recentActivity" :key="index" class="px-0">
-              <template v-slot:prepend>
-                <v-avatar size="40" :color="item.color" variant="tonal">
-                  <v-icon :icon="item.icon" />
-                </v-avatar>
-              </template>
-              <v-list-item-title>{{ item.title }}</v-list-item-title>
-              <v-list-item-subtitle>{{ item.subtitle }}</v-list-item-subtitle>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-        <v-card-actions>
-          <v-btn variant="text" color="primary">
-            View All Activity
-            <v-icon end>mdi-arrow-right</v-icon>
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-col>
 
     <!-- Quick Actions & Chart Placeholder -->
     <v-col cols="12" md="4">
@@ -185,7 +122,7 @@ const quickActions = ref([
         </v-col>
       </v-row>
     </v-col>
-  </v-row>
+  </v-row> -->
 
   <!-- Additional Cards Row -->
   <v-row class="mt-6">

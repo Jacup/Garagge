@@ -3,44 +3,36 @@ import { computed } from 'vue'
 
 interface Props {
   title: string
-  titleHelper?: string
-  value: string | number
-  valueHelper?: string
+  subtitle?: string
 
-  trendValue?: string // Tekst w chipie, np. "+12%", "-5%", "Active"
-  trendMode?: 'good' | 'bad' | 'neutral' // Określa kolor. Domyślnie 'neutral'
+  value: string | number
+
+  chipValue?: string
+  chipColor?: string
+  chipAppendText?: string
+  chipPrefixArrow?: 'up' | 'down' | 'neutral'
 
   icon: string
-  accentColor?: string // np. 'primary', 'blue', 'orange'
+  accentColor: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  titleHelper: '',
-  valueHelper: '',
-  trendMode: 'neutral', // Domyślnie neutralny (np. szary/niebieski)
-  accentColor: 'primary',
+  subtitle: '',
+  chipValue: '',
+  chipAppendText: '',
+  chipPrefixArrow: 'neutral',
 })
 
-const trendIcon = computed(() => {
-  if (!props.trendValue) return null
-  if (props.trendValue.includes('+')) return 'mdi-arrow-up'
-  if (props.trendValue.includes('-')) return 'mdi-arrow-down'
-  return null // Brak strzałki dla zwykłego tekstu (np. "Active")
-})
-
-// LOGIKA KOLORU CHIPA:
-const chipColor = computed(() => {
-  switch (props.trendMode) {
-    case 'good':
-      return 'success'
-    case 'bad':
-      return 'error'
-    default:
-      return 'secondary' // Lub 'surface-variant' dla neutralnego
+const chipIcon = computed(() => {
+  const iconMap: Record<string, string | null> = {
+    up: 'mdi-arrow-up',
+    down: 'mdi-arrow-down',
+    neutral: null,
   }
+  return iconMap[props.chipPrefixArrow] ?? null
 })
+
 const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
-const containerColor = computed(() => `${props.accentColor}-container`)
 </script>
 
 <template>
@@ -49,36 +41,35 @@ const containerColor = computed(() => `${props.accentColor}-container`)
     :color="accentColor"
     rounded="xl"
     variant="tonal"
-    min-height="160"
+    role="article"
+    :aria-label="`${title} ${subtitle ? '- ' + subtitle : ''}`"
   >
-    <div class="position-absolute" style="right: -20px; bottom: -20px; opacity: 0.08; pointer-events: none">
+    <div class="card-overlay">
       <v-icon :icon="icon" size="180" :color="accentColor"></v-icon>
     </div>
 
-    <div class="pa-5 z-index-1 d-flex flex-column">
-      <div class="mb-1">
-        <div class="text-body-2 font-weight-bold text-uppercase letter-spacing-1">
+    <div class="card-container pa-5">
+      <div class="card-header">
+        <div class="card-header-title text-body-2 text-uppercase font-weight-bold">
           {{ title }}
         </div>
-        <div class="text-caption font-weight-medium opacity-60">
-          {{ titleHelper }}
+        <div class="card-header-subtitle text-caption font-weight-medium opacity-60">
+          {{ subtitle }}
         </div>
       </div>
 
-      <v-spacer></v-spacer>
-
-      <div class="mt-2">
-        <div class="text-h3 font-weight-black text-high-emphasis">
+      <div>
+        <div class="stat-card-value text-h4 font-weight-black text-high-emphasis">
           {{ value }}
         </div>
 
-        <div class="d-flex align-center mt-3">
-          <v-chip v-if="trendValue" size="x-small" :color="chipColor" variant="flat" class="font-weight-bold">
-            <v-icon v-if="trendIcon" start size="small" :icon="trendIcon"></v-icon>
-            {{ trendValue }}
+        <div class="stat-card-chips d-flex align-center mt-1">
+          <v-chip v-if="chipValue" size="x-small" :color="chipColor" variant="flat" class="suggestion-chip">
+            <v-icon v-if="chipIcon" start size="small" :icon="chipIcon"></v-icon>
+            {{ chipValue }}
           </v-chip>
-          <span v-if="valueHelper" class="text-caption font-weight-bold opacity-60 text-truncate" :class="textColorClass">
-            {{valueHelper }}
+          <span v-if="chipAppendText" class="text-caption font-weight-bold opacity-60 text-truncate ml-1" :class="textColorClass">
+            {{ chipAppendText }}
           </span>
         </div>
       </div>
@@ -87,14 +78,46 @@ const containerColor = computed(() => `${props.accentColor}-container`)
 </template>
 
 <style scoped>
-.letter-spacing-1 {
-  letter-spacing: 1.5px !important;
+.card-overlay {
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  opacity: 0.08;
+  pointer-events: none;
 }
-.leading-tight {
-  line-height: 1 !important;
-}
-.z-index-1 {
+
+.card-container {
   z-index: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  margin-bottom: 12px;
+}
+
+.card-header-title {
+  letter-spacing: 1.5px;
+  min-height: 20px;
+  align-items: center;
+}
+
+.card-header-subtitle {
+  min-height: 20px;
+  align-items: center;
+}
+
+.stat-card-value {
+  min-height: 40px;
+}
+
+.stat-card-chips {
+  min-height: 20px;
+}
+
+.suggestion-chip {
+  border-radius: 8px !important;
+  font-weight: 500;
 }
 </style>
