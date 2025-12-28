@@ -4,7 +4,7 @@ using Application.Core;
 using Application.Dashboard.GetStats;
 using MediatR;
 
-namespace Api.Endpoints.Miscellaneous;
+namespace Api.Endpoints.Dashboard;
 
 internal sealed class GetStats : IEndpoint
 {
@@ -19,6 +19,7 @@ internal sealed class GetStats : IEndpoint
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
             .RequireAuthorization()
+            .WithTags(Tags.Dashboard)
             .Produces<DashboardStatsDto>()
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError);

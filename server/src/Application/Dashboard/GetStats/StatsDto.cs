@@ -2,9 +2,9 @@
 
 public sealed record DashboardStatsDto
 {
-    public StatMetricDto FuelExpenses { get; init; }
-    public StatMetricDto DistanceDriven { get; init; }
-    public List<TimelineActivityDto> RecentActivity { get; init; }
+    public required StatMetricDto FuelExpenses { get; init; }
+    public required StatMetricDto DistanceDriven { get; init; }
+    public required List<TimelineActivityDto> RecentActivity { get; init; }
 }
 
 public sealed record StatMetricDto
