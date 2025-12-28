@@ -1,11 +1,11 @@
 ﻿namespace Application.Dashboard.GetStats;
 
-public sealed record DashboardStatsDto(
-    StatMetricDto FuelExpenses,
-    StatMetricDto DistanceDriven
-    // StatMetricDto MaintenanceAlerts,
-    // StatMetricDto Efficiency
-);
+public sealed record DashboardStatsDto
+{
+    public StatMetricDto FuelExpenses { get; init; }
+    public StatMetricDto DistanceDriven { get; init; }
+    public List<TimelineActivityDto> RecentActivity { get; init; }
+}
 
 public sealed record StatMetricDto
 {
@@ -17,4 +17,28 @@ public sealed record StatMetricDto
     public string? ContextAppendText { get; init; }
     public ContextTrend? ContextTrend { get; init; }
     public TrendMode? ContextTrendMode { get; init; }
+}
+
+public sealed record TimelineActivityDto
+{
+    public required Guid Id { get; init; }
+
+    public required ActivityType Type { get; init; }
+    public required DateTime Date { get; init; }
+    
+    public required string Vehicle { get; init; }
+    public required ActivityDetail[] ActivityDetails { get; init; }
+}
+
+public sealed record ActivityDetail(string Name, string Value);
+
+public enum ActivityType
+{
+    VehicleAdded,
+    VehicleUpdated,
+
+    Refuel,
+    Charge,
+
+    ServiceAdded
 }
