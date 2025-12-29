@@ -37,28 +37,6 @@ async function loadDashboardStats() {
 const username = ref('')
 username.value = userStore.profile?.firstName || ''
 
-const quickActions = ref([
-  {
-    title: 'Add Fuel Entry',
-    icon: 'mdi-gas-station',
-    color: 'primary',
-  },
-  {
-    title: 'Log Maintenance',
-    icon: 'mdi-wrench',
-    color: 'secondary',
-  },
-  {
-    title: 'Add Vehicle',
-    icon: 'mdi-car-plus',
-    color: 'tertiary',
-  },
-  {
-    title: 'View Reports',
-    icon: 'mdi-chart-line',
-    color: 'success',
-  },
-])
 </script>
 
 <template>
@@ -91,6 +69,7 @@ const quickActions = ref([
   z-index: 1;
   position: relative;
 }
+
 
 .stat-icon {
   opacity: 0.7;
