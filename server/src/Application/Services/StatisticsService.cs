@@ -20,7 +20,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
         return new DashboardStatsDto { FuelExpenses = fuelExpenses, DistanceDriven = distanceDriven, RecentActivity = recentActivities };
     }
 
-    private IQueryable<Vehicle> GetVehicleScope(Guid userId, string userRole)
+    internal IQueryable<Vehicle> GetVehicleScope(Guid userId, string userRole)
     {
         var query = dbContext.Vehicles.AsNoTracking();
 
@@ -47,7 +47,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
             .Where(e => e.Date >= previousMonthStart && e.Date < currentMonthStart)
             .SumAsync(e => e.Cost ?? 0);
 
-        (ContextTrend trend, TrendMode trendMode, string diffText) = CalculateTrend(currentMonthCost, previousMonthCost, inverse: true);
+        (ContextTrend trend, TrendMode trendMode, string diffText) = CalculateTrend(currentMonthCost, previousMonthCost, inverse: true, isPercentage: true);
 
         return new StatMetricDto
         {
@@ -95,7 +95,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
             }
         }
 
-        (ContextTrend trend, TrendMode trendMode, string diffText) = CalculateTrend(currentDistance, previousDistance, inverse: false);
+        (ContextTrend trend, TrendMode trendMode, string diffText) = CalculateTrend(currentDistance, previousDistance, inverse: false, isPercentage: false);
 
         return new StatMetricDto
         {
@@ -108,11 +108,16 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
         };
     }
 
-    private static (ContextTrend Trend, TrendMode Mode, string DiffText) CalculateTrend(decimal current, decimal previous, bool inverse)
+    private static (ContextTrend Trend, TrendMode Mode, string DiffText) CalculateTrend(decimal current, decimal previous, bool inverse, bool isPercentage)
     {
-        decimal diff = 0;
-        if (previous != 0) diff = (current - previous) / previous;
-        else if (current > 0) diff = 1;
+        decimal diff = current - previous;
+        decimal percentageDiff = 0;
+        
+        if (isPercentage)
+        {
+            if (previous != 0) percentageDiff = diff / previous;
+            else if (current > 0) percentageDiff = 1;
+        }
 
         var trend = current > previous ? ContextTrend.Up : (current < previous ? ContextTrend.Down : ContextTrend.None);
 
@@ -124,7 +129,18 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
             mode = inverse ? TrendMode.Good : TrendMode.Bad;
 
         var sign = diff > 0 ? "+" : "";
-        return (trend, mode, $"{sign}{diff:P0}");
+        
+        string diffText;
+        if (isPercentage)
+        {
+            diffText = $"{sign}{percentageDiff:P0}";
+        }
+        else
+        {
+            diffText = $"{sign}{diff}";
+        }
+        
+        return (trend, mode, diffText);
     }
 
     private async Task<List<TimelineActivityDto>> GetRecentActivities(IQueryable<Vehicle> scope)
