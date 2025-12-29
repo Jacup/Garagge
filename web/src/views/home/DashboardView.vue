@@ -2,14 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import SummaryGrid from '@/components/dashboard/SummaryGrid.vue'
-import type { TimelineActivityDto } from '@/api/generated/apiV1.schemas'
+import type { TimelineActivityDto, StatMetricDto } from '@/api/generated/apiV1.schemas'
 import RecentActivity from '@/components/dashboard/RecentActivity.vue'
+import EnergyChartCard from '@/components/dashboard/EnergyChartCard.vue'
 
 import { getDashboard } from '@/api/generated/dashboard/dashboard'
 
 const userStore = useUserStore()
 const { getApiStats } = getDashboard()
 
+const fuelExpenses = ref(null as StatMetricDto | null)
+const distanceDriven = ref(null as StatMetricDto | null)
 const recentActivity = ref([] as TimelineActivityDto[])
 const loading = ref(true)
 
@@ -21,6 +24,8 @@ async function loadDashboardStats() {
   loading.value = true
   try {
     const res = await getApiStats()
+    fuelExpenses.value = res.fuelExpenses ?? null
+    distanceDriven.value = res.distanceDriven ?? null
     recentActivity.value = res.recentActivity ?? []
   } catch (error) {
     console.error('Error loading dashboard stats:', error)
@@ -57,20 +62,22 @@ const quickActions = ref([
 </script>
 
 <template>
-  <!-- Header -->
   <div class="mb-6">
     <h1 class="text-h3 font-weight-light mb-2">Hi{{ username == '' ? '' : ', ' + username + '!👋' }}</h1>
     <p class="text-body-1 text-medium-emphasis">Here's what's happening with your fleet.</p>
   </div>
 
-  <!-- Stats Cards -->
-  <SummaryGrid />
+  <SummaryGrid :fuelExpenses="fuelExpenses" :distanceDriven="distanceDriven"/>
 
-  <!-- Recent Activity -->
   <v-row>
-    <v-col cols="12" md="5">
+    <v-col cols="12" md="5" lg="4">
       <RecentActivity :recentActivity="recentActivity" />
     </v-col>
+
+    <v-col cols="12" md="7" lg="8">
+      <EnergyChartCard />
+    </v-col>
+
   </v-row>
 
   <v-row>

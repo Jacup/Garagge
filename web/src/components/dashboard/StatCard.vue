@@ -1,26 +1,42 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { StatMetricDto } from '@/api/generated/apiV1.schemas'
+import { NullableOfContextTrend, NullableOfTrendMode } from '@/api/generated/apiV1.schemas'
 
 interface Props {
   title: string
-  subtitle?: string
-
-  value: string | number
-
-  chipValue?: string
-  chipColor?: string
-  chipAppendText?: string
-  chipPrefixArrow?: 'up' | 'down' | 'neutral'
-
+  metric: StatMetricDto | null
   icon: string
   accentColor: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  subtitle: '',
-  chipValue: '',
-  chipAppendText: '',
-  chipPrefixArrow: 'neutral',
+const props = defineProps<Props>()
+
+const chipValue = computed(() => props.metric?.contextValue || '')
+const chipAppendText = computed(() => props.metric?.contextAppendText || '')
+
+const chipPrefixArrow = computed((): 'up' | 'down' | 'neutral' => {
+  switch (props.metric?.contextTrend) {
+    case NullableOfContextTrend.Up:
+      return 'up'
+    case NullableOfContextTrend.Down:
+      return 'down'
+    case NullableOfContextTrend.None:
+    default:
+      return 'neutral'
+  }
+})
+
+const chipColor = computed(() => {
+  switch (props.metric?.contextTrendMode) {
+    case NullableOfTrendMode.Good:
+      return 'success'
+    case NullableOfTrendMode.Bad:
+      return 'error'
+    case NullableOfTrendMode.Neutral:
+    default:
+      return 'surface'
+  }
 })
 
 const chipIcon = computed(() => {
@@ -29,7 +45,7 @@ const chipIcon = computed(() => {
     down: 'mdi-arrow-down',
     neutral: null,
   }
-  return iconMap[props.chipPrefixArrow] ?? null
+  return iconMap[chipPrefixArrow.value] ?? null
 })
 
 const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
@@ -42,7 +58,7 @@ const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
     rounded="xl"
     variant="tonal"
     role="article"
-    :aria-label="`${title} ${subtitle ? '- ' + subtitle : ''}`"
+    :aria-label="`${metric?.value ?? 'N/A'} ${metric?.subtitle ? '- ' + metric.subtitle : ''}`"
   >
     <div class="card-overlay">
       <v-icon :icon="icon" size="180" :color="accentColor"></v-icon>
@@ -54,13 +70,13 @@ const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
           {{ title }}
         </div>
         <div class="card-header-subtitle text-caption font-weight-medium opacity-60">
-          {{ subtitle }}
+          {{ metric?.subtitle }}
         </div>
       </div>
 
       <div>
         <div class="stat-card-value text-h4 font-weight-black text-high-emphasis">
-          {{ value }}
+          {{ metric?.value ?? 'N/A' }}
         </div>
 
         <div class="stat-card-chips d-flex align-center mt-1">
