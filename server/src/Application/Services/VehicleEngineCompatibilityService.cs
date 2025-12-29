@@ -52,7 +52,6 @@ internal sealed class VehicleEngineCompatibilityService(IApplicationDbContext db
         return Task.FromResult(validTypes);
     }
     
-
     private static readonly EnergyType[] IceFuels =
     [
         EnergyType.Gasoline,

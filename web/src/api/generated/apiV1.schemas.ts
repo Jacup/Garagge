@@ -4,9 +4,32 @@
  * Api | v1
  * OpenAPI spec version: 1.0.0
  */
+export interface ActivityDetail {
+  name: string;
+  value: string;
+}
+
+export type ActivityType = typeof ActivityType[keyof typeof ActivityType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ActivityType = {
+  VehicleAdded: 'VehicleAdded',
+  VehicleUpdated: 'VehicleUpdated',
+  Refuel: 'Refuel',
+  Charge: 'Charge',
+  ServiceAdded: 'ServiceAdded',
+} as const;
+
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface DashboardStatsDto {
+  fuelExpenses: StatMetricDto;
+  distanceDriven: StatMetricDto;
+  recentActivity: TimelineActivityDto[];
 }
 
 export interface EnergyEntryCreateRequest {
@@ -59,7 +82,7 @@ export interface EnergyStatsDto {
 export type EnergyType = typeof EnergyType[keyof typeof EnergyType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EnergyType = {
   Gasoline: 'Gasoline',
   Diesel: 'Diesel',
@@ -74,7 +97,7 @@ export const EnergyType = {
 export type EnergyUnit = typeof EnergyUnit[keyof typeof EnergyUnit];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EnergyUnit = {
   Liter: 'Liter',
   Gallon: 'Gallon',
@@ -96,7 +119,7 @@ export interface EnergyUnitStats {
 export type EngineType = typeof EngineType[keyof typeof EngineType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const EngineType = {
   Fuel: 'Fuel',
   Hybrid: 'Hybrid',
@@ -118,10 +141,36 @@ export interface LoginResponse {
 /**
  * @nullable
  */
+export type NullableOfContextTrend = typeof NullableOfContextTrend[keyof typeof NullableOfContextTrend] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NullableOfContextTrend = {
+  Up: 'Up',
+  Down: 'Down',
+  None: 'None',
+} as const;
+
+/**
+ * @nullable
+ */
+export type NullableOfTrendMode = typeof NullableOfTrendMode[keyof typeof NullableOfTrendMode] | null;
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const NullableOfTrendMode = {
+  Neutral: 'Neutral',
+  Good: 'Good',
+  Bad: 'Bad',
+} as const;
+
+/**
+ * @nullable
+ */
 export type NullableOfVehicleType = typeof NullableOfVehicleType[keyof typeof NullableOfVehicleType] | null;
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NullableOfVehicleType = {
   Bus: 'Bus',
   Car: 'Car',
@@ -193,7 +242,7 @@ export interface ServiceItemDto {
 export type ServiceItemType = typeof ServiceItemType[keyof typeof ServiceItemType];
 
 
- 
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ServiceItemType = {
   Other: 'Other',
   Labor: 'Labor',
@@ -279,6 +328,26 @@ export interface SessionDto {
 
 export interface SessionsDto {
   items: SessionDto[];
+}
+
+export interface StatMetricDto {
+  value: string;
+  /** @nullable */
+  subtitle?: string | null;
+  /** @nullable */
+  contextValue?: string | null;
+  /** @nullable */
+  contextAppendText?: string | null;
+  contextTrend?: NullableOfContextTrend;
+  contextTrendMode?: NullableOfTrendMode;
+}
+
+export interface TimelineActivityDto {
+  id: string;
+  type: ActivityType;
+  date: string;
+  vehicle: string;
+  activityDetails: ActivityDetail[];
 }
 
 export interface UserDto {

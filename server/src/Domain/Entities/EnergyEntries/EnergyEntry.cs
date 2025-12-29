@@ -6,7 +6,7 @@ namespace Domain.Entities.EnergyEntries;
 public class EnergyEntry : Entity
 {
     public required DateOnly Date { get; set; }
-    public required int Mileage { get; set;  }
+    public required int Mileage { get; set; }
 
     public required EnergyType Type { get; set; }
     public required EnergyUnit EnergyUnit { get; set; }

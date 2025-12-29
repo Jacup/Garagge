@@ -26,5 +26,13 @@ export function useFormatting() {
     })
   }
 
-  return { formatCurrency, formatDate, formatMileage, formatDateTime }
+  const formatDateOnly = (dateString: string) => {
+    return new Date(dateString).toLocaleString('pl-PL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+  }
+
+  return { formatCurrency, formatDate, formatMileage, formatDateTime, formatDateOnly }
 }
