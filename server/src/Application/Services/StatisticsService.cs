@@ -13,13 +13,11 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
     {
         var vehiclesQuery = GetVehicleScope(userId, userRole);
 
-        var fuelTask = CalculateFuelExpenses(vehiclesQuery);
-        var distanceTask = CalculateDistanceDriven(vehiclesQuery);
-        var recentActivitiesTask = GetRecentActivities(vehiclesQuery);
+        var fuelExpenses = await CalculateFuelExpenses(vehiclesQuery);
+        var distanceDriven = await CalculateDistanceDriven(vehiclesQuery);
+        var recentActivities = await GetRecentActivities(vehiclesQuery);
 
-        await Task.WhenAll(fuelTask, distanceTask, recentActivitiesTask);
-
-        return new DashboardStatsDto { FuelExpenses = await fuelTask, DistanceDriven = await distanceTask, RecentActivity = await recentActivitiesTask };
+        return new DashboardStatsDto { FuelExpenses = fuelExpenses, DistanceDriven = distanceDriven, RecentActivity = recentActivities };
     }
 
     private IQueryable<Vehicle> GetVehicleScope(Guid userId, string userRole)
@@ -154,7 +152,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
                 s.CreatedDate,
                 VehicleBrand = s.Vehicle!.Brand,
                 VehicleModel = s.Vehicle.Model,
-                TotalCost = s.ManualCost ?? s.Items.Sum(i => i.TotalPrice),
+                TotalCost = s.ManualCost ?? s.Items.Sum(i => i.UnitPrice * i.Quantity),
                 s.Title
             })
             .ToListAsync();

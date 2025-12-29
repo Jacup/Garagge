@@ -24,7 +24,7 @@ const getApiUsersUserId = (
       );
     }
   const deleteApiUsersMe = (
-
+    
  ) => {
       return axiosInstance<null>(
       {url: `/api/users/me`, method: 'DELETE'
@@ -32,7 +32,7 @@ const getApiUsersUserId = (
       );
     }
   const getApiUsersMe = (
-
+    
  ) => {
       return axiosInstance<UserDto>(
       {url: `/api/users/me`, method: 'GET'
@@ -58,7 +58,7 @@ const getApiUsersUserId = (
       );
     }
   const getApiUsersMeSessions = (
-
+    
  ) => {
       return axiosInstance<SessionsDto>(
       {url: `/api/users/me/sessions`, method: 'GET'

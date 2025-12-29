@@ -1,41 +1,36 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import SummaryGrid from '@/components/dashboard/SummaryGrid.vue'
+import type { TimelineActivityDto } from '@/api/generated/apiV1.schemas'
 import RecentActivity from '@/components/dashboard/RecentActivity.vue'
 
+import { getDashboard } from '@/api/generated/dashboard/dashboard'
+
 const userStore = useUserStore()
+const { getApiStats } = getDashboard()
+
+const recentActivity = ref([] as TimelineActivityDto[])
+const loading = ref(true)
+
+onMounted(() => {
+  loadDashboardStats()
+})
+
+async function loadDashboardStats() {
+  loading.value = true
+  try {
+    const res = await getApiStats()
+    recentActivity.value = res.recentActivity ?? []
+  } catch (error) {
+    console.error('Error loading dashboard stats:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
 const username = ref('')
 username.value = userStore.profile?.firstName || ''
-
-const recentActivity = ref([
-  {
-    title: 'Honda Civic - Fuel Added',
-    subtitle: '$45.20 • 2 hours ago',
-    date: '2024-06-10T14:30:00Z',
-    icon: 'mdi-gas-station',
-    color: 'primary',
-  },
-  {
-    title: 'Toyota Prius - Service Completed',
-    subtitle: 'Oil change • Yesterday',
-    icon: 'mdi-wrench',
-    color: 'success',
-  },
-  {
-    title: 'BMW X3 - Inspection Due',
-    subtitle: 'Due in 5 days',
-    icon: 'mdi-clipboard-check',
-    color: 'warning',
-  },
-  {
-    title: 'Mercedes C-Class - Added to Fleet',
-    subtitle: '3 days ago',
-    icon: 'mdi-car-plus',
-    color: 'secondary',
-  },
-])
 
 const quickActions = ref([
   {
@@ -73,14 +68,12 @@ const quickActions = ref([
 
   <!-- Recent Activity -->
   <v-row>
-    <v-col cols="12" md="4">
-    <RecentActivity :recentActivity="recentActivity" />
+    <v-col cols="12" md="5">
+      <RecentActivity :recentActivity="recentActivity" />
     </v-col>
   </v-row>
 
-
   <v-row>
-
     <!-- Quick Actions & Chart Placeholder -->
     <v-col cols="12" md="4">
       <v-row>
@@ -122,7 +115,8 @@ const quickActions = ref([
         </v-col>
       </v-row>
     </v-col>
-  </v-row> -->
+  </v-row>
+  -->
 
   <!-- Additional Cards Row -->
   <v-row class="mt-6">
