@@ -1,10 +1,21 @@
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
-import { getVehicles } from '@/api/generated/vehicles/vehicles'
 
-// API Error Response interface
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+import { useLayoutFab } from '@/composables/useLayoutFab'
+
+import { getVehicles } from '@/api/generated/vehicles/vehicles'
+import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
+
+import VehiclesList from '@/components/vehicles/VehiclesList.vue'
+import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
+import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
+import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
+import VehicleDetailedListView from '@/components/vehicles/views/VehicleDetailedListView.vue'
+import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
+import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
+
 interface ApiErrorResponse {
   type: string
   title: string
@@ -17,26 +28,23 @@ interface ApiErrorResponse {
   }>
   traceId?: string
 }
-import { useLayoutFab } from '@/composables/useLayoutFab'
-import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
-import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
-import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
-import VehicleDetailedListView from '@/components/vehicles/views/VehicleDetailedListView.vue'
-import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
-import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 
-const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
+const { isMobile } = useResponsiveLayout()
 const { registerFab, unregisterFab } = useLayoutFab()
+const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
 
-const page = ref(1)
-const itemsPerPage = ref(10)
+const vehiclesList = ref([] as VehicleDto[])
+const vehiclesLoading = ref(false)
+const vehiclesPage = ref(1)
+const vehiclesPageSize = ref(10)
+const vehiclesTotal = ref(0)
+const error = ref<string | null>(null)
+const hasMoreRecords = ref(true)
+
 const search = ref('')
 const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
-const serverItems = ref([] as VehicleDto[])
-const loading = ref(true)
-const totalItems = ref(0)
-const viewMode = ref<'list' | 'detailed-list' | 'cards'>('cards')
+const viewMode = ref<'list' | 'detailed-list' | 'cards'>('list')
 
 // Dialog state
 const showVehicleDialog = ref(false)
@@ -45,9 +53,9 @@ const savingVehicle = ref(false)
 const vehicleFormDialogRef = ref()
 
 const viewModeOptions = [
-  { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
   { value: 'list' as const, icon: 'mdi-view-agenda-outline', selectedIcon: 'mdi-view-agenda', tooltip: 'List View' },
   { value: 'detailed-list' as const, icon: 'mdi-view-list-outline', selectedIcon: 'mdi-view-list', tooltip: 'Detailed List View' },
+  { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
 ]
 
 const itemsPerPageOptions = [
@@ -59,59 +67,87 @@ const itemsPerPageOptions = [
 ]
 
 const pageCount = computed(() => {
-  return Math.ceil(totalItems.value / itemsPerPage.value)
+  return Math.ceil(vehiclesTotal.value / vehiclesPageSize.value)
 })
+
+async function loadVehicles() {
+  vehiclesLoading.value = true
+  error.value = null
+
+  try {
+    const response = await getApiVehicles({
+      searchTerm: search.value || undefined,
+      pageSize: vehiclesPageSize.value,
+      page: vehiclesPage.value,
+    })
+
+    const fetchedItems = response.items ?? []
+    const totalCount = response.totalCount ?? 0
+
+    if (isMobile.value && vehiclesPage.value > 1) {
+      vehiclesList.value = [...vehiclesList.value, ...fetchedItems]
+    } else {
+      vehiclesList.value = fetchedItems
+    }
+
+    vehiclesTotal.value = totalCount
+    hasMoreRecords.value = vehiclesList.value.length < vehiclesTotal.value
+  } catch (err) {
+    console.error('Failed to load vehicles:', err)
+    error.value = 'Failed to load vehicles. Please try again.'
+
+    vehiclesList.value = []
+    vehiclesTotal.value = 0
+    hasMoreRecords.value = false
+  } finally {
+    vehiclesLoading.value = false
+  }
+}
+
+async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => void }) {
+  if (!hasMoreRecords.value) {
+    done('empty')
+    return
+  }
+
+  vehiclesPage.value++
+  await loadVehicles()
+
+  done(hasMoreRecords.value ? 'ok' : 'empty')
+}
 
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
 
 function onSearchChange() {
   if (debounceTimeout) clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
-    page.value = 1
-    loadItems()
+    vehiclesPage.value = 1
+    loadVehicles()
   }, 500)
 }
 
 watch(search, onSearchChange)
 
 function updatePage(newPage: number) {
-  page.value = newPage
-  loadItems()
+  vehiclesPage.value = newPage
+  loadVehicles()
 }
 
 function updateItemsPerPage(newItemsPerPage: number) {
-  itemsPerPage.value = newItemsPerPage
-  page.value = 1 // Reset to first page
-  loadItems()
+  vehiclesPageSize.value = newItemsPerPage
+  vehiclesPage.value = 1 // Reset to first page
+  loadVehicles()
 }
 
 function updateSortBy(newSortBy: { key: string; order: 'asc' | 'desc' }[]) {
   sortBy.value = newSortBy
-  loadItems()
+  loadVehicles()
 }
 
-async function loadItems() {
-  loading.value = true
-  try {
-    const res = await getApiVehicles({
-      searchTerm: search.value || undefined,
-      pageSize: itemsPerPage.value,
-      page: page.value,
-    })
-    serverItems.value = res.items ?? []
-    totalItems.value = res.totalCount ?? 0
-  } catch (error) {
-    console.error('Fetching data failed: ', error)
-    serverItems.value = []
-    totalItems.value = 0
-  } finally {
-    loading.value = false
-  }
-}
 
 async function remove(id: string | undefined) {
   await deleteApiVehiclesId(id ?? '')
-  loadItems()
+  loadVehicles()
 }
 
 async function edit(id: string | undefined) {
@@ -126,7 +162,8 @@ async function edit(id: string | undefined) {
   }
 }
 
-function viewOverview(id: string | undefined) {
+
+function goToVehicle(id: string | undefined) {
   if (id) {
     router.push(`/vehicles/${id}`)
   }
@@ -149,7 +186,7 @@ async function saveVehicle(vehicleData: VehicleCreateRequest | VehicleUpdateRequ
     }
     showVehicleDialog.value = false
     editingVehicle.value = null
-    await loadItems()
+    await loadVehicles()
   } catch (error: unknown) {
     console.error('Failed to save vehicle:', error)
 
@@ -197,7 +234,7 @@ onMounted(() => {
     text: 'Add',
     action: openAddVehicleDialog,
   })
-  loadItems()
+  loadVehicles()
 })
 
 onUnmounted(() => {
@@ -206,12 +243,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="vehicles-topbar">
-    <SearchTable v-model="search" />
+  <div class="topbar">
     <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
+    <v-btn icon="mdi-filter-variant" variant="text" disabled></v-btn>
   </div>
 
-  <div class="vehicles-container">
+  <v-infinite-scroll @load="loadMore" :items="vehiclesList">
+    <VehiclesList :items="vehiclesList" :showDetails="viewMode === 'detailed-list'" @select="goToVehicle" />
+  </v-infinite-scroll>
+
+  <!-- <div class="vehicles-container">
     <div class="vehicles-content">
       <VehicleListView
         v-if="viewMode === 'list'"
@@ -258,9 +299,8 @@ onUnmounted(() => {
         <v-pagination :model-value="page" :length="pageCount" :total-visible="7" density="comfortable" @update:model-value="updatePage" />
       </div>
     </div>
-  </div>
+  </div> -->
 
-  <!-- Vehicle Form Dialog -->
   <!-- Vehicle Form Dialog -->
   <VehicleFormDialog
     ref="vehicleFormDialogRef"
@@ -273,14 +313,10 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-.vehicles-topbar {
+.topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: rgba(var(--v-theme-primary), 0.08);
-  border-radius: 16px;
-  margin-bottom: 16px;
 }
 
 .vehicles-container {
@@ -290,7 +326,11 @@ onUnmounted(() => {
   padding: 1rem;
   border-radius: 16px;
 }
-
+.mobile-infinite-scroll {
+  :deep(.v-infinite-scroll__side) {
+    padding: 0 !important;
+  }
+}
 .vehicles-content {
   flex: 1;
   min-height: 0;
