@@ -39,21 +39,21 @@ defineProps<{
 }
 
 .group-activator.is-open {
-  border-bottom-left-radius: 2px !important;
-  border-bottom-right-radius: 2px !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
   margin-bottom: 2px !important;
 }
 
 :deep(.inner-item) {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  border-radius: 2px !important;
+  border-radius: 4px !important;
   margin-bottom: 2px !important;
   padding-inline-start: 32px !important;
 }
 
 :deep(.v-list-group__items .inner-item:first-child) {
-  border-top-left-radius: 2px !important;
-  border-top-right-radius: 2px !important;
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
 }
 
 :deep(.v-list-group__items .inner-item:last-child) {
