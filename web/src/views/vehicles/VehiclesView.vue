@@ -126,7 +126,7 @@ async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => 
 
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null
 
-  watch(search, () => {
+watch(search, () => {
   if (debounceTimeout) clearTimeout(debounceTimeout)
   debounceTimeout = setTimeout(() => {
     vehiclesPage.value = 1
@@ -292,7 +292,13 @@ onUnmounted(() => {
       </template>
 
       <template v-else>
-        <VehiclesList :items="vehiclesList" :showDetails="viewMode === 'detailed-list'" @select="goToVehicle" @delete="remove" />
+        <VehiclesList
+          v-model="selectedVehicleIds"
+          :items="vehiclesList"
+          :showDetails="viewMode === 'detailed-list'"
+          @select="goToVehicle"
+          @delete="remove"
+        />
       </template>
     </v-infinite-scroll>
   </template>
@@ -300,7 +306,14 @@ onUnmounted(() => {
   <template v-else>
     <div class="vehicles-container">
       <div class="vehicles-content" style="overflow: hidden">
-        <VehiclesList v-if="viewMode === 'list'" :items="vehiclesList" :showDetails="true" @select="goToVehicle" @delete="remove" />
+        <VehiclesList
+          v-if="viewMode === 'list'"
+          v-model="selectedVehicleIds"
+          :items="vehiclesList"
+          :showDetails="true"
+          @select="goToVehicle"
+          @delete="remove"
+        />
 
         <VehiclesTable
           v-else-if="viewMode === 'detailed-list'"

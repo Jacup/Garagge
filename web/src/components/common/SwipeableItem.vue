@@ -11,21 +11,15 @@ const startY = ref(0)
 const currentX = ref(0)
 const isSwiping = ref(false)
 const actionThreshold = -100
-const startThreshold = 10
+
+const isThresholdMet = computed(() => currentX.value < actionThreshold)
 
 const indicatorWidth = computed(() => Math.max(0, Math.abs(currentX.value) - 2))
 
-const iconOpacity = computed(() => {
-  const width = indicatorWidth.value
-  if (width < 30) return 0
-  return Math.min((width - 30) / 50, 1)
-})
+// IKONA: 0 opacity dopóki nie przekroczymy progu, potem nagłe 1
+const iconOpacity = computed(() => (isThresholdMet.value ? 1 : 0))
 
-const iconScale = computed(() => {
-  const width = indicatorWidth.value
-  if (width < 30) return 0.5
-  return Math.min(0.8 + ((width - 30) / 90) * 0.4, 1.2)
-})
+const iconScale = computed(() => (isThresholdMet.value ? 1.2 : 0.5))
 
 function onTouchStart(e: TouchEvent) {
   startX.value = e.touches[0].clientX
@@ -41,6 +35,8 @@ function onTouchMove(e: TouchEvent) {
 
   const deltaX = touchX - startX.value
   const deltaY = touchY - startY.value
+
+  const startThreshold = 10
 
   if (currentX.value === 0) {
     if (deltaX > 0) return
@@ -63,7 +59,7 @@ function onTouchMove(e: TouchEvent) {
 function onTouchEnd() {
   isSwiping.value = false
 
-  if (currentX.value < actionThreshold) {
+  if (isThresholdMet.value) {
     currentX.value = -window.innerWidth * 1.5
 
     setTimeout(() => {
@@ -96,7 +92,7 @@ function onClick() {
         :style="{
           opacity: iconOpacity,
           transform: `scale(${iconScale})`,
-          transition: 'opacity 0.1s, transform 0.1s',
+          transition: 'opacity 0.1s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
         }"
       ></v-icon>
     </div>
@@ -129,11 +125,8 @@ function onClick() {
   right: 0;
   height: 100%;
   z-index: 0;
-
   max-width: 100%;
-
   border-radius: 999px;
-
   overflow: hidden;
 }
 
