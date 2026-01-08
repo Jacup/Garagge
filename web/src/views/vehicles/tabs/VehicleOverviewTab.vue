@@ -132,6 +132,21 @@ const emit = defineEmits<{
       </v-card>
     </v-col>
 
+    <v-col cols="12" sm="6">
+      <v-list lines="one">
+        <v-list-item class="list-item" prepend-icon="mdi-shield-outline" title="Insurance" disabled />
+        <v-list-item class="list-item" prepend-icon="mdi-bell-outline" title="Reminders" disabled />
+      </v-list>
+    </v-col>
+
+    <v-col cols="12" sm="6">
+      <v-list lines="one">
+        <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
+        <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
+        <v-list-item class="list-item" prepend-icon="mdi-delete-outline" title="Delete vehicle" base-color="error" />
+      </v-list>
+    </v-col>
+
     <v-col cols="12">
       <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
     </v-col>
@@ -193,5 +208,22 @@ const emit = defineEmits<{
   gap: 12px;
   height: 100%;
   justify-content: center;
+}
+
+.list-item {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  margin-bottom: 2px !important;
+  border-radius: 2px !important;
+}
+
+.list-item:first-child {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+.list-item:last-child {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  margin-bottom: 0 !important;
 }
 </style>
