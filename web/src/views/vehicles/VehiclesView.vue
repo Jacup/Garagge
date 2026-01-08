@@ -253,13 +253,47 @@ async function saveVehicle(vehicleData: VehicleCreateRequest | VehicleUpdateRequ
   }
 }
 
+let isPoppingState = false
+
+watch(
+  () => selectedVehicleIds.value.length > 0,
+  (hasSelection) => {
+    if (hasSelection) {
+      if (!history.state?.selectionMode) {
+        history.pushState({ selectionMode: true }, '')
+      }
+    } else {
+      if (isPoppingState) {
+        isPoppingState = false
+      } else {
+        if (history.state?.selectionMode) {
+          history.back()
+        }
+      }
+    }
+  },
+)
+
+const handlePopState = (event: PopStateEvent) => {
+  if (selectedVehicleIds.value.length > 0) {
+    isPoppingState = true
+    selectedVehicleIds.value = []
+  }
+}
+
 onMounted(() => {
   registerFab({ icon: 'mdi-plus', text: 'Add', action: openAddVehicleDialog })
+  window.addEventListener('popstate', handlePopState)
   loadVehicles()
 })
 
 onUnmounted(() => {
   unregisterFab()
+  window.removeEventListener('popstate', handlePopState)
+
+  if (history.state?.selectionMode) {
+    history.back()
+  }
 })
 </script>
 
