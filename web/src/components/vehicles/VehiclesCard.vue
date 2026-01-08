@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicleIcon } from '@/utils/vehicleUtils'
 
@@ -72,6 +72,12 @@ const handleAvatarClick = (id: string | undefined, event: Event) => {
   event.stopPropagation()
   toggleSelection(id)
 }
+
+onUnmounted(() => {
+  if (longPressTimeout.value) {
+    clearTimeout(longPressTimeout.value)
+  }
+})
 </script>
 
 <template>

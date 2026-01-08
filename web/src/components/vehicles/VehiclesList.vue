@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
 import { getVehicleIcon } from '@/utils/vehicleUtils'
 import SwipeableItem from '@/components/common/SwipeableItem.vue'
@@ -87,6 +87,12 @@ const handleRowClick = (item: VehicleDto) => {
 const handleDelete = (item: VehicleDto) => {
   emit('delete', item.id)
 }
+
+onUnmounted(() => {
+  if (longPressTimeout.value) {
+    clearTimeout(longPressTimeout.value)
+  }
+})
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 
 const emit = defineEmits<{
   (e: 'delete'): void
@@ -12,11 +12,14 @@ const currentX = ref(0)
 const isSwiping = ref(false)
 const actionThreshold = -100
 
+let deleteAnimationTimeout: ReturnType<typeof setTimeout> | null = null
+let resetPositionTimeout: ReturnType<typeof setTimeout> | null = null
+
 const isThresholdMet = computed(() => currentX.value < actionThreshold)
 
 const indicatorWidth = computed(() => Math.max(0, Math.abs(currentX.value) - 2))
 
-// IKONA: 0 opacity dopóki nie przekroczymy progu, potem nagłe 1
+// Opacity of the icon is 0 until the threshold is met, then it becomes 1.
 const iconOpacity = computed(() => (isThresholdMet.value ? 1 : 0))
 
 const iconScale = computed(() => (isThresholdMet.value ? 1.2 : 0.5))
@@ -62,9 +65,9 @@ function onTouchEnd() {
   if (isThresholdMet.value) {
     currentX.value = -window.innerWidth * 1.5
 
-    setTimeout(() => {
+    deleteAnimationTimeout = setTimeout(() => {
       emit('delete')
-      setTimeout(() => {
+      resetPositionTimeout = setTimeout(() => {
         currentX.value = 0
       }, 100)
     }, 300)
@@ -78,6 +81,15 @@ function onClick() {
     emit('click')
   }
 }
+
+onUnmounted(() => {
+  if (deleteAnimationTimeout) {
+    clearTimeout(deleteAnimationTimeout)
+  }
+  if (resetPositionTimeout) {
+    clearTimeout(resetPositionTimeout)
+  }
+})
 </script>
 
 <template>
