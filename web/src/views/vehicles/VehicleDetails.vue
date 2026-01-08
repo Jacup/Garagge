@@ -435,7 +435,7 @@ watch(activeTab, () => {
     </v-tabs>
 
     <!-- Tab Content -->
-    <v-window v-model="activeTab">
+    <v-window v-model="activeTab" :continuous="false" :touch="false">
       <v-window-item value="overview">
         <VehicleOverviewTab
           :vehicle="selectedVehicle"

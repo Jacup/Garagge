@@ -2,6 +2,8 @@
 import type { VehicleDto, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
 
+import RecordInfo from '@/components/common/RecordInfo.vue'
+
 interface Props {
   vehicle: VehicleDto
   lastEnteredMileage: number | null
@@ -24,7 +26,7 @@ const emit = defineEmits<{
 
 <template>
   <!-- Enhanced Summary Cards with Material Design Colors -->
-  <section class="summary-section mb-6">
+  <!-- <section class="summary-section mb-6">
     <v-row>
       <v-col cols="12" sm="6" md="3">
         <v-card class="summary-card" height="120" color="primary-container" variant="flat">
@@ -92,7 +94,7 @@ const emit = defineEmits<{
         </v-card>
       </v-col>
     </v-row>
-  </section>
+  </section> -->
 
   <v-row class="equal-height-row">
     <v-col cols="12" md="4">
@@ -108,11 +110,7 @@ const emit = defineEmits<{
         </template>
         <v-card-text>
           <div class="details-items-container">
-            <VehicleDetailItem
-              icon="mdi-calendar"
-              label="Year"
-              :value="vehicle?.manufacturedYear ? vehicle.manufacturedYear : 'N/A'"
-            />
+            <VehicleDetailItem icon="mdi-calendar" label="Year" :value="vehicle?.manufacturedYear ? vehicle.manufacturedYear : 'N/A'" />
             <v-spacer />
             <VehicleDetailItem icon="mdi-car" label="Type" :value="vehicle?.type ? vehicle.type : 'N/A'" />
             <v-spacer />
@@ -132,6 +130,10 @@ const emit = defineEmits<{
           <span>No image available</span>
         </v-card-text>
       </v-card>
+    </v-col>
+
+    <v-col cols="12">
+      <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
     </v-col>
   </v-row>
 </template>
