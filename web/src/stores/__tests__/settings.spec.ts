@@ -1,10 +1,16 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useSettingsStore } from '../settings'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
+import { createApp } from 'vue'
+
+const app = createApp({})
 describe('Settings Store', () => {
   beforeEach(() => {
-    setActivePinia(createPinia())
+    const pinia = createPinia().use(piniaPluginPersistedstate)
+    app.use(pinia)
+    setActivePinia(pinia)
   })
 
   it('initializes with default settings', () => {
@@ -21,20 +27,20 @@ describe('Settings Store', () => {
   it('updates theme correctly', () => {
     const store = useSettingsStore()
 
-    store.settings.theme = 'dark'
+    store.setTheme('dark')
     expect(store.settings.theme).toBe('dark')
 
-    store.settings.theme = 'light'
+    store.setTheme('light')
     expect(store.settings.theme).toBe('light')
   })
 
   it('updates vehicle view mode correctly', () => {
     const store = useSettingsStore()
 
-    store.settings.vehicleViewMode = 'cards'
+    store.setVehicleViewMode('cards')
     expect(store.settings.vehicleViewMode).toBe('cards')
 
-    store.settings.vehicleViewMode = 'list'
+    store.setVehicleViewMode('list')
     expect(store.settings.vehicleViewMode).toBe('list')
   })
 })
