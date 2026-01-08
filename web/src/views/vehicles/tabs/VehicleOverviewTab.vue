@@ -26,7 +26,7 @@ const emit = defineEmits<{
   <!-- Enhanced Summary Cards with Material Design Colors -->
   <section class="summary-section mb-6">
     <v-row>
-      <v-col cols="12" sm="6" md="3" class="grid-column">
+      <v-col cols="12" sm="6" md="3">
         <v-card class="summary-card" height="120" color="primary-container" variant="flat">
           <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
             <v-icon

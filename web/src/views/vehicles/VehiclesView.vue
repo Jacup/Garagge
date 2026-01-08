@@ -288,7 +288,14 @@ onUnmounted(() => {
   <template v-if="isMobile">
     <v-infinite-scroll @load="loadMore" :items="vehiclesList">
       <template v-if="viewMode === 'cards'">
-        <VehiclesCards :items="vehiclesList" :loading="vehiclesLoading" @edit="edit" @delete="remove" @view="goToVehicle" />
+        <VehiclesCards
+          v-model="selectedVehicleIds"
+          :items="vehiclesList"
+          :loading="vehiclesLoading"
+          @edit="edit"
+          @delete="remove"
+          @view="goToVehicle"
+        />
       </template>
 
       <template v-else>
@@ -327,7 +334,15 @@ onUnmounted(() => {
           @update:sort-by="updateSortBy"
         />
 
-        <VehiclesCards v-else :items="vehiclesList" :loading="vehiclesLoading" @edit="edit" @delete="remove" @view="goToVehicle" />
+        <VehiclesCards
+          v-else
+          v-model="selectedVehicleIds"
+          :items="vehiclesList"
+          :loading="vehiclesLoading"
+          @edit="edit"
+          @delete="remove"
+          @view="goToVehicle"
+        />
       </div>
 
       <div class="vehicles-pagination">
