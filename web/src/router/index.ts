@@ -6,9 +6,7 @@ import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import VehiclesView from '@/views/vehicles/VehiclesView.vue'
 import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
-import ComponentGalleryView from '@/views/ComponentGalleryView.vue'
-import CardGalleryView from '@/views/CardGalleryView.vue'
-import VehicleOverview from '@/views/vehicles/VehicleOverview.vue'
+import VehicleDetails from '@/views/vehicles/VehicleDetails.vue'
 import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
 import SettingsView from '@/views/settings/SettingsView.vue'
 
@@ -39,8 +37,8 @@ const routes = [
   },
   {
     path: '/vehicles/:id',
-    name: 'VehicleOverview',
-    component: VehicleOverview,
+    name: 'VehicleDetails',
+    component: VehicleDetails,
     meta: { requiresAuth: true },
   },
   {
@@ -55,16 +53,6 @@ const routes = [
     name: 'Settings',
     component: SettingsView,
     meta: { requiresAuth: true },
-  },
-  {
-    path: '/components',
-    name: 'ComponentGallery',
-    component: ComponentGalleryView,
-  },
-  {
-    path: '/cards',
-    name: 'CardGallery',
-    component: CardGalleryView,
   },
   {
     path: '/register',

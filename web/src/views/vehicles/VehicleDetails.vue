@@ -12,14 +12,14 @@ import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState';
+import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
 
 const route = useRoute()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
-const { close: closeServiceDetailsSheet } = useServiceDetailsState();
-const detailsState = useServiceDetailsState();
+const { close: closeServiceDetailsSheet } = useServiceDetailsState()
+const detailsState = useServiceDetailsState()
 
 const vehicleId = ref(route.params.id as string)
 const selectedVehicle = ref<VehicleDto | null>(null)
@@ -246,7 +246,6 @@ async function confirmBulkDelete() {
   }
   bulkDeleteDialog.value = false
 }
-
 
 const updateFabForTab = () => {
   if (activeTab.value === 'overview') {
