@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useLayoutFab } from '@/composables/useLayoutFab'
+import { useSettingsStore, type VehicleViewType } from '@/stores/settings'
 
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
@@ -19,6 +20,7 @@ const router = useRouter()
 const { isMobile } = useResponsiveLayout()
 const { registerFab, unregisterFab } = useLayoutFab()
 const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
+const settingsStore = useSettingsStore()
 
 const vehiclesList = ref<VehicleDto[]>([])
 const vehiclesLoading = ref(false)
@@ -30,7 +32,10 @@ const hasMoreRecords = ref(true)
 
 const search = ref('')
 const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
-const viewMode = ref<'list' | 'detailed-list' | 'cards'>('detailed-list')
+const viewMode = computed({
+  get: () => settingsStore.currentVehicleViewMode,
+  set: (val: VehicleViewType) => settingsStore.setVehicleViewMode(val),
+})
 
 const selectedVehicleIds = ref<string[]>([])
 
