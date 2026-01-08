@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
-import { useServiceItemState } from '@/composables/vehicle/useServiceItemState'
+import { useServiceItemState } from '@/composables/vehicles/useServiceItemState'
 import { getServiceItems } from '@/api/generated/service-items/service-items'
 
 const props = defineProps<{

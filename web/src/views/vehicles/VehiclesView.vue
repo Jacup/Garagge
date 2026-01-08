@@ -1,12 +1,13 @@
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useLayoutFab } from '@/composables/useLayoutFab'
+import { useVehicles } from '@/composables/vehicles/useVehicles'
+import { useVehiclesSelection } from '@/composables/vehicles/useVehiclesSelection'
 import { useSettingsStore, type VehicleViewType } from '@/stores/settings'
 
-import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
 
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
@@ -19,25 +20,46 @@ import DeleteDialog from '@/components/common/DeleteDialog.vue'
 const router = useRouter()
 const { isMobile } = useResponsiveLayout()
 const { registerFab, unregisterFab } = useLayoutFab()
-const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
 const settingsStore = useSettingsStore()
 
-const vehiclesList = ref<VehicleDto[]>([])
-const vehiclesLoading = ref(false)
-const vehiclesPage = ref(1)
-const vehiclesPageSize = ref(10)
-const vehiclesTotal = ref(0)
-const error = ref<string | null>(null)
-const hasMoreRecords = ref(true)
+const vehicles = useVehicles({
+  initialPageSize: 10,
+  isMobile,
+  onError: (error, operation) => {
+    // TODO: Show snackbar/toast notification
+    console.error(`Operation ${operation} failed:`, error)
+  },
+})
 
-const search = ref('')
-const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
+const {
+  vehiclesList,
+  vehiclesLoading,
+  vehiclesTotal,
+  pageCount,
+  sortBy,
+  page,
+  itemsPerPage,
+  loadVehicles,
+  loadMore,
+  fetchVehicleById,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+  deleteMultipleVehicles,
+  updateSortBy,
+  cleanup: cleanupVehicles,
+} = vehicles
+
+const selection = useVehiclesSelection({
+  enableHistoryIntegration: true,
+})
+
+const { selectedIds, hasSelection, selectedCount, clear: clearSelection } = selection
+
 const viewMode = computed({
   get: () => settingsStore.currentVehicleViewMode,
   set: (val: VehicleViewType) => settingsStore.setVehicleViewMode(val),
 })
-
-const selectedVehicleIds = ref<string[]>([])
 
 const showVehicleDialog = ref(false)
 const editingVehicle = ref<VehicleDto | null>(null)
@@ -46,7 +68,6 @@ const formDialogKey = ref(0)
 
 const showBulkDeleteDialog = ref(false)
 const isBulkDeleting = ref(false)
-
 const showSingleDeleteDialog = ref(false)
 const vehicleIdToDelete = ref<string | null>(null)
 
@@ -64,169 +85,11 @@ const itemsPerPageOptions = [
   { value: 100, title: '100' },
 ]
 
-const pageCount = computed(() => Math.ceil(vehiclesTotal.value / vehiclesPageSize.value))
-
 const vehicleToDeleteName = computed(() => {
   if (!vehicleIdToDelete.value) return 'vehicle'
   const vehicle = vehiclesList.value.find((v) => v.id === vehicleIdToDelete.value)
   return vehicle ? `${vehicle.brand} ${vehicle.model}` : 'vehicle'
 })
-
-async function loadVehicles(options: { isBackgroundReload?: boolean; resetList?: boolean } = {}) {
-  const { isBackgroundReload = false, resetList = false } = options
-
-  if (!isBackgroundReload) {
-    vehiclesLoading.value = true
-  }
-  error.value = null
-
-  if (resetList) {
-    vehiclesPage.value = 1
-    if (isMobile.value) {
-      vehiclesList.value = []
-    }
-  }
-
-  try {
-    const response = await getApiVehicles({
-      searchTerm: search.value || undefined,
-      pageSize: vehiclesPageSize.value,
-      page: vehiclesPage.value,
-    })
-
-    const fetchedItems = response.items ?? []
-    const totalCount = response.totalCount ?? 0
-
-    if (isMobile.value && vehiclesPage.value > 1) {
-      const existingIds = new Set(vehiclesList.value.map((v) => v.id))
-      const uniqueNewItems = fetchedItems.filter((v) => !existingIds.has(v.id))
-      vehiclesList.value = [...vehiclesList.value, ...uniqueNewItems]
-    } else {
-      vehiclesList.value = fetchedItems
-    }
-
-    vehiclesTotal.value = totalCount
-    hasMoreRecords.value = vehiclesList.value.length < vehiclesTotal.value
-  } catch (err) {
-    console.error('Failed to load vehicles:', err)
-    error.value = 'Failed to load vehicles. Please try again.'
-    if (!isBackgroundReload) {
-      vehiclesList.value = []
-      vehiclesTotal.value = 0
-    }
-  } finally {
-    vehiclesLoading.value = false
-  }
-}
-
-async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => void }) {
-  if (!hasMoreRecords.value) {
-    done('empty')
-    return
-  }
-  vehiclesPage.value++
-  await loadVehicles()
-  done(hasMoreRecords.value ? 'ok' : 'empty')
-}
-
-let debounceTimeout: ReturnType<typeof setTimeout> | null = null
-
-watch(search, () => {
-  if (debounceTimeout) clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(() => {
-    vehiclesPage.value = 1
-    selectedVehicleIds.value = []
-    loadVehicles()
-  }, 500)
-})
-
-function updatePage(newPage: number) {
-  vehiclesPage.value = newPage
-  loadVehicles()
-}
-
-function updateItemsPerPage(newItemsPerPage: number) {
-  vehiclesPageSize.value = newItemsPerPage
-  vehiclesPage.value = 1
-  loadVehicles()
-}
-
-function updateSortBy(newSortBy: { key: string; order: 'asc' | 'desc' }[]) {
-  sortBy.value = newSortBy
-  loadVehicles()
-}
-
-function remove(id: string | undefined) {
-  if (id) {
-    vehicleIdToDelete.value = id
-    showSingleDeleteDialog.value = true
-  }
-}
-
-async function confirmSingleDelete() {
-  if (vehicleIdToDelete.value) {
-    const idToDelete = vehicleIdToDelete.value
-
-    showSingleDeleteDialog.value = false
-    vehicleIdToDelete.value = null
-
-    try {
-      vehiclesList.value = vehiclesList.value.filter((v) => v.id !== idToDelete)
-      selectedVehicleIds.value = selectedVehicleIds.value.filter((id) => id !== idToDelete)
-
-      vehiclesTotal.value = Math.max(0, vehiclesTotal.value - 1)
-
-      await deleteApiVehiclesId(idToDelete)
-
-      await loadVehicles({ isBackgroundReload: true })
-    } catch (error) {
-      console.error('Delete failed', error)
-      loadVehicles()
-    }
-  }
-}
-
-function clearSelection() {
-  selectedVehicleIds.value = []
-}
-
-async function deleteSelected() {
-  isBulkDeleting.value = true
-  try {
-    const deletePromises = selectedVehicleIds.value.map((id) => deleteApiVehiclesId(id))
-
-    vehiclesList.value = vehiclesList.value.filter((v) => !selectedVehicleIds.value.includes(v.id!))
-    vehiclesTotal.value = Math.max(0, vehiclesTotal.value - selectedVehicleIds.value.length)
-
-    selectedVehicleIds.value = []
-    showBulkDeleteDialog.value = false
-
-    await Promise.all(deletePromises)
-    await loadVehicles({ isBackgroundReload: true })
-  } catch (error) {
-    console.error('Bulk delete failed', error)
-    loadVehicles()
-  } finally {
-    isBulkDeleting.value = false
-  }
-}
-
-async function edit(id: string | undefined) {
-  if (id) {
-    try {
-      const res = await getApiVehiclesId(id)
-      editingVehicle.value = res
-      formDialogKey.value++
-      showVehicleDialog.value = true
-    } catch (error) {
-      console.error('Failed to fetch vehicle for editing:', error)
-    }
-  }
-}
-
-function goToVehicle(id: string | undefined) {
-  if (id) router.push(`/vehicles/${id}`)
-}
 
 function openAddVehicleDialog() {
   editingVehicle.value = null
@@ -234,80 +97,101 @@ function openAddVehicleDialog() {
   showVehicleDialog.value = true
 }
 
-async function saveVehicle(vehicleData: VehicleCreateRequest | VehicleUpdateRequest) {
+async function openEditVehicleDialog(id: string | undefined) {
+  if (!id) return
+
+  const vehicle = await fetchVehicleById(id)
+  if (vehicle) {
+    editingVehicle.value = vehicle
+    formDialogKey.value++
+    showVehicleDialog.value = true
+  }
+}
+
+async function confirmSave(vehicleData: VehicleCreateRequest | VehicleUpdateRequest) {
   savingVehicle.value = true
+
   try {
+    let success = false
+
     if (editingVehicle.value) {
-      await putApiVehiclesId(editingVehicle.value.id!, vehicleData as VehicleUpdateRequest)
-      await loadVehicles({ isBackgroundReload: true })
+      success = await updateVehicle(editingVehicle.value.id!, vehicleData as VehicleUpdateRequest)
     } else {
-      await postApiVehicles(vehicleData as VehicleCreateRequest)
-      await loadVehicles({ resetList: true })
+      success = await createVehicle(vehicleData as VehicleCreateRequest)
     }
-    showVehicleDialog.value = false
-    editingVehicle.value = null
-  } catch (error: unknown) {
-    console.error(error)
+
+    if (success) {
+      showVehicleDialog.value = false
+      editingVehicle.value = null
+    }
   } finally {
     savingVehicle.value = false
   }
 }
 
-let isPoppingState = false
-
-watch(
-  () => selectedVehicleIds.value.length > 0,
-  (hasSelection) => {
-    if (hasSelection) {
-      if (!history.state?.selectionMode) {
-        history.pushState({ selectionMode: true }, '')
-      }
-    } else {
-      if (isPoppingState) {
-        isPoppingState = false
-      } else {
-        if (history.state?.selectionMode) {
-          history.back()
-        }
-      }
-    }
-  },
-)
-
-const handlePopState = (event: PopStateEvent) => {
-  if (selectedVehicleIds.value.length > 0) {
-    isPoppingState = true
-    selectedVehicleIds.value = []
+function openSingleDeleteDialog(id: string | undefined) {
+  if (id) {
+    vehicleIdToDelete.value = id
+    showSingleDeleteDialog.value = true
   }
+}
+
+async function confirmSingleDelete() {
+  if (!vehicleIdToDelete.value) return
+
+  const idToDelete = vehicleIdToDelete.value
+
+  showSingleDeleteDialog.value = false
+  vehicleIdToDelete.value = null
+
+  selection.remove(idToDelete)
+
+  await deleteVehicle(idToDelete)
+}
+
+async function confirmMultipleDelete() {
+  if (selectedIds.value.length === 0) return
+
+  isBulkDeleting.value = true
+
+  try {
+    const idsToDelete = [...selectedIds.value]
+
+    clearSelection()
+    showBulkDeleteDialog.value = false
+
+    await deleteMultipleVehicles(idsToDelete)
+  } finally {
+    isBulkDeleting.value = false
+  }
+}
+
+function goToVehicle(id: string | undefined) {
+  if (id) router.push(`/vehicles/${id}`)
 }
 
 onMounted(() => {
   registerFab({ icon: 'mdi-plus', text: 'Add', action: openAddVehicleDialog })
-  window.addEventListener('popstate', handlePopState)
   loadVehicles()
 })
 
 onUnmounted(() => {
   unregisterFab()
-  window.removeEventListener('popstate', handlePopState)
-
-  if (history.state?.selectionMode) {
-    history.back()
-  }
+  cleanupVehicles()
 })
 </script>
 
 <template>
   <div class="topbar-container">
     <v-fade-transition mode="out-in" duration="200">
-      <div v-if="selectedVehicleIds.length > 0" class="context-bar d-flex align-center w-100 rounded-pill px-2 py-1" key="context-bar">
+      <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2 py-1" key="context-bar">
         <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
           <template #activator="{ props }">
             <v-btn v-bind="props" icon="mdi-close" variant="text" @click="clearSelection"></v-btn>
           </template>
         </v-tooltip>
 
-        <div class="text-subtitle-1 font-weight-medium ml-2">{{ selectedVehicleIds.length }} vehicle(s) selected</div>
+        <div class="text-subtitle-1 font-weight-medium ml-2">{{ selectedCount }} vehicle(s) selected</div>
 
         <v-spacer></v-spacer>
         <v-tooltip text="Delete selected vehicles" location="bottom" open-delay="200" close-delay="500">
@@ -328,22 +212,22 @@ onUnmounted(() => {
     <v-infinite-scroll @load="loadMore" :items="vehiclesList">
       <template v-if="viewMode === 'cards'">
         <VehiclesCards
-          v-model="selectedVehicleIds"
+          v-model="selectedIds"
           :items="vehiclesList"
           :loading="vehiclesLoading"
-          @edit="edit"
-          @delete="remove"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
           @view="goToVehicle"
         />
       </template>
 
       <template v-else>
         <VehiclesList
-          v-model="selectedVehicleIds"
+          v-model="selectedIds"
           :items="vehiclesList"
           :showDetails="viewMode === 'detailed-list'"
           @select="goToVehicle"
-          @delete="remove"
+          @delete="openSingleDeleteDialog"
         />
       </template>
     </v-infinite-scroll>
@@ -351,35 +235,35 @@ onUnmounted(() => {
 
   <template v-else>
     <div class="vehicles-container">
-      <div class="vehicles-content" style="overflow: hidden">
+      <div class="vehicles-content">
         <VehiclesList
           v-if="viewMode === 'list'"
-          v-model="selectedVehicleIds"
+          v-model="selectedIds"
           :items="vehiclesList"
           :showDetails="true"
           @select="goToVehicle"
-          @delete="remove"
+          @delete="openSingleDeleteDialog"
         />
 
         <VehiclesTable
           v-else-if="viewMode === 'detailed-list'"
-          v-model="selectedVehicleIds"
+          v-model="selectedIds"
           :items="vehiclesList"
           :loading="vehiclesLoading"
           :sort-by="sortBy"
-          @edit="edit"
-          @delete="remove"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
           @view="goToVehicle"
           @update:sort-by="updateSortBy"
         />
 
         <VehiclesCards
           v-else
-          v-model="selectedVehicleIds"
+          v-model="selectedIds"
           :items="vehiclesList"
           :loading="vehiclesLoading"
-          @edit="edit"
-          @delete="remove"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
           @view="goToVehicle"
         />
       </div>
@@ -387,30 +271,21 @@ onUnmounted(() => {
       <div class="vehicles-pagination">
         <div class="pagination-left">
           <v-select
-            :model-value="vehiclesPageSize"
+            v-model="itemsPerPage"
             :items="itemsPerPageOptions"
             label="Items per page"
             density="compact"
             hide-details
             class="items-per-page-select"
-            @update:model-value="updateItemsPerPage"
           />
           <div class="pagination-info">
-            {{ Math.min((vehiclesPage - 1) * vehiclesPageSize + 1, vehiclesTotal) }}-{{
-              Math.min(vehiclesPage * vehiclesPageSize, vehiclesTotal)
-            }}
-            of {{ vehiclesTotal }} items
+            {{ Math.min((page - 1) * itemsPerPage + 1, vehiclesTotal) }}-{{ Math.min(page * itemsPerPage, vehiclesTotal) }} of
+            {{ vehiclesTotal }} items
           </div>
         </div>
 
         <div class="pagination-right">
-          <v-pagination
-            :model-value="vehiclesPage"
-            :length="pageCount"
-            :total-visible="7"
-            density="comfortable"
-            @update:model-value="updatePage"
-          />
+          <v-pagination v-model="page" :length="pageCount" :total-visible="7" density="comfortable" />
         </div>
       </div>
     </div>
@@ -423,13 +298,13 @@ onUnmounted(() => {
     :vehicle="editingVehicle"
     :loading="savingVehicle"
     @update:is-open="showVehicleDialog = $event"
-    @save="saveVehicle"
+    @save="confirmSave"
   />
 
   <DeleteDialog
-    :item-to-delete="`${selectedVehicleIds.length} vehicle(s)`"
+    :item-to-delete="`${selectedCount} vehicle(s)`"
     :is-open="showBulkDeleteDialog"
-    :on-confirm="deleteSelected"
+    :on-confirm="confirmMultipleDelete"
     :on-cancel="() => (showBulkDeleteDialog = false)"
   />
 

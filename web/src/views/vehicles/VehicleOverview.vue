@@ -12,7 +12,7 @@ import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState';
+import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState';
 
 const route = useRoute()
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()

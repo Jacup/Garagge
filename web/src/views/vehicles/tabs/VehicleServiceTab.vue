@@ -9,7 +9,7 @@ import ServiceRecordsTable from '@/components/vehicles/service/ServiceRecordsTab
 import ServiceRecordsList from '@/components/vehicles/service/ServiceRecordsList.vue'
 import ServiceDetailsWrapper from '@/components/vehicles/service/ServiceDetailsWrapper.vue'
 
-import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState'
+import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
 
 const { isMobile } = useResponsiveLayout()
 
