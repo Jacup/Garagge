@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 import { useFormatting } from '@/composables/useFormatting'
-import { useServiceItemState } from '@/composables/vehicle/useServiceItemState'
+import { useServiceItemState } from '@/composables/vehicles/useServiceItemState'
 
 const props = defineProps<{
   record: ServiceRecordDto | null

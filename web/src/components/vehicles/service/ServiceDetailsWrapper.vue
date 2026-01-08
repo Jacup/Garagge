@@ -15,7 +15,7 @@ import ServiceItemFormDialog from './ServiceItemFormDialog.vue'
 import ServiceItemDeleteDialog from './ServiceItemDeleteDialog.vue'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
-import { useServiceDetailsState } from '@/composables/vehicle/useServiceDetailsState'
+import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
 
 const props = defineProps<{
   modelValue: boolean

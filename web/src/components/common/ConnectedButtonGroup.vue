@@ -46,7 +46,7 @@ function getIcon(option: ButtonOption) {
       class="tooltip-plain"
     >
       <template #activator="{ props }">
-        <v-btn
+        <v-btn class="button"
           v-bind="props"
           :value="option.value"
           :icon="getIcon(option)"
@@ -69,5 +69,9 @@ function getIcon(option: ButtonOption) {
 
 .connected-button-group :deep(.v-btn--active) {
   border-radius: 9999px !important;
+}
+
+.button {
+  background-color: rgb(var(--v-theme-secondary-container));
 }
 </style>

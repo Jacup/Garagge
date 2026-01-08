@@ -1,53 +1,80 @@
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
-import { getVehicles } from '@/api/generated/vehicles/vehicles'
 
-// API Error Response interface
-interface ApiErrorResponse {
-  type: string
-  title: string
-  status: number
-  detail: string
-  errors?: Array<{
-    code: string
-    description: string
-    type: string
-  }>
-  traceId?: string
-}
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useLayoutFab } from '@/composables/useLayoutFab'
-import SearchTable from '@/components/vehicles/topbar/SearchTable.vue'
+import { useVehicles } from '@/composables/vehicles/useVehicles'
+import { useVehiclesSelection } from '@/composables/vehicles/useVehiclesSelection'
+import { useSettingsStore, type VehicleViewType } from '@/stores/settings'
+
+import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
+
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
-import VehicleListView from '@/components/vehicles/views/VehicleListView.vue'
-import VehicleDetailedListView from '@/components/vehicles/views/VehicleDetailedListView.vue'
-import VehicleCardsView from '@/components/vehicles/views/VehicleCardsView.vue'
+import VehiclesList from '@/components/vehicles/VehiclesList.vue'
+import VehiclesTable from '@/components/vehicles/VehiclesTable.vue'
+import VehiclesCards from '@/components/vehicles/VehiclesCard.vue'
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
-const { getApiVehicles, getApiVehiclesId, postApiVehicles, putApiVehiclesId, deleteApiVehiclesId } = getVehicles()
 const router = useRouter()
+const { isMobile } = useResponsiveLayout()
 const { registerFab, unregisterFab } = useLayoutFab()
+const settingsStore = useSettingsStore()
 
-const page = ref(1)
-const itemsPerPage = ref(10)
-const search = ref('')
-const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([])
-const serverItems = ref([] as VehicleDto[])
-const loading = ref(true)
-const totalItems = ref(0)
-const viewMode = ref<'list' | 'detailed-list' | 'cards'>('cards')
+const vehicles = useVehicles({
+  initialPageSize: 10,
+  isMobile,
+  onError: (error, operation) => {
+    // TODO: Show snackbar/toast notification
+    console.error(`Operation ${operation} failed:`, error)
+  },
+})
 
-// Dialog state
+const {
+  vehiclesList,
+  vehiclesLoading,
+  vehiclesTotal,
+  pageCount,
+  sortBy,
+  page,
+  itemsPerPage,
+  loadVehicles,
+  loadMore,
+  fetchVehicleById,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+  deleteMultipleVehicles,
+  updateSortBy,
+  cleanup: cleanupVehicles,
+} = vehicles
+
+const selection = useVehiclesSelection({
+  enableHistoryIntegration: true,
+})
+
+const { selectedIds, hasSelection, selectedCount, clear: clearSelection } = selection
+
+const viewMode = computed({
+  get: () => settingsStore.currentVehicleViewMode,
+  set: (val: VehicleViewType) => settingsStore.setVehicleViewMode(val),
+})
+
 const showVehicleDialog = ref(false)
 const editingVehicle = ref<VehicleDto | null>(null)
 const savingVehicle = ref(false)
-const vehicleFormDialogRef = ref()
+const formDialogKey = ref(0)
+
+const showBulkDeleteDialog = ref(false)
+const isBulkDeleting = ref(false)
+const showSingleDeleteDialog = ref(false)
+const vehicleIdToDelete = ref<string | null>(null)
 
 const viewModeOptions = [
-  { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
   { value: 'list' as const, icon: 'mdi-view-agenda-outline', selectedIcon: 'mdi-view-agenda', tooltip: 'List View' },
   { value: 'detailed-list' as const, icon: 'mdi-view-list-outline', selectedIcon: 'mdi-view-list', tooltip: 'Detailed List View' },
+  { value: 'cards' as const, icon: 'mdi-view-grid-outline', selectedIcon: 'mdi-view-grid', tooltip: 'Card View' },
 ]
 
 const itemsPerPageOptions = [
@@ -58,237 +85,254 @@ const itemsPerPageOptions = [
   { value: 100, title: '100' },
 ]
 
-const pageCount = computed(() => {
-  return Math.ceil(totalItems.value / itemsPerPage.value)
+const vehicleToDeleteName = computed(() => {
+  if (!vehicleIdToDelete.value) return 'vehicle'
+  const vehicle = vehiclesList.value.find((v) => v.id === vehicleIdToDelete.value)
+  return vehicle ? `${vehicle.brand} ${vehicle.model}` : 'vehicle'
 })
-
-let debounceTimeout: ReturnType<typeof setTimeout> | null = null
-
-function onSearchChange() {
-  if (debounceTimeout) clearTimeout(debounceTimeout)
-  debounceTimeout = setTimeout(() => {
-    page.value = 1
-    loadItems()
-  }, 500)
-}
-
-watch(search, onSearchChange)
-
-function updatePage(newPage: number) {
-  page.value = newPage
-  loadItems()
-}
-
-function updateItemsPerPage(newItemsPerPage: number) {
-  itemsPerPage.value = newItemsPerPage
-  page.value = 1 // Reset to first page
-  loadItems()
-}
-
-function updateSortBy(newSortBy: { key: string; order: 'asc' | 'desc' }[]) {
-  sortBy.value = newSortBy
-  loadItems()
-}
-
-async function loadItems() {
-  loading.value = true
-  try {
-    const res = await getApiVehicles({
-      searchTerm: search.value || undefined,
-      pageSize: itemsPerPage.value,
-      page: page.value,
-    })
-    serverItems.value = res.items ?? []
-    totalItems.value = res.totalCount ?? 0
-  } catch (error) {
-    console.error('Fetching data failed: ', error)
-    serverItems.value = []
-    totalItems.value = 0
-  } finally {
-    loading.value = false
-  }
-}
-
-async function remove(id: string | undefined) {
-  await deleteApiVehiclesId(id ?? '')
-  loadItems()
-}
-
-async function edit(id: string | undefined) {
-  if (id) {
-    try {
-      const res = await getApiVehiclesId(id)
-      editingVehicle.value = res
-      showVehicleDialog.value = true
-    } catch (error) {
-      console.error('Failed to fetch vehicle for editing:', error)
-    }
-  }
-}
-
-function viewOverview(id: string | undefined) {
-  if (id) {
-    router.push(`/vehicles/${id}`)
-  }
-}
 
 function openAddVehicleDialog() {
   editingVehicle.value = null
+  formDialogKey.value++
   showVehicleDialog.value = true
 }
 
-async function saveVehicle(vehicleData: VehicleCreateRequest | VehicleUpdateRequest) {
-  savingVehicle.value = true
-  try {
-    if (editingVehicle.value) {
-      // Update existing vehicle
-      await putApiVehiclesId(editingVehicle.value.id!, vehicleData as VehicleUpdateRequest)
-    } else {
-      // Create new vehicle
-      await postApiVehicles(vehicleData as VehicleCreateRequest)
-    }
-    showVehicleDialog.value = false
-    editingVehicle.value = null
-    await loadItems()
-  } catch (error: unknown) {
-    console.error('Failed to save vehicle:', error)
+async function openEditVehicleDialog(id: string | undefined) {
+  if (!id) return
 
-    // Handle API validation errors
-    if (error && typeof error === 'object' && 'response' in error) {
-      const axiosError = error as { response?: { status: number; data: ApiErrorResponse } }
-      if (axiosError.response && axiosError.response.status === 400 && axiosError.response.data) {
-        const apiErrorResponse = axiosError.response.data
-        // Pass error to dialog component
-        if (vehicleFormDialogRef.value) {
-          vehicleFormDialogRef.value.setApiError(apiErrorResponse)
-        }
-      } else {
-        // Handle other errors (network, 500, etc.)
-        if (vehicleFormDialogRef.value) {
-          vehicleFormDialogRef.value.setApiError({
-            type: 'error',
-            title: 'Error',
-            status: axiosError.response?.status || 500,
-            detail: 'An unexpected error occurred while saving the vehicle.',
-            errors: [],
-          } as ApiErrorResponse)
-        }
-      }
+  const vehicle = await fetchVehicleById(id)
+  if (vehicle) {
+    editingVehicle.value = vehicle
+    formDialogKey.value++
+    showVehicleDialog.value = true
+  }
+}
+
+async function confirmSave(vehicleData: VehicleCreateRequest | VehicleUpdateRequest) {
+  savingVehicle.value = true
+
+  try {
+    let success = false
+
+    if (editingVehicle.value) {
+      success = await updateVehicle(editingVehicle.value.id!, vehicleData as VehicleUpdateRequest)
     } else {
-      // Handle unexpected errors
-      if (vehicleFormDialogRef.value) {
-        vehicleFormDialogRef.value.setApiError({
-          type: 'error',
-          title: 'Error',
-          status: 500,
-          detail: 'An unexpected error occurred while saving the vehicle.',
-          errors: [],
-        } as ApiErrorResponse)
-      }
+      success = await createVehicle(vehicleData as VehicleCreateRequest)
+    }
+
+    if (success) {
+      showVehicleDialog.value = false
+      editingVehicle.value = null
     }
   } finally {
     savingVehicle.value = false
   }
 }
 
+function openSingleDeleteDialog(id: string | undefined) {
+  if (id) {
+    vehicleIdToDelete.value = id
+    showSingleDeleteDialog.value = true
+  }
+}
+
+async function confirmSingleDelete() {
+  if (!vehicleIdToDelete.value) return
+
+  const idToDelete = vehicleIdToDelete.value
+
+  showSingleDeleteDialog.value = false
+  vehicleIdToDelete.value = null
+
+  selection.remove(idToDelete)
+
+  await deleteVehicle(idToDelete)
+}
+
+async function confirmMultipleDelete() {
+  if (selectedIds.value.length === 0) return
+
+  isBulkDeleting.value = true
+
+  try {
+    const idsToDelete = [...selectedIds.value]
+
+    clearSelection()
+    showBulkDeleteDialog.value = false
+
+    await deleteMultipleVehicles(idsToDelete)
+  } finally {
+    isBulkDeleting.value = false
+  }
+}
+
+function goToVehicle(id: string | undefined) {
+  if (id) router.push(`/vehicles/${id}`)
+}
+
 onMounted(() => {
-  registerFab({
-    icon: 'mdi-plus',
-    text: 'Add',
-    action: openAddVehicleDialog,
-  })
-  loadItems()
+  registerFab({ icon: 'mdi-plus', text: 'Add', action: openAddVehicleDialog })
+  loadVehicles()
 })
 
 onUnmounted(() => {
   unregisterFab()
+  cleanupVehicles()
 })
 </script>
 
 <template>
-  <div class="vehicles-topbar">
-    <SearchTable v-model="search" />
-    <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
+  <div class="topbar-container">
+    <v-fade-transition mode="out-in" duration="200">
+      <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2 py-1" key="context-bar">
+        <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-close" variant="text" @click="clearSelection"></v-btn>
+          </template>
+        </v-tooltip>
+
+        <div class="text-subtitle-1 font-weight-medium ml-2">{{ selectedCount }} vehicle(s) selected</div>
+
+        <v-spacer></v-spacer>
+        <v-tooltip text="Delete selected vehicles" location="bottom" open-delay="200" close-delay="500">
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-delete" variant="text" color="error" @click="showBulkDeleteDialog = true"></v-btn>
+          </template>
+        </v-tooltip>
+      </div>
+
+      <div v-else class="d-flex justify-space-between align-center w-100 py-1" key="standard-bar">
+        <ConnectedButtonGroup v-model="viewMode" :options="viewModeOptions" mandatory />
+        <v-btn icon="mdi-filter-variant" variant="text" disabled></v-btn>
+      </div>
+    </v-fade-transition>
   </div>
 
-  <div class="vehicles-container">
-    <div class="vehicles-content">
-      <VehicleListView
-        v-if="viewMode === 'list'"
-        :items="serverItems"
-        :loading="loading"
-        @edit="edit"
-        @delete="remove"
-        @view="viewOverview"
-      />
+  <template v-if="isMobile">
+    <v-infinite-scroll @load="loadMore" :items="vehiclesList">
+      <template v-if="viewMode === 'cards'">
+        <VehiclesCards
+          v-model="selectedIds"
+          :items="vehiclesList"
+          :loading="vehiclesLoading"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
+          @view="goToVehicle"
+        />
+      </template>
 
-      <VehicleDetailedListView
-        v-else-if="viewMode === 'detailed-list'"
-        :items="serverItems"
-        :loading="loading"
-        :sort-by="sortBy"
-        @edit="edit"
-        @delete="remove"
-        @view="viewOverview"
-        @update:sort-by="updateSortBy"
-      />
+      <template v-else>
+        <VehiclesList
+          v-model="selectedIds"
+          :items="vehiclesList"
+          :showDetails="viewMode === 'detailed-list'"
+          @select="goToVehicle"
+          @delete="openSingleDeleteDialog"
+        />
+      </template>
+    </v-infinite-scroll>
+  </template>
 
-      <VehicleCardsView v-else :items="serverItems" :loading="loading" @edit="edit" @delete="remove" @view="viewOverview" />
-    </div>
-
-    <div class="vehicles-pagination">
-      <div class="pagination-left">
-        <v-select
-          :model-value="itemsPerPage"
-          :items="itemsPerPageOptions"
-          label="Items per page"
-          density="compact"
-          hide-details
-          class="items-per-page-select"
-          @update:model-value="updateItemsPerPage"
+  <template v-else>
+    <div class="vehicles-container">
+      <div class="vehicles-content">
+        <VehiclesList
+          v-if="viewMode === 'list'"
+          v-model="selectedIds"
+          :items="vehiclesList"
+          :showDetails="true"
+          @select="goToVehicle"
+          @delete="openSingleDeleteDialog"
         />
 
-        <div class="pagination-info">
-          {{ Math.min((page - 1) * itemsPerPage + 1, totalItems) }}-{{ Math.min(page * itemsPerPage, totalItems) }} of
-          {{ totalItems }} items
+        <VehiclesTable
+          v-else-if="viewMode === 'detailed-list'"
+          v-model="selectedIds"
+          :items="vehiclesList"
+          :loading="vehiclesLoading"
+          :sort-by="sortBy"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
+          @view="goToVehicle"
+          @update:sort-by="updateSortBy"
+        />
+
+        <VehiclesCards
+          v-else
+          v-model="selectedIds"
+          :items="vehiclesList"
+          :loading="vehiclesLoading"
+          @edit="openEditVehicleDialog"
+          @delete="openSingleDeleteDialog"
+          @view="goToVehicle"
+        />
+      </div>
+
+      <div class="vehicles-pagination">
+        <div class="pagination-left">
+          <v-select
+            v-model="itemsPerPage"
+            :items="itemsPerPageOptions"
+            label="Items per page"
+            density="compact"
+            hide-details
+            class="items-per-page-select"
+          />
+          <div class="pagination-info">
+            {{ Math.min((page - 1) * itemsPerPage + 1, vehiclesTotal) }}-{{ Math.min(page * itemsPerPage, vehiclesTotal) }} of
+            {{ vehiclesTotal }} items
+          </div>
+        </div>
+
+        <div class="pagination-right">
+          <v-pagination v-model="page" :length="pageCount" :total-visible="7" density="comfortable" />
         </div>
       </div>
-
-      <div class="pagination-right">
-        <v-pagination :model-value="page" :length="pageCount" :total-visible="7" density="comfortable" @update:model-value="updatePage" />
-      </div>
     </div>
-  </div>
+  </template>
 
-  <!-- Vehicle Form Dialog -->
-  <!-- Vehicle Form Dialog -->
   <VehicleFormDialog
+    :key="formDialogKey"
     ref="vehicleFormDialogRef"
     :is-open="showVehicleDialog"
     :vehicle="editingVehicle"
     :loading="savingVehicle"
     @update:is-open="showVehicleDialog = $event"
-    @save="saveVehicle"
+    @save="confirmSave"
+  />
+
+  <DeleteDialog
+    :item-to-delete="`${selectedCount} vehicle(s)`"
+    :is-open="showBulkDeleteDialog"
+    :on-confirm="confirmMultipleDelete"
+    :on-cancel="() => (showBulkDeleteDialog = false)"
+  />
+
+  <DeleteDialog
+    :item-to-delete="vehicleToDeleteName"
+    :is-open="showSingleDeleteDialog"
+    :on-confirm="confirmSingleDelete"
+    :on-cancel="() => (showSingleDeleteDialog = false)"
   />
 </template>
 
 <style lang="scss" scoped>
-.vehicles-topbar {
+.topbar-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background-color: rgba(var(--v-theme-primary), 0.08);
-  border-radius: 16px;
-  margin-bottom: 16px;
+  min-height: 64px;
+  padding: 0;
+}
+
+.context-bar {
+  background-color: rgb(var(--v-theme-secondary-container));
+  color: rgb(var(--v-theme-on-secondary-container));
 }
 
 .vehicles-container {
   display: flex;
   flex-direction: column;
-  background-color: rgba(var(--v-theme-primary), 0.08);
-  padding: 1rem;
-  border-radius: 16px;
+  margin-top: 8px;
 }
 
 .vehicles-content {
@@ -320,55 +364,6 @@ onUnmounted(() => {
       font-size: 0.875rem;
       color: rgb(var(--v-theme-on-surface-variant));
       white-space: nowrap;
-    }
-
-    .pagination-right {
-      flex-shrink: 0;
-    }
-  }
-}
-
-.vehicles-header {
-  flex-shrink: 0;
-  padding: 16px 24px;
-  border-bottom: 1px solid rgb(var(--v-theme-outline-variant));
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-
-  .vehicles-title {
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: rgb(var(--v-theme-on-surface));
-  }
-}
-
-@media (max-width: 768px) {
-  .vehicles-header {
-    padding: 12px 16px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-
-    .vehicles-title {
-      text-align: center;
-    }
-  }
-
-  .vehicle-pagination {
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 12px;
-
-    .pagination-left {
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-
-      .pagination-info {
-        font-size: 0.8125rem;
-      }
     }
   }
 }

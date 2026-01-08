@@ -21,9 +21,7 @@ const handleToggleDrawer = () => {
         <router-view />
       </v-container>
 
-      <v-footer class="app-footer">
-        <div class="footer-wrapper">Created by Jakub Gramburg © 2025</div>
-      </v-footer>
+      <v-footer class="app-footer"/>
     </v-main>
 
     <FloatingActionButton />
@@ -39,20 +37,8 @@ const handleToggleDrawer = () => {
 
 .app-footer {
   background-color: transparent !important;
-  padding: 0 16px 16px 16px;
-  /* Set height to allow wrapper to be visible */
-  height: 80px !important;
+  height: 96px !important;
   z-index: 0 !important;
-}
-
-.footer-wrapper {
-  width: 100%;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-  background-color: rgba(var(--v-theme-primary), 0.08);
-  border-radius: 12px;
 }
 
 /* Add bottom layout offset for mobile view when bottom navigation is present */

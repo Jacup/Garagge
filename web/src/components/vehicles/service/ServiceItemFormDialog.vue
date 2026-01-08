@@ -9,7 +9,7 @@ import type {
 } from '@/api/generated/apiV1.schemas'
 import { getServiceItems } from '@/api/generated/service-items/service-items'
 
-import { useServiceItemState } from '@/composables/vehicle/useServiceItemState'
+import { useServiceItemState } from '@/composables/vehicles/useServiceItemState'
 
 const props = defineProps<{
   vehicleId: string
