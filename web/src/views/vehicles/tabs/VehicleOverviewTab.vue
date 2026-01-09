@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { VehicleDto, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
-import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
-
+import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import RecordInfo from '@/components/common/RecordInfo.vue'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   vehicle: VehicleDto
@@ -17,11 +19,21 @@ interface Props {
   } | null
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
-const emit = defineEmits<{
-  'edit-vehicle': []
-}>()
+const { deleteApiVehiclesId } = getVehicles()
+const router = useRouter()
+
+const showDeleteDialog = ref(false)
+
+async function confirmDelete() {
+  if (!props.vehicle.id) return
+
+  showDeleteDialog.value = false
+
+  await deleteApiVehiclesId(props.vehicle.id)
+  router.push({ name: 'Vehicles' })
+}
 </script>
 
 <template>
@@ -97,7 +109,7 @@ const emit = defineEmits<{
   </section> -->
 
   <v-row class="equal-height-row">
-    <v-col cols="12" md="4">
+    <!-- <v-col cols="12" md="4">
       <v-card class="card-background" variant="flat" rounded="md-16px" height="260px">
         <template #title>{{ vehicle?.brand }} {{ vehicle?.model }}</template>
         <template #append>
@@ -121,15 +133,52 @@ const emit = defineEmits<{
           </div>
         </v-card-text>
       </v-card>
-    </v-col>
+    </v-col> -->
 
-    <v-col cols="12" md="8">
+    <!-- <v-col cols="12" md="8">
       <v-card class="card-background vehicle-image-card" variant="flat" rounded="md-16px" height="260px">
         <v-card-text class="image-placeholder">
           <v-icon size="64">mdi-image-off-outline</v-icon>
           <span>No image available</span>
         </v-card-text>
       </v-card>
+    </v-col> -->
+
+    <v-col cols="12" sm="6" class="pb-0">
+      <v-list lines="two">
+        <v-list-item
+          v-if="vehicle.manufacturedYear"
+          class="list-item"
+          prepend-icon="mdi-calendar"
+          :title="vehicle.manufacturedYear"
+          subtitle="Year"
+        />
+        <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
+        <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
+      </v-list>
+    </v-col>
+
+    <v-col cols="12" sm="6" class="pt-0">
+      <v-list lines="two">
+        <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
+        <v-list-item
+          v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
+          lines="one"
+          class="list-item"
+          :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
+        >
+          <template #title>
+            <v-chip
+              v-for="energyType in vehicle.allowedEnergyTypes"
+              :key="energyType"
+              class="suggestion-chip mr-2"
+              size="small"
+              variant="flat"
+              >{{ energyType }}</v-chip
+            >
+          </template>
+        </v-list-item>
+      </v-list>
     </v-col>
 
     <v-col cols="12" sm="6">
@@ -140,10 +189,16 @@ const emit = defineEmits<{
     </v-col>
 
     <v-col cols="12" sm="6">
-      <v-list lines="one">
+      <v-list lines="one" selectable>
         <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
         <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-        <v-list-item class="list-item" prepend-icon="mdi-delete-outline" title="Delete vehicle" base-color="error" />
+        <v-list-item
+          class="list-item"
+          prepend-icon="mdi-delete-outline"
+          title="Delete vehicle"
+          base-color="error"
+          @click="() => (showDeleteDialog = true)"
+        />
       </v-list>
     </v-col>
 
@@ -151,6 +206,13 @@ const emit = defineEmits<{
       <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
     </v-col>
   </v-row>
+
+  <DeleteDialog
+    :item-to-delete="vehicle.brand + ' ' + vehicle.model"
+    :is-open="showDeleteDialog"
+    :on-confirm="confirmDelete"
+    :on-cancel="() => (showDeleteDialog = false)"
+  />
 </template>
 
 <style scoped>
@@ -158,7 +220,13 @@ const emit = defineEmits<{
 .summary-card {
   border-radius: 16px;
 }
-
+.suggestion-chip {
+  border-radius: 8px !important;
+  border: 1px solid rgb(var(--v-theme-outline-variant)) !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
+  color: rgb(var(--v-theme-on-surface-variant)) !important;
+}
 /* Consumption display for multiple values */
 .consumption-values {
   display: flex;
