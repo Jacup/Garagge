@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import type { EnergyEntryDto, EnergyUnit } from '@/api/generated/apiV1.schemas'
-import { EnergyType } from '@/api/generated/apiV1.schemas'
+import type { EnergyEntryDto } from '@/api/generated/apiV1.schemas'
 
 import { useFormatting } from '@/composables/useFormatting'
-import { formattingUtils } from "@/utils/formattingUtils";
-import { energyUtils } from "@/utils/energyUtils";
+import { formattingUtils } from '@/utils/formattingUtils'
+import { energyUtils } from '@/utils/energyUtils'
 
 interface Props {
   items: EnergyEntryDto[]
@@ -12,7 +11,7 @@ interface Props {
 
 defineProps<Props>()
 
-const { formatCurrency, formatDate, formatMileage, formatDateTime, formatDateOnly } = useFormatting()
+const { formatDate, formatMileage } = useFormatting()
 const { formatEnergyUnit } = formattingUtils()
 const { getFuelIcon, getFuelColor } = energyUtils()
 
@@ -29,7 +28,6 @@ const formatUnitCost = (value: number | null): string => {
     maximumFractionDigits: 2,
   }).format(value)
 }
-
 </script>
 
 <template>
