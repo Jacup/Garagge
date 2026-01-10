@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, onUnmounted } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
-import { getVehicleIcon } from '@/utils/vehicleUtils'
+import { vehicleUtils } from '@/utils/vehicleUtils'
 import SwipeableItem from '@/components/common/SwipeableItem.vue'
 
 interface Props {
@@ -19,6 +19,8 @@ const emit = defineEmits<{
   (e: 'delete', id: string | undefined): void
   (e: 'update:modelValue', ids: string[]): void
 }>()
+
+const { getVehicleIcon } = vehicleUtils()
 
 const selectedIds = computed({
   get: () => props.modelValue,

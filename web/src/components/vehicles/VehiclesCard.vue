@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, onUnmounted } from 'vue'
 import type { VehicleDto } from '@/api/generated/apiV1.schemas'
-import { getVehicleIcon } from '@/utils/vehicleUtils'
+import { vehicleUtils } from '@/utils/vehicleUtils'
 
 interface Props {
   items: VehicleDto[]
@@ -19,8 +19,10 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: () => [],
 })
+
 const emit = defineEmits<Emits>()
 
+const { getVehicleIcon } = vehicleUtils()
 const selectedIds = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),

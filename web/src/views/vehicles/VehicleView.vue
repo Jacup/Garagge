@@ -449,7 +449,7 @@ watch(activeTab, () => {
       <v-window-item value="fuel">
         <VehicleFuelTab
           :vehicle-id="vehicleId"
-          :allowed-energy-types="selectedVehicle?.allowedEnergyTypes"
+          :energyTypes="selectedVehicle?.allowedEnergyTypes"
           :energystats="energystats"
           :stats-loading="statsLoading"
           :selected-energy-entries="selectedEnergyEntries"
