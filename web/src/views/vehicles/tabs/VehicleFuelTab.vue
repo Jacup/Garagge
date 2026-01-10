@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
@@ -8,6 +8,7 @@ import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated
 import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
 import EnergyStatisticsCard from '@/components/vehicles/EnergyStatisticsCard.vue'
 import EnergyEntriesList from '@/components/vehicles/fuel/EnergyEntriesList.vue'
+import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   vehicleId: string
@@ -27,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const { isMobile } = useResponsiveLayout()
-const { getApiVehiclesVehicleIdEnergyEntries } = getEnergyEntries()
+const { getApiVehiclesVehicleIdEnergyEntries, deleteApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
 
 const energyEntries = ref<EnergyEntryDto[]>([])
 const energyEntriesLoading = ref(false)
@@ -36,6 +37,9 @@ const energyEntriesPageSize = ref(10)
 const energyEntriesTotal = ref(0)
 const error = ref<string | null>(null)
 const hasMoreRecords = ref(true)
+
+const showSingleDeleteDialog = ref(false)
+const energyEntryToDeleteId = ref<string | null>(null)
 
 const energyEntriesTableRef = ref<InstanceType<typeof EnergyEntriesTable> | null>(null)
 
@@ -68,13 +72,12 @@ async function loadEnergyEntries() {
 
     // Ważne: Sprawdzamy czy pobraliśmy tyle ile chcieliśmy, lub czy total został osiągnięty
     hasMoreRecords.value = energyEntries.value.length < energyEntriesTotal.value
-
   } catch (err) {
     console.error('Failed to load energy entries:', err)
     error.value = 'Failed'
     // W przypadku błędu nie czyścimy listy, żeby user nie stracił tego co widzi
     if (energyEntriesPage.value === 1) {
-        energyEntries.value = []
+      energyEntries.value = []
     }
     hasMoreRecords.value = false
   } finally {
@@ -99,6 +102,42 @@ async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => 
     done('empty')
   } else {
     done('ok')
+  }
+}
+
+function openSingleDeleteDialog(id: string | undefined) {
+  if (id) {
+    energyEntryToDeleteId.value = id
+    showSingleDeleteDialog.value = true
+  }
+}
+
+async function confirmSingleDelete() {
+  if (!energyEntryToDeleteId.value) return
+  const idToDelete = energyEntryToDeleteId.value
+
+  const energyEntryIndex = energyEntries.value.findIndex((e) => e.id === energyEntryToDeleteId.value)
+  const deletedEntry = energyEntryIndex >= 0 ? energyEntries.value[energyEntryIndex] : null
+
+  if (energyEntryIndex >= 0) {
+    energyEntries.value = energyEntries.value.filter((e) => e.id != idToDelete)
+    energyEntriesTotal.value = Math.max(0, energyEntriesTotal.value - 1)
+  }
+
+  try {
+    await deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, idToDelete)
+    await loadEnergyEntries()
+    return true
+  } catch (error) {
+    if (deletedEntry && energyEntryIndex >= 0) {
+      energyEntries.value.splice(energyEntryIndex, 0, deletedEntry)
+      energyEntriesTotal.value++
+    }
+    console.error('Failed to delete energy entry:', error)
+    return false
+  } finally {
+    showSingleDeleteDialog.value = false
+    energyEntryToDeleteId.value = null
   }
 }
 
@@ -161,9 +200,16 @@ defineExpose({
 
   <template v-else>
     <v-infinite-scroll :onLoad="loadMore" :items="energyEntries">
-      <EnergyEntriesList :items="energyEntries" />
+      <EnergyEntriesList :items="energyEntries" @delete="openSingleDeleteDialog" />
     </v-infinite-scroll>
   </template>
+
+  <DeleteDialog
+    item-to-delete="fuel entry"
+    :is-open="showSingleDeleteDialog"
+    :on-confirm="confirmSingleDelete"
+    :on-cancel="() => (showSingleDeleteDialog = false)"
+  />
 </template>
 
 <style scoped>
