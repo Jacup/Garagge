@@ -38,7 +38,6 @@ const selectedEnergyTypeFilters = ref<EnergyType[]>([])
 
 // --- Selection State & Logic (NOWE) ---
 const selectedEntryIds = ref<string[]>([])
-const showBulkDeleteDialog = ref(false) // Stan dla modala grupowego usuwania
 
 // Computed properties sterujące Topbarem
 const hasSelection = computed(() => selectedEntryIds.value.length > 0)
@@ -48,11 +47,6 @@ function clearSelection() {
   selectedEntryIds.value = []
 }
 
-// --- Dialog State (Single Delete) ---
-const showDeleteDialog = ref(false)
-const entryToDeleteId = ref<string | null>(null)
-
-// --- Data Fetching Logic ---
 async function loadEnergyEntries() {
   if (!props.vehicleId) return
 
@@ -120,36 +114,55 @@ const handlePageSizeChange = (newSize: number) => {
   loadEnergyEntries()
 }
 
-// --- Actions (Edit / Delete) ---
-function openDeleteDialog(id: string | undefined) {
-  if (!id) return
-  entryToDeleteId.value = id
-  showDeleteDialog.value = true
-}
-
 function openEditDialog(entry: EnergyEntryDto) {
   console.log('Edit clicked for', entry.id)
 }
 
-async function confirmDelete() {
+const entryToDeleteId = ref<string | null>(null)
+const showSingleDeleteDialog = ref(false)
+const showBulkDeleteDialog = ref(false)
+
+function openSingleDeleteDialog(id: string | undefined) {
+  if (!id) return
+  entryToDeleteId.value = id
+  showSingleDeleteDialog.value = true
+}
+
+async function confirmSingleDelete() {
   if (!entryToDeleteId.value) return
 
   try {
     await deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, entryToDeleteId.value)
 
     page.value = 1
-    selectedEntryIds.value = [] // Reset zaznaczenia po usunięciu
+    selectedEntryIds.value = []
     await loadEnergyEntries()
     emit('entry-changed')
   } catch (err) {
     console.error('Delete failed', err)
   } finally {
-    showDeleteDialog.value = false
+    showSingleDeleteDialog.value = false
     entryToDeleteId.value = null
   }
 }
 
-// --- Lifecycle ---
+async function confirmBulkDelete() {
+  if (selectedEntryIds.value.length === 0) return
+
+  try {
+    const idsToDelete = [...selectedEntryIds.value]
+
+    clearSelection()
+    showBulkDeleteDialog.value = false
+
+    await Promise.all(idsToDelete.map((id) => deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, id)))
+    await loadEnergyEntries()
+    emit('entry-changed')
+  } catch (err) {
+    console.error('Delete failed', err)
+  }
+}
+
 onMounted(() => {
   if (!isMobile.value) {
     loadEnergyEntries()
@@ -246,7 +259,7 @@ watch(selectedEnergyTypeFilters, () => {
             @update:page="handlePageChange"
             @update:items-per-page="handlePageSizeChange"
             @edit="openEditDialog"
-            @delete="(item) => openDeleteDialog(item.id)"
+            @delete="(item) => openSingleDeleteDialog(item.id)"
           />
         </v-card>
       </v-col>
@@ -264,7 +277,7 @@ watch(selectedEnergyTypeFilters, () => {
 
   <template v-else>
     <v-infinite-scroll :onLoad="loadMore" :items="energyEntries">
-      <EnergyEntriesList :items="energyEntries" @delete="openDeleteDialog" />
+      <EnergyEntriesList :items="energyEntries" @delete="openSingleDeleteDialog" />
       <template v-slot:empty>
         <div class="pa-4 text-center text-medium-emphasis text-caption">No more records</div>
       </template>
@@ -273,9 +286,15 @@ watch(selectedEnergyTypeFilters, () => {
 
   <DeleteDialog
     item-to-delete="fuel entry"
-    :is-open="showDeleteDialog"
-    :on-confirm="confirmDelete"
-    :on-cancel="() => (showDeleteDialog = false)"
+    :is-open="showSingleDeleteDialog"
+    :on-confirm="confirmSingleDelete"
+    :on-cancel="() => (showSingleDeleteDialog = false)"
+  />
+  <DeleteDialog
+    :item-to-delete="selectedCount > 1 ? `${selectedCount} fuel entries` : `${selectedCount} fuel entry`"
+    :is-open="showBulkDeleteDialog"
+    :on-confirm="confirmBulkDelete"
+    :on-cancel="() => (showBulkDeleteDialog = false)"
   />
 </template>
 
