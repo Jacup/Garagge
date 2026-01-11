@@ -189,13 +189,13 @@ defineExpose({
 
       <v-row>
         <v-col cols="12">
-          <v-card class="service-records" variant="flat">
+          <v-card variant="flat">
             <v-alert v-if="error" type="error" density="compact" class="mb-4" closable>
               {{ error }}
             </v-alert>
             <ServiceRecordsTable
               :items="serviceRecords"
-              :items-length="serviceRecordsTotal"
+              :totalCount="serviceRecordsTotal"
               :loading="serviceRecordsLoading"
               :page="serviceRecordsPage"
               :items-per-page="serviceRecordsPageSize"
