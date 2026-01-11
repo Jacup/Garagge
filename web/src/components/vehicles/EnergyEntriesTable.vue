@@ -1,250 +1,185 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
+import { computed } from 'vue'
+
+import { useFormatting } from '@/composables/useFormatting'
+import { formattingUtils } from '@/utils/formattingUtils'
 import type { EnergyEntryDto } from '@/api/generated/apiV1.schemas'
-import DeleteDialog from '@/components/common/DeleteDialog.vue'
-import ModifyEnergyEntryDialog from '@/components/vehicles/energyEntries/ModifyEnergyEntryDialog.vue'
 
 interface Props {
-  vehicleId: string
-  allowedEnergyTypes?: string[] // Energy types allowed for this vehicle
-  selected?: string[]
+  items: EnergyEntryDto[]
+  totalCount: number
+  loading: boolean
+  page: number
+  itemsPerPage: number
+  selectedIds?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  allowedEnergyTypes: () => [],
-  selected: () => []
+  items: () => [],
+  selectedIds: () => [],
 })
 
-// Define emits
 const emit = defineEmits<{
-  'update:selected': [value: string[]]
-  'entry-changed': []
+  'update:selectedIds': [value: string[]]
+  'update:page': [value: number]
+  'update:itemsPerPage': [value: number]
+  edit: [item: EnergyEntryDto]
+  delete: [item: EnergyEntryDto]
 }>()
 
-const { getApiVehiclesVehicleIdEnergyEntries, deleteApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
-
-// Energy entries data
-const energyEntries = ref<EnergyEntryDto[]>([])
-const energyEntriesLoading = ref(false)
-const energyEntriesPage = ref(1)
-const energyEntriesPageSize = ref(10)
-const energyEntriesTotal = ref(0)
-const error = ref<string | null>(null)
-
-// Selection state - computed to sync with parent
 const selectedItems = computed({
-  get: () => props.selected,
-  set: (value: string[]) => emit('update:selected', value)
+  get: () => props.selectedIds,
+  set: (value) => emit('update:selectedIds', value),
 })
 
-// Dialog state
-const editDialog = ref(false)
-const deleteDialog = ref(false)
-const selectedEntry = ref<EnergyEntryDto | null>(null)
+const { formatCurrency, formatDate, formatMileage } = useFormatting()
+const { formatEnergyUnit } = formattingUtils()
 
-// Table configuration
-const energyHeaders = [
-  { title: 'Date', key: 'date', value: 'date', sortable: false },
-  { title: 'Mileage', key: 'mileage', value: 'mileage', sortable: false },
-  { title: 'Type', key: 'type', value: 'type', sortable: false },
-  { title: 'Volume', key: 'volume', value: 'volume', sortable: false },
-  { title: 'Cost', key: 'cost', value: 'cost', sortable: false },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'end' as const },
+const headers = [
+  {
+    title: 'Date',
+    key: 'date',
+    sortable: false,
+    align: 'start' as const,
+  },
+  {
+    title: 'Mileage',
+    key: 'mileage',
+    sortable: false,
+    align: 'end' as const,
+  },
+  {
+    title: 'Type',
+    key: 'type',
+    sortable: false,
+    align: 'start' as const,
+  },
+  {
+    title: 'Volume',
+    key: 'volume',
+    sortable: false,
+    align: 'end' as const,
+  },
+  {
+    title: 'Cost',
+    key: 'cost',
+    sortable: false,
+    align: 'end' as const,
+  },
+  {
+    title: '',
+    key: 'actions',
+    sortable: false,
+    align: 'end' as const,
+    width: '100px',
+  },
 ]
-
-// Utility functions
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
-}
-
-// Load energy entries from API
-async function loadEnergyEntries() {
-  if (!props.vehicleId) return
-
-  energyEntriesLoading.value = true
-  error.value = null
-  try {
-    const response = await getApiVehiclesVehicleIdEnergyEntries(props.vehicleId, {
-      page: energyEntriesPage.value,
-      pageSize: energyEntriesPageSize.value,
-    })
-    energyEntries.value = response.items ?? []
-    energyEntriesTotal.value = response.totalCount ?? 0
-  } catch (err) {
-    console.error('Failed to load energy entries:', err)
-    error.value = 'Nie udało się załadować danych tankowania'
-    energyEntries.value = []
-    energyEntriesTotal.value = 0
-  } finally {
-    energyEntriesLoading.value = false
-  }
-}
-
-async function remove(id: string) {
-  try {
-    await deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, id)
-    loadEnergyEntries()
-    emit('entry-changed')
-  } catch (err) {
-    console.error('Failed to delete energy entry:', err)
-  }
-}
-
-// Bulk delete function
-async function removeMultiple(ids: string[]) {
-  try {
-    await Promise.all(ids.map(id => deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, id)))
-    // Clear selection after successful delete
-    selectedItems.value = []
-    loadEnergyEntries()
-    emit('entry-changed')
-  } catch (err) {
-    console.error('Failed to delete energy entries:', err)
-  }
-}
-
-function openDeleteDialog(id: string) {
-  selectedEntry.value = energyEntries.value.find((entry) => entry.id === id) || null
-  deleteDialog.value = true
-}
-
-function closeDeleteDialog() {
-  deleteDialog.value = false
-  selectedEntry.value = null
-}
-
-async function confirmDelete() {
-  if (selectedEntry.value?.id) {
-    await remove(selectedEntry.value.id)
-    deleteDialog.value = false
-    selectedEntry.value = null
-  }
-}
-
-function openEditDialog(entry: EnergyEntryDto) {
-  selectedEntry.value = entry
-  editDialog.value = true
-}
-
-function closeEditDialog() {
-  editDialog.value = false
-  selectedEntry.value = null
-}
-
-function handleEntrySaved() {
-  closeEditDialog()
-  loadEnergyEntries()
-  emit('entry-changed')
-}
-
-function handlePageUpdate(page: number) {
-  energyEntriesPage.value = page
-  loadEnergyEntries()
-}
-
-function handlePageSizeUpdate(pageSize: number) {
-  energyEntriesPageSize.value = pageSize
-  loadEnergyEntries()
-}
-
-onMounted(() => {
-  loadEnergyEntries()
-})
-
-// Expose loadEnergyEntries function to parent components
-defineExpose({
-  loadEnergyEntries,
-  removeMultiple
-})
-
 </script>
 
 <template>
-  <div>
-        <v-alert
-      v-if="error"
-      type="error"
-      density="compact"
-      class="mb-4"
-      closable
-      @click:close="error = null"
-    >
-      {{ error }}
-    </v-alert>
+  <v-data-table-server
+    v-model="selectedItems"
+    :headers="headers"
+    :items="items"
+    :items-length="totalCount"
+    :loading="loading"
+    :page="page"
+    :items-per-page="itemsPerPage"
+    show-select
+    item-value="id"
+    density="comfortable"
+    class="energy-table"
+    :row-props="{ class: 'energy-table-row' }"
+    @update:page="emit('update:page', $event)"
+    @update:items-per-page="emit('update:itemsPerPage', $event)"
+  >
+    <template v-slot:[`item.date`]="{ item }"> {{ formatDate(item.date) }} </template>
 
-    <v-data-table-server
-      v-model:items-per-page="energyEntriesPageSize"
-      v-model="selectedItems"
-      :headers="energyHeaders"
-      :items="energyEntries"
-      :items-length="energyEntriesTotal"
-      :loading="energyEntriesLoading"
-      :page="energyEntriesPage"
-      @update:page="handlePageUpdate"
-      @update:items-per-page="handlePageSizeUpdate"
-      show-select
-      density="compact"
-      fixed-header
-      disable-sort
-      :height="407"
-    >
-      <template v-slot:[`item.date`]="{ item }">
-        {{ formatDate(item.date) }}
-      </template>
-      <template v-slot:[`item.volume`]="{ item }"> {{ item.volume }} {{ item.energyUnit }} </template>
-      <template v-slot:[`item.cost`]="{ item }">
-        {{ item.cost ? item.cost.toFixed(2) + ' PLN' : 'N/A' }}
-      </template>
-      <template v-slot:[`item.actions`]="{ item }">
-          <v-btn icon="mdi-pencil" variant="text" size="x-small" @click="openEditDialog(item)" />
-          <v-btn icon="mdi-delete" variant="text" size="x-small" color="error" @click="openDeleteDialog(item.id)" />
-      </template>
-    </v-data-table-server>
+    <template v-slot:[`item.mileage`]="{ item }"> {{ formatMileage(item.mileage) }} </template>
 
-    <DeleteDialog :is-open="deleteDialog" item-to-delete="energy entry" :on-confirm="confirmDelete" :on-cancel="closeDeleteDialog" />
+    <template v-slot:[`item.volume`]="{ item }"> {{ item.volume }} {{ formatEnergyUnit(item.energyUnit) }} </template>
 
-    <ModifyEnergyEntryDialog
-      :is-open="editDialog"
-      :vehicle-id="vehicleId"
-      :allowed-energy-types="allowedEnergyTypes"
-      :entry="selectedEntry"
-      :on-save="handleEntrySaved"
-      :on-cancel="closeEditDialog"
-    />
-  </div>
+    <template v-slot:[`item.cost`]="{ item }"> {{ formatCurrency(item.cost) }} </template>
+
+    <template v-slot:[`item.actions`]="{ item }">
+      <div class="d-flex justify-end action-buttons">
+        <v-tooltip text="Edit" location="bottom" open-delay="200" close-delay="200">
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-pencil" color="secondary" variant="text" size="x-small" @click.stop="$emit('edit', item)" />
+          </template>
+        </v-tooltip>
+        <v-tooltip text="Delete" location="bottom" open-delay="200" close-delay="200">
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-delete" color="error" variant="text" size="x-small" @click.stop="$emit('delete', item)" />
+          </template>
+        </v-tooltip>
+      </div>
+    </template>
+
+    <template v-slot:no-data>
+      <div class="py-6 text-center text-medium-emphasis">Brak danych o tankowaniach</div>
+    </template>
+  </v-data-table-server>
 </template>
 
-<style scoped>
-/* Make table background transparent */
-:deep(.v-table) {
-  background: transparent !important;
+<style scoped lang="scss">
+.energy-table {
+  background-color: transparent !important;
+
+  :deep(table) {
+    border-collapse: separate !important;
+    border-spacing: 0;
+  }
+
+  :deep(thead),
+  :deep(tbody tr),
+  :deep(tbody tr:hover) {
+    background: transparent !important;
+  }
+
+  :deep(th),
+  :deep(td) {
+    border-bottom: none !important;
+  }
+
+  :deep(th) {
+    background-color: rgba(var(--v-theme-primary), 0.2) !important;
+    color: rgb(var(--v-theme-on-surface));
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  :deep(td) {
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  :deep(tbody tr:hover td) {
+    background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  }
+
+  :deep(th:first-child),
+  :deep(td:first-child) {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  :deep(th:last-child),
+  :deep(td:last-child) {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 }
 
-/* Table header styling */
-:deep(.v-data-table__th) {
-  background-color: rgba(var(--v-theme-primary), 0.12) !important;
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 2 !important;
+.action-buttons {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s;
 }
 
-/* Make header opaque for proper sticky behavior and rounded corners */
-:deep(.v-data-table__thead) {
-  background-color: rgba(var(--v-theme-surface), 1) !important;
+.energy-table :deep(tbody tr:hover) .action-buttons {
+  opacity: 1;
+  visibility: visible;
 }
-
-/* Ensure only first and last header cells have proper radius */
-:deep(.v-data-table__th:first-child) {
-  border-top-left-radius: 8px !important;
-}
-
-:deep(.v-data-table__th:last-child) {
-  border-top-right-radius: 8px !important;
-}
-
 </style>

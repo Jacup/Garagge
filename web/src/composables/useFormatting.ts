@@ -1,10 +1,11 @@
-// web/src/composables/useFormatting.ts
 export function useFormatting() {
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | null) => {
+    if (!value) return '-'
     return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
   }
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('pl-PL', {
       year: 'numeric',
       month: 'short',
