@@ -117,7 +117,7 @@ const headers = [
     </template>
 
     <template v-slot:no-data>
-      <div class="py-6 text-center text-medium-emphasis">Brak danych o tankowaniach</div>
+      <div class="py-6 text-center text-medium-emphasis">No fuel data</div>
     </template>
   </v-data-table-server>
 </template>

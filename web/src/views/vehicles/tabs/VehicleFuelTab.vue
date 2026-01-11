@@ -36,10 +36,8 @@ const error = ref<string | null>(null)
 
 const selectedEnergyTypeFilters = ref<EnergyType[]>([])
 
-// --- Selection State & Logic (NOWE) ---
 const selectedEntryIds = ref<string[]>([])
 
-// Computed properties sterujące Topbarem
 const hasSelection = computed(() => selectedEntryIds.value.length > 0)
 const selectedCount = computed(() => selectedEntryIds.value.length)
 
@@ -81,7 +79,6 @@ async function loadEnergyEntries() {
   }
 }
 
-// --- Mobile Infinite Scroll Handler ---
 async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => void }) {
   if (energyEntriesLoading.value) return
 
@@ -102,7 +99,6 @@ async function loadMore({ done }: { done: (status: 'ok' | 'empty' | 'error') => 
   }
 }
 
-// --- Desktop Handlers ---
 const handlePageChange = (newPage: number) => {
   page.value = newPage
   loadEnergyEntries()
