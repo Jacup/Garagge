@@ -5,9 +5,11 @@ import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated/apiV1.schemas'
 
-import EnergyEntriesTable from '@/components/vehicles/EnergyEntriesTable.vue'
-import EnergyStatisticsCard from '@/components/vehicles/EnergyStatisticsCard.vue'
-import EnergyEntriesList from '@/components/vehicles/fuel/EnergyEntriesList.vue'
+import EnergyEntriesList from '@/components/vehicles/energy/EnergyEntriesList.vue'
+import EnergyEntriesTable from '@/components/vehicles/energy/EnergyEntriesTable.vue'
+import EnergyStatisticsCard from '@/components/vehicles/energy/EnergyStatisticsCard.vue'
+
+import EnergyEntryDialog from '@/components/vehicles/energy/EnergyEntryDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
@@ -110,8 +112,22 @@ const handlePageSizeChange = (newSize: number) => {
   loadEnergyEntries()
 }
 
+const showEntryDialog = ref(false)
+const editingEntry = ref<EnergyEntryDto | null>(null)
+
+function openCreateDialog() {
+  editingEntry.value = null
+  showEntryDialog.value = true
+}
+
 function openEditDialog(entry: EnergyEntryDto) {
-  console.log('Edit clicked for', entry.id)
+  editingEntry.value = entry
+  showEntryDialog.value = true
+}
+
+function onEntrySaved() {
+  loadEnergyEntries()
+  emit('entry-changed')
 }
 
 const entryToDeleteId = ref<string | null>(null)
@@ -180,6 +196,10 @@ watch(selectedEnergyTypeFilters, () => {
   energyEntries.value = []
   selectedEntryIds.value = []
   loadEnergyEntries()
+})
+
+defineExpose({
+  openCreateDialog,
 })
 </script>
 
@@ -260,7 +280,7 @@ watch(selectedEnergyTypeFilters, () => {
         </v-card>
       </v-col>
 
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="4" xl="6">
         <EnergyStatisticsCard
           :vehicle-id="vehicleId"
           :allowed-energy-types="energyTypes"
@@ -279,6 +299,8 @@ watch(selectedEnergyTypeFilters, () => {
       </template>
     </v-infinite-scroll>
   </template>
+
+  <EnergyEntryDialog v-model="showEntryDialog" :entry="editingEntry" :vehicle-id="vehicleId" @saved="onEntrySaved" />
 
   <DeleteDialog
     item-to-delete="fuel entry"
