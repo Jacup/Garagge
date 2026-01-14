@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { VehicleDto, EnergyEntryDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
 
 import VehicleOverviewTab from '@/views/vehicles/tabs/VehicleOverviewTab.vue'
 import VehicleFuelTab from '@/views/vehicles/tabs/VehicleFuelTab.vue'
@@ -12,28 +12,25 @@ import VehicleServiceTab from '@/views/vehicles/tabs/VehicleServiceTab.vue'
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
 import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
+import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesState'
 
 const route = useRoute()
+
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
-const { getApiVehiclesVehicleIdEnergyEntries, getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
+const { getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
 const { close: closeServiceDetailsSheet } = useServiceDetailsState()
+
+const energyEntriesState = useEnergyEntriesState()
 const detailsState = useServiceDetailsState()
 
-// REF do zakładki paliwa - kluczowe dla otwierania dialogu z FAB
-const vehicleFuelTabRef = ref<InstanceType<typeof VehicleFuelTab> | null>(null)
-
 const vehicleId = ref(route.params.id as string)
-const selectedVehicle = ref<VehicleDto | null>(null)
+const vehicle = ref<VehicleDto | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
-const energyEntries = ref<EnergyEntryDto[]>([]) // Używane do obliczeń Overview (last mileage)
-const timelineLoading = ref(false)
-
 const energystats = ref<EnergyStatsDto | null>(null)
 const statsLoading = ref(false)
-
 const globalStats = ref<EnergyStatsDto | null>(null)
 
 const getUnitLabel = (unit: string | undefined): string => {
@@ -73,19 +70,10 @@ const summaryStats = computed(() => {
   }
 })
 
-const lastEnteredMileage = computed(() => {
-  if (!energyEntries.value || energyEntries.value.length === 0) return null
-  const sortedEntries = [...energyEntries.value].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  return sortedEntries[0]?.mileage ?? null
-})
-
 const activeTab = ref('overview')
 const editVehicleDialog = ref(false)
 
-const selectedEnergyEntries = ref<string[]>([])
 const selectedServiceRecords = ref<string[]>([])
-
-const vehicleFormDialogRef = ref<InstanceType<typeof VehicleFormDialog> | null>(null)
 
 async function loadVehicle() {
   if (!vehicleId.value) {
@@ -98,32 +86,13 @@ async function loadVehicle() {
     loading.value = true
     error.value = null
     const response = await getApiVehiclesId(vehicleId.value)
-    selectedVehicle.value = response
-    await loadEnergyEntries()
+    vehicle.value = response
     await loadGlobalStats()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
     error.value = 'Failed to load vehicle data'
   } finally {
     loading.value = false
-  }
-}
-
-async function loadEnergyEntries() {
-  if (!vehicleId.value) return
-
-  try {
-    timelineLoading.value = true
-    const response = await getApiVehiclesVehicleIdEnergyEntries(vehicleId.value, {
-      page: 1,
-      pageSize: 100,
-    })
-    energyEntries.value = response.items ?? []
-  } catch (err) {
-    console.error('Failed to load energy entries for timeline:', err)
-    energyEntries.value = []
-  } finally {
-    timelineLoading.value = false
   }
 }
 
@@ -170,11 +139,9 @@ const mockStats = {
   totalServiceCost: 2350.0,
 }
 
-// Wywoływane gdy dziecko (VehicleFuelTab) zgłosi zmianę danych
 function handleEnergyEntryChanged() {
-  loadEnergyEntries() // Odśwież listę w rodzicu (dla Last Mileage w Overview)
-  loadEnergyStats() // Odśwież statystyki karty
-  loadGlobalStats() // Odśwież globalne liczniki
+  loadEnergyStats()
+  loadGlobalStats()
 }
 
 function openEditVehicleDialog() {
@@ -195,18 +162,14 @@ interface ApiErrorResponse {
 }
 
 async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
+  if (!vehicleId.value) return
+
   try {
     await putApiVehiclesId(vehicleId.value, vehicleData)
     closeEditVehicleDialog()
     await loadVehicle()
   } catch (error) {
     console.error('Failed to update vehicle:', error)
-    if (vehicleFormDialogRef.value && error && typeof error === 'object' && 'response' in error) {
-      const axiosError = error as { response?: { data?: ApiErrorResponse } }
-      if (axiosError.response?.data) {
-        vehicleFormDialogRef.value.setApiError(axiosError.response.data)
-      }
-    }
   }
 }
 
@@ -222,9 +185,8 @@ const updateFabForTab = () => {
           text: 'Add Fuel',
           action: () => {
             activeTab.value = 'fuel'
-            // Czekamy na wyrenderowanie taba i wywołujemy metodę w dziecku
             nextTick(() => {
-              vehicleFuelTabRef.value?.openCreateDialog()
+              energyEntriesState.openCreateDialog()
             })
           },
         },
@@ -246,8 +208,7 @@ const updateFabForTab = () => {
     registerFab({
       icon: 'mdi-gas-station',
       text: 'Add Fuel',
-      // Bezpośrednie wywołanie metody w dziecku
-      action: () => vehicleFuelTabRef.value?.openCreateDialog(),
+      action: () => energyEntriesState.openCreateDialog(),
     })
   } else if (activeTab.value === 'service') {
     registerFab({
@@ -307,7 +268,7 @@ watch(activeTab, () => {
     </v-btn>
   </div>
 
-  <div v-else-if="selectedVehicle" class="page-content">
+  <div v-else-if="vehicle" class="page-content">
     <v-tabs
       v-model="activeTab"
       align-tabs="center"
@@ -335,8 +296,8 @@ watch(activeTab, () => {
     <v-window v-model="activeTab" :continuous="false" :touch="false">
       <v-window-item value="overview">
         <VehicleOverviewTab
-          :vehicle="selectedVehicle"
-          :last-entered-mileage="lastEnteredMileage"
+          :vehicle="vehicle"
+          :last-entered-mileage="1234"
           :global-stats="globalStats"
           :summary-stats="summaryStats"
           @edit-vehicle="openEditVehicleDialog"
@@ -345,20 +306,16 @@ watch(activeTab, () => {
 
       <v-window-item value="fuel">
         <VehicleFuelTab
-          ref="vehicleFuelTabRef"
-          :vehicle-id="vehicleId"
-          :energyTypes="selectedVehicle?.allowedEnergyTypes"
+          :vehicle-id="vehicle.id!"
+          :allowedEnergyTypes="vehicle?.allowedEnergyTypes"
           :energystats="energystats"
-          :stats-loading="statsLoading"
-          :selected-energy-entries="selectedEnergyEntries"
-          @update:selected-energy-entries="selectedEnergyEntries = $event"
           @entry-changed="handleEnergyEntryChanged"
         />
       </v-window-item>
 
       <v-window-item value="service">
         <VehicleServiceTab
-          :vehicle-id="vehicleId"
+          :vehicle-id="vehicle.id!"
           :selected-service-records="selectedServiceRecords"
           :mock-stats="mockStats"
           @update:selected-service-records="selectedServiceRecords = $event"
@@ -376,7 +333,7 @@ watch(activeTab, () => {
   <VehicleFormDialog
     ref="vehicleFormDialogRef"
     :is-open="editVehicleDialog"
-    :vehicle="selectedVehicle"
+    :vehicle="vehicle"
     @update:is-open="editVehicleDialog = $event"
     @save="handleVehicleUpdated"
   />

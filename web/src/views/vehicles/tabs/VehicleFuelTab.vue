@@ -2,6 +2,8 @@
 import { onMounted, ref, watch, computed } from 'vue'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesState'
+
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated/apiV1.schemas'
 
@@ -14,9 +16,8 @@ import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
 interface Props {
   vehicleId: string
-  energyTypes?: EnergyType[]
+  allowedEnergyTypes: EnergyType[] | undefined
   energystats: EnergyStatsDto | null
-  statsLoading: boolean
 }
 
 const props = defineProps<Props>()
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 
 const { isMobile } = useResponsiveLayout()
 const { getApiVehiclesVehicleIdEnergyEntries, deleteApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
+const { showEntryDialog, selectedEntry, openEditDialog, closeDialog } = useEnergyEntriesState()
 
 const energyEntries = ref<EnergyEntryDto[]>([])
 const energyEntriesLoading = ref(false)
@@ -112,19 +114,6 @@ const handlePageSizeChange = (newSize: number) => {
   loadEnergyEntries()
 }
 
-const showEntryDialog = ref(false)
-const editingEntry = ref<EnergyEntryDto | null>(null)
-
-function openCreateDialog() {
-  editingEntry.value = null
-  showEntryDialog.value = true
-}
-
-function openEditDialog(entry: EnergyEntryDto) {
-  editingEntry.value = entry
-  showEntryDialog.value = true
-}
-
 function onEntrySaved() {
   loadEnergyEntries()
   emit('entry-changed')
@@ -197,10 +186,6 @@ watch(selectedEnergyTypeFilters, () => {
   selectedEntryIds.value = []
   loadEnergyEntries()
 })
-
-defineExpose({
-  openCreateDialog,
-})
 </script>
 
 <template>
@@ -251,7 +236,7 @@ defineExpose({
                 <v-spacer />
                 <v-chip-group v-model="selectedEnergyTypeFilters" multiple filter class="pr-1" selected-class="filter-chip-selected">
                   <v-chip
-                    v-for="energyType in energyTypes"
+                    v-for="energyType in allowedEnergyTypes"
                     :key="energyType"
                     :value="energyType"
                     filter
@@ -281,12 +266,12 @@ defineExpose({
       </v-col>
 
       <v-col cols="12" md="4" xl="6">
-        <EnergyStatisticsCard
+        <!-- <EnergyStatisticsCard
           :vehicle-id="vehicleId"
           :allowed-energy-types="energyTypes"
           :energystats="energystats"
           :stats-loading="statsLoading"
-        />
+        /> -->
       </v-col>
     </v-row>
   </template>
@@ -300,7 +285,14 @@ defineExpose({
     </v-infinite-scroll>
   </template>
 
-  <EnergyEntryDialog v-model="showEntryDialog" :entry="editingEntry" :vehicle-id="vehicleId" @saved="onEntrySaved" />
+  <EnergyEntryDialog
+    :model-value="showEntryDialog"
+    :vehicleId="vehicleId"
+    :entry="selectedEntry"
+    :allowedEnergyTypes="allowedEnergyTypes"
+    @update:model-value="val => !val && closeDialog()"
+    @saved="onEntrySaved"
+  />
 
   <DeleteDialog
     item-to-delete="fuel entry"

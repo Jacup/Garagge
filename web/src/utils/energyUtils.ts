@@ -1,4 +1,4 @@
-import { EnergyType } from '@/api/generated/apiV1.schemas'
+import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
 import {} from '@/api/generated/apiV1.schemas'
 
 export function energyUtils() {
@@ -26,8 +26,30 @@ export function energyUtils() {
     }
   }
 
+  const getDefaultUnitForEnergyType = (type: EnergyType) => {
+    switch (type) {
+      case EnergyType.Gasoline:
+        return EnergyUnit.Liter
+      case EnergyType.Diesel:
+        return EnergyUnit.Liter
+      case EnergyType.LPG:
+        return EnergyUnit.Liter
+      case EnergyType.Ethanol:
+        return EnergyUnit.Liter
+      case EnergyType.Biofuel:
+        return EnergyUnit.Liter
+      case EnergyType.CNG:
+        return EnergyUnit.CubicMeter
+      case EnergyType.Hydrogen:
+        return EnergyUnit.CubicMeter
+      case EnergyType.Electric:
+        return EnergyUnit.kWh
+    }
+  }
+
   return {
     getFuelIcon,
     getFuelColor,
+    getDefaultUnitForEnergyType,
   }
 }
