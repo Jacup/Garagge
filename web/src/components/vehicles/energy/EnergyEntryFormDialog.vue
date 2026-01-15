@@ -5,7 +5,6 @@ import { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 
-// API Error Response interfaces
 interface ApiError {
   code: string
   description: string
@@ -21,7 +20,6 @@ interface ApiErrorResponse {
   traceId?: string
 }
 
-// Energy type labels mapping
 const ENERGY_TYPE_LABELS: Record<EnergyType, string> = {
   [EnergyType.Gasoline]: 'Gasoline',
   [EnergyType.Diesel]: 'Diesel',
@@ -62,18 +60,18 @@ const props = defineProps<Props>()
 const availableEnergyTypeOptions = computed(() => {
   if (!props.allowedEnergyTypes || props.allowedEnergyTypes.length === 0) {
     // Fallback to all energy types if no allowed types specified
-    return Object.values(EnergyType).map(type => ({
+    return Object.values(EnergyType).map((type) => ({
       title: ENERGY_TYPE_LABELS[type],
-      value: type
+      value: type,
     }))
   }
 
   // Filter to only show allowed energy types
   return props.allowedEnergyTypes
-    .filter(type => Object.values(EnergyType).includes(type as EnergyType))
-    .map(type => ({
+    .filter((type) => Object.values(EnergyType).includes(type as EnergyType))
+    .map((type) => ({
       title: ENERGY_TYPE_LABELS[type as EnergyType],
-      value: type as EnergyType
+      value: type as EnergyType,
     }))
 })
 
@@ -144,25 +142,32 @@ watch(
 )
 
 // Automatyczna zmiana jednostki po zmianie typu energii
-watch(() => form.value.type, (newType) => {
-  if (!newType) return
-  const defaultUnit = defaultUnitMap[newType]
-  if (defaultUnit) {
-    form.value.energyUnit = defaultUnit
-  }
-})
+watch(
+  () => form.value.type,
+  (newType) => {
+    if (!newType) return
+    const defaultUnit = defaultUnitMap[newType]
+    if (defaultUnit) {
+      form.value.energyUnit = defaultUnit
+    }
+  },
+)
 
 // Watch for changes in allowed energy types - reset form type if no longer allowed
-watch(() => props.allowedEnergyTypes, (newAllowedTypes) => {
-  if (!newAllowedTypes || !form.value.type) return
+watch(
+  () => props.allowedEnergyTypes,
+  (newAllowedTypes) => {
+    if (!newAllowedTypes || !form.value.type) return
 
-  // Check if current selected type is still allowed
-  if (!newAllowedTypes.includes(form.value.type)) {
-    // Reset to first available type or empty if none available
-    const firstAvailable = availableEnergyTypeOptions.value[0]?.value
-    form.value.type = firstAvailable || ('' as EnergyType)
-  }
-}, { deep: true })
+    // Check if current selected type is still allowed
+    if (!newAllowedTypes.includes(form.value.type)) {
+      // Reset to first available type or empty if none available
+      const firstAvailable = availableEnergyTypeOptions.value[0]?.value
+      form.value.type = firstAvailable || ('' as EnergyType)
+    }
+  },
+  { deep: true },
+)
 
 const clearErrors = () => {
   apiErrors.value = []
@@ -230,7 +235,7 @@ async function handleSave() {
 
 defineExpose({
   setApiError,
-  clearErrors
+  clearErrors,
 })
 </script>
 
@@ -254,7 +259,7 @@ defineExpose({
 
         <v-form ref="formRef" v-model="isFormValid" lazy-validation @submit.prevent="handleSave">
           <v-container class="form-container pa-4">
-            <v-row class="mb-2" align="center" justify="center">
+            <v-row class="mb-2" justify="center">
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="form.date"
@@ -310,7 +315,7 @@ defineExpose({
                 <v-select
                   v-model="form.energyUnit"
                   label="Unit"
-                  :items="form.type === 'Electric' ? ['kWh'] : energyUnitOptions.filter(u => u !== 'kWh')"
+                  :items="form.type === 'Electric' ? ['kWh'] : energyUnitOptions.filter((u) => u !== 'kWh')"
                   :disabled="form.type === 'Electric'"
                   variant="outlined"
                   density="comfortable"

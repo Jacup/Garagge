@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue' // Dodane onUnmounted
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 
 import { getServiceRecords } from '@/api/generated/service-records/service-records'
@@ -124,7 +124,6 @@ defineExpose({
 </script>
 
 <template>
-  <div class="h-100 position-relative">
     <template v-if="!isMobile">
       <v-row>
         <v-col cols="6" sm="6" md="3">
@@ -190,13 +189,13 @@ defineExpose({
 
       <v-row>
         <v-col cols="12">
-          <v-card class="service-records" variant="flat">
+          <v-card variant="flat">
             <v-alert v-if="error" type="error" density="compact" class="mb-4" closable>
               {{ error }}
             </v-alert>
             <ServiceRecordsTable
               :items="serviceRecords"
-              :items-length="serviceRecordsTotal"
+              :totalCount="serviceRecordsTotal"
               :loading="serviceRecordsLoading"
               :page="serviceRecordsPage"
               :items-per-page="serviceRecordsPageSize"
@@ -234,7 +233,6 @@ defineExpose({
       :vehicle-id="vehicleId"
       @refresh-data="loadServiceRecords"
     />
-  </div>
 </template>
 
 <style scoped>

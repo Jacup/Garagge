@@ -3,20 +3,16 @@ import { computed } from 'vue'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 import { useFormatting } from '@/composables/useFormatting'
 import { useServiceItemState } from '@/composables/vehicles/useServiceItemState'
+import RecordInfo from '@/components/common/RecordInfo.vue'
 
 const props = defineProps<{
   record: ServiceRecordDto | null
 }>()
 
-const { formatCurrency, formatDate, formatMileage, formatDateTime } = useFormatting()
+const { formatCurrency, formatDate, formatMileage } = useFormatting()
 
 const itemState = useServiceItemState()
 const itemCount = computed(() => props.record?.serviceItems.length ?? 0)
-
-const wasUpdated = computed(() => {
-  if (!props.record) return false
-  return props.record.createdDate !== props.record.updatedDate
-})
 </script>
 
 <template>
@@ -90,7 +86,13 @@ const wasUpdated = computed(() => {
                     </template>
 
                     <v-list density="compact" width="150" class="menu-container pa-1" rounded="md-16px">
-                      <v-list-item class="menu-item" rounded="md-medium" prepend-icon="mdi-pencil-outline" title="Edit" @click="itemState.edit(item, record.id)"></v-list-item>
+                      <v-list-item
+                        class="menu-item"
+                        rounded="md-medium"
+                        prepend-icon="mdi-pencil-outline"
+                        title="Edit"
+                        @click="itemState.edit(item, record.id)"
+                      ></v-list-item>
 
                       <v-list-item
                         class="menu-item text-error"
@@ -107,21 +109,7 @@ const wasUpdated = computed(() => {
           </template>
         </v-list>
 
-        <div class="text-center text-caption text-medium-emphasis d-flex flex-column gap-2 pb-4">
-          <div class="audit-info">
-            <div class="d-flex justify-center align-center">
-              <v-icon icon="mdi-clock-plus-outline" size="small" class="mr-1 opacity-70" />
-              <span>Created: {{ formatDateTime(record.createdDate) }}</span>
-            </div>
-
-            <div v-if="wasUpdated" class="d-flex justify-center align-center mt-1 text-medium-emphasis">
-              <v-icon icon="mdi-clock-edit-outline" size="small" class="mr-1 opacity-70" />
-              <span>Updated: {{ formatDateTime(record.updatedDate) }}</span>
-            </div>
-          </div>
-
-          <div class="font-mono text-disabled opacity-70 mt-2" style="font-size: 0.7rem">ID: {{ record.id }}</div>
-        </div>
+        <RecordInfo :created-date="record.createdDate" :updated-date="record.updatedDate" :id="record.id" />
       </div>
     </template>
   </div>
