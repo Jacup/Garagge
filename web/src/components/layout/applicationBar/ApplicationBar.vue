@@ -114,19 +114,13 @@ const appBarType = computed(() => {
 
     <v-app-bar-title class="ma-0">{{ appBarState.title }}</v-app-bar-title>
 
-    <v-btn
-      v-if="appBarState.actions.length >= 1"
-      :icon="appBarState.actions[0].icon"
-      variant="text"
-      @click="appBarState.actions[0].action"
-    />
+    <v-btn v-if="appBarState.actions.length >= 1" icon variant="text" @click="appBarState.actions[0].action">
+      <v-icon size="24">{{ appBarState.actions[0].icon }}</v-icon>
+    </v-btn>
 
-    <v-btn
-      v-if="appBarState.actions.length === 2"
-      :icon="appBarState.actions[1].icon"
-      variant="text"
-      @click="appBarState.actions[1].action"
-    />
+    <v-btn v-if="appBarState.actions.length === 2" icon variant="text" @click="appBarState.actions[1].action">
+      <v-icon size="24">{{ appBarState.actions[1].icon }}</v-icon>
+    </v-btn>
 
     <v-btn v-if="appBarState.actions.length >= 3" icon variant="text">
       <v-icon size="24">mdi-dots-vertical</v-icon>
