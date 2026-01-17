@@ -43,10 +43,6 @@ defineExpose({
   </v-navigation-drawer>
 
   <template v-else-if="mode === 'mobile'">
-    <v-navigation-drawer v-model="drawer" temporary @update:model-value="handleDrawerUpdate">
-      <DrawerNavigation @navigate="handleNavigate" />
-    </v-navigation-drawer>
-
     <BottomNavigation />
   </template>
 </template>

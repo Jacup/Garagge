@@ -39,7 +39,12 @@ const routes = [
     path: '/vehicles/:id',
     name: 'VehicleView',
     component: VehicleView,
-    meta: { requiresAuth: true },
+    meta: {
+      requiresAuth: true,
+      appBar: {
+        type: 'context',
+      },
+    },
   },
   {
     path: '/vehicles/:id/services/add',
