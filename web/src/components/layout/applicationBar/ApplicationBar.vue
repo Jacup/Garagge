@@ -2,6 +2,7 @@
 import { useTheme } from 'vuetify'
 import { useRoute } from 'vue-router'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+import { useAppBar } from '@/composables/useAppBar'
 import { useSettingsStore } from '@/stores/settings'
 import AccountMenu from '@/components/layout/applicationBar/AccountMenu.vue'
 import SearchBox from '@/components/layout/applicationBar/SearchBox.vue'
@@ -71,8 +72,12 @@ const handleSearch = (query: string) => {
 
 const route = useRoute()
 const { mode } = useResponsiveLayout()
+const { state: appBarState } = useAppBar()
 
 const appBarType = computed(() => {
+  if (appBarState.value.type === 'context') {
+    return 'context'
+  }
   return (route.meta?.appBar as { type: 'search' | 'context' } | undefined)?.type ?? 'search'
 })
 </script>
@@ -81,7 +86,7 @@ const appBarType = computed(() => {
   <v-app-bar v-if="mode === 'desktop' || mode === 'tablet'" flat floating class="header-desktop" :height="80">
     <div class="navbar-wrapper">
       <div class="searchbar-container">
-        <SearchBox @search="handleSearch"/>
+        <SearchBox @search="handleSearch" />
       </div>
 
       <v-spacer />
@@ -103,14 +108,38 @@ const appBarType = computed(() => {
   </v-app-bar>
 
   <v-app-bar v-else-if="mode === 'mobile' && appBarType === 'context'" class="header-mobile" flat>
-    <v-btn icon variant="text">
+    <v-btn icon variant="text" @click="$router.back()">
       <v-icon size="24">mdi-arrow-left</v-icon>
     </v-btn>
 
-    <v-app-bar-title class="ma-0">Title</v-app-bar-title>
+    <v-app-bar-title class="ma-0">{{ appBarState.title }}</v-app-bar-title>
 
-    <v-btn icon variant="text">
+    <v-btn
+      v-if="appBarState.actions.length >= 1"
+      :icon="appBarState.actions[0].icon"
+      variant="text"
+      @click="appBarState.actions[0].action"
+    />
+
+    <v-btn
+      v-if="appBarState.actions.length === 2"
+      :icon="appBarState.actions[1].icon"
+      variant="text"
+      @click="appBarState.actions[1].action"
+    />
+
+    <v-btn v-if="appBarState.actions.length >= 3" icon variant="text">
       <v-icon size="24">mdi-dots-vertical</v-icon>
+      <v-menu activator="parent">
+        <v-list>
+          <v-list-item v-for="action in appBarState.actions.slice(1)" :key="action.icon" @click="action.action">
+            <template #prepend>
+              <v-icon>{{ action.icon }}</v-icon>
+            </template>
+            <v-list-item-title>{{ action.label }}</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </v-btn>
   </v-app-bar>
 </template>

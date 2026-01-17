@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
@@ -11,6 +11,7 @@ import VehicleServiceTab from '@/views/vehicles/tabs/VehicleServiceTab.vue'
 
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
+import { useAppBar } from '@/composables/useAppBar'
 import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
 import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesState'
 
@@ -20,6 +21,7 @@ const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
 const { getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
 const { close: closeServiceDetailsSheet } = useServiceDetailsState()
+const { setContextBar, resetToSearch } = useAppBar()
 
 const energyEntriesState = useEnergyEntriesState()
 const detailsState = useServiceDetailsState()
@@ -87,6 +89,15 @@ async function loadVehicle() {
     error.value = null
     const response = await getApiVehiclesId(vehicleId.value)
     vehicle.value = response
+    setContextBar(`${response.brand} ${response.model}`, [
+      {
+        icon: 'mdi-pencil-outline',
+        label: 'Edit',
+        action: () => {
+          editVehicleDialog.value = true
+        },
+      }
+    ])
     await loadGlobalStats()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
@@ -224,6 +235,10 @@ const updateFabForTab = () => {
 onMounted(async () => {
   await loadVehicle()
   updateFabForTab()
+})
+
+onBeforeUnmount(() => {
+  resetToSearch()
 })
 
 onUnmounted(() => {

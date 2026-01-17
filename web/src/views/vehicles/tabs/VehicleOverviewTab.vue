@@ -42,12 +42,6 @@ async function confirmDelete() {
 <template>
   <template v-if="isMobile">
     <v-row>
-      <v-card variant="flat">
-        <v-card-title>
-          <div class="text-h6 font-weight-bold">{{ vehicle.brand }} {{ vehicle.model }}</div>
-        </v-card-title>
-      </v-card>
-
       <!-- Actions -->
       <v-col cols="12">
         <div class="d-flex flex-wrap ga-2">
