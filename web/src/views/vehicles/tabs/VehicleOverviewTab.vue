@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import type { VehicleDto, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import RecordInfo from '@/components/common/RecordInfo.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
+import StackedButton from '@/components/common/StackedButton.vue'
 
 interface Props {
   vehicle: VehicleDto
@@ -22,6 +24,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const { deleteApiVehiclesId } = getVehicles()
+const { isMobile } = useResponsiveLayout()
 const router = useRouter()
 
 const showDeleteDialog = ref(false)
@@ -37,6 +40,84 @@ async function confirmDelete() {
 </script>
 
 <template>
+  <template v-if="isMobile">
+    <v-row>
+      <v-card variant="flat">
+        <v-card-title>
+          <div class="text-h6 font-weight-bold">{{ vehicle.brand }} {{ vehicle.model }}</div>
+        </v-card-title>
+      </v-card>
+
+      <!-- Actions -->
+      <v-col cols="12">
+        <div class="d-flex flex-wrap ga-2">
+          <StackedButton icon="mdi-shield" label="Insurance" disabled/>
+          <StackedButton icon="mdi-bell" label="Reminders" disabled />
+        </div>
+      </v-col>
+
+      <!-- Vehicle details -->
+      <v-col cols="12" class="pt-0">
+        <v-list lines="two">
+          <v-list-item
+            v-if="vehicle.manufacturedYear"
+            class="list-item"
+            prepend-icon="mdi-calendar"
+            :title="vehicle.manufacturedYear"
+            subtitle="Year"
+          />
+          <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
+          <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
+        </v-list>
+      </v-col>
+
+      <!-- Engine details -->
+      <v-col cols="12" class="pt-0">
+        <v-list lines="two">
+          <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
+          <v-list-item
+            v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
+            lines="one"
+            class="list-item"
+            :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
+          >
+            <template #title>
+              <v-chip
+                v-for="energyType in vehicle.allowedEnergyTypes"
+                :key="energyType"
+                class="suggestion-chip mr-2"
+                size="small"
+                variant="flat"
+                >{{ energyType }}</v-chip
+              >
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-col>
+
+      <!-- Settings -->
+      <v-col cols="12">
+        <v-list lines="one" selectable>
+          <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
+          <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
+          <v-list-item
+            class="list-item"
+            prepend-icon="mdi-delete-outline"
+            title="Delete vehicle"
+            base-color="error"
+            @click="() => (showDeleteDialog = true)"
+          />
+        </v-list>
+      </v-col>
+
+      <v-col cols="12">
+        <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
+      </v-col>
+    </v-row>
+  </template>
+
+  <template v-else> </template>
+
   <!-- Enhanced Summary Cards with Material Design Colors -->
   <!-- <section class="summary-section mb-6">
     <v-row>
@@ -143,68 +224,6 @@ async function confirmDelete() {
         </v-card-text>
       </v-card>
     </v-col> -->
-
-    <v-col cols="12" sm="6" class="pb-0">
-      <v-list lines="two">
-        <v-list-item
-          v-if="vehicle.manufacturedYear"
-          class="list-item"
-          prepend-icon="mdi-calendar"
-          :title="vehicle.manufacturedYear"
-          subtitle="Year"
-        />
-        <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
-        <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
-      </v-list>
-    </v-col>
-
-    <v-col cols="12" sm="6" class="pt-0">
-      <v-list lines="two">
-        <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
-        <v-list-item
-          v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
-          lines="one"
-          class="list-item"
-          :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
-        >
-          <template #title>
-            <v-chip
-              v-for="energyType in vehicle.allowedEnergyTypes"
-              :key="energyType"
-              class="suggestion-chip mr-2"
-              size="small"
-              variant="flat"
-              >{{ energyType }}</v-chip
-            >
-          </template>
-        </v-list-item>
-      </v-list>
-    </v-col>
-
-    <v-col cols="12" sm="6">
-      <v-list lines="one">
-        <v-list-item class="list-item" prepend-icon="mdi-shield-outline" title="Insurance" disabled />
-        <v-list-item class="list-item" prepend-icon="mdi-bell-outline" title="Reminders" disabled />
-      </v-list>
-    </v-col>
-
-    <v-col cols="12" sm="6">
-      <v-list lines="one" selectable>
-        <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
-        <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-        <v-list-item
-          class="list-item"
-          prepend-icon="mdi-delete-outline"
-          title="Delete vehicle"
-          base-color="error"
-          @click="() => (showDeleteDialog = true)"
-        />
-      </v-list>
-    </v-col>
-
-    <v-col cols="12">
-      <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
-    </v-col>
   </v-row>
 
   <DeleteDialog

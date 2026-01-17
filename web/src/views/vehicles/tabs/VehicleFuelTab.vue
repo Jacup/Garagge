@@ -9,7 +9,7 @@ import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated
 
 import EnergyEntriesList from '@/components/vehicles/energy/EnergyEntriesList.vue'
 import EnergyEntriesTable from '@/components/vehicles/energy/EnergyEntriesTable.vue'
-import EnergyStatisticsCard from '@/components/vehicles/energy/EnergyStatisticsCard.vue'
+import EnergyStatCard from '@/components/vehicles/energy/EnergyStatCard.vue'
 
 import EnergyEntryDialog from '@/components/vehicles/energy/EnergyEntryDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
@@ -190,88 +190,98 @@ watch(selectedEnergyTypeFilters, () => {
 
 <template>
   <template v-if="!isMobile">
-    <v-row class="mb-4">
-      <v-col cols="6" sm="6" md="3" v-for="i in 4" :key="i">
-        <v-card class="summary-card border-thin" height="110" color="surface-container-low" variant="flat">
-          <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
-            <v-icon icon="mdi-gas-station" size="32" class="position-absolute text-primary opacity-20" style="top: 12px; right: 16px" />
-            <div class="text-caption text-medium-emphasis text-uppercase font-weight-bold mb-1">Total Cost</div>
-            <div class="text-h5 font-weight-bold text-high-emphasis">2 450 PLN</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-
     <v-row class="equal-height-row">
-      <v-col cols="12" md="8" xl="6">
-        <v-card class="table-container pa-3" variant="flat" rounded="md-16px">
-          <div class="topbar-container mb-3">
-            <v-fade-transition mode="out-in" duration="200">
-              <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2" key="context-bar">
-                <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
-                  <template #activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-close" variant="text" density="comfortable" @click="clearSelection" />
-                  </template>
-                </v-tooltip>
+      <v-col cols="12">
+        <v-card class="fuel-card" variant="flat" rounded="md-16px">
+          <v-row class="fuel-container-row no-gutters mx-4 my-4" dense>
+            <div class="table-container-flex">
+              <div class="topbar-container mb-3">
+                <v-fade-transition mode="out-in" duration="200">
+                  <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2" key="context-bar">
+                    <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
+                      <template #activator="{ props }">
+                        <v-btn v-bind="props" icon="mdi-close" variant="text" density="comfortable" @click="clearSelection" />
+                      </template>
+                    </v-tooltip>
 
-                <span class="text-subtitle-2 font-weight-medium ml-2">{{ selectedCount }} selected</span>
+                    <span class="text-subtitle-2 font-weight-medium ml-2">{{ selectedCount }} selected</span>
 
-                <v-spacer />
+                    <v-spacer />
 
-                <v-tooltip text="Delete selected" location="bottom" open-delay="200" close-delay="500">
-                  <template #activator="{ props }">
-                    <v-btn
-                      v-bind="props"
-                      icon="mdi-delete"
-                      variant="text"
-                      color="error"
-                      density="comfortable"
-                      @click="showBulkDeleteDialog = true"
-                    />
-                  </template>
-                </v-tooltip>
+                    <v-tooltip text="Delete selected" location="bottom" open-delay="200" close-delay="500">
+                      <template #activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          icon="mdi-delete"
+                          variant="text"
+                          color="error"
+                          density="comfortable"
+                          @click="showBulkDeleteDialog = true"
+                        />
+                      </template>
+                    </v-tooltip>
+                  </div>
+
+                  <div v-else class="d-flex justify-space-between align-center w-100" key="standard-bar">
+                    <v-spacer />
+                    <v-chip-group v-model="selectedEnergyTypeFilters" multiple filter class="pr-1" selected-class="filter-chip-selected">
+                      <v-chip
+                        v-for="energyType in allowedEnergyTypes"
+                        :key="energyType"
+                        :value="energyType"
+                        filter
+                        variant="outlined"
+                        class="filter-chip"
+                      >
+                        {{ energyType }}
+                      </v-chip>
+                    </v-chip-group>
+                  </div>
+                </v-fade-transition>
               </div>
 
-              <div v-else class="d-flex justify-space-between align-center w-100" key="standard-bar">
-                <v-spacer />
-                <v-chip-group v-model="selectedEnergyTypeFilters" multiple filter class="pr-1" selected-class="filter-chip-selected">
-                  <v-chip
-                    v-for="energyType in allowedEnergyTypes"
-                    :key="energyType"
-                    :value="energyType"
-                    filter
-                    variant="outlined"
-                    class="filter-chip"
-                  >
-                    {{ energyType }}
-                  </v-chip>
-                </v-chip-group>
-              </div>
-            </v-fade-transition>
-          </div>
+              <EnergyEntriesTable
+                :items="energyEntries"
+                :total-count="totalCount"
+                :loading="energyEntriesLoading"
+                :page="page"
+                :items-per-page="itemsPerPage"
+                v-model:selectedIds="selectedEntryIds"
+                @update:page="handlePageChange"
+                @update:items-per-page="handlePageSizeChange"
+                @edit="openEditDialog"
+                @delete="(item) => openSingleDeleteDialog(item.id)"
+              />
+            </div>
 
-          <EnergyEntriesTable
-            :items="energyEntries"
-            :total-count="totalCount"
-            :loading="energyEntriesLoading"
-            :page="page"
-            :items-per-page="itemsPerPage"
-            v-model:selectedIds="selectedEntryIds"
-            @update:page="handlePageChange"
-            @update:items-per-page="handlePageSizeChange"
-            @edit="openEditDialog"
-            @delete="(item) => openSingleDeleteDialog(item.id)"
-          />
+            <div class="statistics-container-flex">
+              <v-row>
+                <v-col cols="6">
+                  <EnergyStatCard
+                    title="Average Consumption"
+                    title-prepend-icon="mdi-gauge"
+                    subtitle="This year"
+                    value="8.2"
+                    value-append="L/100km"
+                    trend-icon="mdi-arrow-bottom-right"
+                    trend="-0.5%"
+                  />
+                </v-col>
+                <v-col cols="6">
+                  <EnergyStatCard
+                    title="Average Consumption"
+                    title-prepend-icon="mdi-gauge"
+                    subtitle="This year"
+                    value="8"
+                    value-append="L/100km"
+                    trend-icon="mdi-arrow-bottom-right"
+                    trend="+10%"
+                  />
+                </v-col>
+              </v-row>
+            </div>
+          </v-row>
         </v-card>
-      </v-col>
-
-      <v-col cols="12" md="4" xl="6">
-        <!-- <EnergyStatisticsCard
-          :vehicle-id="vehicleId"
-          :allowed-energy-types="energyTypes"
-          :energystats="energystats"
-          :stats-loading="statsLoading"
-        /> -->
       </v-col>
     </v-row>
   </template>
@@ -290,7 +300,7 @@ watch(selectedEnergyTypeFilters, () => {
     :vehicleId="vehicleId"
     :entry="selectedEntry"
     :allowedEnergyTypes="allowedEnergyTypes"
-    @update:model-value="val => !val && closeDialog()"
+    @update:model-value="(val) => !val && closeDialog()"
     @saved="onEntrySaved"
   />
 
@@ -308,12 +318,40 @@ watch(selectedEnergyTypeFilters, () => {
   />
 </template>
 
-<style scoped>
-.table-container {
+<style scoped lang="scss">
+.fuel-card {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
   border-radius: 8px;
 }
 
+.fuel-container-row {
+  display: flex;
+  flex-wrap: wrap; // Pozwala na spadnięcie statystyk pod tabelę na mobile
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.table-container-flex {
+  flex: 1 1 65%;
+  min-width: 600px;
+  max-width: 1400px;
+
+  @media (max-width: 960px) {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+}
+
+.statistics-container-flex {
+  // Zajmuje resztę miejsca (ok 35%), ale ma swoje limity
+  flex: 1 1 300px;
+  max-width: 600px;
+
+  @media (max-width: 960px) {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}
 .topbar-container {
   display: flex;
   align-items: center;

@@ -119,7 +119,7 @@ const isSaveDisabled = computed(() => isLoading.value)
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
     :fullscreen="isMobile"
-    :max-width="600"
+    :max-width="560"
     scrollable
     persistent
     transition="dialog-bottom-transition"
@@ -147,7 +147,7 @@ const isSaveDisabled = computed(() => isLoading.value)
     </template>
 
     <template v-else>
-      <v-card :title="dialogTitle" variant="flat" rounded="lg" class="dialog-card">
+      <v-card :title="dialogTitle" variant="flat" class="dialog-card">
         <v-card-text>
           <EnergyEntryForm ref="formComponentRef" v-model="formData" :allowed-energy-types="allowedEnergyTypes" :api-errors="apiErrors" />
         </v-card-text>
@@ -165,19 +165,4 @@ const isSaveDisabled = computed(() => isLoading.value)
 </template>
 
 <style scoped lang="scss">
-.dialog-card {
-  background-color: rgb(var(--v-theme-surface-container-high)) !important;
-
-  :deep(.v-card-title) {
-    color: rgb(var(--v-theme-on-surface)) !important;
-  }
-
-  :deep(.v-card-text) {
-    color: rgb(var(--v-theme-on-surface-variant)) !important;
-  }
-
-  :deep(.v-card-actions) {
-    padding: 0 24px 24px 24px;
-  }
-}
 </style>
