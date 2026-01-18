@@ -53,6 +53,28 @@ async function confirmDelete() {
       <div class="title-container">
         <span class="title">{{ vehicle.brand }} {{ vehicle.model }}</span>
       </div>
+      <div class="hero-actions">
+        <v-btn color="on-surface-variant" icon variant="text">
+          <v-icon size="24">mdi-star-outline</v-icon>
+        </v-btn>
+        <v-btn color="primary" variant="flat">Edit</v-btn>
+        <v-btn color="on-surface-variant" icon variant="text">
+          <v-icon size="24">mdi-dots-vertical</v-icon>
+          <v-menu activator="parent">
+            <v-list>
+              <v-list-item prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
+              <v-list-item prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
+              <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
+              <v-list-item
+                prepend-icon="mdi-delete-outline"
+                title="Delete vehicle"
+                base-color="error"
+                @click="() => (showDeleteDialog = true)"
+              />
+            </v-list>
+          </v-menu>
+        </v-btn>
+      </div>
     </v-col>
 
     <v-col cols="12">
@@ -123,7 +145,7 @@ async function confirmDelete() {
   </v-row>
 
   <v-row>
-    <v-col>
+    <v-col v-if="isMobile">
       <v-list lines="one" selectable>
         <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
         <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
@@ -157,6 +179,7 @@ async function confirmDelete() {
   align-items: center;
   justify-content: flex-start;
   gap: 24px;
+  position: relative;
 
   @media (max-width: 959px) {
     flex-direction: column;
@@ -183,6 +206,16 @@ async function confirmDelete() {
   font-weight: 600;
   line-height: 40px;
   color: rgba(var(--v-theme-on-surface-variant));
+}
+
+.hero-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  /* Opcjonalnie: mały odstęp, żeby nie dotykało krawędzi */
+  margin-top: 12px;
+  margin-right: 12px;
 }
 
 /* Summary cards */
