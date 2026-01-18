@@ -9,7 +9,6 @@ import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import StackedButton from '@/components/common/StackedButton.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
-import { v } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 interface Props {
   vehicle: VehicleDto
@@ -23,6 +22,10 @@ interface Props {
     consumptions: Array<{ value: number | undefined; unit: string }>
   } | null
 }
+
+const emit = defineEmits<{
+  'edit': []
+}>()
 
 const props = defineProps<Props>()
 
@@ -53,18 +56,18 @@ async function confirmDelete() {
       <div class="title-container">
         <span class="title">{{ vehicle.brand }} {{ vehicle.model }}</span>
       </div>
-      <div class="hero-actions">
+      <div v-if="!isMobile" class="hero-actions">
         <v-btn color="on-surface-variant" icon variant="text">
           <v-icon size="24">mdi-star-outline</v-icon>
         </v-btn>
-        <v-btn color="primary" variant="flat">Edit</v-btn>
+        <v-btn color="primary" variant="flat" @click="emit('edit')">Edit</v-btn>
         <v-btn color="on-surface-variant" icon variant="text">
           <v-icon size="24">mdi-dots-vertical</v-icon>
-          <v-menu activator="parent">
+          <v-menu activator="parent" >
             <v-list>
               <v-list-item prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
               <v-list-item prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-              <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
+              <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled/>
               <v-list-item
                 prepend-icon="mdi-delete-outline"
                 title="Delete vehicle"

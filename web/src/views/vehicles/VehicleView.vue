@@ -315,7 +315,7 @@ watch(activeTab, () => {
           :last-entered-mileage="1234"
           :global-stats="globalStats"
           :summary-stats="summaryStats"
-          @edit-vehicle="openEditVehicleDialog"
+          @edit="openEditVehicleDialog"
         />
       </v-window-item>
 

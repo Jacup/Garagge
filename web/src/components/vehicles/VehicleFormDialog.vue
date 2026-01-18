@@ -8,10 +8,7 @@ import type {
   EnergyType,
   NullableOfVehicleType,
 } from '@/api/generated/apiV1.schemas'
-import {
-  EngineType as EngineTypeEnum,
-  EnergyType as EnergyTypeEnum,
-} from '@/api/generated/apiV1.schemas'
+import { EngineType as EngineTypeEnum, EnergyType as EnergyTypeEnum } from '@/api/generated/apiV1.schemas'
 import { getVehicleEnergyTypes } from '@/api/generated/vehicle-energy-types/vehicle-energy-types'
 
 interface ApiError {
@@ -112,10 +109,10 @@ const ENGINE_TYPE_LABELS: Record<EngineType, string> = {
 }
 
 const VEHICLE_TYPE_LABELS: Record<string, string> = {
-  'Bus': 'Bus',
-  'Car': 'Car',
-  'Motorbike': 'Motorbike',
-  'Truck': 'Truck',
+  Bus: 'Bus',
+  Car: 'Car',
+  Motorbike: 'Motorbike',
+  Truck: 'Truck',
 }
 
 const createEnergyTypeOptions = (energyTypes: EnergyType[]) => energyTypes.map((type) => ({ label: ENERGY_TYPE_LABELS[type], value: type }))
@@ -125,8 +122,10 @@ const engineTypeOptions: { label: string; value: EngineType }[] = Object.entries
   value: value as EngineType,
 }))
 
-const vehicleTypeOptions: { label: string; value: NullableOfVehicleType }[] = Object.entries(VEHICLE_TYPE_LABELS)
-  .map(([value, label]) => ({ label, value: value as NullableOfVehicleType }))
+const vehicleTypeOptions: { label: string; value: NullableOfVehicleType }[] = Object.entries(VEHICLE_TYPE_LABELS).map(([value, label]) => ({
+  label,
+  value: value as NullableOfVehicleType,
+}))
 
 async function fetchSupportedEnergyTypes(engineType: EngineType) {
   try {
@@ -158,15 +157,11 @@ function populateFormWithVehicle(vehicle: VehicleDto) {
 
 watch(
   () => props.vehicle,
-  async (newVehicle) => {
+  (newVehicle) => {
     if (newVehicle) {
       isLoadingVehicle.value = true
       isEditMode.value = true
       populateFormWithVehicle(newVehicle)
-
-      if (newVehicle.engineType) {
-        await fetchSupportedEnergyTypes(newVehicle.engineType)
-      }
       isLoadingVehicle.value = false
     } else {
       isEditMode.value = false
@@ -179,7 +174,7 @@ watch(
 watch(
   () => formData.engineType,
   async (newEngineType, oldEngineType) => {
-    if (oldEngineType === undefined || isLoadingVehicle.value) return
+    if (oldEngineType === undefined || isLoadingVehicle.value || !props.isOpen) return
 
     if (newEngineType && newEngineType !== oldEngineType) {
       formData.energyTypes = []
@@ -196,8 +191,24 @@ watch(
   async (isOpen) => {
     if (isOpen) {
       await nextTick()
-      form.value?.resetValidation()
       clearErrors()
+
+      if (props.vehicle) {
+        isLoadingVehicle.value = true
+        isEditMode.value = true
+
+        populateFormWithVehicle(props.vehicle)
+
+        if (formData.engineType) {
+          await fetchSupportedEnergyTypes(formData.engineType)
+        }
+
+        isLoadingVehicle.value = false
+      } else {
+        isEditMode.value = false
+        resetForm()
+        form.value?.resetValidation()
+      }
     }
   },
 )
