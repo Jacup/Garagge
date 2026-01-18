@@ -7,6 +7,9 @@ import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import RecordInfo from '@/components/common/RecordInfo.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import StackedButton from '@/components/common/StackedButton.vue'
+import StatCard from '@/components/dashboard/StatCard.vue'
+import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
+import { v } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 interface Props {
   vehicle: VehicleDto
@@ -40,184 +43,103 @@ async function confirmDelete() {
 </script>
 
 <template>
-  <template v-if="isMobile">
-    <v-row>
-      <!-- Actions -->
-      <v-col cols="12">
-        <div class="d-flex flex-wrap ga-2">
-          <StackedButton icon="mdi-shield" label="Insurance" disabled/>
-          <StackedButton icon="mdi-bell" label="Reminders" disabled />
-        </div>
-      </v-col>
+  <v-row>
+    <v-col cols="12" class="hero-container">
+      <div class="image-container">
+        <v-icon size="64">mdi-image-off-outline</v-icon>
+        <span>No image available</span>
+      </div>
 
-      <!-- Vehicle details -->
-      <v-col cols="12" class="pt-0">
-        <v-list lines="two">
-          <v-list-item
-            v-if="vehicle.manufacturedYear"
-            class="list-item"
-            prepend-icon="mdi-calendar"
-            :title="vehicle.manufacturedYear"
-            subtitle="Year"
-          />
-          <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
-          <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
-        </v-list>
-      </v-col>
+      <div class="title-container">
+        <span class="title">{{ vehicle.brand }} {{ vehicle.model }}</span>
+      </div>
+    </v-col>
 
-      <!-- Engine details -->
-      <v-col cols="12" class="pt-0">
-        <v-list lines="two">
-          <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
-          <v-list-item
-            v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
-            lines="one"
-            class="list-item"
-            :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
-          >
-            <template #title>
-              <v-chip
-                v-for="energyType in vehicle.allowedEnergyTypes"
-                :key="energyType"
-                class="suggestion-chip mr-2"
-                size="small"
-                variant="flat"
-                >{{ energyType }}</v-chip
-              >
-            </template>
-          </v-list-item>
-        </v-list>
-      </v-col>
+    <v-col cols="12">
+      <div class="d-flex align-start ga-2">
+        <StackedButton icon="mdi-shield" label="Insurance" disabled />
+        <StackedButton icon="mdi-bell" label="Reminders" disabled />
+        <StackedButton icon="mdi-calendar" label="Plan" disabled />
+        <v-divider v-if="!isMobile" class="flex-grow-1" style="margin-top: 28px"></v-divider>
+      </div>
+    </v-col>
+  </v-row>
+  <v-row>
+    <v-col cols="12" md="5" lg="4">
+      <v-list lines="two">
+        <v-list-item
+          v-if="vehicle.manufacturedYear"
+          class="list-item"
+          prepend-icon="mdi-calendar"
+          :title="vehicle.manufacturedYear"
+          subtitle="Year"
+        />
+        <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
+        <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
+      </v-list>
 
-      <!-- Settings -->
-      <v-col cols="12">
-        <v-list lines="one" selectable>
-          <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
-          <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-          <v-list-item
-            class="list-item"
-            prepend-icon="mdi-delete-outline"
-            title="Delete vehicle"
-            base-color="error"
-            @click="() => (showDeleteDialog = true)"
-          />
-        </v-list>
-      </v-col>
+      <v-list lines="two">
+        <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
+        <v-list-item
+          v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
+          lines="one"
+          class="list-item"
+          :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
+        >
+          <template #title>
+            <v-chip
+              v-for="energyType in vehicle.allowedEnergyTypes"
+              :key="energyType"
+              class="suggestion-chip mr-2"
+              size="small"
+              variant="flat"
+              >{{ energyType }}</v-chip
+            >
+          </template>
+        </v-list-item>
+      </v-list>
+    </v-col>
 
-      <v-col cols="12">
-        <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
-      </v-col>
-    </v-row>
-  </template>
+    <v-col>
+      <v-row>
+        <v-col cols="6">
+          <StatCard title="Fuel Expenses" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+        </v-col>
+        <v-col cols="6">
+          <StatCard title="Last Mileage" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+        </v-col>
+        <v-col cols="6">
+          <StatCard title="Avg. Consumption" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+        </v-col>
+        <v-col cols="6">
+          <StatCard title="Total Entries" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+        </v-col>
 
-  <template v-else> </template>
+        <v-col cols="12">
+          <v-card variant="flat" color="red" height="250px">recent activity</v-card>
+        </v-col>
+      </v-row>
+    </v-col>
+  </v-row>
 
-  <!-- Enhanced Summary Cards with Material Design Colors -->
-  <!-- <section class="summary-section mb-6">
-    <v-row>
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="summary-card" height="120" color="primary-container" variant="flat">
-          <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
-            <v-icon
-              icon="mdi-gas-station"
-              size="32"
-              class="position-absolute text-primary"
-              style="top: 12px; right: 16px; opacity: 0.6"
-            />
-            <div class="text-caption text-on-primary-container">Fuel Type</div>
-            <div class="text-h6 font-weight-bold text-on-primary-container">{{ vehicle?.engineType || 'N/A' }}</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="summary-card" height="120" color="secondary-container" variant="flat">
-          <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
-            <v-icon
-              icon="mdi-speedometer"
-              size="32"
-              class="position-absolute text-secondary"
-              style="top: 12px; right: 16px; opacity: 0.6"
-            />
-            <div class="text-caption text-on-secondary-container">Last entered mileage</div>
-            <div class="text-h6 font-weight-bold text-on-secondary-container">
-              {{ lastEnteredMileage !== null ? lastEnteredMileage.toLocaleString() : 'N/A' }}
-              <span v-if="lastEnteredMileage !== null" class="text-body-2">km</span>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="summary-card" height="120" color="tertiary-container" variant="flat">
-          <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
-            <v-icon
-              icon="mdi-currency-usd"
-              size="32"
-              class="position-absolute text-tertiary"
-              style="top: 12px; right: 16px; opacity: 0.6"
-            />
-            <div class="text-caption text-on-tertiary-container">Total fuel cost</div>
-            <div class="text-h6 font-weight-bold text-on-tertiary-container">
-              ${{ globalStats ? globalStats.totalCost.toFixed(2) : 'N/A' }}
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-
-      <v-col cols="12" sm="6" md="3">
-        <v-card class="summary-card" height="120" color="surface-container" variant="flat">
-          <v-card-text class="d-flex flex-column justify-center h-100 position-relative">
-            <v-icon icon="mdi-car-info" size="32" class="position-absolute text-primary" style="top: 12px; right: 16px; opacity: 0.6" />
-            <div class="text-caption text-on-surface">Avg. Consumption</div>
-            <div v-if="summaryStats && summaryStats.consumptions.length > 0" class="consumption-values">
-              <div v-for="(consumption, index) in summaryStats.consumptions" :key="index" class="consumption-item">
-                <span class="text-h6 font-weight-bold text-on-surface">{{ consumption.value?.toFixed(2) }}</span>
-                <span class="text-body-2 text-on-surface ml-1">{{ consumption.unit }}</span>
-              </div>
-            </div>
-            <div v-else class="text-h6 font-weight-bold text-on-surface">N/A</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </section> -->
-
-  <v-row class="equal-height-row">
-    <!-- <v-col cols="12" md="4">
-      <v-card class="card-background" variant="flat" rounded="md-16px" height="260px">
-        <template #title>{{ vehicle?.brand }} {{ vehicle?.model }}</template>
-        <template #append>
-          <v-btn prepend-icon="mdi-pencil" variant="flat" color="primary" @click="emit('edit-vehicle')">Edit</v-btn>
-        </template>
-        <template #subtitle>
-          <v-chip variant="tonal" size="small" density="comfortable" rounded="lg">
-            {{ vehicle?.engineType }}
-          </v-chip>
-        </template>
-        <v-card-text>
-          <div class="details-items-container">
-            <VehicleDetailItem icon="mdi-calendar" label="Year" :value="vehicle?.manufacturedYear ? vehicle.manufacturedYear : 'N/A'" />
-            <v-spacer />
-            <VehicleDetailItem icon="mdi-car" label="Type" :value="vehicle?.type ? vehicle.type : 'N/A'" />
-            <v-spacer />
-          </div>
-          <v-divider class="my-3" />
-          <div class="details-items-container">
-            <VehicleDetailItem icon="mdi-pound" label="VIN" :value="vehicle?.vin ? vehicle.vin : 'N/A'" />
-          </div>
-        </v-card-text>
-      </v-card>
-    </v-col> -->
-
-    <!-- <v-col cols="12" md="8">
-      <v-card class="card-background vehicle-image-card" variant="flat" rounded="md-16px" height="260px">
-        <v-card-text class="image-placeholder">
-          <v-icon size="64">mdi-image-off-outline</v-icon>
-          <span>No image available</span>
-        </v-card-text>
-      </v-card>
-    </v-col> -->
+  <v-row>
+    <v-col>
+      <v-list lines="one" selectable>
+        <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
+        <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
+        <v-list-item class="list-item" prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
+        <v-list-item
+          class="list-item"
+          prepend-icon="mdi-delete-outline"
+          title="Delete vehicle"
+          base-color="error"
+          @click="() => (showDeleteDialog = true)"
+        />
+      </v-list>
+    </v-col>
+    <v-col cols="12">
+      <RecordInfo :created-date="vehicle.createdDate!" :updated-date="vehicle.updatedDate!" :id="vehicle.id!" />
+    </v-col>
   </v-row>
 
   <DeleteDialog
@@ -228,7 +150,41 @@ async function confirmDelete() {
   />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+.hero-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+
+  @media (max-width: 959px) {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.image-container {
+  width: 350px;
+  height: 200px;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed rgba(var(--v-theme-on-surface-variant), 0.38);
+  border-radius: 28px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  color: rgba(var(--v-theme-on-surface-variant));
+}
+
 /* Summary cards */
 .summary-card {
   border-radius: 16px;
