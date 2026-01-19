@@ -4,7 +4,7 @@ export function useFormatting() {
     return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined | null) => {
     if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('pl-PL', {
       year: 'numeric',

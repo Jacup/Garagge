@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
-import type { VehicleDto, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, EnergyStatsDto, VehicleStatsDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import RecordInfo from '@/components/common/RecordInfo.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import StackedButton from '@/components/common/StackedButton.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
-import VehicleDetailItem from '@/components/vehicles/VehicleDetailItem.vue'
+import { useFormatting } from '@/composables/useFormatting'
 
 interface Props {
   vehicle: VehicleDto
@@ -24,14 +24,33 @@ interface Props {
 }
 
 const emit = defineEmits<{
-  'edit': []
+  edit: []
 }>()
 
 const props = defineProps<Props>()
 
-const { deleteApiVehiclesId } = getVehicles()
+const { deleteApiVehiclesId, getApiVehiclesIdStats } = getVehicles()
 const { isMobile } = useResponsiveLayout()
 const router = useRouter()
+const { formatDate } = useFormatting()
+
+const statsLoading = ref(false)
+const vehicleStats = ref<VehicleStatsDto | null>(null)
+
+async function loadVehicleStats() {
+  if (!props.vehicle.id) return
+
+  try {
+    statsLoading.value = true
+    const response = await getApiVehiclesIdStats(props.vehicle.id)
+    vehicleStats.value = response
+  } catch (err) {
+    console.error('Failed to load vehicle stats:', err)
+    vehicleStats.value = null
+  } finally {
+    statsLoading.value = false
+  }
+}
 
 const showDeleteDialog = ref(false)
 
@@ -43,6 +62,10 @@ async function confirmDelete() {
   await deleteApiVehiclesId(props.vehicle.id)
   router.push({ name: 'Vehicles' })
 }
+
+onMounted(() => {
+  loadVehicleStats()
+})
 </script>
 
 <template>
@@ -63,11 +86,11 @@ async function confirmDelete() {
         <v-btn color="primary" variant="flat" @click="emit('edit')">Edit</v-btn>
         <v-btn color="on-surface-variant" icon variant="text">
           <v-icon size="24">mdi-dots-vertical</v-icon>
-          <v-menu activator="parent" >
+          <v-menu activator="parent">
             <v-list>
               <v-list-item prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
               <v-list-item prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-              <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled/>
+              <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
               <v-list-item
                 prepend-icon="mdi-delete-outline"
                 title="Delete vehicle"
@@ -128,18 +151,37 @@ async function confirmDelete() {
     <v-col>
       <v-row>
         <v-col cols="6">
-          <StatCard title="Fuel Expenses" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+          <StatCard
+            title="Total fuel cost"
+            :metric="{ value: `${vehicleStats?.totalFuelCost ?? 0} zł` }"
+            icon="mdi-gas-station"
+            accent-color="primary"
+          />
         </v-col>
         <v-col cols="6">
-          <StatCard title="Last Mileage" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+          <StatCard
+            title="Last entered mileage"
+            :metric="{ value: `${vehicleStats?.lastMileage ?? 0} km`}"
+            icon="mdi-gauge"
+            accent-color="secondary"
+          />
         </v-col>
         <v-col cols="6">
-          <StatCard title="Avg. Consumption" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+          <StatCard
+            title="Total service cost"
+            :metric="{ value: `${vehicleStats?.totalServicesCost ?? 0} zł` }"
+            icon="mdi-wrench"
+            accent-color="error"
+          />
         </v-col>
         <v-col cols="6">
-          <StatCard title="Total Entries" metric="fuelExpenses" icon="mdi-gas-station" accent-color="primary" />
+          <StatCard
+            title="Last fuel entry date"
+            :metric="{ value: `${formatDate(vehicleStats?.lastFuelEntryDate) ?? `-`}` }"
+            icon="mdi-calendar-check"
+            accent-color="tertiary"
+          />
         </v-col>
-
         <v-col cols="12">
           <v-card variant="flat" color="red" height="250px">recent activity</v-card>
         </v-col>
