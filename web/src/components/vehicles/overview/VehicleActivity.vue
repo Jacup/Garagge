@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { TimelineActivityDto, ActivityType } from '@/api/generated/apiV1.schemas'
+import type { VehicleActivityDto, ActivityType } from '@/api/generated/apiV1.schemas'
 import { ActivityType as ActivityTypeEnum } from '@/api/generated/apiV1.schemas'
 import { useFormatting } from '@/composables/useFormatting'
 
 defineProps<{
-  recentActivity: TimelineActivityDto[]
+  vehicleActivities: VehicleActivityDto[]
 }>()
 
 const { formatDateOnly, formatCurrencyString } = useFormatting()
@@ -43,21 +43,21 @@ const getActivityColor = (type: ActivityType): string => {
   }
 }
 
-const getActivityTitle = (activity: TimelineActivityDto): string => {
+const getActivityTitle = (activity: VehicleActivityDto): string => {
   switch (activity.type) {
     case ActivityTypeEnum.VehicleAdded:
-      return `${activity.vehicle} - Added`
+      return `Vehicle Created`
     case ActivityTypeEnum.VehicleUpdated:
-      return `${activity.vehicle} - Updated`
+      return `Vehicle Updated`
     case ActivityTypeEnum.Refuel:
-      return `${activity.vehicle} - Refuel`
+      return `Refuel`
     case ActivityTypeEnum.Charge:
-      return `${activity.vehicle} - Charged`
+      return `Charge`
     case ActivityTypeEnum.ServiceAdded: {
-      return `${activity.vehicle} - Service Added`
+      return `Service Added`
     }
     default:
-      return activity.vehicle
+      return 'Unknown Activity'
   }
 }
 </script>
@@ -67,7 +67,7 @@ const getActivityTitle = (activity: TimelineActivityDto): string => {
     <v-card-title>Recent Activity</v-card-title>
     <v-card-text>
       <v-timeline direction="vertical" side="end">
-        <v-timeline-item v-for="activity in recentActivity" :key="activity.id">
+        <v-timeline-item v-for="activity in vehicleActivities" :key="activity.date">
           <template v-slot:icon>
             <v-avatar size="40" :color="getActivityColor(activity.type)" variant="flat">
               <v-icon :icon="getActivityIcon(activity.type)" />

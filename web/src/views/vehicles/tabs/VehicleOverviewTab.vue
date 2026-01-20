@@ -8,6 +8,7 @@ import RecordInfo from '@/components/common/RecordInfo.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import StackedButton from '@/components/common/StackedButton.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
+import VehicleActivity from '@/components/vehicles/overview/VehicleActivity.vue'
 import { useFormatting } from '@/composables/useFormatting'
 
 interface Props {
@@ -32,7 +33,7 @@ const props = defineProps<Props>()
 const { deleteApiVehiclesId, getApiVehiclesIdStats } = getVehicles()
 const { isMobile } = useResponsiveLayout()
 const router = useRouter()
-const { formatDate } = useFormatting()
+const { formatDate, formatCurrency, formatMileage } = useFormatting()
 
 const statsLoading = ref(false)
 const vehicleStats = ref<VehicleStatsDto | null>(null)
@@ -113,8 +114,8 @@ onMounted(() => {
     </v-col>
   </v-row>
   <v-row>
-    <v-col cols="12" md="5" lg="4">
-      <v-list lines="two">
+    <v-col cols="12" md="4" xl="3">
+      <v-list lines="two" class="pt-0">
         <v-list-item
           v-if="vehicle.manufacturedYear"
           class="list-item"
@@ -148,12 +149,12 @@ onMounted(() => {
       </v-list>
     </v-col>
 
-    <v-col>
+    <v-col cols="12" md="8" xl="5">
       <v-row>
         <v-col cols="6">
           <StatCard
             title="Total fuel cost"
-            :metric="{ value: `${vehicleStats?.totalFuelCost ?? 0} zł` }"
+            :metric="{ value: formatCurrency(vehicleStats?.totalFuelCost) }"
             icon="mdi-gas-station"
             accent-color="primary"
           />
@@ -161,7 +162,7 @@ onMounted(() => {
         <v-col cols="6">
           <StatCard
             title="Last entered mileage"
-            :metric="{ value: `${vehicleStats?.lastMileage ?? 0} km`}"
+            :metric="{ value: formatMileage(vehicleStats?.lastMileage) }"
             icon="mdi-gauge"
             accent-color="secondary"
           />
@@ -169,7 +170,7 @@ onMounted(() => {
         <v-col cols="6">
           <StatCard
             title="Total service cost"
-            :metric="{ value: `${vehicleStats?.totalServicesCost ?? 0} zł` }"
+            :metric="{ value: formatCurrency(vehicleStats?.totalServicesCost) }"
             icon="mdi-wrench"
             accent-color="error"
           />
@@ -182,10 +183,10 @@ onMounted(() => {
             accent-color="tertiary"
           />
         </v-col>
-        <v-col cols="12">
-          <v-card variant="flat" color="red" height="250px">recent activity</v-card>
-        </v-col>
       </v-row>
+    </v-col>
+    <v-col cols="5" xl="4">
+      <VehicleActivity :vehicleActivities="vehicleStats?.vehicleActivities ?? []" />
     </v-col>
   </v-row>
 

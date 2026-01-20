@@ -7,6 +7,7 @@ using Domain.Entities.Services;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace Application.Services;
 
@@ -54,7 +55,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
 
         return new StatMetricDto
         {
-            Value = currentMonthCost.ToString("C"),
+            Value = currentMonthCost.ToString(CultureInfo.InvariantCulture),
             Subtitle = "This month",
             ContextValue = diffText,
             ContextAppendText = "vs last month",
@@ -102,9 +103,9 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
 
         return new StatMetricDto
         {
-            Value = $"{currentDistance} km",
+            Value = currentDistance.ToString(),
             Subtitle = "Last 30 days",
-            ContextValue = diffText + " km",
+            ContextValue = diffText,
             ContextAppendText = "vs previous 30 days",
             ContextTrend = trend,
             ContextTrendMode = trendMode
@@ -220,7 +221,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
             ActivityDetails =
             [
                 new ActivityDetail("Service", s.Title),
-                new ActivityDetail("Cost", s.TotalCost.ToString("C"))
+                new ActivityDetail("Cost", s.TotalCost.ToString(CultureInfo.InvariantCulture))
             ]
         }));
 
@@ -232,7 +233,8 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
             Vehicle = $"{e.VehicleBrand} {e.VehicleModel}",
             ActivityDetails =
             [
-                new ActivityDetail("Cost", e.Cost.ToString("C"))
+                new ActivityDetail("Fuel Type", e.Type.ToString()),
+                new ActivityDetail("Cost", e.Cost.ToString(CultureInfo.InvariantCulture))
             ]
         }));
 
@@ -300,7 +302,6 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
     {
         var activities = new List<VehicleActivityDto>();
 
-        // Pobierz dane pojazdu - tylko CreatedDate i UpdatedDate
         var vehicleData = await dbContext.Vehicles
             .Where(v => v.Id == vehicleId)
             .AsNoTracking()
@@ -327,7 +328,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
                 ActivityDetails =
                 [
                     new ActivityDetail("Service", s.Title),
-                    new ActivityDetail("Cost", s.TotalCost.ToString("C"))
+                    new ActivityDetail("Cost", s.TotalCost.ToString(CultureInfo.InvariantCulture))
                 ]
             }));
 
@@ -341,7 +342,7 @@ public class StatisticsService(IApplicationDbContext dbContext, IDateTimeProvide
                 ActivityDetails =
                 [
                     new ActivityDetail("Fuel Type", e.Type.ToString()),
-                    new ActivityDetail("Cost", (e.Cost ?? 0).ToString("C"))
+                    new ActivityDetail("Cost", (e.Cost ?? 0).ToString(CultureInfo.InvariantCulture))
                 ]
             }));
 
