@@ -96,7 +96,7 @@ async function loadVehicle() {
         action: () => {
           editVehicleDialog.value = true
         },
-      }
+      },
     ])
     await loadGlobalStats()
   } catch (err) {
@@ -161,15 +161,6 @@ function openEditVehicleDialog() {
 
 function closeEditVehicleDialog() {
   editVehicleDialog.value = false
-}
-
-interface ApiErrorResponse {
-  type: string
-  title: string
-  status: number
-  detail: string
-  errors?: Array<{ code: string; description: string; type: string }>
-  traceId?: string
 }
 
 async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {

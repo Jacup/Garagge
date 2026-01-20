@@ -20,11 +20,6 @@ const handleNavigate = () => {
   emit('drawerToggle', drawer.value)
 }
 
-const handleDrawerUpdate = (value: boolean) => {
-  drawer.value = value
-  emit('drawerToggle', value)
-}
-
 defineExpose({
   toggleDrawer: () => {
     drawer.value = !drawer.value
