@@ -1,10 +1,18 @@
-// web/src/composables/useFormatting.ts
 export function useFormatting() {
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | undefined | null) => {
+    if (!value) return '-'
     return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
   }
 
-  const formatDate = (dateString: string) => {
+    const formatCurrencyString = (value: string | undefined | null) => {
+    if (!value || isNaN(Number(value))) return '-'
+
+    const parsedValue = Number(value)
+    return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(parsedValue)
+  }
+
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return '-'
     return new Date(dateString).toLocaleDateString('pl-PL', {
       year: 'numeric',
       month: 'short',
@@ -12,8 +20,8 @@ export function useFormatting() {
     })
   }
 
-  const formatMileage = (mileage: number | null) => {
-    return mileage ? `${mileage.toLocaleString('pl-PL')} km` : 'N/A'
+  const formatMileage = (mileage: number | undefined | null) => {
+    return mileage ? `${mileage.toLocaleString('pl-PL')} km` : '-'
   }
 
   const formatDateTime = (dateString: string) => {
@@ -34,5 +42,5 @@ export function useFormatting() {
     })
   }
 
-  return { formatCurrency, formatDate, formatMileage, formatDateTime, formatDateOnly }
+  return { formatCurrency, formatCurrencyString, formatDate, formatMileage, formatDateTime, formatDateOnly }
 }

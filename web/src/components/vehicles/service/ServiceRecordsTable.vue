@@ -4,7 +4,7 @@ import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
 
 interface Props {
   items: ServiceRecordDto[]
-  itemsLength: number
+  totalCount: number
   loading: boolean
   page: number
   itemsPerPage: number
@@ -23,7 +23,7 @@ const emit = defineEmits<{
 const selectedIds = computed(() => props.selectedId ? [props.selectedId] : [])
 
 // Table configuration
-const serviceHeaders = [
+const headers = [
   {
     title: 'Title',
     key: 'title',
@@ -73,9 +73,9 @@ const handleRowClick = (_event: Event, { item }: { item: ServiceRecordDto }) => 
 <v-data-table-server
     :model-value="selectedIds"
     item-value="id"
-    :headers="serviceHeaders"
+    :headers="headers"
     :items="items"
-    :items-length="itemsLength"
+    :items-length="totalCount"
     :loading="loading"
     :page="page"
     :items-per-page="itemsPerPage"
@@ -104,8 +104,6 @@ const handleRowClick = (_event: Event, { item }: { item: ServiceRecordDto }) => 
 </template>
 
 <style scoped>
-.service-records-table {
-}
 
 .service-records-table :deep(.service-table-header) {
   background-color: rgba(var(--v-theme-primary), 0.2) !important;

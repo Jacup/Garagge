@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 
-// Props
 const { isMobile } = defineProps<{
   isMobile?: boolean
 }>()
 
-// Emits
 const emit = defineEmits<{
   open: []
   voiceSearch: []
@@ -26,25 +24,19 @@ function handleVoiceSearch() {
 </script>
 
 <template>
-  <div class="search-container" :class="{ 'search-container--mobile': isMobile }">
+  <div class="search-button-container">
     <v-btn
       variant="flat"
       rounded="pill"
-      height="48px"
+      height="56px"
       class="search-button"
-      :class="{ 'search-button--mobile': isMobile }"
       @click="emit('open')"
     >
-      <template #prepend>
-        <v-icon>mdi-magnify</v-icon>
-      </template>
-
       Search
 
       <template #append>
         <div v-if="!isMobile" class="hotkey-container">
-          <kbd class="hotkey-key">{{ shortcutKey }}</kbd>
-          <kbd class="hotkey-key">K</kbd>
+          <kbd class="hotkey-key">{{ shortcutKey }} + K</kbd>
         </div>
         <v-btn
           v-else
@@ -61,34 +53,15 @@ function handleVoiceSearch() {
 </template>
 
 <style scoped>
-.search-container {
-  width: 100%;
-  max-width: 312px;
-  container-type: inline-size;
-}
-
-@media (min-width: 768px) {
-  .search-container:not(.search-container--mobile) {
-    width: min(100%, max(312px, 312px + (100vw - 312px - 200px) * 0.5));
-    max-width: 800px;
-  }
-}
-
-.search-container--mobile {
-  width: 100%;
-  max-width: none;
-  flex: 1;
+.search-button-container {
+  width: min(100%, max(312px, 50%));
 }
 
 .search-button {
   width: 100%;
   text-transform: none;
-  background-color: rgb(var(--v-theme-surface-container));
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
   justify-content: space-between;
-}
-
-.search-button--mobile {
-  background-color: rgb(var(--v-theme-surface-container));
 }
 
 .search-button :deep(.v-btn__content) {

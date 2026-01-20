@@ -1,19 +1,17 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useHotkey } from 'vuetify'
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
+
 import SearchBoxActivator from './SearchBoxActivator.vue'
 import SearchBoxOverlay from './SearchBoxOverlay.vue'
-
-// Props
-const { isMobile } = defineProps<{
-  isRail?: boolean
-  isMobile?: boolean
-}>()
 
 // Emits
 const emit = defineEmits<{
   search: [query: string]
 }>()
+
+const { isMobile } = useResponsiveLayout()
 
 // Reactive state
 const isOverlayOpen = ref(false)

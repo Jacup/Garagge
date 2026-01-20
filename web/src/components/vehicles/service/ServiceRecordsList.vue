@@ -84,7 +84,7 @@ const formatDate = (dateString: string) => {
 .list-item {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
   margin-bottom: 2px !important;
-  border-radius: 2px !important;
+  border-radius: 4px !important;
 }
 
 .list-item:first-child {

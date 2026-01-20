@@ -1,4 +1,6 @@
-﻿namespace Application.Dashboard.GetStats;
+﻿using Application.Vehicles.Stats;
+
+namespace Application.Dashboard.GetStats;
 
 public sealed record DashboardStatsDto
 {
@@ -21,24 +23,11 @@ public sealed record StatMetricDto
 
 public sealed record TimelineActivityDto
 {
-    public required Guid Id { get; init; }
+    public required Guid VehicleId { get; init; }
 
     public required ActivityType Type { get; init; }
     public required DateTime Date { get; init; }
     
     public required string Vehicle { get; init; }
     public required ActivityDetail[] ActivityDetails { get; init; }
-}
-
-public sealed record ActivityDetail(string Name, string Value);
-
-public enum ActivityType
-{
-    VehicleAdded,
-    VehicleUpdated,
-
-    Refuel,
-    Charge,
-
-    ServiceAdded
 }
