@@ -67,7 +67,7 @@ const getActivityTitle = (activity: TimelineActivityDto): string => {
     <v-card-title>Recent Activity</v-card-title>
     <v-card-text>
       <v-timeline direction="vertical" side="end">
-        <v-timeline-item v-for="activity in recentActivity" :key="activity.id">
+        <v-timeline-item v-for="activity in recentActivity" :key="activity.date">
           <template v-slot:icon>
             <v-avatar size="40" :color="getActivityColor(activity.type)" variant="flat">
               <v-icon :icon="getActivityIcon(activity.type)" />
