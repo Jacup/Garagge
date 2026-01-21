@@ -4,17 +4,19 @@ import { useUserStore } from './user'
 import type { LoginRequest, RegisterRequest } from '@/api/generated/apiV1.schemas'
 import axios from 'axios'
 
-const { postApiAuthLogin, postApiAuthRegister } = getAuth()
+const { postApiAuthLogin, postApiAuthRegister, postApiAuthLogout } = getAuth()
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({ accessToken: '' }),
+  state: () => ({
+    accessToken: null as string | null,
+  }),
 
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
   },
 
   actions: {
-    setToken(token: string) {
+    setToken(token: string | null) {
       this.accessToken = token
     },
 
@@ -34,9 +36,16 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       const userStore = useUserStore()
-
-      userStore.$reset()
-      this.$reset()
+      try {
+        await postApiAuthLogout()
+      } catch (error) {
+        console.error('Logout API failed, but clearing local state anyway', error)
+      } finally {
+        this.setToken(null)
+        this.$reset()
+        userStore.$reset()
+        localStorage.clear()
+      }
     },
 
     async register(registerRequest: RegisterRequest) {
@@ -60,6 +69,4 @@ export const useAuthStore = defineStore('auth', {
       console.log('Registration successful:')
     },
   },
-
-  persist: true,
 })
