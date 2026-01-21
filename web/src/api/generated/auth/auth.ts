@@ -36,6 +36,14 @@ const putApiAuthChangePassword = (
     },
       );
     }
+  const postApiAuthLogout = (
+    
+ ) => {
+      return axiosInstance<void>(
+      {url: `/api/auth/logout`, method: 'POST'
+    },
+      );
+    }
   const postApiAuthRefresh = (
     
  ) => {
@@ -54,8 +62,9 @@ const putApiAuthChangePassword = (
     },
       );
     }
-  return {putApiAuthChangePassword,postApiAuthLogin,postApiAuthRefresh,postApiAuthRegister}};
+  return {putApiAuthChangePassword,postApiAuthLogin,postApiAuthLogout,postApiAuthRefresh,postApiAuthRegister}};
 export type PutApiAuthChangePasswordResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['putApiAuthChangePassword']>>>
 export type PostApiAuthLoginResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthLogin']>>>
+export type PostApiAuthLogoutResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthLogout']>>>
 export type PostApiAuthRefreshResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRefresh']>>>
 export type PostApiAuthRegisterResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getAuth>['postApiAuthRegister']>>>
