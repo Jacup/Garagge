@@ -12,7 +12,7 @@ internal sealed class Logout : IEndpoint
     {
         app.MapPost("auth/logout", async (ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
             {
-                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
                     return Results.NoContent();
 
                 var command = new LogoutUserCommand(refreshToken);
@@ -28,7 +28,6 @@ internal sealed class Logout : IEndpoint
                 return result.Match(Results.NoContent, CustomResults.Problem);
             })
             .AllowAnonymous()
-            .Produces(StatusCodes.Status401Unauthorized)
             .WithTags(Tags.Auth);
     }
 }

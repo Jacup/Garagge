@@ -29,7 +29,7 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     }
 
     [Fact]
-    public async Task Logout_WithValidTokens_RevokesRefreshToken()
+    public async Task Logout_WithValidTokens_DeletesRefreshToken()
     {
         // Arrange
         await CreateUserAsync();
