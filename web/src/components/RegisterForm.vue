@@ -1,65 +1,115 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import type { RegisterRequest } from '@/api/generated/apiV1.schemas'
 
+interface Props {
+  loading?: boolean
+  error?: string
+}
 
+interface Emits {
+  (e: 'submit', payload: RegisterRequest): void
+  (e: 'clearError'): void
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  loading: false,
+  error: '',
+})
+
+const emit = defineEmits<Emits>()
+
+const form = ref()
 const email = ref('')
 const firstName = ref('')
 const lastName = ref('')
 const password = ref('')
-const error = ref('')
-const loading = ref(false)
+const passwordVisible = ref(false)
 
-const authStore = useAuthStore()
-const router = useRouter()
+const rules = {
+    required: (value: string | null) => !!value || 'This field is required.',
+    passwordMinLength: (value: string) => value.length >= 8 || 'Password must be at least 8 characters long.',
+    validEmail: (value: string) => /.+@.+\..+/.test(value) || 'Email is invalid.',
+  }
 
-async function onSubmit() {
-  error.value = ''
-  loading.value = true
+async function validateAndSubmit() {
+  const { valid } = await form.value.validate()
 
-  try {
-    authStore.register({
+  if (valid) {
+    emit('submit', {
       email: email.value,
       firstName: firstName.value,
       lastName: lastName.value,
       password: password.value,
     })
-    router.push('/login')
-  } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : 'An error occurred during registration'
-  } finally {
-    loading.value = false
   }
 }
+
+function handleErrorDismiss() {
+  if (props.error) emit('clearError')
+}
+
+defineExpose({
+  submit: validateAndSubmit,
+})
 </script>
 
 <template>
-  <div class="auth-form">
-    <v-card>
-      <v-card-title class="text-h5 text-center mb-4"> Rejestracja </v-card-title>
+  <v-form ref="form" :disabled="loading" @submit.prevent="validateAndSubmit">
+    <v-text-field
+      v-model="email"
+      label="Email"
+      type="email"
+      variant="outlined"
+      autocomplete="email"
+      required
+      :rules="[rules.required, rules.validEmail]"
+      class="mb-1"
+      @update:model-value="handleErrorDismiss"
+    />
 
-      <v-form @submit.prevent="onSubmit">
-        <v-text-field v-model="email" label="Email" type="email" variant="outlined" required class="form-field" :disabled="loading" />
+    <v-text-field
+      v-model="password"
+      label="Password"
+      :append-inner-icon="passwordVisible ? 'mdi-eye-off' : 'mdi-eye'"
+      :type="passwordVisible ? 'text' : 'password'"
+      :rules="[rules.required, rules.passwordMinLength]"
+      variant="outlined"
+      autocomplete="current-password"
+      required
+      class="mb-6"
+      @click:append-inner="passwordVisible = !passwordVisible"
+      @update:model-value="handleErrorDismiss"
+      @keydown.enter="validateAndSubmit"
+    />
 
-        <v-text-field v-model="firstName" label="Imię" type="text" variant="outlined" required class="form-field" :disabled="loading" />
+    <v-text-field
+      v-model="firstName"
+      label="First Name"
+      type="text"
+      variant="outlined"
+      class="mb-1"
+      :rules="[rules.required]"
+      @update:model-value="handleErrorDismiss"
+    />
 
-        <v-text-field v-model="lastName" label="Nazwisko" type="text" variant="outlined" required class="form-field" :disabled="loading" />
+    <v-text-field
+      v-model="lastName"
+      label="Last Name"
+      type="text"
+      variant="outlined"
+      class="mb-1"
+      :rules="[rules.required]"
+      @update:model-value="handleErrorDismiss"
+    />
 
-        <v-text-field v-model="password" label="Hasło" type="password" variant="outlined" required class="form-field" :disabled="loading" />
-
-        <v-btn type="submit" color="primary" variant="elevated" block size="large" class="mt-4" :loading="loading" :disabled="loading">
-          Zarejestruj
-        </v-btn>
-
-        <v-alert v-if="error" type="error" variant="tonal" class="mt-4">
-          {{ error }}
-        </v-alert>
-      </v-form>
-    </v-card>
-  </div>
+    <v-expand-transition>
+      <v-alert v-if="error" type="error" variant="tonal" closable class="mt-4" @click:close="handleErrorDismiss">
+        <template #close>
+          <v-btn icon="mdi-close" variant="text" color="error" size="small" @click="handleErrorDismiss" />
+        </template>
+        {{ error }}
+      </v-alert>
+    </v-expand-transition>
+  </v-form>
 </template>
-
-<style scoped>
-/* Wszystkie style są teraz globalne w main.css lub pochodzą z Vuetify theme */
-</style>

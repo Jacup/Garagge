@@ -11,6 +11,8 @@ export const useAuthStore = defineStore('auth', {
     accessToken: null as string | null,
   }),
 
+  persist: true,
+
   getters: {
     isAuthenticated: (state) => !!state.accessToken,
   },

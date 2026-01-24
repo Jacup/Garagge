@@ -85,9 +85,7 @@ export function getFieldError(parsedError: ParsedApiError, fieldName: string): s
   }
 
   // Try to find error by field name in error code
-  const fieldError = parsedError.validationErrors.find(
-    (error) => error.code.toLowerCase().includes(fieldName.toLowerCase())
-  )
+  const fieldError = parsedError.validationErrors.find((error) => error.code.toLowerCase().includes(fieldName.toLowerCase()))
 
   return fieldError?.description
 }
@@ -98,9 +96,7 @@ export function getFieldError(parsedError: ParsedApiError, fieldName: string): s
  * @param parsedError - Parsed error from parseApiError()
  * @returns Object with field-level errors, or empty object if no validation errors
  */
-export function getValidationErrorMap(
-  parsedError: ParsedApiError
-): Record<string, string> {
+export function getValidationErrorMap(parsedError: ParsedApiError): Record<string, string> {
   if (!parsedError.validationErrors) {
     return {}
   }
@@ -112,6 +108,7 @@ export function getValidationErrorMap(
     // e.g., "Auth.InvalidEmail" -> "email", "Email.Required" -> "email"
     const fieldName = error.code.split('.')[1]?.toLowerCase() || error.code.toLowerCase()
     errorMap[fieldName] = error.description
+    console.log(`Validation error for field '${fieldName}': ${error.description}`)
   })
 
   return errorMap
