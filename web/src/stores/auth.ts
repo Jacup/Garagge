@@ -9,6 +9,7 @@ const { postApiAuthLogin, postApiAuthRegister, postApiAuthLogout } = getAuth()
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     accessToken: null as string | null,
+    isSuperAdmin: true as boolean,
   }),
 
   persist: true,
@@ -60,7 +61,6 @@ export const useAuthStore = defineStore('auth', {
         await postApiAuthRegister(registerRequest)
       } catch (error) {
         const parsedError = parseApiError(error)
-        // For now, just throw the error - view layer will handle it
         throw new Error(parsedError.message)
       }
 
