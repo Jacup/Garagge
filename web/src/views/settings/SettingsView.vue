@@ -6,7 +6,7 @@ import SessionSettings from '@/components/settings/sections/SessionsSettings.vue
 </script>
 
 <template>
-  <v-list lines="two" class="settings-container">
+  <v-list lines="two" class="md3-list">
     <SettingsGroup value="app-settings" title="App settings" icon="mdi-cog-outline">
       <AppSettings />
     </SettingsGroup>
@@ -21,9 +21,4 @@ import SessionSettings from '@/components/settings/sections/SessionsSettings.vue
   </v-list>
 </template>
 
-<style scoped>
-.settings-container {
-  padding: 0;
-  margin: 0 auto;
-}
-</style>
+<style scoped></style>

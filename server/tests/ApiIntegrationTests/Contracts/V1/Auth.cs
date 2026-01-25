@@ -7,5 +7,5 @@ internal sealed record RefreshRequest();
 
 internal sealed record RegisterRequest(string Email, string Password, string FirstName, string LastName);
 
-internal sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);
+internal sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword, bool LogoutAllDevices = false);
 

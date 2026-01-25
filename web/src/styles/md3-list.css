@@ -1,0 +1,71 @@
+/* Material Design 3 List Styles */
+
+/* Base styles for inner items in MD3 lists */
+.md3-list .inner-item {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  border-radius: 4px !important;
+  margin-bottom: 2px !important;
+  padding-inline-start: 32px !important;
+}
+
+.md3-list .inner-item:first-child {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
+}
+
+.md3-list .inner-item:last-child {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  margin-bottom: 0 !important;
+}
+
+/* For nested items inside list groups (using :deep for scoped styles) */
+.md3-list :deep(.v-list-group__items .inner-item) {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  border-radius: 4px !important;
+  margin-bottom: 2px !important;
+  padding-inline-start: 32px !important;
+}
+
+.md3-list :deep(.v-list-group__items .inner-item:first-child) {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
+}
+
+.md3-list :deep(.v-list-group__items .inner-item:last-child) {
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+  margin-bottom: 0 !important;
+}
+
+/* List group container */
+.md3-list-group {
+  margin-bottom: 16px;
+}
+
+/* List group activator (header when closed) */
+.md3-list-group-activator {
+  background-color: rgba(var(--v-theme-primary), 0.08) !important;
+  border-radius: 12px !important;
+  transition:
+    border-radius 0.2s ease-in-out,
+    margin-bottom 0.2s;
+}
+
+/* List group activator when it has a sibling before (not first child) */
+.inner-item ~ .md3-list-group .md3-list-group-activator {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
+}
+
+/* List group activator when open - appears as inner item */
+.md3-list-group-activator.is-open {
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  margin-bottom: 2px !important;
+}
+
+/* Remove default v-list-group padding */
+.md3-list :deep(.v-list-group__items) {
+  --v-list-group-items-face-padding-start: 0px !important;
+}

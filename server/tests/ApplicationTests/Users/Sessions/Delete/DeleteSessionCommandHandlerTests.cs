@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Authentication;
 using Application.Users;
-using Application.Users.Sessions.Delete;
+using Application.Users.Sessions.DeleteById;
 using Domain.Entities.Auth;
 using Moq;
 
