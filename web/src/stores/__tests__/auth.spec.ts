@@ -30,9 +30,8 @@ vi.mock('axios', () => {
     return error instanceof Error && 'isAxiosError' in error && (error as Record<string, unknown>).isAxiosError === true
   }
   return {
-    default: {
-      isAxiosError,
-    },
+    default: { isAxiosError },
+    isAxiosError,
   }
 })
 
@@ -245,7 +244,6 @@ describe('Auth Store', () => {
         })
 
         mockPostApiAuthRegister.mockRejectedValue(error)
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         const store = useAuthStore()
         const registerRequest: RegisterRequest = {
@@ -255,11 +253,7 @@ describe('Auth Store', () => {
           lastName: 'User',
         }
 
-        await store.register(registerRequest)
-
-        expect(consoleSpy).toHaveBeenCalledWith('Registration failed: Bad Request -', { message: 'Invalid input' })
-
-        consoleSpy.mockRestore()
+        await expect(store.register(registerRequest)).rejects.toThrow('Bad Request')
       })
 
       it('handles 409 conflict error (email already in use)', async () => {
@@ -272,7 +266,6 @@ describe('Auth Store', () => {
         })
 
         mockPostApiAuthRegister.mockRejectedValue(error)
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         const store = useAuthStore()
         const registerRequest: RegisterRequest = {
@@ -282,11 +275,7 @@ describe('Auth Store', () => {
           lastName: 'User',
         }
 
-        await store.register(registerRequest)
-
-        expect(consoleSpy).toHaveBeenCalledWith('Registration failed: Conflict - Email already in use.')
-
-        consoleSpy.mockRestore()
+        await expect(store.register(registerRequest)).rejects.toThrow('Conflict')
       })
 
       it('handles generic errors', async () => {
@@ -295,7 +284,6 @@ describe('Auth Store', () => {
         })
 
         mockPostApiAuthRegister.mockRejectedValue(error)
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         const store = useAuthStore()
         const registerRequest: RegisterRequest = {
@@ -305,16 +293,11 @@ describe('Auth Store', () => {
           lastName: 'User',
         }
 
-        await store.register(registerRequest)
-
-        expect(consoleSpy).toHaveBeenCalledWith('Registration failed:', error)
-
-        consoleSpy.mockRestore()
+        await expect(store.register(registerRequest)).rejects.toThrow('Network error')
       })
 
       it('does not throw exception on any error type', async () => {
         mockPostApiAuthRegister.mockRejectedValue(new Error('Some error'))
-        vi.spyOn(console, 'error').mockImplementation(() => {})
 
         const store = useAuthStore()
         const registerRequest: RegisterRequest = {
@@ -324,8 +307,8 @@ describe('Auth Store', () => {
           lastName: 'User',
         }
 
-        // Should not throw
-        await expect(store.register(registerRequest)).resolves.not.toThrow()
+        // Should throw error from handler
+        await expect(store.register(registerRequest)).rejects.toThrow('Some error')
       })
     })
   })

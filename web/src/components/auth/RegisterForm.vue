@@ -27,10 +27,10 @@ const password = ref('')
 const passwordVisible = ref(false)
 
 const rules = {
-    required: (value: string | null) => !!value || 'This field is required.',
-    passwordMinLength: (value: string) => value.length >= 8 || 'Password must be at least 8 characters long.',
-    validEmail: (value: string) => /.+@.+\..+/.test(value) || 'Email is invalid.',
-  }
+  required: (value: string | null) => !!value || 'This field is required.',
+  passwordMinLength: (value: string) => value.length >= 8 || 'Password must be at least 8 characters long.',
+  validEmail: (value: string) => /.+@.+\..+/.test(value) || 'Email is invalid.',
+}
 
 async function validateAndSubmit() {
   const { valid } = await form.value.validate()

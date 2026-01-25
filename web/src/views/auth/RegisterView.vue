@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import RegisterForm from '@/components/RegisterForm.vue'
+import RegisterForm from '@/components/auth/RegisterForm.vue'
 import type { RegisterRequest } from '@/api/generated/apiV1.schemas'
 
 withDefaults(defineProps<{ showBackToLogin?: boolean }>(), {
@@ -44,13 +44,7 @@ function submitForm() {
     <v-card-title class="px-0 pt-6 pb-6 text-h4 font-weight-bold"> Register </v-card-title>
 
     <v-card-text class="px-0">
-      <RegisterForm
-        ref="registerFormRef"
-        :loading="loading"
-        :error="error"
-        @submit="handleRegister"
-        @clear-error="error = ''"
-      />
+      <RegisterForm ref="registerFormRef" :loading="loading" :error="error" @submit="handleRegister" @clear-error="error = ''" />
     </v-card-text>
 
     <v-card-actions class="px-0 pt-4">
