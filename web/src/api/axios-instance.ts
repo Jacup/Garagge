@@ -50,7 +50,8 @@ axiosClient.interceptors.response.use(
 
     if (!originalRequest) return Promise.reject(error)
 
-    if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/api/auth/refresh') {
+    const isAuthEndpoint = originalRequest.url?.includes('/api/auth')
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       if (isRefreshing) {
         return new Promise<string>((resolve, reject) => {
           failedQueue.push({ resolve, reject })

@@ -2,77 +2,90 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 import DashboardView from '../views/home/DashboardView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/auth/RegisterView.vue'
+import LoginView from '../views/auth/LoginView.vue'
 import VehiclesView from '@/views/vehicles/VehiclesView.vue'
-import ModifyVehicleView from '@/views/ModifyVehicleView.vue'
 import VehicleView from '@/views/vehicles/VehicleView.vue'
 import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
 import SettingsView from '@/views/settings/SettingsView.vue'
 
+import ApplicationLayout from '@/layouts/ApplicationLayout.vue'
+import SetupLayout from '@/layouts/SetupLayout.vue'
+
 const routes = [
   {
-    path: '/',
-    name: 'Dashboard',
-    component: DashboardView,
-  },
-  {
-    path: '/vehicles',
-    name: 'Vehicles',
-    component: VehiclesView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/vehicles/add',
-    name: 'AddVehicle',
-    component: ModifyVehicleView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/vehicles/edit/:id',
-    name: 'EditVehicle',
-    component: ModifyVehicleView,
-    meta: { requiresAuth: true },
-    props: true,
-  },
-  {
-    path: '/vehicles/:id',
-    name: 'VehicleView',
-    component: VehicleView,
-    meta: {
-      requiresAuth: true,
-      appBar: {
-        type: 'context',
+    path: '/auth',
+    component: SetupLayout,
+    children: [
+      {
+        path: 'login',
+        name: 'Login',
+        component: LoginView,
+        meta: { requiresGuest: true },
       },
-    },
+      {
+        path: 'register',
+        name: 'Register',
+        component: RegisterView,
+        meta: { requiresGuest: true },
+      },
+    ],
   },
   {
-    path: '/vehicles/:id/services/add',
-    name: 'AddServiceRecord',
-    component: AddServiceRecordView,
+    path: '/',
+    component: ApplicationLayout,
     meta: { requiresAuth: true },
-    props: true,
+    children: [
+      {
+        path: '',
+        name: 'Dashboard',
+        component: DashboardView,
+      },
+      {
+        path: 'vehicles',
+        name: 'Vehicles',
+        component: VehiclesView,
+      },
+      {
+        path: 'vehicles/:id',
+        name: 'VehicleView',
+        component: VehicleView,
+        meta: {
+          appBar: {
+            type: 'context',
+          },
+        },
+      },
+      {
+        path: 'vehicles/:id/services/add',
+        name: 'AddServiceRecord',
+        component: AddServiceRecordView,
+        props: true,
+      },
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: SettingsView,
+      },
+    ],
   },
+
   {
-    path: '/settings',
-    name: 'Settings',
-    component: SettingsView,
-    meta: { requiresAuth: true },
+    path: '/login',
+    redirect: '/auth/login',
   },
   {
     path: '/register',
-    name: 'Register',
-    component: RegisterView,
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: LoginView,
+    redirect: '/auth/register',
   },
   {
     path: '/logout',
-    name: 'Logout',
-    component: LoginView,
+    redirect: '/auth/login',
+  },
+
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
   },
 ]
 
@@ -84,8 +97,13 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest)
+
+  if (requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+  } else if (requiresGuest && authStore.isAuthenticated) {
+    next({ name: 'Dashboard' })
   } else {
     next()
   }

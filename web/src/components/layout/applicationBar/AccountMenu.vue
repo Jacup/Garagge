@@ -8,8 +8,8 @@ const userStore = useUserStore()
 
 const router = useRouter()
 
-const handleLogout = () => {
-  authStore.logout()
+const handleLogout = async () => {
+  await authStore.logout()
   router.push('/')
 }
 </script>
