@@ -14,7 +14,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
     public ChangePasswordCommandHandlerTests()
     {
-        _sut = new ChangePasswordCommandHandler(Context, UserContextMock.Object ,_passwordHasherMock.Object);
+        _sut = new ChangePasswordCommandHandler(Context, UserContextMock.Object, _passwordHasherMock.Object);
     }
 
     [Fact]
@@ -22,8 +22,8 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
-        var command = new ChangePasswordCommand("currentPassword", "newPassword123");
+
+        var command = new ChangePasswordCommand("currentPassword", "newPassword123", false);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -38,10 +38,10 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         const string currentPassword = "currentPassword";
         const string hashedPassword = "hashedCurrentPassword";
-        
+
         var user = new User
         {
             Id = AuthorizedUserId,
@@ -58,7 +58,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
             .Setup(x => x.Verify(currentPassword, hashedPassword))
             .Returns(false);
 
-        var command = new ChangePasswordCommand(currentPassword, "newPassword123");
+        var command = new ChangePasswordCommand(currentPassword, "newPassword123", false);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);
@@ -74,12 +74,12 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        
+
         const string currentPassword = "currentPassword";
         const string newPassword = "newPassword123";
         const string hashedCurrentPassword = "hashedCurrentPassword";
         const string hashedNewPassword = "hashedNewPassword123";
-        
+
         var user = new User
         {
             Id = AuthorizedUserId,
@@ -95,12 +95,12 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
         _passwordHasherMock
             .Setup(x => x.Verify(currentPassword, hashedCurrentPassword))
             .Returns(true);
-        
+
         _passwordHasherMock
             .Setup(x => x.Hash(newPassword))
             .Returns(hashedNewPassword);
 
-        var command = new ChangePasswordCommand(currentPassword, newPassword);
+        var command = new ChangePasswordCommand(currentPassword, newPassword, false);
 
         // Act
         var result = await _sut.Handle(command, CancellationToken.None);

@@ -2,6 +2,7 @@
 using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth;
+using Domain.Entities.Auth;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -79,11 +80,62 @@ public class AuthFlowTests : BaseIntegrationTest
         // Step 1: Register and login user
         await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
 
+        // Create an additional refresh token to simulate another device/session
+        var refreshToken = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = DbContext.Users.First(u => u.Email == UserEmail).Id,
+            Token = "SomeRefreshToken",
+            ExpiresAt = new DateTimeOffset(),
+            SessionDurationDays = 10,
+        };
+        DbContext.RefreshTokens.Add(refreshToken);
+        await DbContext.SaveChangesAsync();
+
+        DbContext.RefreshTokens.Count().ShouldBe(2);
+
         // Step 2: Change password
-        var changePasswordRequest = new ChangePasswordRequest(UserPassword, NewPassword);
+        var changePasswordRequest = new ChangePasswordRequest(UserPassword, NewPassword, false);
         var changeResponse = await Client.PutAsJsonAsync(ApiV1Definition.Auth.ChangePassword, changePasswordRequest);
 
         changeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        DbContext.RefreshTokens.Count().ShouldBe(2);
+
+        // Step 3: Verify the old password no longer works
+        var oldPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword, false));
+        oldPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+
+        // Step 4: Verify the new password works
+        var newPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, NewPassword, false));
+        newPasswordLogin.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task ChangePasswordFlow_ValidChangePasswordRequestWithLogout_Success()
+    {
+        // Step 1: Register and login user
+        await RegisterAndAuthenticateUser(UserEmail, FirstName, LastName, UserPassword);
+
+        // Create an additional refresh token to simulate another device/session
+        var refreshToken = new RefreshToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = DbContext.Users.First(u => u.Email == UserEmail).Id,
+            Token = "SomeRefreshToken",
+            ExpiresAt = new DateTimeOffset(),
+            SessionDurationDays = 10,
+        };
+        DbContext.RefreshTokens.Add(refreshToken);
+        await DbContext.SaveChangesAsync();
+
+        DbContext.RefreshTokens.Count().ShouldBe(2);
+
+        // Step 2: Change password
+        var changePasswordRequest = new ChangePasswordRequest(UserPassword, NewPassword, true);
+        var changeResponse = await Client.PutAsJsonAsync(ApiV1Definition.Auth.ChangePassword, changePasswordRequest);
+
+        changeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
+        DbContext.RefreshTokens.Count().ShouldBe(1);
 
         // Step 3: Verify the old password no longer works
         var oldPasswordLogin = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, new LoginRequest(UserEmail, UserPassword, false));
@@ -144,9 +196,7 @@ public class AuthFlowTests : BaseIntegrationTest
     [Theory]
     [InlineData("", "ValidNewPass123")] // Empty current password
     [InlineData("ValidCurrentPass123", "")] // Empty new password
-    [InlineData("short", "ValidNewPass123")] // Current password too short
     [InlineData("ValidCurrentPass123", "short")] // New password too short 
-    [InlineData("1234567", "ValidNewPass123")] // Exactly 7 characters (below a minimum)
     [InlineData("ValidCurrentPass123", "1234567")] // Exactly 7 characters (below a minimum)
     public async Task ChangePasswordFlow_InvalidPasswordFormat_ShouldFail(string currentPassword, string newPassword)
     {

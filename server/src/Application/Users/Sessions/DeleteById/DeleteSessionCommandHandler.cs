@@ -4,7 +4,7 @@ using Application.Abstractions.Messaging;
 using Application.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Users.Sessions.Delete;
+namespace Application.Users.Sessions.DeleteById;
 
 public class DeleteSessionCommandHandler(IApplicationDbContext context, IUserContext userContext) : ICommandHandler<DeleteSessionCommand>
 {

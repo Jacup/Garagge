@@ -4,12 +4,13 @@ import { getUsers, type SessionDto } from '@/api/generated'
 import SessionListItem from '@/components/settings/sections/sessions/SessionListItem.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 
-const { getApiUsersMeSessions, deleteApiUsersMeSessionsId } = getUsers()
+const { getApiUsersMeSessions, deleteApiUsersMeSessionsId, deleteApiUsersMeSessions } = getUsers()
 const sessions = ref<SessionDto[]>([])
 
 const isLoading = ref(true)
 
-const isDeleteDialogOpen = ref(false)
+const isDeleteSingleSessionDialogOpen = ref(false)
+const isDeleteSessionsDialogOpen = ref(false)
 const sessionToDelete = ref<SessionDto | null>(null)
 
 const currentSession = computed(() => sessions.value.find((s) => s.isCurrent))
@@ -31,21 +32,23 @@ async function loadSessions() {
   }
 }
 
-const openDeleteDialog = (session: SessionDto) => {
+const openDeleteSingleSessionDialog = (session: SessionDto) => {
   sessionToDelete.value = session
-  isDeleteDialogOpen.value = true
+  isDeleteSingleSessionDialogOpen.value = true
 }
-
-const closeDeleteDialog = () => {
+const closeDeleteSingleSessionDialog = () => {
   sessionToDelete.value = null
-  isDeleteDialogOpen.value = false
+  isDeleteSingleSessionDialogOpen.value = false
 }
 
-const deleteSession = (session: SessionDto) => {
-  openDeleteDialog(session)
+const openDeleteSessionsDialog = () => {
+  isDeleteSessionsDialogOpen.value = true
+}
+const closeDeleteSessionsDialog = () => {
+  isDeleteSessionsDialogOpen.value = false
 }
 
-const confirmDelete = async () => {
+const confirmDeleteSingleSession = async () => {
   if (!sessionToDelete.value?.id) {
     return
   }
@@ -56,12 +59,19 @@ const confirmDelete = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    closeDeleteDialog()
+    closeDeleteSingleSessionDialog()
   }
 }
 
-const deleteOtherSessions = () => {
-  /* ... */
+const confirmDeleteSessions = async () => {
+  try {
+    await deleteApiUsersMeSessions()
+    await loadSessions()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    closeDeleteSessionsDialog()
+  }
 }
 </script>
 
@@ -77,21 +87,28 @@ const deleteOtherSessions = () => {
       v-for="session in otherSessions"
       :key="session.id"
       :session="session"
-      @deleteSession="deleteSession"
+      @deleteSession="openDeleteSingleSessionDialog"
       class="inner-item"
     />
 
     <v-list-item class="inner-item">
       <template #append>
-        <v-btn color="error" variant="text" disabled @click="deleteOtherSessions"> Sign out all sessions</v-btn>
+        <v-btn color="error" variant="text" @click="openDeleteSessionsDialog" :disabled="sessions.length == 1"> Sign out all sessions</v-btn>
       </template>
     </v-list-item>
   </template>
 
   <DeleteDialog
-    :is-open="isDeleteDialogOpen"
+    :is-open="isDeleteSingleSessionDialogOpen"
     :item-to-delete="sessionToDelete?.deviceOs || 'session'"
-    :on-cancel="closeDeleteDialog"
-    :on-confirm="confirmDelete"
+    :on-cancel="closeDeleteSingleSessionDialog"
+    :on-confirm="confirmDeleteSingleSession"
+  />
+
+    <DeleteDialog
+    :is-open="isDeleteSessionsDialogOpen"
+    item-to-delete="sessions"
+    :on-cancel="closeDeleteSessionsDialog"
+    :on-confirm="confirmDeleteSessions"
   />
 </template>

@@ -12,8 +12,8 @@ internal sealed class ChangePassword : IEndpoint
     {
         app.MapPut("auth/change-password", async (ChangePasswordRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
-                var command = new ChangePasswordCommand(request.CurrentPassword, request.NewPassword);
-                
+                var command = new ChangePasswordCommand(request.CurrentPassword, request.NewPassword, request.LogoutAllDevices);
+
                 Result result = await sender.Send(command, cancellationToken);
 
                 return result.Match(() => Results.Ok(), CustomResults.Problem);
@@ -24,4 +24,4 @@ internal sealed class ChangePassword : IEndpoint
     }
 }
 
-internal sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword);
+internal sealed record ChangePasswordRequest(string CurrentPassword, string NewPassword, bool LogoutAllDevices = false);

@@ -40,19 +40,21 @@ function submitForm() {
 </script>
 
 <template>
-  <v-card class="mx-auto" width="450" variant="flat" color="transparent">
-    <v-card-title class="px-0 pt-6 pb-6 text-h4 font-weight-bold"> Register </v-card-title>
+  <v-card max-width="512" width="100%" variant="flat" color="transparent">
+    <v-card-title class="px-0 pt-0 pb-6 text-h4 font-weight-bold text-wrap"> Register </v-card-title>
 
     <v-card-text class="px-0">
       <RegisterForm ref="registerFormRef" :loading="loading" :error="error" @submit="handleRegister" @clear-error="error = ''" />
     </v-card-text>
 
-    <v-card-actions class="px-0 pt-4">
+    <v-card-actions class="pa-0 d-flex flex-column flex-sm-row">
       <v-btn v-if="showBackToLogin" variant="text" :disabled="loading" @click="router.push('/login')"> Back to login </v-btn>
 
-      <v-spacer />
+      <v-spacer class="d-none d-sm-flex" />
 
-      <v-btn color="primary" variant="flat" size="large" :loading="loading" @click="submitForm"> Register </v-btn>
+      <v-btn color="primary" variant="flat" size="large" :loading="loading" @click="submitForm" :block="$vuetify.display.xs">
+        Register
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
