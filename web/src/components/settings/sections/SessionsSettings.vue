@@ -69,6 +69,8 @@ const confirmDeleteSessions = async () => {
     await loadSessions()
   } catch (error) {
     console.error(error)
+  } finally {
+    closeDeleteSessionsDialog()
   }
 }
 </script>
