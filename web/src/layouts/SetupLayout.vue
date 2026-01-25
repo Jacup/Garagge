@@ -13,15 +13,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
 }
 
 .container {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  padding: 32px;
+  padding: 24px;
   border-radius: 28px;
-  min-width: 400px;
-  max-width: 600px;
-  min-height: 280px;
-  max-width: 600px;
+  width: 100%;
+  max-width: 560px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 </style>
