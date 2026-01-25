@@ -62,8 +62,6 @@ export const useAuthStore = defineStore('auth', {
         const parsedError = parseApiError(error)
         throw new Error(parsedError.message)
       }
-
-      console.log('Registration successful:')
     },
   },
 })

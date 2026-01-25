@@ -70,7 +70,6 @@ const routes = [
     ],
   },
 
-  // Redirects
   {
     path: '/login',
     redirect: '/auth/login',
@@ -84,7 +83,6 @@ const routes = [
     redirect: '/auth/login',
   },
 
-  // Catch all - redirect to dashboard
   {
     path: '/:pathMatch(.*)*',
     redirect: '/',
@@ -99,15 +97,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  // Sprawdź czy route wymaga autentykacji (dziedziczy z parent route)
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const requiresGuest = to.matched.some((record) => record.meta.requiresGuest)
 
   if (requiresAuth && !authStore.isAuthenticated) {
-    // Użytkownik niezalogowany próbuje wejść na chronioną stronę
     next({ name: 'Login', query: { redirect: to.fullPath } })
   } else if (requiresGuest && authStore.isAuthenticated) {
-    // Zalogowany użytkownik próbuje wejść na login/register
     next({ name: 'Dashboard' })
   } else {
     next()

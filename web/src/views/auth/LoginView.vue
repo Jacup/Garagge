@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoginForm from '@/components/auth/LoginForm.vue'
 import type { LoginRequest } from '@/api/generated/apiV1.schemas'
@@ -11,6 +11,7 @@ withDefaults(defineProps<{ showCreateAccount?: boolean }>(), {
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const loginFormRef = ref<InstanceType<typeof LoginForm>>()
 const loading = ref(false)
@@ -22,7 +23,9 @@ async function handleLogin(credentials: LoginRequest) {
 
   try {
     await authStore.login(credentials)
-    await router.push('/')
+
+    const redirectPath = route.query.redirect as string | undefined
+    await router.push(redirectPath || '/')
   } catch (e: unknown) {
     if (e instanceof Error) {
       error.value = e.message
