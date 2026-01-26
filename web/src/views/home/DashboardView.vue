@@ -70,7 +70,6 @@ username.value = userStore.profile?.firstName || ''
   position: relative;
 }
 
-
 .stat-icon {
   opacity: 0.7;
 }

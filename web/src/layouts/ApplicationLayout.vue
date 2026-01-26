@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { ResponsiveNavigation, ApplicationBar, FloatingActionButton } from '@/components/layout'
+import { useNotificationsStore } from '@/stores/notifications'
 
+const notifications = useNotificationsStore()
 const navigationRef = ref<InstanceType<typeof ResponsiveNavigation>>()
 
 const handleToggleDrawer = () => {
@@ -20,7 +22,7 @@ const handleToggleDrawer = () => {
       </v-container>
       <v-footer class="app-footer" />
     </v-main>
-
+    <v-snackbar-queue v-model="notifications.queue"></v-snackbar-queue>
     <FloatingActionButton />
   </div>
 </template>

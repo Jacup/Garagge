@@ -14,7 +14,9 @@ import { useLayoutFab } from '@/composables/useLayoutFab'
 import { useAppBar } from '@/composables/useAppBar'
 import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
 import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesState'
+import { useNotificationsStore } from '@/stores/notifications'
 
+const notifications = useNotificationsStore()
 const route = useRoute()
 
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
@@ -168,6 +170,7 @@ async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
 
   try {
     await putApiVehiclesId(vehicleId.value, vehicleData)
+    notifications.show('Vehicle updated successfully.')
     closeEditVehicleDialog()
     await loadVehicle()
   } catch (error) {

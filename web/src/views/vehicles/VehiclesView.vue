@@ -7,6 +7,7 @@ import { useLayoutFab } from '@/composables/useLayoutFab'
 import { useVehicles } from '@/composables/vehicles/useVehicles'
 import { useVehiclesSelection } from '@/composables/vehicles/useVehiclesSelection'
 import { useSettingsStore, type VehicleViewType } from '@/stores/settings'
+import { useNotificationsStore } from '@/stores/notifications'
 
 import type { VehicleDto, VehicleCreateRequest, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
 
@@ -21,13 +22,13 @@ const router = useRouter()
 const { isMobile } = useResponsiveLayout()
 const { registerFab, unregisterFab } = useLayoutFab()
 const settingsStore = useSettingsStore()
+const notifications = useNotificationsStore()
 
 const vehicles = useVehicles({
   initialPageSize: 10,
   isMobile,
   onError: (error, operation) => {
-    // TODO: Show snackbar/toast notification
-    console.error(`Operation ${operation} failed:`, error)
+    notifications.show(`Failed to ${operation} vehicle(s).`)
   },
 })
 
@@ -123,6 +124,7 @@ async function confirmSave(vehicleData: VehicleCreateRequest | VehicleUpdateRequ
     if (success) {
       showVehicleDialog.value = false
       editingVehicle.value = null
+      notifications.show('Vehicle saved successfully.')
     }
   } finally {
     savingVehicle.value = false
@@ -146,7 +148,10 @@ async function confirmSingleDelete() {
 
   selection.remove(idToDelete)
 
-  await deleteVehicle(idToDelete)
+  const success = await deleteVehicle(idToDelete)
+  if (success) {
+    notifications.show('Vehicle deleted successfully.')
+  }
 }
 
 async function confirmMultipleDelete() {
@@ -160,7 +165,10 @@ async function confirmMultipleDelete() {
     clearSelection()
     showBulkDeleteDialog.value = false
 
-    await deleteMultipleVehicles(idsToDelete)
+    const success = await deleteMultipleVehicles(idsToDelete)
+    if (success) {
+      notifications.show('Vehicles deleted successfully.')
+    }
   } finally {
     isBulkDeleting.value = false
   }

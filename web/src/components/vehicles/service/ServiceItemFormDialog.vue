@@ -8,8 +8,8 @@ import type {
   ServiceItemType as ApiServiceItemType,
 } from '@/api/generated/apiV1.schemas'
 import { getServiceItems } from '@/api/generated/service-items/service-items'
-
 import { useServiceItemState } from '@/composables/vehicles/useServiceItemState'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const props = defineProps<{
   vehicleId: string
@@ -25,6 +25,7 @@ const {
   postApiVehiclesVehicleIdServiceRecordsServiceRecordIdServiceItems,
   putApiVehiclesVehicleIdServiceRecordsServiceRecordIdServiceItemsServiceItemId,
 } = getServiceItems()
+const notifications = useNotificationsStore()
 
 const isSaving = ref(false)
 const saveError = ref<string | null>(null)
@@ -98,6 +99,7 @@ const submit = async () => {
     if (mode.value === 'create') {
       const createPayload: ServiceItemCreateRequest = { ...payloadBase }
       await postApiVehiclesVehicleIdServiceRecordsServiceRecordIdServiceItems(props.vehicleId, parentRecordId.value, createPayload)
+      notifications.show('Service item created successfully.')
     } else if (mode.value === 'edit' && selectedItem.value?.id) {
       const updatePayload: ServiceItemUpdateRequest = { ...payloadBase }
       await putApiVehiclesVehicleIdServiceRecordsServiceRecordIdServiceItemsServiceItemId(
@@ -106,6 +108,7 @@ const submit = async () => {
         selectedItem.value.id,
         updatePayload,
       )
+      notifications.show('Service item updated successfully.')
     }
 
     emit('refresh-data')

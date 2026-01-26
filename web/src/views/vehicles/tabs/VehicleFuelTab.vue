@@ -3,6 +3,7 @@ import { onMounted, ref, watch, computed } from 'vue'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesState'
+import { useNotificationsStore } from '@/stores/notifications'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated/apiV1.schemas'
@@ -29,6 +30,7 @@ const emit = defineEmits<{
 const { isMobile } = useResponsiveLayout()
 const { getApiVehiclesVehicleIdEnergyEntries, deleteApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
 const { showEntryDialog, selectedEntry, openEditDialog, closeDialog } = useEnergyEntriesState()
+const notifications = useNotificationsStore()
 
 const energyEntries = ref<EnergyEntryDto[]>([])
 const energyEntriesLoading = ref(false)
@@ -134,7 +136,7 @@ async function confirmSingleDelete() {
 
   try {
     await deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, entryToDeleteId.value)
-
+    notifications.show('Fuel entry deleted successfully.')
     page.value = 1
     selectedEntryIds.value = []
     await loadEnergyEntries()
@@ -157,6 +159,7 @@ async function confirmBulkDelete() {
     showBulkDeleteDialog.value = false
 
     await Promise.all(idsToDelete.map((id) => deleteApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, id)))
+    notifications.show('Fuel entries deleted successfully.')
     await loadEnergyEntries()
     emit('entry-changed')
   } catch (err) {

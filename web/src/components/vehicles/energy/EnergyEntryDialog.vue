@@ -5,6 +5,7 @@ import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import type { EnergyEntryDto, EnergyEntryCreateRequest, EnergyEntryUpdateRequest, EnergyType } from '@/api/generated/apiV1.schemas'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import EnergyEntryForm, { type EnergyFormData } from './EnergyEntryForm.vue'
+import { useNotificationsStore } from '@/stores/notifications'
 
 interface Props {
   modelValue: boolean
@@ -25,6 +26,7 @@ const emit = defineEmits<{
 }>()
 
 const { postApiVehiclesVehicleIdEnergyEntries, putApiVehiclesVehicleIdEnergyEntriesId } = getEnergyEntries()
+const notifications = useNotificationsStore()
 
 const { isMobile } = useResponsiveLayout()
 
@@ -78,8 +80,10 @@ async function handleSave() {
   try {
     if (isEditMode.value && props.entry?.id) {
       await putApiVehiclesVehicleIdEnergyEntriesId(props.vehicleId, props.entry.id, formData.value as EnergyEntryUpdateRequest)
+      notifications.show('Fuel entry updated successfully.')
     } else {
       await postApiVehiclesVehicleIdEnergyEntries(props.vehicleId, formData.value as EnergyEntryCreateRequest)
+      notifications.show('Fuel entry created successfully.')
     }
 
     emit('saved')
@@ -164,5 +168,4 @@ const isSaveDisabled = computed(() => isLoading.value)
   </v-dialog>
 </template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

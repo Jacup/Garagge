@@ -10,6 +10,7 @@ import StackedButton from '@/components/common/StackedButton.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import VehicleActivity from '@/components/vehicles/overview/VehicleActivity.vue'
 import { useFormatting } from '@/composables/useFormatting'
+import { useNotificationsStore } from '@/stores/notifications'
 
 interface Props {
   vehicle: VehicleDto
@@ -34,6 +35,7 @@ const { deleteApiVehiclesId, getApiVehiclesIdStats } = getVehicles()
 const { isMobile } = useResponsiveLayout()
 const router = useRouter()
 const { formatDate, formatCurrency, formatMileage } = useFormatting()
+const notifications = useNotificationsStore()
 
 const statsLoading = ref(false)
 const vehicleStats = ref<VehicleStatsDto | null>(null)
@@ -61,6 +63,7 @@ async function confirmDelete() {
   showDeleteDialog.value = false
 
   await deleteApiVehiclesId(props.vehicle.id)
+  notifications.show('Vehicle deleted successfully.')
   router.push({ name: 'Vehicles' })
 }
 

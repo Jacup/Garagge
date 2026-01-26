@@ -16,6 +16,7 @@ import ServiceItemDeleteDialog from './ServiceItemDeleteDialog.vue'
 
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetailsState'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const props = defineProps<{
   modelValue: boolean
@@ -32,6 +33,7 @@ const { getApiVehiclesServiceRecordsTypes, postApiVehiclesVehicleIdServiceRecord
   getServiceRecords()
 const { isMobile } = useResponsiveLayout()
 const { mode, editMetadata, cancelAction, close: closeSheet } = useServiceDetailsState()
+const notifications = useNotificationsStore()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -71,6 +73,7 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
       await postApiVehiclesVehicleIdServiceRecords(props.vehicleId, payload)
       emit('refresh-data')
       closeSheet()
+      notifications.show('Service record created successfully.')
     } else if (mode.value === 'edit-metadata') {
       if (!props.record?.id) {
         throw new Error('Missing record ID for update')
@@ -89,6 +92,7 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
 
       emit('refresh-data')
       closeSheet()
+      notifications.show('Service record updated successfully.')
     }
   } catch (error) {
     console.error('Error saving record:', error)
