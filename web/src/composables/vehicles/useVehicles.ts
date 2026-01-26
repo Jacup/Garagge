@@ -162,7 +162,6 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
       await putApiVehiclesId(id, vehicleData)
 
       await loadVehicles({ isBackgroundReload: true })
-
       return true
     } catch (err) {
       console.error('Failed to update vehicle:', err)
@@ -189,7 +188,6 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
       await deleteApiVehiclesId(id)
 
       await loadVehicles({ isBackgroundReload: true })
-
       return true
     } catch (err) {
       console.error('Failed to delete vehicle:', err)
@@ -221,7 +219,6 @@ export function useVehicles(options: UseVehiclesOptions = {}) {
       await Promise.all(ids.map((id) => deleteApiVehiclesId(id)))
 
       await loadVehicles({ isBackgroundReload: true })
-
       return true
     } catch (err) {
       console.error('Failed to delete vehicles:', err)

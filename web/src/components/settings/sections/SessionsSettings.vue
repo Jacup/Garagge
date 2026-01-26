@@ -3,8 +3,11 @@ import { ref, computed, onMounted } from 'vue'
 import { getUsers, type SessionDto } from '@/api/generated'
 import SessionListItem from '@/components/settings/sections/sessions/SessionListItem.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const { getApiUsersMeSessions, deleteApiUsersMeSessionsId, deleteApiUsersMeSessions } = getUsers()
+const notifications = useNotificationsStore()
+
 const sessions = ref<SessionDto[]>([])
 
 const isLoading = ref(true)
@@ -56,6 +59,7 @@ const confirmDeleteSingleSession = async () => {
   try {
     await deleteApiUsersMeSessionsId(sessionToDelete.value.id)
     await loadSessions()
+    notifications.show('Session deleted successfully.')
   } catch (error) {
     console.error(error)
   } finally {
@@ -67,6 +71,7 @@ const confirmDeleteSessions = async () => {
   try {
     await deleteApiUsersMeSessions()
     await loadSessions()
+    notifications.show('All sessions deleted successfully.')
   } catch (error) {
     console.error(error)
   } finally {
@@ -93,7 +98,9 @@ const confirmDeleteSessions = async () => {
 
     <v-list-item class="inner-item">
       <template #append>
-        <v-btn color="error" variant="text" @click="openDeleteSessionsDialog" :disabled="sessions.length == 1"> Sign out all sessions</v-btn>
+        <v-btn color="error" variant="text" @click="openDeleteSessionsDialog" :disabled="sessions.length == 1">
+          Sign out all sessions</v-btn
+        >
       </template>
     </v-list-item>
   </template>
@@ -105,7 +112,7 @@ const confirmDeleteSessions = async () => {
     :on-confirm="confirmDeleteSingleSession"
   />
 
-    <DeleteDialog
+  <DeleteDialog
     :is-open="isDeleteSessionsDialogOpen"
     item-to-delete="sessions"
     :on-cancel="closeDeleteSessionsDialog"

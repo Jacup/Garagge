@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import { getAuth } from '@/api/generated/auth/auth'
 import { parseApiError } from '@/utils/error-handler'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const { putApiAuthChangePassword } = getAuth()
+const notifications = useNotificationsStore()
 
 const isExpanded = ref(false)
 const loading = ref(false)
@@ -35,8 +37,7 @@ const handleUpdate = async () => {
       logoutAllDevices: form.value.logoutAll,
     })
 
-    console.log('Password changed successfully')
-    alert('Password changed successfully.')
+    notifications.show('Password changed successfully.')
     if (formRef.value) {
       formRef.value.reset()
     }
