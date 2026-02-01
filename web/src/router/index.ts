@@ -11,6 +11,7 @@ import SettingsView from '@/views/settings/SettingsView.vue'
 
 import ApplicationLayout from '@/layouts/ApplicationLayout.vue'
 import SetupLayout from '@/layouts/SetupLayout.vue'
+import { useUserStore } from '@/stores/user'
 
 const routes = [
   {
@@ -94,18 +95,29 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+let initPromise: Promise<void> | null = null
+
+const ensureInitialized = (): Promise<void> => {
+  if (!initPromise) {
+    initPromise = useUserStore().fetchUserData()
+  }
+  return initPromise
+}
+
+router.beforeEach(async (to) => {
+  await ensureInitialized()
+
   const authStore = useAuthStore()
 
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const requiresGuest = to.matched.some((record) => record.meta.requiresGuest)
 
   if (requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (requiresGuest && authStore.isAuthenticated) {
-    next({ name: 'Dashboard' })
-  } else {
-    next()
+    return { name: 'Login', query: { redirect: to.fullPath } }
+  }
+
+  if (requiresGuest && authStore.isAuthenticated) {
+    return { name: 'Dashboard' }
   }
 })
 

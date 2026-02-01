@@ -13,32 +13,16 @@ internal static class ServiceCollectionExtensions
 
             var securityScheme = new OpenApiSecurityScheme
             {
-                Name = "JWT Authentication",
-                Description = "Enter your JWT token in this field",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = JwtBearerDefaults.AuthenticationScheme,
-                BearerFormat = "JWT"
+                Name = "accessToken",
+                Description = "Access token cookie",
+                In = ParameterLocation.Cookie,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "cookie"
             };
 
-            o.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securityScheme);
+            o.AddSecurityDefinition("cookieAuth", securityScheme);
 
-            var securityRequirement = new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = JwtBearerDefaults.AuthenticationScheme
-                        }
-                    },
-                    []
-                }
-            };
-
-            o.AddSecurityRequirement(securityRequirement);
+            o.AddSecurityRequirement(new OpenApiSecurityRequirement { { securityScheme, [] } });
         });
 
         return services;

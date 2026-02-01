@@ -16,9 +16,9 @@ internal sealed class Refresh : IEndpoint
                 {
                     return Results.Unauthorized();
                 }
-                
-                string? ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
-                string? userAgent = httpContext.Request.Headers.UserAgent.ToString();
+
+                var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+                var userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
                 var command = new RefreshTokenCommand(refreshToken, ipAddress, userAgent);
 
@@ -26,11 +26,12 @@ internal sealed class Refresh : IEndpoint
 
                 if (result.IsFailure)
                 {
+                    httpContext.Response.Cookies.Delete("accessToken");
                     httpContext.Response.Cookies.Delete("refreshToken");
                     return CustomResults.Problem(result);
                 }
 
-                var cookieOptions = new CookieOptions
+                var baseCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = configuration.GetValue<bool>("Security:UseSecureCookies"),
@@ -38,9 +39,10 @@ internal sealed class Refresh : IEndpoint
                     Expires = result.Value.RefreshTokenExpiresAt
                 };
 
-                httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, cookieOptions);
+                httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
+                httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions) { Path = "/auth/" });
 
-                return Results.Ok(new LoginResponse(result.Value.AccessToken));
+                return Results.NoContent();
             })
             .AllowAnonymous()
             .WithTags(Tags.Auth);
