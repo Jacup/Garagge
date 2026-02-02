@@ -70,7 +70,7 @@ public class UpdateMeCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsSuccess.ShouldBeFalse();
-        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
+        result.Error.ShouldBe(UserErrors.NotFound);
     }
     
     [Fact]

@@ -1,5 +1,5 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.EnergyEntries;
 using Domain.Entities.Users;
@@ -32,7 +32,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -75,7 +75,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, nonExistentVehicleId),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, nonExistentVehicleId),
             request);
 
         // Assert
@@ -103,7 +103,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -132,7 +132,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -159,7 +159,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -186,7 +186,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -213,7 +213,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert
@@ -250,7 +250,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.EnergyEntries.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.EnergyEntries.Create, vehicle.Id),
             request);
 
         // Assert

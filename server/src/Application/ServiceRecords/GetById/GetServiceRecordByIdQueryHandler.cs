@@ -14,22 +14,18 @@ internal sealed class GetServiceRecordByIdQueryHandler(IApplicationDbContext con
     {
         var userId = userContext.UserId;
 
-        if (userId == Guid.Empty)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.Unauthorized);
-
         var serviceRecord = await context.ServiceRecords
             .AsNoTracking()
             .Include(sr => sr.Vehicle)
             .Include(sr => sr.Type)
             .Include(sr => sr.Items)
-            .Where(sr => sr.Id == request.ServiceRecordId && sr.VehicleId == request.VehicleId)
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(sr => 
+                    sr.Id == request.ServiceRecordId && 
+                    sr.VehicleId == request.VehicleId, 
+                cancellationToken);
 
-        if (serviceRecord == null)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.NotFound(request.ServiceRecordId));
-
-        if (serviceRecord.Vehicle?.UserId != userId)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.Unauthorized);
+        if (serviceRecord?.Vehicle == null || serviceRecord.Vehicle.UserId != userId)
+            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.NotFound);
 
         var dto = new ServiceRecordDto(
             serviceRecord.Id,
@@ -57,6 +53,6 @@ internal sealed class GetServiceRecordByIdQueryHandler(IApplicationDbContext con
             serviceRecord.UpdatedDate
         );
 
-        return Result.Success(dto);
+        return dto;
     }
 }

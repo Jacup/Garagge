@@ -1,10 +1,7 @@
-using Application.Abstractions.Authentication;
-using Application.Abstractions.Data;
 using Application.Core;
 using Application.Users;
 using Application.Users.GetByEmail;
 using Domain.Entities.Users;
-using Moq;
 
 namespace ApplicationTests.Users.GetByEmail;
 
@@ -25,7 +22,7 @@ public class GetUserByEmailQueryHandlerTests : InMemoryDbTestBase
 
         var result = await _sut.Handle(query, CancellationToken.None);
 
-        result.Error.ShouldBe(UserErrors.NotFoundByEmail);
+        result.Error.ShouldBe(UserErrors.NotFound);
         result.IsFailure.ShouldBeTrue();
     }
     

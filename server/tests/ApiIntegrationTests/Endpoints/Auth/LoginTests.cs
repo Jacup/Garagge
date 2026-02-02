@@ -1,8 +1,9 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth;
+using Application.Users;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
@@ -17,36 +18,34 @@ public class LoginTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task Login_ValidRequest_ReturnsOk()
+    public async Task Login_ValidRequest_ReturnsNoContentAndSetsCookies()
     {
         // Arrange
         await CreateUserAsync();
         var loginRequest = new LoginRequest("test@garagge.app", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, loginRequest);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        result?.AccessToken.ShouldNotBeNullOrEmpty();
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.Headers.ShouldContainCookie("accessToken");
+        response.Headers.ShouldContainCookie("refreshToken");
     }
 
     [Fact]
-    public async Task Login_EmailCaseInsensitive_ReturnsOk()
+    public async Task Login_EmailCaseInsensitive_ReturnsNoContentAndSetsCookies()
     {
         await CreateUserAsync();
         var request = new LoginRequest("TEST@GARAGGE.APP", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var str = response.Content.ReadAsStringAsync();
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        result?.AccessToken.ShouldNotBeNullOrEmpty();
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.Headers.ShouldContainCookie("accessToken");
+        response.Headers.ShouldContainCookie("refreshToken");
     }
 
     [Fact]
@@ -54,16 +53,16 @@ public class LoginTests : BaseIntegrationTest
     {
         // Arrange
         await CreateUserAsync();
-        var request = new LoginRequest("test@garagge.app", "WrongPassword", false);
+        var request = new LoginRequest("test@garagge.app", "PasswordInvalid", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         var problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.ShouldBeErrorOfType(AuthErrors.WrongEmailOrPassword);
+        problemDetails.ShouldBeErrorOfType(AuthErrors.CredentialsInvalid);
     }
 
     [Fact]
@@ -73,13 +72,13 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("nonexistent@example.com", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         var problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.ShouldBeErrorOfType(AuthErrors.WrongEmailOrPassword);
+        problemDetails.ShouldBeErrorOfType(AuthErrors.CredentialsInvalid);
     }
 
     [Fact]
@@ -89,7 +88,7 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -97,7 +96,7 @@ public class LoginTests : BaseIntegrationTest
         var problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.MissingEmail);
+        problemDetails.Errors.ShouldContain(UserErrors.EmailRequired);
     }
 
     [Fact]
@@ -107,7 +106,7 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("invalid-email-format", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -115,7 +114,7 @@ public class LoginTests : BaseIntegrationTest
         var problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.InvalidEmail);
+        problemDetails.Errors.ShouldContain(UserErrors.EmailInvalid);
     }
 
     [Fact]
@@ -125,21 +124,21 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("test@garagge.app", "", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
         var problemDetails = await response.GetProblemDetailsAsync();
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.MissingPassword);
+        problemDetails.Errors.ShouldContain(UserErrors.PasswordRequired);
     }
 
     [Fact]
     public async Task Login_WrongHttpMethod_ReturnsMethodNotAllowed()
     {
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Auth.Login);
+        var response = await Client.GetAsync(ApiV1Definitions.Auth.Login);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.MethodNotAllowed);
@@ -154,14 +153,14 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("test@garagge.app", longPassword, false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
-    public async Task Login_PasswordWithSpecialCharacters_ReturnsOk()
+    public async Task Login_PasswordWithSpecialCharacters_ReturnsNoContentAndSetsCookies()
     {
         // Arrange
         const string specialPassword = "P@ssw0rd!#$%^&*()";
@@ -169,17 +168,15 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("test@garagge.app", specialPassword, false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        result?.AccessToken.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.Headers.ShouldContainCookie("accessToken");
     }
 
     [Fact]
-    public async Task Login_EmailWithPlusSign_ReturnsOk()
+    public async Task Login_EmailWithPlusSign_ReturnsNoContentAndSetsCookies()
     {
         // Arrange
         const string emailWithPlus = "test+label@example.com";
@@ -187,30 +184,26 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest(emailWithPlus, "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        result?.AccessToken.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.Headers.ShouldContainCookie("accessToken");
     }
 
     [Fact]
-    public async Task Login_WithWhitespaceInEmail_ReturnsOk()
+    public async Task Login_WithWhitespaceInEmail_ReturnsNoContentAndSetsCookies()
     {
         // Arrange
         await CreateUserAsync();
         var request = new LoginRequest("  test@garagge.app  ", "Password123", false);
         
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
         
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        result?.AccessToken.ShouldNotBeNullOrEmpty();
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        response.Headers.ShouldContainCookie("accessToken");
     }
 
     [Fact]
@@ -220,7 +213,7 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("admin'; DROP TABLE Users; --", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         // Should be either BadRequest (validation) or Unauthorized (user not found)
@@ -242,7 +235,7 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest(email, wrongPassword, false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -257,7 +250,7 @@ public class LoginTests : BaseIntegrationTest
 
         // Act - 5 simultaneous login requests
         var tasks = Enumerable.Range(0, 5)
-            .Select(_ => Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request))
+            .Select(_ => Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request))
             .ToArray();
 
         var responses = await Task.WhenAll(tasks);
@@ -265,10 +258,8 @@ public class LoginTests : BaseIntegrationTest
         // Assert - all should succeed
         foreach (var response in responses)
         {
-            response.StatusCode.ShouldBe(HttpStatusCode.OK);
-
-            var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            result?.AccessToken.ShouldNotBeNullOrEmpty();
+            response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+            response.Headers.ShouldContainCookie("accessToken");
         }
     }
 
@@ -280,10 +271,10 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("test@garagge.app", "Password123", true);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         var token = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         token.ShouldNotBeNull();
@@ -298,10 +289,10 @@ public class LoginTests : BaseIntegrationTest
         var request = new LoginRequest("test@garagge.app", "Password123", false);
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         var token = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         token.ShouldNotBeNull();

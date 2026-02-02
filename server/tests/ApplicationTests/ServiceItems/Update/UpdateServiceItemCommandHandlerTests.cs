@@ -1,7 +1,5 @@
 using Application.ServiceItems;
 using Application.ServiceItems.Update;
-using Application.ServiceRecords;
-using Domain.Entities.Services;
 using Domain.Enums;
 using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
@@ -137,7 +135,7 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(nonExistentServiceItemId));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -166,7 +164,7 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -195,11 +193,11 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -224,7 +222,7 @@ public class UpdateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]

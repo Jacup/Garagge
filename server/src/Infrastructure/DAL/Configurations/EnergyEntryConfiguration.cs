@@ -37,6 +37,7 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
         builder.HasOne(e => e.Vehicle)
             .WithMany(v => v.EnergyEntries)
             .HasForeignKey(e => e.VehicleId)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

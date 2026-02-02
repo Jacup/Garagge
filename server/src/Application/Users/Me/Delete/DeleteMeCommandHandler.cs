@@ -10,23 +10,13 @@ public class DeleteMeCommandHandler(IApplicationDbContext context, IUserContext 
 {
     public async Task<Result> Handle(DeleteMeCommand request, CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-
-        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userContext.UserId, cancellationToken);
 
         if (user == null)
-            return Result.Failure(UserErrors.NotFound(userId));
-        
+            return Result.Failure(UserErrors.NotFound);
+
         context.Users.Remove(user);
-        
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure(UserErrors.DeleteFailed);
-        }
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

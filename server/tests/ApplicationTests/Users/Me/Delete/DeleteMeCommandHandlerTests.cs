@@ -48,6 +48,6 @@ public class DeleteMeCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
+        result.Error.ShouldBe(UserErrors.NotFound);
     }
 }

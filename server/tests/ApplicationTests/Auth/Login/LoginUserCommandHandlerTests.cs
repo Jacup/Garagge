@@ -37,7 +37,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(AuthErrors.WrongEmailOrPassword);
+        result.Error.ShouldBe(AuthErrors.CredentialsInvalid);
         result.IsFailure.ShouldBeTrue();
     }
 
@@ -71,7 +71,7 @@ public class LoginUserCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(AuthErrors.WrongEmailOrPassword);
+        result.Error.ShouldBe(AuthErrors.CredentialsInvalid);
         result.IsFailure.ShouldBeTrue();
         _passwordHasherMock.Verify(x => x.Verify(password, hashedPassword), Times.Once);
     }

@@ -11,29 +11,17 @@ internal sealed class DeleteVehicleByIdCommandHandler(IApplicationDbContext dbCo
 {
     public async Task<Result> Handle(DeleteVehicleByIdCommand request, CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-        if (userId == Guid.Empty)
-            return Result.Failure(VehicleErrors.Unauthorized);
-
         var vehicle = await dbContext.Vehicles
             .FirstOrDefaultAsync(v =>
                     v.Id == request.VehicleId &&
-                    v.UserId == userId,
+                    v.UserId == userContext.UserId,
                 cancellationToken);
 
         if (vehicle is null)
-            return Result.Failure(VehicleErrors.NotFound(request.VehicleId));
+            return Result.Failure(VehicleErrors.NotFound);
 
         dbContext.Vehicles.Remove(vehicle);
-        
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure(VehicleErrors.DeleteFailed(request.VehicleId));
-        }
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

@@ -1,5 +1,4 @@
-﻿using Application.Abstractions;
-using Application.Abstractions.Authentication;
+﻿using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
@@ -18,48 +17,39 @@ internal sealed class UpdateEnergyEntryCommandHandler(
 {
     public async Task<Result<EnergyEntryDto>> Handle(UpdateEnergyEntryCommand request, CancellationToken cancellationToken)
     {
-        var actualEnergyEntry = await dbContext.EnergyEntries
+        var energyEntry = await dbContext.EnergyEntries
             .Include(ee => ee.Vehicle)
-            .FirstOrDefaultAsync(ee => ee.Id == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(ee =>
+                    ee.Id == request.Id &&
+                    ee.VehicleId == request.VehicleId &&
+                    ee.Vehicle.UserId == userContext.UserId,
+                cancellationToken);
 
-        if (actualEnergyEntry is null)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.NotFound(request.Id));
-        
-        if (actualEnergyEntry.VehicleId != request.VehicleId)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Invalid);
+        if (energyEntry is null)
+            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.NotFound);
 
-        if (actualEnergyEntry.Vehicle!.UserId != userContext.UserId)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
-
-        var isCompatible = await engineCompatibilityService.IsEnergyTypeCompatibleAsync(actualEnergyEntry.VehicleId, request.Type, cancellationToken);
+        var isCompatible = await engineCompatibilityService.IsEnergyTypeCompatibleAsync(energyEntry.VehicleId, request.Type, cancellationToken);
 
         if (!isCompatible)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(actualEnergyEntry.VehicleId, request.Type));
-        
+            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.TypeIncompatible);
+
         var entries = await dbContext.EnergyEntries
-            .Where(ee => ee.VehicleId == actualEnergyEntry.VehicleId)
+            .Where(ee => ee.VehicleId == energyEntry.VehicleId)
             .ToListAsync(cancellationToken);
-        
-        if (!mileageValidator.IsValid(entries, actualEnergyEntry, request.Date, request.Mileage))
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncorrectMileage);
 
-        actualEnergyEntry.Date = request.Date;
-        actualEnergyEntry.Mileage = request.Mileage;
-        actualEnergyEntry.Type = request.Type;
-        actualEnergyEntry.EnergyUnit = request.EnergyUnit;
-        actualEnergyEntry.Volume = request.Volume;
-        actualEnergyEntry.Cost = request.Cost;
-        actualEnergyEntry.PricePerUnit = request.PricePerUnit;
+        if (!mileageValidator.IsValid(entries, energyEntry, request.Date, request.Mileage))
+            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.MileageIncorrect);
 
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.CreateFailed);
-        }
+        energyEntry.Date = request.Date;
+        energyEntry.Mileage = request.Mileage;
+        energyEntry.Type = request.Type;
+        energyEntry.EnergyUnit = request.EnergyUnit;
+        energyEntry.Volume = request.Volume;
+        energyEntry.Cost = request.Cost;
+        energyEntry.PricePerUnit = request.PricePerUnit;
 
-        return Result.Success(actualEnergyEntry.Adapt<EnergyEntryDto>());
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return energyEntry.Adapt<EnergyEntryDto>();
     }
 }

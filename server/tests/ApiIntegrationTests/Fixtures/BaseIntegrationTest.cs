@@ -1,10 +1,10 @@
-﻿using System.Net;
+﻿using ApiIntegrationTests.Contracts;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
 using Application.Abstractions.Authentication;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
@@ -67,43 +67,59 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
     {
         await CreateUserAsync();
 
-        var (loginResponse, _) = await LoginUser("test@garagge.app", "Password123", rememberMe);
+        var result = await LoginUser("test@garagge.app", "Password123", rememberMe);
 
-        Authenticate(loginResponse.AccessToken);
+        Authenticate(result.AccessToken);
     }
     
     protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword, bool rememberMe = false)
     {
         await RegisterUser(userEmail, firstName, lastName, userPassword);
 
-        var (loginResponse, _) = await LoginUser(userEmail, userPassword, rememberMe);
+        var result = await LoginUser(userEmail, userPassword, rememberMe);
 
-        Authenticate(loginResponse.AccessToken);
+        Authenticate(result.AccessToken);
     }
     
     protected async Task RegisterUser(string userEmail, string firstName, string lastName, string userPassword)
     {
         var registerRequest = new RegisterRequest(userEmail, userPassword, firstName, lastName);
-        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, registerRequest);
+        var registerResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, registerRequest);
 
         registerResponse.EnsureSuccessStatusCode();
     }
 
-    protected async Task<(LoginResponse Response, string RefreshToken)> LoginUser(string userEmail, string userPassword, bool rememberMe = false)
+    protected async Task<(string AccessToken, string RefreshToken)> LoginUser(string userEmail, string userPassword, bool rememberMe = false)
     {
         var loginRequest = new LoginRequest(userEmail, userPassword, rememberMe);
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Login, loginRequest);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, loginRequest);
 
         response.EnsureSuccessStatusCode();
 
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        loginResponse.ShouldNotBeNull();
-        loginResponse.AccessToken.ShouldNotBeNull();
+        var accessToken = ParseAccessTokenFromCookie(response.Headers);
+        accessToken.ShouldNotBeNullOrEmpty();
 
         var refreshToken = ParseRefreshTokenFromCookie(response.Headers);
         refreshToken.ShouldNotBeNullOrEmpty();
         
-        return (loginResponse, refreshToken);
+        return (accessToken, refreshToken);
+    }
+    
+    protected static string? ParseAccessTokenFromCookie(HttpResponseHeaders headers, bool expired = false)
+    {
+        var cookieHeader = headers.GetValues("Set-Cookie").FirstOrDefault();
+        if (cookieHeader is null) 
+            return null;
+
+        if (expired)
+            return cookieHeader.StartsWith("accessToken=;") ? "" : null;
+
+        var parts = cookieHeader.Split(';')[0].Split('=');
+        if (parts.Length != 2)
+            return null;
+
+        var encodedValue = parts[1];
+        return WebUtility.UrlDecode(encodedValue);
     }
     
     protected static string? ParseRefreshTokenFromCookie(HttpResponseHeaders headers, bool expired = false)

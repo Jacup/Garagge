@@ -4,27 +4,19 @@ using Application.Abstractions.Messaging;
 using Application.Core;
 using Domain.Entities.Vehicles;
 using Mapster;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Vehicles.Create;
 
-public sealed class CreateVehicleCommandHandler(
+internal sealed class CreateVehicleCommandHandler(
     IApplicationDbContext dbContext,
-    IUserContext userContext,
-    ILogger<CreateVehicleCommandHandler> logger)
+    IUserContext userContext)
     : ICommandHandler<CreateVehicleCommand, VehicleDto>
 {
     public async Task<Result<VehicleDto>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
     {
         var userId = userContext.UserId;
-
-        if (userId == Guid.Empty)
-        {
-            logger.LogError("Attempt to create vehicle with empty userId");
-            return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
-        }
-
         var vehicleId = Guid.NewGuid();
+        
         var vehicle = new Vehicle
         {
             Id = vehicleId,
@@ -43,23 +35,7 @@ public sealed class CreateVehicleCommandHandler(
         }
 
         await dbContext.Vehicles.AddAsync(vehicle, cancellationToken);
-
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            logger.LogError("Error occurred while creating vehicle {Vehicle.Brand} {Vehicle.Model}", request.Brand, request.Model);
-            return Result.Failure<VehicleDto>(VehicleErrors.CreateFailed);
-        }
-
-        logger.LogInformation(
-            "Vehicle created successfully. VehicleId: {VehicleId}, UserId: {UserId}, Brand: {Brand}, Model: {Model}",
-            vehicleId,
-            userId,
-            request.Brand,
-            request.Model);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return vehicle.Adapt<VehicleDto>();
     }

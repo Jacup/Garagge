@@ -1,9 +1,10 @@
 ﻿using ApiIntegrationTests.Contracts;
-using ApiIntegrationTests.Definitions;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth;
 using Application.Auth.Register;
+using Application.Users;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -23,7 +24,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand("test@garagge.app", "John", "Doe", "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -48,7 +49,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand("", "John", "Doe", "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -56,8 +57,8 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.MissingEmail);
-        problemDetails.Errors.ShouldContain(AuthErrors.InvalidEmail);
+        problemDetails.Errors.ShouldContain(UserErrors.EmailRequired);
+        problemDetails.Errors.ShouldContain(UserErrors.EmailInvalid);
         
         DbContext.Users.Count().ShouldBe(0);
     }    
@@ -72,7 +73,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand(email, "John", "Doe", "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -80,7 +81,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.InvalidEmail);
+        problemDetails.Errors.ShouldContain(UserErrors.EmailInvalid);
         
         DbContext.Users.Count().ShouldBe(0);
     }
@@ -92,7 +93,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand("test@garagge.app", "", "Doe", "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -100,7 +101,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.MissingFirstName);
+        problemDetails.Errors.ShouldContain(UserErrors.FirstNameRequired);
         
         DbContext.Users.Count().ShouldBe(0);
     }
@@ -112,7 +113,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand("test@garagge.app", "John", "", "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -120,7 +121,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.MissingLastName);
+        problemDetails.Errors.ShouldContain(UserErrors.LastNameRequired);
         
         DbContext.Users.Count().ShouldBe(0);
     }
@@ -133,7 +134,7 @@ public class RegisterTests : BaseIntegrationTest
         const int passwordLength = 8;
         
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -141,7 +142,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.InvalidPassword(passwordLength));
+        problemDetails.Errors.ShouldContain(UserErrors.PasswordTooShort(passwordLength));
         
         DbContext.Users.Count().ShouldBe(0);
     }
@@ -154,7 +155,7 @@ public class RegisterTests : BaseIntegrationTest
         const int passwordLength = 8;
         
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -162,7 +163,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(AuthErrors.InvalidPassword(passwordLength));
+        problemDetails.Errors.ShouldContain(UserErrors.PasswordTooShort(passwordLength));
         
         DbContext.Users.Count().ShouldBe(0);
     }
@@ -172,16 +173,16 @@ public class RegisterTests : BaseIntegrationTest
     {
         // Arrange
         var request = new RegisterUserCommand("test-conflict@garagge.app", "John", "Doe", "Password123");
-        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
         
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
         
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
+        problemDetails.Title.ShouldBe(UserErrors.EmailNotUnique.Code);
     }
 
     [Fact]
@@ -189,18 +190,18 @@ public class RegisterTests : BaseIntegrationTest
     {
         // Arrange
         var initialRequest = new RegisterUserCommand("test-case@garagge.app", "John", "Doe", "Password123");
-        await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, initialRequest);
+        await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, initialRequest);
         
         var duplicateRequest = new RegisterUserCommand("TEST-CASE@GARAGGE.APP", "Jane", "Smith", "Password456");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, duplicateRequest);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, duplicateRequest);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
         
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.Title.ShouldBe(AuthErrors.EmailNotUnique.Code);
+        problemDetails.Title.ShouldBe(UserErrors.EmailNotUnique.Code);
     }
 
     [Theory]
@@ -212,7 +213,7 @@ public class RegisterTests : BaseIntegrationTest
         var request = new RegisterUserCommand(email, firstName, lastName, "Password123");
 
         // Act
-        var response = await Client.PostAsJsonAsync(ApiV1Definition.Auth.Register, request);
+        var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

@@ -1,4 +1,5 @@
-﻿using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
@@ -21,7 +22,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var serviceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicleId, serviceRecordId));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicleId, serviceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -39,7 +40,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         await CreateAndAuthenticateUser();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -54,7 +55,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var serviceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(nonExistentVehicleId, serviceRecordId));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(nonExistentVehicleId, serviceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -70,7 +71,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var nonExistentServiceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, nonExistentServiceRecordId));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, nonExistentServiceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -88,7 +89,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle1.Id, serviceType.Id);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle2.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle2.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -105,7 +106,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -135,7 +136,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             "Used synthetic oil");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -173,7 +174,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             serviceDate); // No notes
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -215,7 +216,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         await CreateServiceItemAsync(serviceRecord.Id, "Labor", 80m);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -252,7 +253,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             25m);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -287,7 +288,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             "Covered under warranty");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -317,7 +318,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             "High mileage maintenance");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -348,7 +349,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             "Service from 2020");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -379,7 +380,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
             longNotes);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -404,7 +405,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var serviceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetById.Replace("{0}", invalidVehicleId).Replace("{1}", serviceRecordId.ToString())}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetById.Replace("{0}", invalidVehicleId).Replace("{1}", serviceRecordId.ToString())}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -419,7 +420,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var invalidServiceRecordId = "invalid-guid";
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetById.Replace("{0}", vehicleId.ToString()).Replace("{1}", invalidServiceRecordId)}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetById.Replace("{0}", vehicleId.ToString()).Replace("{1}", invalidServiceRecordId)}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -445,7 +446,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         await CreateServiceRecordAsync(vehicle2.Id, serviceType.Id, "Service for Vehicle 2");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle1.Id, serviceRecord1.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle1.Id, serviceRecord1.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -471,7 +472,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         ServiceRecord serviceRecord1 = await CreateServiceRecordAsync(vehicle1.Id, serviceType.Id);
 
         // Act - Try to get vehicle1's service record using vehicle2's ID
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetById.WithIds(vehicle2.Id, serviceRecord1.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle2.Id, serviceRecord1.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);

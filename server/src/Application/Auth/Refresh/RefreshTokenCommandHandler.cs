@@ -3,6 +3,7 @@ using Application.Abstractions.Authentication;
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Application.Users;
 using Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -24,13 +25,13 @@ public sealed class RefreshTokenCommandHandler(
             .SingleOrDefaultAsync(r => r.Token == command.RefreshToken, cancellationToken);
 
         if (currentToken is null)
-            return Result.Failure<LoginUserResponse>(AuthErrors.InvalidToken);
+            return Result.Failure<LoginUserResponse>(AuthErrors.TokenInvalid);
 
         if (currentToken.User is null)
         {
             await RevokeAllUserTokens(currentToken.UserId, cancellationToken);
 
-            return Result.Failure<LoginUserResponse>(AuthErrors.UserNotFound);
+            return Result.Failure<LoginUserResponse>(UserErrors.NotFound);
         }
 
         if (currentToken.IsRevoked)
@@ -80,7 +81,7 @@ public sealed class RefreshTokenCommandHandler(
 
         var newAccessToken = tokenProvider.Create(user, sessionId);
 
-        return Result.Success(new LoginUserResponse(newAccessToken, newRefreshToken.Token, newRefreshToken.ExpiresAt));
+        return new LoginUserResponse(newAccessToken, newRefreshToken.Token, newRefreshToken.ExpiresAt);
     }
 
     private async Task RevokeAllUserTokens(Guid userId, CancellationToken cancellationToken)

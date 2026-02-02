@@ -116,11 +116,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFound()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -143,7 +143,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
@@ -171,32 +171,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.IsFailure.ShouldBeTrue();
         result.Error.ShouldBe(ServiceRecordErrors.ServiceTypeNotFound(nonExistentServiceTypeId));
     }
-
-    [Fact]
-    public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
-    {
-        // Arrange
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-
-        var command = new CreateServiceRecordCommand(
-            "Regular oil change",
-            new DateTime(2024, 11, 5),
-            serviceType.Id,
-            vehicle.Id,
-            null,
-            15000,
-            150.50m,
-            new List<CreateServiceItemCommand>());
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
-    }
-
+    
     [Fact]
     public async Task Handle_ValidCommand_GeneratesNewGuidForServiceRecordId()
     {

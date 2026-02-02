@@ -69,5 +69,5 @@ internal sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelin
     }
 
     private static ValidationError CreateValidationError(IEnumerable<ValidationFailure> validationFailures) =>
-        new(validationFailures.Select(f => Error.Problem(f.ErrorCode, f.ErrorMessage)).ToArray());
+        new(validationFailures.Select(f => Error.Validation(f.ErrorCode, f.ErrorMessage)).ToArray());
 }

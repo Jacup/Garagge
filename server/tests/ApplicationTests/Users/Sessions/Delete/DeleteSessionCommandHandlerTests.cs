@@ -33,7 +33,7 @@ public class DeleteSessionCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.DeleteCurrentSessionFailed);
+        result.Error.ShouldBe(UserErrors.DeleteCurrentSession);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class DeleteSessionCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.SessionNotFound(nonExistentSessionId));
+        result.Error.ShouldBe(UserErrors.SessionNotFound);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class DeleteSessionCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.SessionNotFound(otherUserSession.Id));
+        result.Error.ShouldBe(UserErrors.SessionNotFound);
     }
 
     [Fact]

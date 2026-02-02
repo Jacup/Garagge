@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.EnergyEntries.Create;
 
-public class CreateEnergyEntryCommandHandler(
-    IApplicationDbContext dbContext, 
+internal sealed class CreateEnergyEntryCommandHandler(
+    IApplicationDbContext dbContext,
     IUserContext userContext,
     IVehicleEngineCompatibilityService engineCompatibilityService)
     : ICommandHandler<CreateEnergyEntryCommand, EnergyEntryDto>
@@ -20,32 +20,30 @@ public class CreateEnergyEntryCommandHandler(
     {
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Where(v => v.Id == request.VehicleId)
+            .Where(v => v.Id == request.VehicleId && v.UserId == userContext.UserId)
             .FirstOrDefaultAsync(cancellationToken);
-        
+
         if (vehicle is null)
-            return Result.Failure<EnergyEntryDto>(VehicleErrors.NotFound(request.VehicleId));
-        
-        if (userContext.UserId != vehicle.UserId)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.Unauthorized);
+            return Result.Failure<EnergyEntryDto>(VehicleErrors.NotFound);
 
         var isCompatible = await engineCompatibilityService.IsEnergyTypeCompatibleAsync(vehicle.Id, request.Type, cancellationToken);
 
         if (!isCompatible)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncompatibleEnergyType(request.VehicleId, request.Type));
+            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.TypeIncompatible);
 
         var lastEntry = await dbContext.EnergyEntries
-                    .Where(ee => ee.VehicleId == request.VehicleId)
-                    .OrderByDescending(ee => ee.Mileage)
-                    .FirstOrDefaultAsync(cancellationToken);
+            .Where(ee => ee.VehicleId == request.VehicleId)
+            .OrderByDescending(ee => ee.Mileage)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (lastEntry != null && request.Mileage < lastEntry.Mileage)
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.IncorrectMileage);
+            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.MileageIncorrect);
 
         var energyEntry = new EnergyEntry
         {
             Id = Guid.NewGuid(),
             VehicleId = request.VehicleId,
+            Vehicle = null!,
             Date = request.Date,
             Mileage = request.Mileage,
             Type = request.Type,
@@ -55,16 +53,9 @@ public class CreateEnergyEntryCommandHandler(
             PricePerUnit = request.PricePerUnit,
         };
 
-        try
-        {
-            await dbContext.EnergyEntries.AddAsync(energyEntry, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<EnergyEntryDto>(EnergyEntryErrors.CreateFailed);
-        }
-        
-        return Result.Success(energyEntry.Adapt<EnergyEntryDto>());
+        await dbContext.EnergyEntries.AddAsync(energyEntry, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return energyEntry.Adapt<EnergyEntryDto>();
     }
 }

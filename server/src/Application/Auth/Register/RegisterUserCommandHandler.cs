@@ -2,6 +2,7 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Application.Users;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,9 +16,7 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
         var normalizedEmail = command.Email.Trim().ToLowerInvariant();
 
         if (await context.Users.AnyAsync(u => u.Email == normalizedEmail, cancellationToken))
-        {
-            return Result.Failure<Guid>(AuthErrors.EmailNotUnique);
-        }
+            return Result.Failure<Guid>(UserErrors.EmailNotUnique);
 
         var user = new User
         {
@@ -31,14 +30,7 @@ internal sealed class RegisterUserCommandHandler(IApplicationDbContext context, 
         user.Raise(new UserRegisteredDomainEvent(user.Id));
 
         context.Users.Add(user);
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<Guid>(AuthErrors.CreateFailed);
-        }
+        await context.SaveChangesAsync(cancellationToken);
 
         return user.Id;
     }

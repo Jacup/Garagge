@@ -127,7 +127,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(nonExistentServiceRecordId));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(serviceRecord.Id));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -177,11 +177,11 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(serviceRecord.Id));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -202,7 +202,7 @@ public class UpdateServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]

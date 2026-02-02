@@ -41,12 +41,9 @@ internal sealed class Login : IEndpoint
                     return Results.NoContent();
                 })
             .AllowAnonymous()
-            .Produces<LoginResponse>()
             .Produces(StatusCodes.Status401Unauthorized)
             .WithTags(Tags.Auth);
     }
 }
 
 internal sealed record LoginRequest(string Email, string Password, bool RememberMe);
-
-internal sealed record LoginResponse(string AccessToken);

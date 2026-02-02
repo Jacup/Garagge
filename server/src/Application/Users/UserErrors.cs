@@ -4,59 +4,60 @@ namespace Application.Users;
 
 public static class UserErrors
 {
-    public static readonly Error MissingFirstName = Error.Problem(
-        "User.MissingFirstName",
+    public static readonly Error FirstNameRequired = Error.Validation(
+        "User.FirstNameRequired",
         "First name is required.");
 
-    public static readonly Error MissingLastName = Error.Problem(
-        "User.MissingLastName",
+    public static readonly Error LastNameRequired = Error.Validation(
+        "User.LastNameRequired",
         "Last name is required.");
 
-    public static readonly Error MissingEmail = Error.Problem(
-        "User.MissingEmail",
+    public static readonly Error EmailRequired = Error.Validation(
+        "User.EmailRequired",
         "Email is required");
 
-    public static readonly Error InvalidEmail = Error.Problem(
-        "User.InvalidEmail",
+    public static readonly Error EmailInvalid = Error.Problem(
+        "User.EmailInvalid",
         "Email is not valid");
 
+    public static readonly Error EmailNotUnique = Error.Conflict(
+        "User.EmailNotUnique",
+        "This email is already in use.");
+
+    public static readonly Error PasswordRequired = Error.Validation(
+        "User.PasswordRequired",
+        "Password is required.");
+
+    public static Error PasswordTooShort(int minPasswordLength) => Error.Validation(
+        "User.PasswordTooShort",
+        $"Password must be at least {minPasswordLength} characters long.");
+
+    public static readonly Error PasswordSameAsOld = Error.Validation(
+        "User.PasswordSameAsOld",
+        "New password must be different from current password.");
+
+    public static readonly Error NotFound = Error.NotFound(
+        "User.NotFound",
+        "User was not found.");
+
+    // the below errors should be reviewed
     public static readonly Error UpdateFailed = Error.Problem(
         "User.UpdateFailed",
         "Update user failed");
 
-    public static readonly Error DeleteFailed = Error.Problem(
-        "User.DeleteFailed",
-        "Delete user failed");
-
-    public static Error NotFound(Guid userId) => Error.NotFound(
-        "Users.NotFound",
-        $"The user with the Id = '{userId}' was not found");
-
     public static Error Unauthorized => Error.Unauthorized(
-        "Users.Unauthorized",
+        "User.Unauthorized",
         "You are not authorized to perform this action.");
 
-    public static readonly Error WrongPassword = Error.Unauthorized(
-        "Users.WrongPassword",
-        "The provided password is incorrect");
-
-    public static readonly Error NotFoundByEmail = Error.NotFound(
-        "Users.NotFoundByEmail",
-        "The user with the specified email was not found");
-
-    public static readonly Error EmailNotUnique = Error.Conflict(
-        "Users.EmailNotUnique",
-        "The provided email is not unique");
-
-    public static Error DeleteCurrentSessionFailed => Error.Problem(
-        "Users.Sessions.DeleteCurrentSessionFailed",
+    public static readonly Error DeleteCurrentSession = Error.Problem(
+        "User.SessionsDelete",
         "Cannot delete current session.");
 
-    public static Error DeleteSessionFailed(Guid sessionId) => Error.Failure(
-        "Users.Sessions.DeleteSessionFailed",
-        $"Delete session {sessionId} failed");
+    public static readonly Error DeleteSessionFailed = Error.Failure(
+        "User.SessionsDeleteFailed",
+        "Delete session failed");
 
-    public static Error SessionNotFound(Guid sessionId) => Error.NotFound(
-        "Users.Sessions.SessionNotFound",
-        $"Session {sessionId} not found");
+    public static readonly Error SessionNotFound = Error.NotFound(
+        "User.SessionNotFound",
+        "Session not found");
 }

@@ -12,20 +12,15 @@ internal sealed class GetVehicleByIdQueryHandler(IApplicationDbContext context, 
 {
     public async Task<Result<VehicleDto>> Handle(GetVehicleByIdQuery request, CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-
-        if (userId == Guid.Empty)
-            return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
-
         var vehicle = await context.Vehicles
             .AsNoTracking()
-            .Where(v => v.UserId == userId && v.Id == request.VehicleId)
+            .Where(v => v.UserId == userContext.UserId && v.Id == request.VehicleId)
             .Include(v => v.VehicleEnergyTypes)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle == null)
-            return Result.Failure<VehicleDto>(VehicleErrors.NotFound(request.VehicleId));
+            return Result.Failure<VehicleDto>(VehicleErrors.NotFound);
 
-        return Result.Success(vehicle.Adapt<VehicleDto>());
+        return vehicle.Adapt<VehicleDto>();
     }
 }

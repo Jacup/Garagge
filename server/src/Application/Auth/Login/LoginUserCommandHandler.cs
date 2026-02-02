@@ -19,7 +19,7 @@ internal sealed class LoginUserCommandHandler(
 {
     private const int ShortSessionDurationDays = 1;
     private const int LongSessionDurationDays = 30;
-    
+
     public async Task<Result<LoginUserResponse>> Handle(LoginUserCommand command, CancellationToken cancellationToken)
     {
         var normalizedEmail = command.Email.Trim().ToLowerInvariant();
@@ -29,12 +29,12 @@ internal sealed class LoginUserCommandHandler(
             .SingleOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user is null || !passwordHasher.Verify(command.Password, user.PasswordHash))
-            return Result.Failure<LoginUserResponse>(AuthErrors.WrongEmailOrPassword);
+            return Result.Failure<LoginUserResponse>(AuthErrors.CredentialsInvalid);
 
         var sessionId = Guid.NewGuid();
         var sessionDuration = command.RememberMe ? LongSessionDurationDays : ShortSessionDurationDays;
         var refreshTokenExpiration = dateTimeProvider.UtcNow.AddDays(sessionDuration);
-        
+
         var uaParser = Parser.GetDefault();
         var clientInfo = uaParser.Parse(command.UserAgent ?? "");
 
@@ -42,26 +42,22 @@ internal sealed class LoginUserCommandHandler(
         {
             Id = sessionId,
             UserId = user.Id,
-            
             Token = tokenProvider.GenerateRefreshToken(),
             ExpiresAt = refreshTokenExpiration,
             SessionDurationDays = sessionDuration,
-            
             IsRevoked = false,
-            
             UserAgent = command.UserAgent,
             DeviceOs = clientInfo?.OS.ToString(),
             DeviceBrowser = clientInfo?.UA.Family,
             DeviceType = clientInfo?.Device.ToString(),
-            
             IpAddress = command.IpAddress
         };
-        
+
         context.RefreshTokens.Add(refreshToken);
         await context.SaveChangesAsync(cancellationToken);
-        
+
         string token = tokenProvider.Create(user, sessionId);
-        
-        return Result.Success(new LoginUserResponse(token, refreshToken.Token, refreshTokenExpiration));
+
+        return new LoginUserResponse(token, refreshToken.Token, refreshTokenExpiration);
     }
 }
