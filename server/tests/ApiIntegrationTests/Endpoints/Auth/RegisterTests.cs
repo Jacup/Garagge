@@ -1,8 +1,6 @@
 ﻿using ApiIntegrationTests.Contracts;
-using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
-using Application.Auth;
 using Application.Auth.Register;
 using Application.Users;
 using System.Net;

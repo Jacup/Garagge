@@ -16,7 +16,7 @@ public static class UserErrors
         "User.EmailRequired",
         "Email is required");
 
-    public static readonly Error EmailInvalid = Error.Problem(
+    public static readonly Error EmailInvalid = Error.Validation(
         "User.EmailInvalid",
         "Email is not valid");
 

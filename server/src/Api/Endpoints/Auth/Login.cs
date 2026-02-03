@@ -36,7 +36,7 @@ internal sealed class Login : IEndpoint
                     };
 
                     httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
-                    httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions) { Path = "/auth/" });
+                    httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions) { Path = "/api/auth/" });
 
                     return Results.NoContent();
                 })

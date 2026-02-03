@@ -1,5 +1,4 @@
 ﻿using ApiIntegrationTests.Contracts;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -26,16 +25,15 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
     {
         DefaultJsonSerializerOptions = new JsonSerializerOptions
         {
-            PropertyNameCaseInsensitive = true, 
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            PropertyNameCaseInsensitive = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
         DefaultJsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     }
-    
+
     protected BaseIntegrationTest(CustomWebApplicationFactory factory)
     {
         _factory = factory;
-        Client = factory.CreateClient();
+        Client = _factory.CreateClient();
     }
 
     protected HttpClient Client { get; init; }
@@ -47,7 +45,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         string lastName = "Doe")
     {
         var passwordHasher = _factory.Services.GetRequiredService<IPasswordHasher>();
-        
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -56,31 +54,25 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
             LastName = lastName,
             PasswordHash = passwordHasher.Hash(password),
         };
-        
+
         DbContext.Users.Add(user);
         await DbContext.SaveChangesAsync();
-        
+
         return user;
     }
-    
+
     protected async Task CreateAndAuthenticateUser(bool rememberMe = false)
     {
         await CreateUserAsync();
-
-        var result = await LoginUser("test@garagge.app", "Password123", rememberMe);
-
-        Authenticate(result.AccessToken);
+        await LoginUser("test@garagge.app", "Password123", rememberMe);
     }
-    
+
     protected async Task RegisterAndAuthenticateUser(string userEmail, string firstName, string lastName, string userPassword, bool rememberMe = false)
     {
         await RegisterUser(userEmail, firstName, lastName, userPassword);
-
-        var result = await LoginUser(userEmail, userPassword, rememberMe);
-
-        Authenticate(result.AccessToken);
+        await LoginUser(userEmail, userPassword, rememberMe);
     }
-    
+
     protected async Task RegisterUser(string userEmail, string firstName, string lastName, string userPassword)
     {
         var registerRequest = new RegisterRequest(userEmail, userPassword, firstName, lastName);
@@ -89,56 +81,13 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         registerResponse.EnsureSuccessStatusCode();
     }
 
-    protected async Task<(string AccessToken, string RefreshToken)> LoginUser(string userEmail, string userPassword, bool rememberMe = false)
+    protected async Task LoginUser(string userEmail, string userPassword, bool rememberMe = false)
     {
         var loginRequest = new LoginRequest(userEmail, userPassword, rememberMe);
         var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, loginRequest);
-
         response.EnsureSuccessStatusCode();
-
-        var accessToken = ParseAccessTokenFromCookie(response.Headers);
-        accessToken.ShouldNotBeNullOrEmpty();
-
-        var refreshToken = ParseRefreshTokenFromCookie(response.Headers);
-        refreshToken.ShouldNotBeNullOrEmpty();
-        
-        return (accessToken, refreshToken);
     }
-    
-    protected static string? ParseAccessTokenFromCookie(HttpResponseHeaders headers, bool expired = false)
-    {
-        var cookieHeader = headers.GetValues("Set-Cookie").FirstOrDefault();
-        if (cookieHeader is null) 
-            return null;
 
-        if (expired)
-            return cookieHeader.StartsWith("accessToken=;") ? "" : null;
-
-        var parts = cookieHeader.Split(';')[0].Split('=');
-        if (parts.Length != 2)
-            return null;
-
-        var encodedValue = parts[1];
-        return WebUtility.UrlDecode(encodedValue);
-    }
-    
-    protected static string? ParseRefreshTokenFromCookie(HttpResponseHeaders headers, bool expired = false)
-    {
-        var cookieHeader = headers.GetValues("Set-Cookie").FirstOrDefault();
-        if (cookieHeader is null) 
-            return null;
-
-        if (expired)
-            return cookieHeader.StartsWith("refreshToken=;") ? "" : null;
-
-        var parts = cookieHeader.Split(';')[0].Split('=');
-        if (parts.Length != 2)
-            return null;
-
-        var encodedValue = parts[1];
-        return WebUtility.UrlDecode(encodedValue);
-    }
-    
     protected async Task<Vehicle> CreateVehicleAsync(
         User owner,
         string brand = "Toyota",
@@ -160,25 +109,20 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
             Type = type,
             VIN = vin
         };
-        
+
         DbContext.Vehicles.Add(vehicle);
         await DbContext.SaveChangesAsync();
-        
+
         // Add energy types if provided
         var energyTypesToAdd = energyTypes ?? [EnergyType.Gasoline];
         foreach (var energyType in energyTypesToAdd)
         {
-            var vehicleEnergyType = new VehicleEnergyType
-            {
-                Id = Guid.NewGuid(),
-                VehicleId = vehicle.Id,
-                EnergyType = energyType
-            };
+            var vehicleEnergyType = new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = energyType };
             DbContext.VehicleEnergyTypes.Add(vehicleEnergyType);
         }
-        
+
         await DbContext.SaveChangesAsync();
-        
+
         return vehicle;
     }
 
@@ -189,17 +133,13 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         {
             throw new InvalidOperationException("No authenticated user found. Call CreateAndAuthenticateUser() first.");
         }
-        
+
         return await CreateVehicleAsync(user, brand, model);
     }
 
     protected async Task<ServiceType> CreateServiceTypeAsync(string name = "Maintenance")
     {
-        var serviceType = new ServiceType
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
+        var serviceType = new ServiceType { Id = Guid.NewGuid(), Name = name };
 
         DbContext.ServiceTypes.Add(serviceType);
         await DbContext.SaveChangesAsync();
@@ -266,12 +206,12 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
         return serviceItem;
     }
-    
+
     protected void Authenticate(string accessToken)
     {
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     }
-    
+
     public async Task InitializeAsync()
     {
         await _factory.ResetDatabaseAsync();
@@ -284,7 +224,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         DbContext?.Dispose();
         return Task.CompletedTask;
     }
-    
+
     private void RefreshServices()
     {
         _scope?.Dispose();

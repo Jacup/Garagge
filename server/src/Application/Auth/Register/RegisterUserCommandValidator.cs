@@ -10,7 +10,7 @@ internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterU
     {
         RuleFor(c => c.Email)
             .NotEmpty()
-            .WithError(UserErrors.PasswordRequired)
+            .WithError(UserErrors.EmailRequired)
             .EmailAddress()
             .WithError(UserErrors.EmailInvalid);
 

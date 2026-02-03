@@ -14,7 +14,7 @@ internal sealed class Refresh : IEndpoint
             {
                 if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
                 {
-                    return Results.Unauthorized();
+                    return CustomResults.Problem(Result.Failure(AuthErrors.TokenInvalid));
                 }
 
                 var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
@@ -26,8 +26,8 @@ internal sealed class Refresh : IEndpoint
 
                 if (result.IsFailure)
                 {
-                    httpContext.Response.Cookies.Delete("accessToken");
-                    httpContext.Response.Cookies.Delete("refreshToken");
+                    httpContext.Response.Cookies.Delete("accessToken", new CookieOptions { Path = "/" });
+                    httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/auth/" });
                     return CustomResults.Problem(result);
                 }
 
