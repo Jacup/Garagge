@@ -112,8 +112,8 @@ public class AuthFlowTests : BaseIntegrationTest
 
         // Verify all tokens for user are revoked
         var tokens = await DbContext.RefreshTokens.Where(rt => rt.UserId == user.Id).ToListAsync();
-        tokens.Count.ShouldBe(2); // oba tokeny pozostają w DB
-        tokens.ShouldAllBe(t => t.IsRevoked); // oba są revoked
+        tokens.Count.ShouldBe(2);
+        tokens.ShouldAllBe(t => t.IsRevoked);
     }
 
     [Fact]

@@ -2,6 +2,7 @@
 using Application.Auth;
 using Application.Auth.Refresh;
 using Application.Core;
+using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Auth;
@@ -26,8 +27,9 @@ internal sealed class Refresh : IEndpoint
 
                 if (result.IsFailure)
                 {
-                    httpContext.Response.Cookies.Delete("accessToken", new CookieOptions { Path = "/" });
-                    httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions { Path = "/api/auth/" });
+                    httpContext.Response.Cookies.Delete(AuthCookieNames.AccessToken, AuthCookieFactory.GetDeleteOptions());
+                    httpContext.Response.Cookies.Delete(AuthCookieNames.RefreshToken, AuthCookieFactory.GetDeleteOptions(AuthCookiePaths.AuthRoot));
+                    
                     return CustomResults.Problem(result);
                 }
 
@@ -39,9 +41,16 @@ internal sealed class Refresh : IEndpoint
                     Expires = result.Value.RefreshTokenExpiresAt
                 };
 
-                httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
-                httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions) { Path = "/auth/" });
+                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
+                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken,
+                    new CookieOptions(baseCookieOptions) { Path = "/api/auth/" });
 
+                var atOptions = AuthCookieFactory.GetDefaultOptions(configuration);
+                var rtOptions = AuthCookieFactory.GetRefreshTokenOptions(configuration, result.Value.RefreshTokenExpiresAt);
+
+                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, atOptions);
+                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken, rtOptions);
+                
                 return Results.NoContent();
             })
             .AllowAnonymous()
