@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
@@ -7,11 +6,9 @@ import { useUserStore } from '@/stores/user'
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const { isMobile } = useResponsiveLayout()
-const router = useRouter()
 
 const handleLogout = async () => {
   await authStore.logout()
-  router.push('/')
 }
 </script>
 

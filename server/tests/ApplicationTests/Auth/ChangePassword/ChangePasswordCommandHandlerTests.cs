@@ -30,7 +30,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
+        result.Error.ShouldBe(UserErrors.NotFound);
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(AuthErrors.WrongPassword);
+        result.Error.ShouldBe(AuthErrors.PasswordInvalid);
         _passwordHasherMock.Verify(x => x.Verify(currentPassword, hashedPassword), Times.Once);
     }
 

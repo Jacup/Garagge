@@ -1,5 +1,5 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
@@ -24,7 +24,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = 
-            await Client.PostAsJsonAsync(ApiV1Definition.Services.Create.WithId(vehicleId),
+            await Client.PostAsJsonAsync(ApiV1Definitions.Services.Create.WithId(vehicleId),
             request);
 
         // Assert
@@ -32,7 +32,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
     }
 
     [Fact]
-    public async Task CreateServiceRecord_VehicleDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task CreateServiceRecord_VehicleDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -45,11 +45,11 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(nonExistentVehicleId),
+            ApiV1Definitions.Services.Create.WithId(nonExistentVehicleId),
             request);
 
         // Assert
@@ -84,7 +84,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -108,7 +108,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -137,7 +137,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -171,7 +171,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -205,7 +205,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -268,7 +268,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -307,7 +307,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -338,7 +338,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -373,7 +373,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -401,7 +401,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -429,7 +429,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -456,7 +456,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -483,7 +483,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -511,7 +511,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -543,7 +543,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -571,7 +571,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -598,7 +598,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -627,7 +627,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -657,7 +657,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -685,7 +685,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -712,7 +712,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -739,7 +739,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -776,7 +776,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.Services.Create.WithId(vehicle.Id),
+            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert

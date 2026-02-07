@@ -1,5 +1,5 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
 using Application.ServiceRecords;
@@ -36,7 +36,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -54,7 +54,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ServiceRecord
         var getResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto = await getResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -77,7 +77,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType2.Id);
 
         var updateResponse = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -94,7 +94,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ServiceRecord after Update
         var getAfterUpdateResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getAfterUpdateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getAfterUpdateDto = await getAfterUpdateResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -108,13 +108,13 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // DELETE ServiceRecord
         var deleteResponse = await Client.DeleteAsync(
-            string.Format(ApiV1Definition.Services.DeleteById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.DeleteById, vehicle.Id, createdDto.Id));
 
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // TRY GET ServiceRecord after Delete
         var getAfterDeleteResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getAfterDeleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
@@ -142,7 +142,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
                 new("Labor", ServiceItemType.Labor, 80.00m, 1, null, "Oil change service")
             });
 
-        var createResponse = await Client.PostAsJsonAsync(string.Format(ApiV1Definition.Services.Create, vehicle.Id), createRequest);
+        var createResponse = await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.Services.Create, vehicle.Id), createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         var createdDto = await createResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -160,7 +160,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         var serviceItemIds = createdDto.ServiceItems.Select(si => si.Id).ToList();
 
         // GET ServiceRecord
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto = await getResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -180,12 +180,12 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ManualCost: 999.00m, // Should still be ignored
             ServiceTypeId: serviceType.Id);
 
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id), updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET ServiceRecord after Update
-        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getAfterUpdateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getAfterUpdateDto = await getAfterUpdateResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -198,12 +198,12 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         getAfterUpdateDto.ServiceItems.Select(si => si.Id).OrderBy(id => id).ShouldBe(serviceItemIds.OrderBy(id => id));
 
         // DELETE ServiceRecord
-        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Services.DeleteById, vehicle.Id, createdDto.Id));
+        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definitions.Services.DeleteById, vehicle.Id, createdDto.Id));
 
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // TRY GET ServiceRecord after Delete
-        var getAfterDeleteResponse = await Client.GetAsync(string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+        var getAfterDeleteResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getAfterDeleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
@@ -235,7 +235,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -249,7 +249,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET to verify minimal state
         var getResponse1 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto1 = await getResponse1.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto1.ShouldNotBeNull();
@@ -267,14 +267,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id);
 
         var enrichResponse = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             enrichRequest);
 
         enrichResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after enrichment
         var getResponse2 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto2 = await getResponse2.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto2.ShouldNotBeNull();
@@ -293,14 +293,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id);
 
         var clearResponse = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             clearRequest);
 
         clearResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after clearing
         var getResponse3 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto3 = await getResponse3.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto3.ShouldNotBeNull();
@@ -331,7 +331,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -343,7 +343,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET to verify initial type
         var getResponse1 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto1 = await getResponse1.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto1.ShouldNotBeNull();
@@ -360,14 +360,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: inspectionType.Id);
 
         var updateResponse1 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest1);
 
         updateResponse1.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after first type change
         var getResponse2 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto2 = await getResponse2.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto2.ShouldNotBeNull();
@@ -384,14 +384,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: repairType.Id);
 
         var updateResponse2 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest2);
 
         updateResponse2.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after second type change
         var getResponse3 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto3 = await getResponse3.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto3.ShouldNotBeNull();
@@ -408,14 +408,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: oilChangeType.Id);
 
         var updateResponse3 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest3);
 
         updateResponse3.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after returning to original type
         var getResponse4 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto4 = await getResponse4.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto4.ShouldNotBeNull();
@@ -444,7 +444,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
                 ServiceItems: new List<ServiceItemCreateRequest>());
 
             var createResponse = await Client.PostAsJsonAsync(
-                string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+                string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
                 createRequest);
 
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -452,7 +452,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ALL - First Page (default pageSize=10)
         var getPage1Response = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetAll, vehicle.Id));
+            string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id));
 
         getPage1Response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var page1 = await getPage1Response.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -466,7 +466,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ALL - Second Page
         var getPage2Response = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?page=2&pageSize=10");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?page=2&pageSize=10");
 
         getPage2Response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var page2 = await getPage2Response.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -480,7 +480,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ALL - Increased PageSize
         var getAllResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?pageSize=20");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?pageSize=20");
 
         getAllResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var allPage = await getAllResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -519,7 +519,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             });
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -533,7 +533,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET ServiceRecord to verify ServiceItems exist
         var getResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto = await getResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -550,7 +550,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // DELETE ServiceRecord
         var deleteResponse = await Client.DeleteAsync(
-            string.Format(ApiV1Definition.Services.DeleteById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.DeleteById, vehicle.Id, createdDto.Id));
 
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
@@ -587,7 +587,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             });
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -604,7 +604,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET to verify initial state
         var getResponse1 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto1 = await getResponse1.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto1.ShouldNotBeNull();
@@ -620,14 +620,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id);
 
         var updateResponse1 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest1);
 
         updateResponse1.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after first update - verify ServiceItems unchanged
         var getResponse2 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto2 = await getResponse2.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto2.ShouldNotBeNull();
@@ -655,14 +655,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id);
 
         var updateResponse2 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest2);
 
         updateResponse2.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         // GET after second update - ServiceItems still intact
         var getResponse3 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         var getDto3 = await getResponse3.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         getDto3.ShouldNotBeNull();
@@ -695,7 +695,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
-        var createResponse1 = await Client.PostAsJsonAsync(string.Format(ApiV1Definition.Services.Create, vehicle.Id), createRequest1);
+        var createResponse1 = await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.Services.Create, vehicle.Id), createRequest1);
 
         createResponse1.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
@@ -709,7 +709,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
-        var createResponse2 = await Client.PostAsJsonAsync(string.Format(ApiV1Definition.Services.Create, vehicle.Id), createRequest2);
+        var createResponse2 = await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.Services.Create, vehicle.Id), createRequest2);
 
         createResponse2.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
@@ -723,7 +723,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
-        var createResponse3 = await Client.PostAsJsonAsync(string.Format(ApiV1Definition.Services.Create, vehicle.Id), createRequest3);
+        var createResponse3 = await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.Services.Create, vehicle.Id), createRequest3);
 
         createResponse3.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
@@ -737,7 +737,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
-        var validCreateResponse = await Client.PostAsJsonAsync(string.Format(ApiV1Definition.Services.Create, vehicle.Id), validCreateRequest);
+        var validCreateResponse = await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.Services.Create, vehicle.Id), validCreateRequest);
 
         validCreateResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         var validDto = await validCreateResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -752,7 +752,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ManualCost: 100.00m,
             ServiceTypeId: serviceType.Id);
 
-        var updateResponse1 = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, validDto.Id), updateRequest1);
+        var updateResponse1 = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, validDto.Id), updateRequest1);
 
         updateResponse1.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
@@ -765,12 +765,12 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ManualCost: -50.00m,
             ServiceTypeId: serviceType.Id);
 
-        var updateResponse2 = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, validDto.Id), updateRequest2);
+        var updateResponse2 = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, validDto.Id), updateRequest2);
 
         updateResponse2.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
         // GET ServiceRecord - should still have original data (failed updates didn't modify it)
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Services.GetById, vehicle.Id, validDto.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, validDto.Id));
 
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto = await getResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -802,7 +802,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse1 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle1.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle1.Id),
             createRequest1);
 
         createResponse1.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -820,7 +820,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse2 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle2.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle2.Id),
             createRequest2);
 
         createResponse2.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -829,7 +829,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET SR1 via Vehicle1 path - should succeed
         var getSr1Response = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle1.Id, sr1.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle1.Id, sr1.Id));
 
         getSr1Response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getSr1Dto = await getSr1Response.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -838,13 +838,13 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // TRY GET SR1 via Vehicle2 path (wrong vehicle) - should fail
         var getSr1WrongVehicleResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle2.Id, sr1.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle2.Id, sr1.Id));
 
         getSr1WrongVehicleResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         // GET SR2 via Vehicle2 path - should succeed
         var getSr2Response = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle2.Id, sr2.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle2.Id, sr2.Id));
 
         getSr2Response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getSr2Dto = await getSr2Response.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -853,19 +853,19 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // TRY GET SR2 via Vehicle1 path (wrong vehicle) - should fail
         var getSr2WrongVehicleResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle1.Id, sr2.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle1.Id, sr2.Id));
 
         getSr2WrongVehicleResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         // DELETE SR1
         var deleteSr1Response = await Client.DeleteAsync(
-            string.Format(ApiV1Definition.Services.DeleteById, vehicle1.Id, sr1.Id));
+            string.Format(ApiV1Definitions.Services.DeleteById, vehicle1.Id, sr1.Id));
 
         deleteSr1Response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // GET SR2 - should still exist (unaffected by SR1 deletion)
         var getSr2AfterDeleteResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle2.Id, sr2.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle2.Id, sr2.Id));
 
         getSr2AfterDeleteResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getSr2AfterDeleteDto = await getSr2AfterDeleteResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -879,11 +879,10 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
     {
         // Setup User1
         var user1 = await CreateUserAsync("user1@garagge.app");
-        var loginUser1Response = await LoginUser(user1.Email, "Password123");
-        Authenticate(loginUser1Response.Response.AccessToken);
+        await LoginUser(user1.Email, "Password123");
 
         var serviceType = await CreateServiceTypeAsync();
-        var vehicle1 = await CreateVehicleAsync(user1, "User1 Car", "Model1"); // Use user object
+        var vehicle1 = await CreateVehicleAsync(user1, "User1 Car", "Model1");
 
         // CREATE ServiceRecord as User1
         var createRequest = new ServiceRecordCreateRequest(
@@ -896,7 +895,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle1.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle1.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -905,22 +904,26 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET as User1 - should succeed
         var getAsUser1Response = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle1.Id, sr.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle1.Id, sr.Id));
 
         getAsUser1Response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        // Setup User2
+        // Setup User2 with NEW CLIENT (separate cookie container)
+        using var user2Client = Factory.CreateClient();
+
         var user2 = await CreateUserAsync("user2@garagge.app", "Password456");
-        var loginUser2Response = await LoginUser(user2.Email, "Password456");
-        Authenticate(loginUser2Response.Response.AccessToken);
 
-        // TRY GET as User2 (using User1's vehicle/SR) - should fail
-        var getAsUser2Response = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle1.Id, sr.Id));
+        var loginRequest = new LoginRequest(user2.Email, "Password456", false);
+        var loginResponse = await user2Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, loginRequest);
+        loginResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        getAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        // TRY GET as User2 (using User1's vehicle/SR) - should fail with 404 (not 401)
+        var getAsUser2Response = await user2Client.GetAsync(
+            string.Format(ApiV1Definitions.Services.GetById, vehicle1.Id, sr.Id));
 
-        // TRY UPDATE as User2 - should fail
+        getAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+
+        // TRY UPDATE as User2 - should fail with 404
         var updateRequest = new ServiceRecordUpdateRequest(
             Title: "Hacker Update",
             Notes: "Trying to modify",
@@ -929,24 +932,21 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ManualCost: 999.00m,
             ServiceTypeId: serviceType.Id);
 
-        var updateAsUser2Response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle1.Id, sr.Id),
+        var updateAsUser2Response = await user2Client.PutAsJsonAsync(
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle1.Id, sr.Id),
             updateRequest);
 
-        updateAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        updateAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
-        // TRY DELETE as User2 - should fail
-        var deleteAsUser2Response = await Client.DeleteAsync(
-            string.Format(ApiV1Definition.Services.DeleteById, vehicle1.Id, sr.Id));
+        // TRY DELETE as User2 - should fail with 404
+        var deleteAsUser2Response = await user2Client.DeleteAsync(
+            string.Format(ApiV1Definitions.Services.DeleteById, vehicle1.Id, sr.Id));
 
-        deleteAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        deleteAsUser2Response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
-        // Authenticate back as User1
-        Authenticate(loginUser1Response.Response.AccessToken);
-
-        // GET as User1 again - data should be intact
+        // GET as User1 again (original client still has User1 cookies) - data should be intact
         var getFinalResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle1.Id, sr.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle1.Id, sr.Id));
 
         getFinalResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var finalDto = await getFinalResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -970,11 +970,46 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
         // CREATE multiple ServiceRecords with different data
         var records = new[]
         {
-            new { Title = "Alpha Service", Type = oilChangeType.Id, Date = DateTime.UtcNow.AddDays(-10), Mileage = 5000, Cost = 100.00m },
-            new { Title = "Beta Oil Service", Type = inspectionType.Id, Date = DateTime.UtcNow.AddDays(-8), Mileage = 10000, Cost = 200.00m },
-            new { Title = "Charlie Inspection Check", Type = oilChangeType.Id, Date = DateTime.UtcNow.AddDays(-6), Mileage = 15000, Cost = 150.00m },
-            new { Title = "Delta Inspection", Type = inspectionType.Id, Date = DateTime.UtcNow.AddDays(-4), Mileage = 20000, Cost = 300.00m },
-            new { Title = "Echo Oil Change", Type = oilChangeType.Id, Date = DateTime.UtcNow.AddDays(-2), Mileage = 25000, Cost = 250.00m }
+            new
+            {
+                Title = "Alpha Service",
+                Type = oilChangeType.Id,
+                Date = DateTime.UtcNow.AddDays(-10),
+                Mileage = 5000,
+                Cost = 100.00m
+            },
+            new
+            {
+                Title = "Beta Oil Service",
+                Type = inspectionType.Id,
+                Date = DateTime.UtcNow.AddDays(-8),
+                Mileage = 10000,
+                Cost = 200.00m
+            },
+            new
+            {
+                Title = "Charlie Inspection Check",
+                Type = oilChangeType.Id,
+                Date = DateTime.UtcNow.AddDays(-6),
+                Mileage = 15000,
+                Cost = 150.00m
+            },
+            new
+            {
+                Title = "Delta Inspection",
+                Type = inspectionType.Id,
+                Date = DateTime.UtcNow.AddDays(-4),
+                Mileage = 20000,
+                Cost = 300.00m
+            },
+            new
+            {
+                Title = "Echo Oil Change",
+                Type = oilChangeType.Id,
+                Date = DateTime.UtcNow.AddDays(-2),
+                Mileage = 25000,
+                Cost = 250.00m
+            }
         };
 
         foreach (var record in records)
@@ -989,7 +1024,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
                 ServiceItems: new List<ServiceItemCreateRequest>());
 
             var createResponse = await Client.PostAsJsonAsync(
-                string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+                string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
                 createRequest);
 
             createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -997,7 +1032,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // FILTER by searchTerm "Oil" - should return 2 records (Beta Oil Service, Echo Oil Change)
         var filterByOilResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?searchTerm=Oil");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?searchTerm=Oil");
 
         filterByOilResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var filterByOilResult = await filterByOilResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -1008,10 +1043,11 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // FILTER by searchTerm "Inspection" - should return 2 records
         var filterByInspectionResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?searchTerm=Inspection");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?searchTerm=Inspection");
 
         filterByInspectionResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var filterByInspectionResult = await filterByInspectionResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
+        var filterByInspectionResult =
+            await filterByInspectionResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
 
         filterByInspectionResult.ShouldNotBeNull();
         filterByInspectionResult.Items.Count.ShouldBe(2);
@@ -1019,7 +1055,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // SORT by ServiceDate DESC (default) - should return Echo first
         var sortDefaultResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetAll, vehicle.Id));
+            string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id));
 
         sortDefaultResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var sortDefaultResult = await sortDefaultResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -1031,7 +1067,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // SORT by ServiceDate ASC - should return Alpha first
         var sortAscResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?sortBy=ServiceDate&sortDescending=false");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?sortBy=ServiceDate&sortDescending=false");
 
         sortAscResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var sortAscResult = await sortAscResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -1042,7 +1078,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // SORT by Mileage DESC - should return Echo first (25000)
         var sortByMileageDescResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?sortBy=Mileage&sortDescending=true");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?sortBy=Mileage&sortDescending=true");
 
         sortByMileageDescResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var sortByMileageDescResult = await sortByMileageDescResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -1053,7 +1089,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // SORT by TotalCost DESC - should return Delta first (300.00)
         var sortByCostDescResponse = await Client.GetAsync(
-            $"{string.Format(ApiV1Definition.Services.GetAll, vehicle.Id)}?sortBy=TotalCost&sortDescending=true");
+            $"{string.Format(ApiV1Definitions.Services.GetAll, vehicle.Id)}?sortBy=TotalCost&sortDescending=true");
 
         sortByCostDescResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var sortByCostDescResult = await sortByCostDescResponse.Content.ReadFromJsonAsync<PagedList<ServiceRecordDto>>(DefaultJsonSerializerOptions);
@@ -1082,7 +1118,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1124,7 +1160,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // VERIFY original ServiceRecord is still intact
         var getValidResponse = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getValidResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var validDto = await getValidResponse.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -1151,7 +1187,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1160,7 +1196,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
 
         // GET to verify initial state
         var getResponse1 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getResponse1.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto1 = await getResponse1.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -1179,14 +1215,14 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: nonExistentServiceTypeId);
 
         var updateResponse = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         // GET after failed update - data should remain unchanged
         var getResponse2 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, createdDto.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, createdDto.Id));
 
         getResponse2.StatusCode.ShouldBe(HttpStatusCode.OK);
         var getDto2 = await getResponse2.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
@@ -1208,7 +1244,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: Guid.Empty);
 
         var updateResponseEmpty = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, createdDto.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, createdDto.Id),
             updateRequestEmpty);
 
         updateResponseEmpty.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -1233,7 +1269,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse1 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest1);
 
         createResponse1.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1252,7 +1288,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse2 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest2);
 
         createResponse2.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1275,7 +1311,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             });
 
         var createResponse3 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest3);
 
         createResponse3.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1301,7 +1337,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             });
 
         var createResponse4 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest4);
 
         createResponse4.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1321,7 +1357,7 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         var createResponse5 = await Client.PostAsJsonAsync(
-            string.Format(ApiV1Definition.Services.Create, vehicle.Id),
+            string.Format(ApiV1Definitions.Services.Create, vehicle.Id),
             createRequest5);
 
         createResponse5.StatusCode.ShouldBe(HttpStatusCode.Created);
@@ -1339,13 +1375,13 @@ public class ServiceRecordFlowTests : BaseIntegrationTest
             ServiceTypeId: serviceType.Id);
 
         var updateResponse5 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, dto5.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, dto5.Id),
             updateRequest5);
 
         updateResponse5.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var getUpdatedResponse5 = await Client.GetAsync(
-            string.Format(ApiV1Definition.Services.GetById, vehicle.Id, dto5.Id));
+            string.Format(ApiV1Definitions.Services.GetById, vehicle.Id, dto5.Id));
 
         var updatedDto5 = await getUpdatedResponse5.Content.ReadFromJsonAsync<ServiceRecordDto>(DefaultJsonSerializerOptions);
         updatedDto5.ShouldNotBeNull();

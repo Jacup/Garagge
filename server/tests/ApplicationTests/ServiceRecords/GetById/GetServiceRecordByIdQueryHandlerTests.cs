@@ -27,11 +27,11 @@ public class GetServiceRecordByIdQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(nonExistentServiceRecordId));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -47,7 +47,7 @@ public class GetServiceRecordByIdQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class GetServiceRecordByIdQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(serviceRecord.Id));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -192,24 +192,7 @@ public class GetServiceRecordByIdQueryHandlerTests : InMemoryDbTestBase
         result.Value.TotalCost.ShouldBe(0m);
         result.Value.ServiceItems.ShouldBeEmpty();
     }
-
-    [Fact]
-    public async Task Handle_UserNotAuthenticated_ReturnsUnauthorizedError()
-    {
-        // Arrange
-        SetupUnauthenticatedUser();
-        var vehicleId = Guid.NewGuid();
-        var serviceRecordId = Guid.NewGuid();
-        var query = new GetServiceRecordByIdQuery(vehicleId, serviceRecordId);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
-    }
-
+    
     [Fact]
     public async Task Handle_ValidServiceRecord_IncludesCorrectTimestamps()
     {

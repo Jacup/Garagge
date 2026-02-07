@@ -2,7 +2,6 @@
 using Application.ServiceRecords.Get;
 using Application.Services;
 using Application.Vehicles;
-using Domain.Entities.Services;
 using Domain.Enums;
 
 namespace ApplicationTests.ServiceRecords.Get;
@@ -30,11 +29,11 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -47,7 +46,7 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]

@@ -2,6 +2,7 @@
 using Application.Auth;
 using Application.Auth.Refresh;
 using Application.Core;
+using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Auth;
@@ -14,11 +15,11 @@ internal sealed class Refresh : IEndpoint
             {
                 if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
                 {
-                    return Results.Unauthorized();
+                    return CustomResults.Problem(Result.Failure(AuthErrors.TokenInvalid));
                 }
-                
-                string? ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
-                string? userAgent = httpContext.Request.Headers.UserAgent.ToString();
+
+                var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
+                var userAgent = httpContext.Request.Headers.UserAgent.ToString();
 
                 var command = new RefreshTokenCommand(refreshToken, ipAddress, userAgent);
 
@@ -26,11 +27,13 @@ internal sealed class Refresh : IEndpoint
 
                 if (result.IsFailure)
                 {
-                    httpContext.Response.Cookies.Delete("refreshToken");
+                    httpContext.Response.Cookies.Delete(AuthCookieNames.AccessToken, AuthCookieFactory.GetDeleteOptions());
+                    httpContext.Response.Cookies.Delete(AuthCookieNames.RefreshToken, AuthCookieFactory.GetDeleteOptions(AuthCookiePaths.AuthRoot));
+                    
                     return CustomResults.Problem(result);
                 }
 
-                var cookieOptions = new CookieOptions
+                var baseCookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = configuration.GetValue<bool>("Security:UseSecureCookies"),
@@ -38,9 +41,17 @@ internal sealed class Refresh : IEndpoint
                     Expires = result.Value.RefreshTokenExpiresAt
                 };
 
-                httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, cookieOptions);
+                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
+                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken,
+                    new CookieOptions(baseCookieOptions) { Path = "/api/auth/" });
 
-                return Results.Ok(new LoginResponse(result.Value.AccessToken));
+                var atOptions = AuthCookieFactory.GetDefaultOptions(configuration);
+                var rtOptions = AuthCookieFactory.GetRefreshTokenOptions(configuration, result.Value.RefreshTokenExpiresAt);
+
+                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, atOptions);
+                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken, rtOptions);
+                
+                return Results.NoContent();
             })
             .AllowAnonymous()
             .WithTags(Tags.Auth);

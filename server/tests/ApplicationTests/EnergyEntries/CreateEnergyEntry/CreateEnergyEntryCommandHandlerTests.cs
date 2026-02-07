@@ -20,7 +20,6 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         _energyCompatibilityServiceMock = new Mock<IVehicleEngineCompatibilityService>();
         _handler = new CreateEnergyEntryCommandHandler(Context, UserContextMock.Object, _energyCompatibilityServiceMock.Object);
 
-        // Setup default behavior for energy compatibility service
         _energyCompatibilityServiceMock
             .Setup(x => x.IsEnergyTypeCompatibleAsync(It.IsAny<Guid>(), It.IsAny<EnergyType>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -69,11 +68,11 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -86,7 +85,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
@@ -97,7 +96,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline); // Vehicle supports only Gasoline
         var command = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Electric }; // Try to add Electricity
 
-        // Setup mock to return false for incompatible energy type
+        // Setup mock to return false for an incompatible energy type
         _energyCompatibilityServiceMock
             .Setup(x => x.IsEnergyTypeCompatibleAsync(vehicle.Id, EnergyType.Electric, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -107,7 +106,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.IncompatibleEnergyType(vehicle.Id, EnergyType.Electric));
+        result.Error.ShouldBe(EnergyEntryErrors.TypeIncompatible);
     }
 
     [Fact]
@@ -122,6 +121,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicle.Id,
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 1),
             Mileage = 2000, // Higher mileage
             Type = EnergyType.Gasoline,
@@ -138,7 +138,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.IncorrectMileage);
+        result.Error.ShouldBe(EnergyEntryErrors.MileageIncorrect);
     }
 
     [Fact]
@@ -153,6 +153,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicle.Id,
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 1),
             Mileage = 2000,
             Type = EnergyType.Gasoline,
@@ -184,6 +185,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicle.Id,
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 1),
             Mileage = 2000,
             Type = EnergyType.Gasoline,

@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Application.EnergyEntries.Create;
 using FluentValidation;
 
 namespace Application.EnergyEntries.Update;

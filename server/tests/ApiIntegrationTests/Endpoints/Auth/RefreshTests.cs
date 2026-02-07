@@ -1,7 +1,5 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth;
@@ -20,63 +18,57 @@ public class RefreshTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task Refresh_WithValidToken_ReturnsNewTokensAndRevokesOld()
+    public async Task Refresh_WithValidToken_ReturnsNoContentAndRotatesTokens()
     {
         // Arrange
-        await CreateUserAsync();
-        (_, string initialRefreshToken) = await LoginUser("test@garagge.app", "Password123");
-        var oldRefreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == initialRefreshToken);
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
 
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={initialRefreshToken}");
+        var oldRefreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
+        var oldTokenValue = oldRefreshToken.Token;
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-        loginResponse.ShouldNotBeNull();
-        loginResponse.AccessToken.ShouldNotBeNullOrEmpty();
+        // Verify new cookies are set
+        response.Headers.ShouldContainCookie("accessToken");
+        response.Headers.ShouldContainCookie("refreshToken");
 
-        var newRefreshTokenValue = ParseRefreshTokenFromCookie(response.Headers);
-        newRefreshTokenValue.ShouldNotBeNull();
-        newRefreshTokenValue.ShouldNotBe(initialRefreshToken);
-
+        // Verify old token is revoked and replaced
         await DbContext.Entry(oldRefreshToken).ReloadAsync();
         oldRefreshToken.IsRevoked.ShouldBeTrue();
-        oldRefreshToken.ReplacedByToken.ShouldBe(newRefreshTokenValue);
+        oldRefreshToken.ReplacedByToken.ShouldNotBeNullOrEmpty();
 
-        var newRefreshTokenInDb = await DbContext.RefreshTokens.SingleOrDefaultAsync(rt => rt.Token == newRefreshTokenValue);
-        newRefreshTokenInDb.ShouldNotBeNull();
-        newRefreshTokenInDb.IsRevoked.ShouldBeFalse();
+        // Verify new token exists
+        var newRefreshToken = await DbContext.RefreshTokens
+            .SingleOrDefaultAsync(rt => rt.UserId == user.Id && !rt.IsRevoked);
+        newRefreshToken.ShouldNotBeNull();
+        newRefreshToken.Token.ShouldNotBe(oldTokenValue);
     }
 
     [Fact]
     public async Task Refresh_WithExpiredToken_ReturnsUnauthorizedAndRevokesToken()
     {
         // Arrange
-        await CreateUserAsync();
-        (_, string refreshTokenValue) = await LoginUser("test@garagge.app", "Password123");
-        
-        var refreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == refreshTokenValue);
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
+
+        var refreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         refreshToken.ExpiresAt = DateTime.UtcNow.AddDays(-1);
         await DbContext.SaveChangesAsync();
 
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken.Token}");
-
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-        
+
         var problemDetails = await response.GetProblemDetailsAsync();
         problemDetails.ShouldBeErrorOfType(AuthErrors.TokenExpired);
 
-        var expiredCookieValue = ParseRefreshTokenFromCookie(response.Headers, true);
-        expiredCookieValue.ShouldBeEmpty();
-        
         await DbContext.Entry(refreshToken).ReloadAsync();
         refreshToken.IsRevoked.ShouldBeTrue();
     }
@@ -85,20 +77,20 @@ public class RefreshTests : BaseIntegrationTest
     public async Task Refresh_WithReusedToken_RevokesAllUserTokens()
     {
         // Arrange
-        await CreateUserAsync();
-        (_, string refreshToken1) = await LoginUser("test@garagge.app", "Password123");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
 
-        // First refresh (legitimate user)
-        using var legitimateClient = _factory.CreateClient();
-        using var request1 = new HttpRequestMessage(HttpMethod.Post, ApiV1Definition.Auth.Refresh);
-        request1.Headers.Add("Cookie", $"refreshToken={refreshToken1}");
-        var response1 = await legitimateClient.SendAsync(request1);
-        response1.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var initialToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
+        var initialTokenValue = initialToken.Token;
 
-        // Act: Second refresh with the old token (attacker)
+        // First refresh (legitimate user) - uses automatic cookies from LoginUser
+        var response1 = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
+        response1.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        // Act: Second refresh with the old token (attacker with stolen token)
         using var attackerClient = _factory.CreateClient();
-        using var request2 = new HttpRequestMessage(HttpMethod.Post, ApiV1Definition.Auth.Refresh);
-        request2.Headers.Add("Cookie", $"refreshToken={refreshToken1}");
+        using var request2 = new HttpRequestMessage(HttpMethod.Post, ApiV1Definitions.Auth.Refresh);
+        request2.Headers.Add("Cookie", $"refreshToken={initialTokenValue}");
         var response2 = await attackerClient.SendAsync(request2);
 
         // Assert
@@ -106,11 +98,11 @@ public class RefreshTests : BaseIntegrationTest
         var problemDetails = await response2.GetProblemDetailsAsync();
         problemDetails.ShouldBeErrorOfType(AuthErrors.TokenRevoked);
 
-        var user = await DbContext.Users.FirstAsync(u => u.Email == "test@garagge.app");
         var allTokens = await DbContext.RefreshTokens
+            .AsNoTracking()
             .Where(rt => rt.UserId == user.Id)
             .ToListAsync();
-            
+
         allTokens.ShouldAllBe(rt => rt.IsRevoked);
     }
 
@@ -118,18 +110,18 @@ public class RefreshTests : BaseIntegrationTest
     public async Task Refresh_ForLongSession_MaintainsLongSessionDuration()
     {
         // Arrange
-        await CreateUserAsync();
-        (_, string refreshToken) = await LoginUser("test@garagge.app", "Password123", rememberMe: true);
-
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123", rememberMe: true);
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var newRefreshTokenValue = ParseRefreshTokenFromCookie(response.Headers);
-        var newRefreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == newRefreshTokenValue);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        var newRefreshToken = await DbContext.RefreshTokens
+            .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
+            .SingleAsync();
 
         newRefreshToken.SessionDurationDays.ShouldBe(30);
     }
@@ -138,19 +130,32 @@ public class RefreshTests : BaseIntegrationTest
     public async Task Refresh_ForShortSession_MaintainsShortSessionDuration()
     {
         // Arrange
-        await CreateUserAsync();
-        (_, string refreshToken) = await LoginUser("test@garagge.app", "Password123", rememberMe: false);
-
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123", rememberMe: false);
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var newRefreshTokenValue = ParseRefreshTokenFromCookie(response.Headers);
-        var newRefreshToken = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == newRefreshTokenValue);
+        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
+        var newRefreshToken = await DbContext.RefreshTokens
+            .Where(rt => rt.UserId == user.Id && !rt.IsRevoked)
+            .SingleAsync();
 
         newRefreshToken.SessionDurationDays.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Refresh_WithoutRefreshToken_ReturnsUnauthorized()
+    {
+        // Arrange
+        await CreateUserAsync();
+
+        // Act
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 }

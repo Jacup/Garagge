@@ -1,12 +1,9 @@
-﻿using Application.Abstractions.Authentication;
-using Application.EnergyEntries;
+﻿using Application.EnergyEntries;
 using Application.EnergyEntries.GetByVehicle;
 using Application.Services;
 using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
-using Domain.Entities.Vehicles;
 using Domain.Enums;
-using Moq;
 
 namespace ApplicationTests.EnergyEntries.GetEnergyEntriesByVehicle;
 
@@ -16,7 +13,6 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
 
     public GetEnergyEntriesByVehicleQueryHandlerTests()
     {
-        // Use real implementation instead of mock to avoid IAsyncQueryProvider issues
         var filterService = new EnergyEntryFilterService();
         _handler = new GetEnergyEntriesByVehicleQueryHandler(Context, UserContextMock.Object, filterService);
     }
@@ -27,31 +23,31 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var nonExistentVehicleId = Guid.NewGuid();
-        var query = new GetEnergyEntriesByVehicleQuery(nonExistentVehicleId, 1, 20, null);
+        var query = new GetEnergyEntriesByVehicleQuery(nonExistentVehicleId, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
         var otherUserId = Guid.NewGuid();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline], otherUserId);
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, null);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -60,7 +56,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, null);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -94,8 +90,6 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
         var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 3, 5, [EnergyType.Gasoline]);
 
-        var callSequence = new List<string>();
-
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
@@ -114,7 +108,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         var entry1 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
         var entry2 = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 10), 950);
 
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, null);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -132,13 +126,13 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline,  EnergyType.Diesel, EnergyType.Electric]);
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel, EnergyType.Electric]);
 
         _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline, new DateOnly(2023, 10, 15), 1000);
         _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Diesel, new DateOnly(2023, 10, 14), 950);
         _ = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Electric, new DateOnly(2023, 10, 13), 900);
 
-        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, [EnergyType.Gasoline,  EnergyType.Diesel]);
+        var query = new GetEnergyEntriesByVehicleQuery(vehicle.Id, 1, 20, [EnergyType.Gasoline, EnergyType.Diesel]);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -160,6 +154,7 @@ public class GetEnergyEntriesByVehicleQueryHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
+            Vehicle = null!,
             Date = date,
             Mileage = mileage,
             Type = energyType,

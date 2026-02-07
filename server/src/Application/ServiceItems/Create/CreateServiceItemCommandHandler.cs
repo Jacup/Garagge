@@ -9,9 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.ServiceItems.Create;
 
-internal sealed class CreateServiceItemCommandHandler(
-    IApplicationDbContext dbContext,
-    IUserContext userContext) : ICommandHandler<CreateServiceItemCommand, ServiceItemDto>
+internal sealed class CreateServiceItemCommandHandler(IApplicationDbContext dbContext, IUserContext userContext)
+    : ICommandHandler<CreateServiceItemCommand, ServiceItemDto>
 {
     public async Task<Result<ServiceItemDto>> Handle(CreateServiceItemCommand request, CancellationToken cancellationToken)
     {
@@ -20,11 +19,8 @@ internal sealed class CreateServiceItemCommandHandler(
             .Include(sr => sr.Vehicle)
             .FirstOrDefaultAsync(sr => sr.Id == request.ServiceRecordId, cancellationToken);
 
-        if (serviceRecord is null)
-            return Result.Failure<ServiceItemDto>(ServiceRecordErrors.NotFound(request.ServiceRecordId));
-
-        if (serviceRecord.Vehicle?.UserId != userContext.UserId)
-            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.Unauthorized);
+        if (serviceRecord?.Vehicle == null || serviceRecord.Vehicle.UserId != userContext.UserId)
+            return Result.Failure<ServiceItemDto>(ServiceRecordErrors.NotFound);
 
         var serviceItem = new ServiceItem
         {
@@ -38,16 +34,9 @@ internal sealed class CreateServiceItemCommandHandler(
             Notes = request.Notes
         };
 
-        try
-        {
-            await dbContext.ServiceItems.AddAsync(serviceItem, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.CreateFailed);
-        }
+        await dbContext.ServiceItems.AddAsync(serviceItem, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(serviceItem.Adapt<ServiceItemDto>());
+        return serviceItem.Adapt<ServiceItemDto>();
     }
 }

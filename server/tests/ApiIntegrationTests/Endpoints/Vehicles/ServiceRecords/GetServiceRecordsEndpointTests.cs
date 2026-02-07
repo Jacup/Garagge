@@ -1,4 +1,5 @@
-﻿using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
 using Application.ServiceRecords;
@@ -21,14 +22,14 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var vehicleId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicleId));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicleId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
-    public async Task GetServiceRecords_ShouldReturnUnauthorized_WhenVehicleDoesNotBelongToUser()
+    public async Task GetServiceRecords_ShouldReturnNotFound_WhenVehicleDoesNotBelongToUser()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -39,10 +40,10 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateAndAuthenticateUser();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var nonExistentVehicleId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(nonExistentVehicleId));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(nonExistentVehicleId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -68,7 +69,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -87,7 +88,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -111,7 +112,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=NonExistent");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=NonExistent");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -141,7 +142,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Brake Inspection", DateTime.UtcNow.AddDays(-2), 1500, 200m);
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -174,7 +175,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
             "Used synthetic oil");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -210,7 +211,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var record3 = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2024, 2, 1));
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -242,7 +243,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         }
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?page=1&pageSize=2");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?page=1&pageSize=2");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -271,7 +272,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         }
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?page=2&pageSize=2");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?page=2&pageSize=2");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -300,7 +301,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         }
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?page=2&pageSize=3");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?page=2&pageSize=3");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -326,7 +327,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         }
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?pageSize=5");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?pageSize=5");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -354,7 +355,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Oil Filter Replacement");
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Oil");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Oil");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -378,7 +379,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", notes: "Used synthetic parts");
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=synthetic");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=synthetic");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -400,7 +401,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Tire Rotation");
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=oil");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=oil");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -428,7 +429,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, oilChangeType.Id, "Oil Change 2");
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?serviceTypeId={oilChangeType.Id}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?serviceTypeId={oilChangeType.Id}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -452,7 +453,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var nonExistentTypeId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?serviceTypeId={nonExistentTypeId}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?serviceTypeId={nonExistentTypeId}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -481,7 +482,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateFrom = new DateTime(2024, 5, 1);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -507,7 +508,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateTo = new DateTime(2024, 5, 31);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?dateTo={dateTo:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?dateTo={dateTo:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -535,7 +536,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateTo = new DateTime(2024, 6, 30);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -562,7 +563,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", boundaryDate2);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?dateFrom={boundaryDate1:yyyy-MM-dd}&dateTo={boundaryDate2:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?dateFrom={boundaryDate1:yyyy-MM-dd}&dateTo={boundaryDate2:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -593,7 +594,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateTo = new DateTime(2024, 5, 31);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Premium&serviceTypeId={oilChangeType.Id}&dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Premium&serviceTypeId={oilChangeType.Id}&dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -618,7 +619,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateTo = new DateTime(2024, 6, 30);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Tire&dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?searchTerm=Tire&dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -645,7 +646,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var record3 = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2024, 2, 1));
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?sortBy=servicedate&sortDescending=false");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?sortBy=servicedate&sortDescending=false");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -670,7 +671,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var record3 = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2024, 2, 1));
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?sortBy=servicedate&sortDescending=true");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?sortBy=servicedate&sortDescending=true");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -695,7 +696,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 3", mileage: 2000);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?sortBy=mileage&sortDescending=true");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?sortBy=mileage&sortDescending=true");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -720,7 +721,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "B Service");
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?sortBy=title&sortDescending=false");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?sortBy=title&sortDescending=false");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -744,7 +745,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?page=0");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?page=0");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -759,7 +760,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?page=-1");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?page=-1");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -774,7 +775,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?pageSize=0");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?pageSize=0");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -789,7 +790,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         Vehicle vehicle = await CreateVehicleAsync(user);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?pageSize=101");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?pageSize=101");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -807,7 +808,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         var dateTo = new DateTime(2024, 5, 1);
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?dateFrom={dateFrom:yyyy-MM-dd}&dateTo={dateTo:yyyy-MM-dd}");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
@@ -829,7 +830,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Service 1");
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Services.GetAll.WithId(vehicle.Id));
+        var response = await Client.GetAsync(ApiV1Definitions.Services.GetAll.WithId(vehicle.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -853,7 +854,7 @@ public class GetServiceRecordsEndpointTests(CustomWebApplicationFactory factory)
         }
 
         // Act
-        var response = await Client.GetAsync($"{ApiV1Definition.Services.GetAll.WithId(vehicle.Id)}?pageSize=100");
+        var response = await Client.GetAsync($"{ApiV1Definitions.Services.GetAll.WithId(vehicle.Id)}?pageSize=100");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

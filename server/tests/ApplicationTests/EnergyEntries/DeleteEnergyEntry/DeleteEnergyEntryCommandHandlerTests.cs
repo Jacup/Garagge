@@ -1,6 +1,5 @@
 using Application.EnergyEntries;
 using Application.EnergyEntries.Delete;
-using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
@@ -49,7 +48,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(nonExistentEntryId));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -67,7 +66,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(vehicle.Id));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -85,24 +84,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(energyEntry.Id));
-    }
-
-    [Fact]
-    public async Task Handle_UnauthorizedUser_ReturnsFailureWithUnauthorizedError()
-    {
-        // Arrange
-        UserContextMock.Setup(x => x.UserId).Returns(Guid.Empty); // Unauthorized user
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        var energyEntry = await CreateEnergyEntryInDb(vehicle.Id, EnergyType.Gasoline);
-        var command = new DeleteEnergyEntryCommand(energyEntry.Id, vehicle.Id);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -137,17 +119,9 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             ManufacturedYear = 2020,
             Type = VehicleType.Car,
             UserId = userId ?? AuthorizedUserId,
-            VehicleEnergyTypes = new List<VehicleEnergyType>
-            {
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    VehicleId = vehicleId,
-                    EnergyType = energyType
-                }
-            }
+            VehicleEnergyTypes = new List<VehicleEnergyType> { new() { Id = Guid.NewGuid(), VehicleId = vehicleId, EnergyType = energyType } }
         };
-        
+
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
         return vehicle;
@@ -159,6 +133,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 1000,
             Type = energyType,

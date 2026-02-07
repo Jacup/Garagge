@@ -23,6 +23,7 @@ public class ChargingEnergyEntryTests
             Mileage = Mileage,
             Cost = Cost,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
@@ -47,6 +48,7 @@ public class ChargingEnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -70,6 +72,7 @@ public class ChargingEnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.kWh,
             Type = EnergyType.Electric
@@ -90,6 +93,7 @@ public class ChargingEnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = volume,
             EnergyUnit = unit,
             Type = EnergyType.Electric
@@ -107,6 +111,7 @@ public class ChargingEnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -128,6 +133,7 @@ public class ChargingEnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = volume,
             EnergyUnit = Unit,
             Type = Type,

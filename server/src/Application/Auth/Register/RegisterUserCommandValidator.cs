@@ -1,4 +1,5 @@
 ﻿using Application.Core;
+using Application.Users;
 using FluentValidation;
 
 namespace Application.Auth.Register;
@@ -9,23 +10,23 @@ internal sealed class RegisterUserCommandValidator : AbstractValidator<RegisterU
     {
         RuleFor(c => c.Email)
             .NotEmpty()
-            .WithError(AuthErrors.MissingEmail)
+            .WithError(UserErrors.EmailRequired)
             .EmailAddress()
-            .WithError(AuthErrors.InvalidEmail);
-        
+            .WithError(UserErrors.EmailInvalid);
+
         RuleFor(c => c.FirstName)
             .NotEmpty()
-            .WithError(AuthErrors.MissingFirstName);
-        
+            .WithError(UserErrors.FirstNameRequired);
+
         RuleFor(c => c.LastName)
             .NotEmpty()
-            .WithError(AuthErrors.MissingLastName);
+            .WithError(UserErrors.LastNameRequired);
 
         const int minPasswordLength = 8;
-        
+
         RuleFor(c => c.Password)
             .NotEmpty()
             .MinimumLength(minPasswordLength)
-            .WithError(AuthErrors.InvalidPassword(minPasswordLength));
+            .WithError(UserErrors.PasswordTooShort(minPasswordLength));
     }
 }

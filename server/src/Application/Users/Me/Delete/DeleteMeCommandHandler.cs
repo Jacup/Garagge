@@ -15,18 +15,15 @@ public class DeleteMeCommandHandler(IApplicationDbContext context, IUserContext 
         var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
         if (user == null)
-            return Result.Failure(UserErrors.NotFound(userId));
-        
+            return Result.Failure(UserErrors.NotFound);
+
+        var refreshTokens = await context.RefreshTokens
+            .Where(rt => rt.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        context.RefreshTokens.RemoveRange(refreshTokens);
         context.Users.Remove(user);
-        
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure(UserErrors.DeleteFailed);
-        }
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

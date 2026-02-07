@@ -10,17 +10,14 @@ public class DeleteSessionCommandHandler(IApplicationDbContext context, IUserCon
 {
     public async Task<Result> Handle(DeleteSessionCommand request, CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-        var currentSessionId = userContext.SessionId;
-
-        if (request.SessionId == currentSessionId)
-            return Result.Failure(UserErrors.DeleteCurrentSessionFailed);
+        if (request.SessionId == userContext.SessionId)
+            return Result.Failure(UserErrors.DeleteCurrentSession);
 
         var refreshToken = await context.RefreshTokens
-            .SingleOrDefaultAsync(rt => rt.UserId == userId && rt.Id == request.SessionId, cancellationToken);
+            .SingleOrDefaultAsync(rt => rt.UserId == userContext.UserId && rt.Id == request.SessionId, cancellationToken);
 
         if (refreshToken is null)
-            return Result.Failure(UserErrors.SessionNotFound(request.SessionId));
+            return Result.Failure(UserErrors.SessionNotFound);
 
         context.RefreshTokens.Remove(refreshToken);
         await context.SaveChangesAsync(cancellationToken);

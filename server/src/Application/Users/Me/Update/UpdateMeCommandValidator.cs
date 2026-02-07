@@ -9,16 +9,16 @@ public class UpdateMeCommandValidator : AbstractValidator<UpdateMeCommand>
     {
         RuleFor(c => c.Email)
             .NotEmpty()
-            .WithError(UserErrors.MissingEmail)
+            .WithError(UserErrors.EmailRequired)
             .EmailAddress()
-            .WithError(UserErrors.InvalidEmail);
+            .WithError(UserErrors.EmailInvalid);
         
         RuleFor(c => c.FirstName)
             .NotEmpty()
-            .WithError(UserErrors.MissingFirstName);
+            .WithError(UserErrors.FirstNameRequired);
         
         RuleFor(c => c.LastName)
             .NotEmpty()
-            .WithError(UserErrors.MissingLastName);
+            .WithError(UserErrors.LastNameRequired);
     }
 }

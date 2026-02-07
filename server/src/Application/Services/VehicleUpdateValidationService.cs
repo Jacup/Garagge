@@ -47,10 +47,7 @@ public class VehicleUpdateValidationService(IApplicationDbContext dbContext) : I
                 .ToList();
 
             return Result.Failure<VehicleEnergyTypesUpdatePlan>(
-                VehicleErrors.CannotRemoveEnergyTypesWithExistingEntries(
-                    vehicle.Id,
-                    conflictingTypes,
-                    conflictingEntries.Count));
+                VehicleErrors.CannotRemoveEnergyTypes(conflictingTypes, conflictingEntries.Count));
         }
 
         return Result.Success(new VehicleEnergyTypesUpdatePlan(

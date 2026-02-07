@@ -1,4 +1,3 @@
-using Application.Core;
 using Application.Vehicles;
 using Application.Vehicles.Create;
 using Domain.Enums;
@@ -14,10 +13,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
 
     public CreateVehicleCommandHandlerTests()
     {
-        _handler = new CreateVehicleCommandHandler(
-            Context,
-            UserContextMock.Object,
-            _loggerMock.Object);
+        _handler = new CreateVehicleCommandHandler(Context, UserContextMock.Object);
     }
 
     [Fact]
@@ -30,11 +26,11 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
             "Audi",
             "A4",
             EngineType.Fuel,
-            new List<EnergyType>() {EnergyType.Gasoline, EnergyType.LPG},
+            new List<EnergyType>() { EnergyType.Gasoline, EnergyType.LPG },
             2010,
             VehicleType.Car,
             "1HGBH41JXMN109186");
-        
+
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -92,21 +88,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         result.Value.AllowedEnergyTypes.ShouldBeEmpty();
         result.Value.UserId.ShouldBe(AuthorizedUserId);
     }
-
-    [Fact]
-    public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
-    {
-        // Arrange
-        var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, [], 2010);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.Unauthorized);
-    }
-
+    
     [Theory]
     [InlineData(EngineType.Fuel)]
     [InlineData(EngineType.Hybrid)]
@@ -118,7 +100,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var command = new CreateVehicleCommand("Audi", "A4", engineType, [EnergyType.CNG], 2010);
-        
+
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -133,7 +115,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var command = new CreateVehicleCommand("Audi", "A4", EngineType.Fuel, [], 2010);
-        
+
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
 
@@ -141,7 +123,7 @@ public class CreateVehicleCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Id.ShouldNotBe(Guid.Empty);
     }
-    
+
     [Fact]
     public async Task Handle_WithEmptyEnergyTypes_DoesNotCreateVehicleEnergyTypes()
     {

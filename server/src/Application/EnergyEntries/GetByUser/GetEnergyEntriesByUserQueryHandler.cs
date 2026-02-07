@@ -16,7 +16,7 @@ internal sealed class GetEnergyEntriesByUserQueryHandler(
     public async Task<Result<PagedList<EnergyEntryDto>>> Handle(GetEnergyEntriesByUserQuery request, CancellationToken cancellationToken)
     {
         if (userContext.UserId != request.UserId)
-            return Result.Failure<PagedList<EnergyEntryDto>>(EnergyEntryErrors.Unauthorized);
+            return Result.Failure<PagedList<EnergyEntryDto>>(EnergyEntryErrors.Forbidden);
 
         var entriesQuery = dbContext.EnergyEntries
             .AsNoTracking()
@@ -48,6 +48,6 @@ internal sealed class GetEnergyEntriesByUserQueryHandler(
             request.Page,
             request.PageSize);
 
-        return Result.Success(energyEntriesDto);
+        return energyEntriesDto;
     }
 }

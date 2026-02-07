@@ -10,6 +10,7 @@ public class EnergyEntryMileageValidatorTests
         {
             Id = id,
             VehicleId = vehicleId,
+            Vehicle = null!,
             Date = date,
             Mileage = mileage,
             Type = 0,
@@ -24,9 +25,9 @@ public class EnergyEntryMileageValidatorTests
         var entry = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 1, 1), 1000);
         var entries = new List<EnergyEntry> { entry };
         var validator = new EnergyEntryMileageValidator();
-        
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeTrue();
     }
 
@@ -38,9 +39,9 @@ public class EnergyEntryMileageValidatorTests
         var later = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 2, 1), 1500);
         var entries = new List<EnergyEntry> { entry, later };
         var validator = new EnergyEntryMileageValidator();
-        
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-       
+
         result.ShouldBeFalse();
     }
 
@@ -52,9 +53,9 @@ public class EnergyEntryMileageValidatorTests
         var earlier = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 1, 1), 2000);
         var entries = new List<EnergyEntry> { entry, earlier };
         var validator = new EnergyEntryMileageValidator();
-        
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeFalse();
     }
 
@@ -66,9 +67,9 @@ public class EnergyEntryMileageValidatorTests
         var later = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 2, 1), 2000);
         var entries = new List<EnergyEntry> { entry, later };
         var validator = new EnergyEntryMileageValidator();
-        
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeTrue();
     }
 
@@ -80,9 +81,9 @@ public class EnergyEntryMileageValidatorTests
         var earlier = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 1, 1), 1000);
         var entries = new List<EnergyEntry> { entry, earlier };
         var validator = new EnergyEntryMileageValidator();
-        
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeTrue();
     }
 
@@ -94,9 +95,9 @@ public class EnergyEntryMileageValidatorTests
         var later = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 2, 1), 1000);
         var entries = new List<EnergyEntry> { entry, later };
         var validator = new EnergyEntryMileageValidator();
-       
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeTrue();
     }
 
@@ -108,9 +109,9 @@ public class EnergyEntryMileageValidatorTests
         var earlier = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 1, 1), 1000);
         var entries = new List<EnergyEntry> { entry, earlier };
         var validator = new EnergyEntryMileageValidator();
-       
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-        
+
         result.ShouldBeTrue();
     }
 
@@ -123,9 +124,9 @@ public class EnergyEntryMileageValidatorTests
         var later2 = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2024, 4, 1), 2500);
         var entries = new List<EnergyEntry> { entry, later1, later2 };
         var validator = new EnergyEntryMileageValidator();
-     
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-     
+
         result.ShouldBeFalse();
     }
 
@@ -138,9 +139,9 @@ public class EnergyEntryMileageValidatorTests
         var earlier2 = CreateEntry(Guid.NewGuid(), vehicleId, new DateOnly(2023, 12, 1), 1000);
         var entries = new List<EnergyEntry> { entry, earlier1, earlier2 };
         var validator = new EnergyEntryMileageValidator();
-    
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
-   
+
         result.ShouldBeFalse();
     }
 
@@ -153,7 +154,7 @@ public class EnergyEntryMileageValidatorTests
         var other = CreateEntry(Guid.NewGuid(), otherVehicleId, new DateOnly(2024, 2, 1), 500);
         var entries = new List<EnergyEntry> { entry, other };
         var validator = new EnergyEntryMileageValidator();
-    
+
         var result = validator.IsValid(entries, entry, entry.Date, entry.Mileage);
 
         result.ShouldBeTrue();

@@ -6,36 +6,26 @@ using Application.Core;
 using Domain.Entities.Vehicles;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Vehicles.Update;
 
 public sealed class UpdateVehicleCommandHandler(
     IApplicationDbContext dbContext,
     IUserContext userContext,
-    IVehicleUpdateValidationService validationService,
-    ILogger<UpdateVehicleCommandHandler> logger)
+    IVehicleUpdateValidationService validationService)
     : ICommandHandler<UpdateVehicleCommand, VehicleDto>
 {
     public async Task<Result<VehicleDto>> Handle(UpdateVehicleCommand request, CancellationToken cancellationToken)
     {
         var userId = userContext.UserId;
 
-        if (userId == Guid.Empty)
-        {
-            logger.LogError("Attempt to update vehicle with empty userId");
-            return Result.Failure<VehicleDto>(VehicleErrors.Unauthorized);
-        }
-
         var vehicle = await dbContext.Vehicles
             .Include(v => v.VehicleEnergyTypes)
-            .FirstOrDefaultAsync(v => v.UserId == userId && v.Id == request.VehicleId, cancellationToken);
+            .FirstOrDefaultAsync(v => v.UserId == userId &&
+                                      v.Id == request.VehicleId, cancellationToken);
 
         if (vehicle == null)
-        {
-            logger.LogError("Vehicle with Id = '{VehicleId}' not found for UserId = '{UserId}'", request.VehicleId, userId);
-            return Result.Failure<VehicleDto>(VehicleErrors.NotFound(request.VehicleId));
-        }
+            return Result.Failure<VehicleDto>(VehicleErrors.NotFound);
 
         var energyTypesValidation = await validationService
             .ValidateEnergyTypesChangeAsync(
@@ -63,12 +53,7 @@ public sealed class UpdateVehicleCommandHandler(
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Result.Failure<VehicleDto>(VehicleErrors.ConcurrencyConflict(request.VehicleId));
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error updating vehicle {VehicleId}", request.VehicleId);
-            return Result.Failure<VehicleDto>(VehicleErrors.UpdateFailed(request.VehicleId));
+            return Result.Failure<VehicleDto>(VehicleErrors.ConcurrencyConflict);
         }
 
         return vehicle.Adapt<VehicleDto>();

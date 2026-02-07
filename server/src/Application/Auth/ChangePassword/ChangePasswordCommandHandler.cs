@@ -15,10 +15,10 @@ internal sealed class ChangePasswordCommandHandler(IApplicationDbContext context
         var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userContext.UserId, cancellationToken);
 
         if (user == null)
-            return Result.Failure(UserErrors.NotFound(userContext.UserId));
+            return Result.Failure(UserErrors.NotFound);
 
         if (!passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
-            return Result.Failure(AuthErrors.WrongPassword);
+            return Result.Failure(AuthErrors.PasswordInvalid);
 
         user.PasswordHash = passwordHasher.Hash(request.NewPassword);
 

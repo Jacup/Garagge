@@ -29,7 +29,7 @@ public class EnergyEntryFilterServiceTests
         // Assert
         result.Count().ShouldBe(5);
     }
-    
+
     [Fact]
     public void ApplyEnergyTypeFilter_WithEmptyList_ReturnsUnfilteredQuery()
     {
@@ -43,7 +43,7 @@ public class EnergyEntryFilterServiceTests
         // Assert
         result.Count().ShouldBe(entries.Count);
     }
-    
+
     [Fact]
     public void ApplyEnergyTypeFilter_WithMultipleTypes_ReturnsOnlyMatchingEntries()
     {
@@ -60,7 +60,7 @@ public class EnergyEntryFilterServiceTests
         filteredEntries.Count.ShouldBe(3);
         filteredEntries.All(e => types.Contains(e.Type)).ShouldBeTrue();
     }
-    
+
     [Fact]
     public void ApplyEnergyTypeFilter_WhenSingleTypeMatches_ReturnsOnlyMatchingEntries()
     {
@@ -83,7 +83,7 @@ public class EnergyEntryFilterServiceTests
         // Arrange
         var entries = CreateTestEnergyEntries();
         var query = entries.AsQueryable();
-        var types = new[] { EnergyType.Hydrogen }; // brak w testowych danych
+        var types = new[] { EnergyType.Hydrogen };
 
         // Act
         var result = _service.ApplyEnergyTypeFilter(query, types);
@@ -114,7 +114,7 @@ public class EnergyEntryFilterServiceTests
         // Arrange
         var entries = CreateTestEnergyEntries();
         var query = entries.AsQueryable();
-        var types = new[] { EnergyType.Hydrogen, EnergyType.Biofuel }; // brak w danych
+        var types = new[] { EnergyType.Hydrogen, EnergyType.Biofuel }; 
 
         // Act
         var result = _service.ApplyEnergyTypeFilter(query, types);
@@ -218,7 +218,7 @@ public class EnergyEntryFilterServiceTests
         // Assert
         var sortedEntries = result.ToList();
         sortedEntries.Count.ShouldBe(4);
-        
+
         // Check sorting: Date DESC, then Mileage DESC
         sortedEntries[0].Date.ShouldBe(new DateOnly(2023, 10, 16)); // Latest date
         sortedEntries[1].Date.ShouldBe(new DateOnly(2023, 10, 15)); // Same date, higher mileage
@@ -234,52 +234,271 @@ public class EnergyEntryFilterServiceTests
 
     private static List<EnergyEntry> CreateTestEnergyEntries()
     {
-        return new List<EnergyEntry>
-        {
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Gasoline, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 1), Mileage = 1000, EnergyUnit = EnergyUnit.Liter, Volume = 50m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Gasoline, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 2), Mileage = 1100, EnergyUnit = EnergyUnit.Liter, Volume = 45m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Diesel, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 3), Mileage = 2000, EnergyUnit = EnergyUnit.Liter, Volume = 55m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Electric, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 4), Mileage = 3000, EnergyUnit = EnergyUnit.kWh, Volume = 30m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.LPG, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 5), Mileage = 1500, EnergyUnit = EnergyUnit.Liter, Volume = 40m }
-        };
+        return
+        [
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 1),
+                Mileage = 1000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 50m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 2),
+                Mileage = 1100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 45m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Diesel,
+                Date = new DateOnly(2023, 10, 3),
+                Mileage = 2000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 55m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Electric,
+                Date = new DateOnly(2023, 10, 4),
+                Mileage = 3000,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 30m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.LPG,
+                Date = new DateOnly(2023, 10, 5),
+                Mileage = 1500,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 40m
+            }
+        ];
     }
 
     private static List<EnergyEntry> CreateTestEnergyEntriesWithUsers(Guid userId, Guid otherUserId)
     {
-        var vehicle1 = new Vehicle { Id = Guid.NewGuid(), UserId = userId, Brand = "Toyota", Model = "Corolla", EngineType = EngineType.Fuel };
-        var vehicle2 = new Vehicle { Id = Guid.NewGuid(), UserId = otherUserId, Brand = "Honda", Model = "Civic", EngineType = EngineType.Fuel };
-
-        return new List<EnergyEntry>
+        var vehicle1 = new Vehicle
         {
-            new() { Id = Guid.NewGuid(), VehicleId = vehicle1.Id, Vehicle = vehicle1, Type = EnergyType.Gasoline, Date = new DateOnly(2023, 10, 1), Mileage = 1000, EnergyUnit = EnergyUnit.Liter, Volume = 50m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicle1.Id, Vehicle = vehicle1, Type = EnergyType.Gasoline, Date = new DateOnly(2023, 10, 2), Mileage = 1100, EnergyUnit = EnergyUnit.Liter, Volume = 45m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicle1.Id, Vehicle = vehicle1, Type = EnergyType.Diesel, Date = new DateOnly(2023, 10, 3), Mileage = 1200, EnergyUnit = EnergyUnit.Liter, Volume = 55m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicle2.Id, Vehicle = vehicle2, Type = EnergyType.Electric, Date = new DateOnly(2023, 10, 4), Mileage = 2000, EnergyUnit = EnergyUnit.kWh, Volume = 30m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicle2.Id, Vehicle = vehicle2, Type = EnergyType.LPG, Date = new DateOnly(2023, 10, 5), Mileage = 2100, EnergyUnit = EnergyUnit.Liter, Volume = 40m }
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            Brand = "Toyota",
+            Model = "Corolla",
+            EngineType = EngineType.Fuel
         };
+        var vehicle2 = new Vehicle
+        {
+            Id = Guid.NewGuid(),
+            UserId = otherUserId,
+            Brand = "Honda",
+            Model = "Civic",
+            EngineType = EngineType.Fuel
+        };
+
+        return
+        [
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle1.Id,
+                Vehicle = vehicle1,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 1),
+                Mileage = 1000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 50m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle1.Id,
+                Vehicle = vehicle1,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 2),
+                Mileage = 1100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 45m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle1.Id,
+                Vehicle = vehicle1,
+                Type = EnergyType.Diesel,
+                Date = new DateOnly(2023, 10, 3),
+                Mileage = 1200,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 55m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle2.Id,
+                Vehicle = vehicle2,
+                Type = EnergyType.Electric,
+                Date = new DateOnly(2023, 10, 4),
+                Mileage = 2000,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 30m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = vehicle2.Id,
+                Vehicle = vehicle2,
+                Type = EnergyType.LPG,
+                Date = new DateOnly(2023, 10, 5),
+                Mileage = 2100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 40m
+            }
+        ];
     }
 
     private static List<EnergyEntry> CreateTestEnergyEntriesWithVehicles(Guid vehicleId, Guid otherVehicleId)
     {
-        return new List<EnergyEntry>
-        {
-            new() { Id = Guid.NewGuid(), VehicleId = vehicleId, Type = EnergyType.Gasoline, Date = new DateOnly(2023, 10, 1), Mileage = 1000, EnergyUnit = EnergyUnit.Liter, Volume = 50m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicleId, Type = EnergyType.Diesel, Date = new DateOnly(2023, 10, 2), Mileage = 1100, EnergyUnit = EnergyUnit.Liter, Volume = 45m },
-            new() { Id = Guid.NewGuid(), VehicleId = vehicleId, Type = EnergyType.Electric, Date = new DateOnly(2023, 10, 3), Mileage = 1200, EnergyUnit = EnergyUnit.kWh, Volume = 30m },
-            new() { Id = Guid.NewGuid(), VehicleId = otherVehicleId, Type = EnergyType.LPG, Date = new DateOnly(2023, 10, 4), Mileage = 2000, EnergyUnit = EnergyUnit.Liter, Volume = 40m },
-            new() { Id = Guid.NewGuid(), VehicleId = otherVehicleId, Type = EnergyType.Gasoline, Date = new DateOnly(2023, 10, 5), Mileage = 2100, EnergyUnit = EnergyUnit.Liter, Volume = 55m }
-        };
+        return
+        [
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Vehicle = null!,
+                VehicleId = vehicleId,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 1),
+                Mileage = 1000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 50m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Vehicle = null!,
+                VehicleId = vehicleId,
+                Type = EnergyType.Diesel,
+                Date = new DateOnly(2023, 10, 2),
+                Mileage = 1100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 45m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Vehicle = null!,
+                VehicleId = vehicleId,
+                Type = EnergyType.Electric,
+                Date = new DateOnly(2023, 10, 3),
+                Mileage = 1200,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 30m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Vehicle = null!,
+                VehicleId = otherVehicleId,
+                Type = EnergyType.LPG,
+                Date = new DateOnly(2023, 10, 4),
+                Mileage = 2000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 40m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Vehicle = null!,
+                VehicleId = otherVehicleId,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 5),
+                Mileage = 2100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 55m
+            }
+        ];
     }
 
     private static List<EnergyEntry> CreateTestEnergyEntriesWithDifferentDatesAndMileage()
     {
-        return new List<EnergyEntry>
-        {
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Gasoline, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 15), Mileage = 1000, EnergyUnit = EnergyUnit.Liter, Volume = 50m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Diesel, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 15), Mileage = 1100, EnergyUnit = EnergyUnit.Liter, Volume = 45m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.Electric, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 16), Mileage = 950, EnergyUnit = EnergyUnit.kWh, Volume = 30m },
-            new() { Id = Guid.NewGuid(), Type = EnergyType.LPG, VehicleId = Guid.NewGuid(), Date = new DateOnly(2023, 10, 10), Mileage = 2000, EnergyUnit = EnergyUnit.Liter, Volume = 40m }
-        };
+        return
+        [
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Gasoline,
+                Date = new DateOnly(2023, 10, 15),
+                Mileage = 1000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 50m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Diesel,
+                Date = new DateOnly(2023, 10, 15),
+                Mileage = 1100,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 45m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.Electric,
+                Date = new DateOnly(2023, 10, 16),
+                Mileage = 950,
+                EnergyUnit = EnergyUnit.kWh,
+                Volume = 30m
+            },
+
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
+                Type = EnergyType.LPG,
+                Date = new DateOnly(2023, 10, 10),
+                Mileage = 2000,
+                EnergyUnit = EnergyUnit.Liter,
+                Volume = 40m
+            }
+        ];
     }
 
     #endregion

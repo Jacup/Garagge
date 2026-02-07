@@ -1,9 +1,10 @@
 ﻿using Application.Core;
+using Application.Users;
 using FluentValidation;
 
 namespace Application.Auth.ChangePassword;
 
-public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
+internal sealed class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
 {
     public ChangePasswordCommandValidator()
     {
@@ -11,15 +12,15 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
         
         RuleFor(c => c.CurrentPassword)
             .NotEmpty()
-            .WithError(AuthErrors.MissingPassword);
+            .WithError(UserErrors.PasswordRequired);
         
         RuleFor(c => c.NewPassword)
             .NotEmpty()
             .MinimumLength(minPasswordLength)
-            .WithError(AuthErrors.InvalidPassword(minPasswordLength));
+            .WithError(UserErrors.PasswordTooShort(minPasswordLength));
         
         RuleFor(c => c.NewPassword)
             .NotEqual(c => c.CurrentPassword)
-            .WithError(AuthErrors.NewPasswordSameAsOld);
+            .WithError(UserErrors.PasswordSameAsOld);
     }
 }

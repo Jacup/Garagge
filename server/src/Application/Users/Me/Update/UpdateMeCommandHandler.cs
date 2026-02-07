@@ -12,31 +12,22 @@ public class UpdateMeCommandHandler(IApplicationDbContext context, IUserContext 
     public async Task<Result<UserDto>> Handle(UpdateMeCommand request, CancellationToken cancellationToken)
     {
         var userId = userContext.UserId;
-        
+
         var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
         if (user == null)
-            return Result.Failure<UserDto>(UserErrors.NotFound(userId));
+            return Result.Failure<UserDto>(UserErrors.NotFound);
 
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         if (await context.Users.AnyAsync(u => u.Email == normalizedEmail && u.Id != userId, cancellationToken))
-        {
             return Result.Failure<UserDto>(UserErrors.EmailNotUnique);
-        }
 
         user.Email = normalizedEmail;
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
 
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<UserDto>(UserErrors.UpdateFailed);
-        }
+        await context.SaveChangesAsync(cancellationToken);
 
         return user.Adapt<UserDto>();
     }

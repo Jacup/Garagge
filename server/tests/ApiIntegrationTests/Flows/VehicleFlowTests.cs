@@ -1,5 +1,5 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
 using Application.Vehicles;
@@ -32,7 +32,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         // Create Vehicle
         var createVehicleCommand = new VehicleCreateRequest(initialBrand, initialModel, initialEngineType, initialYear, initialVehicleType, initialVin, []);
 
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleCommand);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
 
@@ -46,7 +46,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         createContent.VIN.ShouldBe(initialVin);
 
         // Get Vehicle
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, createContent.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, createContent.Id));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var getContent = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
@@ -67,8 +67,10 @@ public class VehicleFlowTests : BaseIntegrationTest
         const VehicleType updatedVehicleType = VehicleType.Car;
         const string updatedVin = "1FA6P8CF8GH123456";
 
-        var updateVehicleRequest = new VehicleUpdateRequest(updatedBrand, updatedModel, updatedEngineType, updatedYear, updatedVehicleType, updatedVin, null);
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, createContent.Id), updateVehicleRequest);
+        var updateVehicleRequest =
+            new VehicleUpdateRequest(updatedBrand, updatedModel, updatedEngineType, updatedYear, updatedVehicleType, updatedVin, null);
+
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, createContent.Id), updateVehicleRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
@@ -82,7 +84,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         updateResult.VIN.ShouldBe(updatedVin);
 
         // Get Vehicle After Update
-        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, createContent.Id));
+        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, createContent.Id));
         getAfterUpdateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var getAfterUpdateContent = await getAfterUpdateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
@@ -95,11 +97,11 @@ public class VehicleFlowTests : BaseIntegrationTest
         getAfterUpdateContent.VIN.ShouldBe(updatedVin);
 
         // Delete Vehicle
-        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Vehicles.DeleteById, createContent.Id));
+        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definitions.Vehicles.DeleteById, createContent.Id));
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
         // Get Vehicle After Delete
-        var getAfterDeleteResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, createContent.Id));
+        var getAfterDeleteResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, createContent.Id));
         getAfterDeleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
@@ -111,13 +113,13 @@ public class VehicleFlowTests : BaseIntegrationTest
         for (int i = 0; i < 15; i++)
         {
             var command = new VehicleCreateRequest($"TestBrand X{i}", $"TestModel Y{i}", EngineType.Fuel, null, null, null, null);
-            var response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, command);
+            var response = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, command);
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
         }
 
         // Get All Vehicles - First Page
-        var getAllResponse = await Client.GetAsync(ApiV1Definition.Vehicles.GetAll);
+        var getAllResponse = await Client.GetAsync(ApiV1Definitions.Vehicles.GetAll);
         getAllResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pagedListOfVehicles = await getAllResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
 
@@ -129,7 +131,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         pagedListOfVehicles.HasPreviousPage.ShouldBeFalse();
 
         // Get All Vehicles - Second Page
-        var getSecondPageResponse = await Client.GetAsync($"{ApiV1Definition.Vehicles.GetAll}?page=2&pageSize=10");
+        var getSecondPageResponse = await Client.GetAsync($"{ApiV1Definitions.Vehicles.GetAll}?page=2&pageSize=10");
         getSecondPageResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var secondPage = await getSecondPageResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
 
@@ -140,7 +142,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         secondPage.HasNextPage.ShouldBeFalse();
         secondPage.HasPreviousPage.ShouldBeTrue();
 
-        var getPageWithIncreasedPageSizeResponse = await Client.GetAsync($"{ApiV1Definition.Vehicles.GetAll}?pageSize=20");
+        var getPageWithIncreasedPageSizeResponse = await Client.GetAsync($"{ApiV1Definitions.Vehicles.GetAll}?pageSize=20");
         getPageWithIncreasedPageSizeResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var pageWithIncreasedPageSize =
             await getPageWithIncreasedPageSizeResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
@@ -168,11 +170,11 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         foreach (VehicleCreateRequest createVehicleCommand in commands)
         {
-            await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleCommand);
+            await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleCommand);
         }
 
         // Search Vehicles by Brand containing 'a' (case-insensitive)
-        var searchLowercaseResponse = await Client.GetAsync($"{ApiV1Definition.Vehicles.GetAll}?searchTerm=a");
+        var searchLowercaseResponse = await Client.GetAsync($"{ApiV1Definitions.Vehicles.GetAll}?searchTerm=a");
         searchLowercaseResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var searchLowercaseResult = await searchLowercaseResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
         searchLowercaseResult.ShouldNotBeNull();
@@ -182,7 +184,7 @@ public class VehicleFlowTests : BaseIntegrationTest
             v.Model.Contains('a', StringComparison.OrdinalIgnoreCase));
 
         // Search Vehicles by Model containing 'X' (case-insensitive)
-        var searchUppercaseResponse = await Client.GetAsync($"{ApiV1Definition.Vehicles.GetAll}?searchTerm=X");
+        var searchUppercaseResponse = await Client.GetAsync($"{ApiV1Definitions.Vehicles.GetAll}?searchTerm=X");
         searchUppercaseResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var searchUppercaseResult = await searchUppercaseResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
         searchUppercaseResult.ShouldNotBeNull();
@@ -197,30 +199,32 @@ public class VehicleFlowTests : BaseIntegrationTest
         var user2 = await CreateUserAsync("user2@garagge.app", "password345");
 
         // Authenticate as User 1 and create a vehicle
-        var loginUser1Response = await LoginUser(user1.Email, "password123");
-        Authenticate(loginUser1Response.Response.AccessToken);
+        await LoginUser(user1.Email, "password123");
         var createVehicleUser1Command = new VehicleCreateRequest("User1Brand", "User1Model", EngineType.Fuel, null, null, null, null);
-        var createUser1Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser1Command);
+        var createUser1Response = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleUser1Command);
         createUser1Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
-        // Authenticate as User 2 and create a vehicle
-        var loginUser2Response = await LoginUser(user2.Email, "password345");
-        Authenticate(loginUser2Response.Response.AccessToken);
+        // Authenticate as User 2 (new client with separate cookies)
+        using var user2Client = Factory.CreateClient();
+
+        var loginRequest = new LoginRequest(user2.Email, "password345", false);
+        var loginResponse = await user2Client.PostAsJsonAsync(ApiV1Definitions.Auth.Login, loginRequest);
+        loginResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
+
         var createVehicleUser2Command = new VehicleCreateRequest("User2Brand", "User2Model", EngineType.Fuel, null, null, null, null);
-        var createUser2Response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleUser2Command);
+        var createUser2Response = await user2Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleUser2Command);
         createUser2Response.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Retrieve vehicles as User 2
-        var getUser2VehiclesResponse = await Client.GetAsync(ApiV1Definition.Vehicles.GetAll);
+        var getUser2VehiclesResponse = await user2Client.GetAsync(ApiV1Definitions.Vehicles.GetAll);
         getUser2VehiclesResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var user2Vehicles = await getUser2VehiclesResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
         user2Vehicles.ShouldNotBeNull();
         user2Vehicles.Items.Count.ShouldBe(1);
         user2Vehicles.Items[0].Brand.ShouldBe("User2Brand");
 
-        // Retrieve vehicles as User 1
-        Authenticate(loginUser1Response.Response.AccessToken);
-        var getUser1VehiclesResponse = await Client.GetAsync(ApiV1Definition.Vehicles.GetAll);
+        // Retrieve vehicles as User 1 (original Client still has User1 cookies)
+        var getUser1VehiclesResponse = await Client.GetAsync(ApiV1Definitions.Vehicles.GetAll);
         getUser1VehiclesResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var user1Vehicles = await getUser1VehiclesResponse.Content.ReadFromJsonAsync<PagedList<VehicleDto>>(DefaultJsonSerializerOptions);
         user1Vehicles.ShouldNotBeNull();
@@ -232,26 +236,29 @@ public class VehicleFlowTests : BaseIntegrationTest
     public async Task VehicleAuthFlow_UnauthorizedAccess_Returns401()
     {
         var user = await CreateUserAsync();
-        var vehicle = new Vehicle { Brand = "Toyota", Model = "Corolla", EngineType = EngineType.Fuel, UserId = user.Id };
+        var vehicle = new Vehicle
+        {
+            Brand = "Toyota", Model = "Corolla", EngineType = EngineType.Fuel, UserId = user.Id
+        };
 
         DbContext.Vehicles.Add(vehicle);
         await DbContext.SaveChangesAsync();
 
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicle.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, vehicle.Id));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         var createCommand = new VehicleCreateRequest("Honda", "Civic", EngineType.Fuel, null, null, null, null);
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createCommand);
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
         var updateRequest = new VehicleUpdateRequest("Honda", "Civic", EngineType.Fuel, null, null, null, null);
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicle.Id), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, vehicle.Id), updateRequest);
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Vehicles.DeleteById, vehicle.Id));
+        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definitions.Vehicles.DeleteById, vehicle.Id));
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
 
-        var getAllResponse = await Client.GetAsync(ApiV1Definition.Vehicles.GetAll);
+        var getAllResponse = await Client.GetAsync(ApiV1Definitions.Vehicles.GetAll);
         getAllResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
@@ -274,7 +281,7 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         foreach (var command in invalidCreateCommands)
         {
-            var response = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, command);
+            var response = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, command);
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         }
     }
@@ -285,7 +292,7 @@ public class VehicleFlowTests : BaseIntegrationTest
         await CreateAndAuthenticateUser();
 
         var createCommand = new VehicleCreateRequest("ValidBrand", "ValidModel", EngineType.Fuel, null, null, null, null);
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createCommand);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createCommand);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         createResponse.Content.ShouldNotBeNull();
@@ -307,7 +314,7 @@ public class VehicleFlowTests : BaseIntegrationTest
 
         foreach (var command in invalidUpdateCommands)
         {
-            var response = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, result.Id), command);
+            var response = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, result.Id), command);
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         }
     }
@@ -318,14 +325,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         await CreateAndAuthenticateUser();
         var nonExistentVehicleId = Guid.NewGuid();
 
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, nonExistentVehicleId));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, nonExistentVehicleId));
         getResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         var updateRequest = new VehicleUpdateRequest("Brand", "Model", EngineType.Fuel, null, null, null, null);
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, nonExistentVehicleId), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, nonExistentVehicleId), updateRequest);
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
-        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definition.Vehicles.DeleteById, nonExistentVehicleId));
+        var deleteResponse = await Client.DeleteAsync(string.Format(ApiV1Definitions.Vehicles.DeleteById, nonExistentVehicleId));
         deleteResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
@@ -339,14 +346,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         await CreateAndAuthenticateUser();
 
         // Create a Vehicle with Fuel EngineType and no EnergyTypes
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, _vehicleCreateDefaultRequest);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, _vehicleCreateDefaultRequest);
 
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         vehicleDtoFromCreate.ShouldNotBeNull();
 
         // Get Vehicle to verify initial state
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, vehicleDtoFromCreate.Id));
 
         var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         vehicleDtoFromGet.ShouldNotBeNull();
@@ -363,7 +370,7 @@ public class VehicleFlowTests : BaseIntegrationTest
             null,
             null);
 
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
@@ -379,14 +386,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         var createVehicleRequest = new VehicleCreateRequest("Toyota", "Corolla", EngineType.Fuel, null, null, null, [EnergyType.Gasoline]);
 
         // Create a Vehicle with Fuel EngineType and no EnergyTypes
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleRequest);
 
         var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         vehicleDtoFromCreate.ShouldNotBeNull();
 
         // Get Vehicle to verify initial state
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, vehicleDtoFromCreate.Id));
 
         var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         vehicleDtoFromGet.ShouldNotBeNull();
@@ -403,7 +410,7 @@ public class VehicleFlowTests : BaseIntegrationTest
             null,
             [EnergyType.Electric]);
 
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.OK);
         var updatedVehicleDto = await updateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
@@ -419,14 +426,14 @@ public class VehicleFlowTests : BaseIntegrationTest
         var createVehicleRequest = new VehicleCreateRequest("Toyota", "Corolla", EngineType.Fuel, null, null, null, [EnergyType.Gasoline]);
 
         // Create a Vehicle with Fuel EngineType and no EnergyTypes
-        var createResponse = await Client.PostAsJsonAsync(ApiV1Definition.Vehicles.Create, createVehicleRequest);
+        var createResponse = await Client.PostAsJsonAsync(ApiV1Definitions.Vehicles.Create, createVehicleRequest);
 
         var vehicleDtoFromCreate = await createResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         createResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
         vehicleDtoFromCreate.ShouldNotBeNull();
 
         // Get Vehicle to verify initial state
-        var getResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+        var getResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, vehicleDtoFromCreate.Id));
 
         var vehicleDtoFromGet = await getResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         vehicleDtoFromGet.ShouldNotBeNull();
@@ -444,7 +451,8 @@ public class VehicleFlowTests : BaseIntegrationTest
             null);
 
         var createEnergyEntryResponse =
-            await Client.PostAsJsonAsync(string.Format(ApiV1Definition.EnergyEntries.Create, vehicleDtoFromGet.Id), createEnergyEntryRequest);
+            await Client.PostAsJsonAsync(string.Format(ApiV1Definitions.EnergyEntries.Create, vehicleDtoFromGet.Id), createEnergyEntryRequest);
+
         createEnergyEntryResponse.StatusCode.ShouldBe(HttpStatusCode.Created);
 
         // Try to update Vehicle EngineType to Electric
@@ -457,12 +465,12 @@ public class VehicleFlowTests : BaseIntegrationTest
             null,
             [EnergyType.Electric]);
 
-        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definition.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
+        var updateResponse = await Client.PutAsJsonAsync(string.Format(ApiV1Definitions.Vehicles.UpdateById, vehicleDtoFromGet.Id), updateRequest);
 
         updateResponse.StatusCode.ShouldBe(HttpStatusCode.Conflict);
-        
+
         // Vehicle EngineType should remain unchanged
-        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definition.Vehicles.GetById, vehicleDtoFromCreate.Id));
+        var getAfterUpdateResponse = await Client.GetAsync(string.Format(ApiV1Definitions.Vehicles.GetById, vehicleDtoFromCreate.Id));
 
         var vehicleDtoAfterUpdate = await getAfterUpdateResponse.Content.ReadFromJsonAsync<VehicleDto>(DefaultJsonSerializerOptions);
         vehicleDtoAfterUpdate.ShouldNotBeNull();

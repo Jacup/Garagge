@@ -1,7 +1,6 @@
 ﻿using Application.ServiceItems;
 using Application.ServiceItems.Create;
 using Application.ServiceRecords;
-using Domain.Entities.Services;
 using Domain.Enums;
 using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
@@ -117,11 +116,11 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(nonExistentServiceRecordId));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_ServiceRecordNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -144,32 +143,7 @@ public class CreateServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
-    }
-
-    [Fact]
-    public async Task Handle_WhenUserIdIsEmpty_ReturnsUnauthorizedError()
-    {
-        // Arrange
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
-
-        var command = new CreateServiceItemCommand(
-            serviceRecord.Id,
-            "Test Item",
-            ServiceItemType.Part,
-            10.00m,
-            1,
-            null,
-            null);
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]

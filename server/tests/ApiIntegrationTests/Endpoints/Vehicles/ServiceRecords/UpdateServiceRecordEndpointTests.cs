@@ -1,5 +1,5 @@
-﻿using ApiIntegrationTests.Contracts.V1;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.ServiceRecords;
 using Domain.Entities.Services;
@@ -24,7 +24,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicleId, serviceRecordId),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicleId, serviceRecordId),
             request);
 
         // Assert
@@ -32,7 +32,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
     }
 
     [Fact]
-    public async Task UpdateServiceRecord_ServiceRecordDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task UpdateServiceRecord_ServiceRecordDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -45,11 +45,11 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, nonExistentServiceRecordId),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, nonExistentServiceRecordId),
             request);
 
         // Assert
@@ -88,7 +88,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, nonExistentVehicleId, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, nonExistentVehicleId, serviceRecord.Id),
             request);
 
         // Assert
@@ -110,7 +110,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle2.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle2.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -132,7 +132,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -171,7 +171,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -211,7 +211,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -252,7 +252,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -281,7 +281,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -313,7 +313,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -344,7 +344,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -383,7 +383,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -425,7 +425,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -460,7 +460,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -488,7 +488,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -516,7 +516,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -543,7 +543,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -570,7 +570,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -598,7 +598,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -626,7 +626,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -654,7 +654,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -682,7 +682,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -710,7 +710,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -735,11 +735,11 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act - Update multiple times
         var response1 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
         
         var response2 = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -773,7 +773,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
@@ -807,7 +807,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.PutAsJsonAsync(
-            string.Format(ApiV1Definition.Services.UpdateById, vehicle.Id, serviceRecord.Id),
+            string.Format(ApiV1Definitions.Services.UpdateById, vehicle.Id, serviceRecord.Id),
             request);
 
         // Assert
