@@ -65,7 +65,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(AuthErrors.CredentialsInvalid);
+        result.Error.ShouldBe(AuthErrors.PasswordInvalid);
         _passwordHasherMock.Verify(x => x.Verify(currentPassword, hashedPassword), Times.Once);
     }
 

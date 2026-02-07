@@ -9,9 +9,14 @@ public class LogoutUserCommandHandler(IApplicationDbContext context) : ICommandH
 {
     public async Task<Result> Handle(LogoutUserCommand request, CancellationToken cancellationToken)
     {
-        await context.RefreshTokens
-            .Where(t => t.Token == request.RefreshToken)
-            .ExecuteDeleteAsync(cancellationToken);
+        var token = await context.RefreshTokens
+            .FirstOrDefaultAsync(t => t.Token == request.RefreshToken, cancellationToken);
+
+        if (token is null)
+            return Result.Success();
+
+        token.IsRevoked = true;
+        await context.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

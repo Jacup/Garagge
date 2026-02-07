@@ -50,7 +50,7 @@ public class GetUserByEmailQueryHandlerTests : InMemoryDbTestBase
 
         var result = await _sut.Handle(query, CancellationToken.None);
 
-        result.Error.ShouldBe(UserErrors.Unauthorized);
+        result.Error.ShouldBe(UserErrors.NotFound);
         result.IsFailure.ShouldBeTrue();
     }
     

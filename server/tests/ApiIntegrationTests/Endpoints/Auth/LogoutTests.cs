@@ -25,7 +25,7 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     }
 
     [Fact]
-    public async Task Logout_WithValidTokens_DeletesRefreshToken()
+    public async Task Logout_WithValidTokens_RevokesRefreshToken()
     {
         // Arrange
         var user = await CreateUserAsync();
@@ -40,8 +40,8 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        var tokenExists = await DbContext.RefreshTokens.AnyAsync(rt => rt.UserId == user.Id);
-        tokenExists.ShouldBeFalse();
+        var token = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
+        token.IsRevoked.ShouldBeTrue();
     }
 
     [Fact]
@@ -156,13 +156,13 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     }
 
     [Fact]
-    public async Task Logout_WithRememberedSession_DeletesToken()
+    public async Task Logout_WithRememberedSession_RevokesToken()
     {
         // Arrange
         var user = await CreateUserAsync();
         await LoginUser("test@garagge.app", "Password123", rememberMe: true);
 
-        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
+        var tokenInDb = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
         tokenInDb.SessionDurationDays.ShouldBe(30);
 
         // Act
@@ -171,7 +171,7 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        var tokenExists = await DbContext.RefreshTokens.AnyAsync(rt => rt.UserId == user.Id);
-        tokenExists.ShouldBeFalse();
+        var token = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
+        token.IsRevoked.ShouldBeTrue();
     }
 }

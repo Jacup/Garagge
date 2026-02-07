@@ -18,7 +18,7 @@ internal sealed class ChangePasswordCommandHandler(IApplicationDbContext context
             return Result.Failure(UserErrors.NotFound);
 
         if (!passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
-            return Result.Failure(AuthErrors.CredentialsInvalid);
+            return Result.Failure(AuthErrors.PasswordInvalid);
 
         user.PasswordHash = passwordHasher.Hash(request.NewPassword);
 

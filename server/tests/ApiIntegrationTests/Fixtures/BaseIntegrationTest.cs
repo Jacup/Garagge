@@ -16,7 +16,6 @@ namespace ApiIntegrationTests.Fixtures;
 
 public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
-    private readonly CustomWebApplicationFactory _factory;
     private IServiceScope _scope = null!;
     protected ApplicationDbContext DbContext = null!;
     protected static readonly JsonSerializerOptions DefaultJsonSerializerOptions;
@@ -32,11 +31,13 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
     protected BaseIntegrationTest(CustomWebApplicationFactory factory)
     {
-        _factory = factory;
-        Client = _factory.CreateClient();
+        Factory = factory;
+        Client = Factory.CreateClient();
     }
 
     protected HttpClient Client { get; init; }
+
+    protected CustomWebApplicationFactory Factory { get; }
 
     protected async Task<User> CreateUserAsync(
         string email = "test@garagge.app",
@@ -44,7 +45,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         string firstName = "John",
         string lastName = "Doe")
     {
-        var passwordHasher = _factory.Services.GetRequiredService<IPasswordHasher>();
+        var passwordHasher = Factory.Services.GetRequiredService<IPasswordHasher>();
 
         var user = new User
         {
@@ -214,7 +215,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
     public async Task InitializeAsync()
     {
-        await _factory.ResetDatabaseAsync();
+        await Factory.ResetDatabaseAsync();
         RefreshServices();
     }
 
@@ -228,7 +229,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
     private void RefreshServices()
     {
         _scope?.Dispose();
-        _scope = _factory.Services.CreateScope();
+        _scope = Factory.Services.CreateScope();
         DbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }
 }

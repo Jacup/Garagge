@@ -22,21 +22,20 @@ internal sealed class Login : IEndpoint
 
                     if (result.IsFailure)
                         return CustomResults.Problem(result);
-
-                    DateTimeOffset? cookieExpires = request.RememberMe
-                        ? result.Value.RefreshTokenExpiresAt
-                        : null;
-
+                    
                     var baseCookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
                         Secure = configuration.GetValue<bool>("Security:UseSecureCookies"),
                         SameSite = SameSiteMode.Strict,
-                        Expires = cookieExpires
                     };
 
-                    httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
-                    httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions) { Path = "/api/auth/" });
+                    httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/", Expires = null});
+                    httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions)
+                    {
+                        Path = "/api/auth/",
+                        Expires = request.RememberMe ? result.Value.RefreshTokenExpiresAt : null
+                    });
 
                     return Results.NoContent();
                 })

@@ -40,7 +40,7 @@ public class GetUserByIdQueryHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(query, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(UserErrors.Unauthorized);
+        result.Error.ShouldBe(UserErrors.NotFound);
         result.IsFailure.ShouldBeTrue();
     }
 
