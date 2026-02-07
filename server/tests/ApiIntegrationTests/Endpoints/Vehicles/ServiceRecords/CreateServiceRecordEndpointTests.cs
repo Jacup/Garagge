@@ -32,7 +32,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
     }
 
     [Fact]
-    public async Task CreateServiceRecord_VehicleDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task CreateServiceRecord_VehicleDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -49,7 +49,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]

@@ -32,7 +32,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
     }
 
     [Fact]
-    public async Task UpdateServiceRecord_ServiceRecordDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task UpdateServiceRecord_ServiceRecordDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -49,7 +49,7 @@ public class UpdateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]

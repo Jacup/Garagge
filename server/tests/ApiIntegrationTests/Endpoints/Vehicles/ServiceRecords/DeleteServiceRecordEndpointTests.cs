@@ -29,7 +29,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
     }
 
     [Fact]
-    public async Task DeleteServiceRecord_VehicleDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task DeleteServiceRecord_VehicleDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -43,7 +43,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         // Verify service record was not deleted
         var recordStillExists = await DbContext.ServiceRecords.AnyAsync(sr => sr.Id == serviceRecord.Id);

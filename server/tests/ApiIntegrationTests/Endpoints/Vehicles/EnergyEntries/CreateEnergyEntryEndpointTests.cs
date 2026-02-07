@@ -83,13 +83,13 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
     }
 
     [Fact]
-    public async Task CreateEnergyEntry_ShouldReturnForbidden_WhenUserDoesNotOwnVehicle()
+    public async Task CreateEnergyEntry_ShouldReturnNotFound_WhenUserDoesNotOwnVehicle()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(owner);
 
-        await CreateAndAuthenticateUser(); // Different user
+        await CreateAndAuthenticateUser();
 
         var request = new CreateEnergyEntryRequest(
             Date: DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
@@ -107,7 +107,7 @@ public class CreateEnergyEntryEndpointTests(CustomWebApplicationFactory factory)
             request);
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Theory]

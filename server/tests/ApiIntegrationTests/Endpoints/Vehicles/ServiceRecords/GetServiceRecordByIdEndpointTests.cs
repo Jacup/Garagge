@@ -29,7 +29,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
     }
 
     [Fact]
-    public async Task GetServiceRecordById_Unauthorized_VehicleDoesNotBelongToUser()
+    public async Task GetServiceRecordById_NotFound_VehicleDoesNotBelongToUser()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -43,7 +43,7 @@ public class GetServiceRecordByIdEndpointTests(CustomWebApplicationFactory facto
         var response = await Client.GetAsync(ApiV1Definitions.Services.GetById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Fact]
