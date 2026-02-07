@@ -17,10 +17,11 @@ public class DeleteMeCommandHandler(IApplicationDbContext context, IUserContext 
         if (user == null)
             return Result.Failure(UserErrors.NotFound);
 
-        await context.RefreshTokens
+        var refreshTokens = await context.RefreshTokens
             .Where(rt => rt.UserId == userId)
-            .ExecuteDeleteAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
 
+        context.RefreshTokens.RemoveRange(refreshTokens);
         context.Users.Remove(user);
         await context.SaveChangesAsync(cancellationToken);
 
