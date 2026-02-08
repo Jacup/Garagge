@@ -1,5 +1,6 @@
 using Application.Auth;
 using Application.Auth.Register;
+using Application.Users;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.Auth.Register;
@@ -69,7 +70,7 @@ public class RegisterUserCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.Email)
-              .WithErrorMessage(AuthErrors.MissingEmail.Description);
+              .WithErrorMessage(UserErrors.EmailRequired.Description);
     }
 
     [Theory]
@@ -84,7 +85,7 @@ public class RegisterUserCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.Email)
-              .WithErrorMessage(AuthErrors.InvalidEmail.Description);
+              .WithErrorMessage(UserErrors.EmailInvalid.Description);
     }
 
     [Fact]

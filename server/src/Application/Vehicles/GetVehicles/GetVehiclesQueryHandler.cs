@@ -3,7 +3,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Domain.Entities.Vehicles;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Vehicles.GetVehicles;
@@ -14,9 +13,6 @@ internal sealed class GetVehiclesQueryHandler(IApplicationDbContext context, IUs
     public async Task<Result<PagedList<VehicleDto>>> Handle(GetVehiclesQuery request, CancellationToken cancellationToken)
     {
         var userId = userContext.UserId;
-
-        if (userId == Guid.Empty)
-            return Result.Failure<PagedList<VehicleDto>>(VehicleErrors.Unauthorized);
 
         var vehiclesQuery = context.Vehicles
             .AsNoTracking()
@@ -48,7 +44,7 @@ internal sealed class GetVehiclesQueryHandler(IApplicationDbContext context, IUs
             request.Page,
             request.PageSize);
 
-        return Result.Success(vehiclesDto);
+        return vehiclesDto;
     }
 
     private static IQueryable<Vehicle> ApplyFiltering(GetVehiclesQuery request, IQueryable<Vehicle> vehiclesQuery)

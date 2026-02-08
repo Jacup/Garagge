@@ -41,7 +41,7 @@ public class GetVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var result = await sut.Handle(request, CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(vehicle.Id));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
         result.Error.Type.ShouldBe(ErrorType.NotFound);
     }
     
@@ -69,8 +69,7 @@ public class GetVehicleByIdQueryHandlerTests : InMemoryDbTestBase
         var result = await sut.Handle(request, CancellationToken.None);
 
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(requestedVehicleId));
-        result.Error.Type.ShouldBe(ErrorType.NotFound);
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
     
     [Fact]

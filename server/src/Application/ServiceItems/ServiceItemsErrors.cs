@@ -4,23 +4,11 @@ namespace Application.ServiceItems;
 
 public static class ServiceItemsErrors
 {
-    public static Error Unauthorized => Error.Unauthorized(
-        "ServiceItems.Unauthorized",
+    public static readonly Error Forbidden = Error.Forbidden(
+        "ServiceItem.Forbidden",
         "You are not authorized to perform this action.");
 
-    public static Error NotFound(Guid recordId) => Error.NotFound(
-        "ServiceItems.NotFound",
-        $"Service Item with Id = '{recordId}' was not found.");
-
-    public static Error CreateFailed => Error.Failure(
-        "ServiceItems.CreateFailed",
-        "Failed to create service item.");
-
-    public static Error DeleteFailed(Guid requestServiceItemId) => Error.Failure(
-        "ServiceItems.DeleteFailed",
-        $"Failed to delete service item with Id = '{requestServiceItemId}'.");
-
-    public static Error UpdateFailed(Guid serviceItemId) => Error.Failure(
-        "ServiceItems.UpdateFailed",
-        $"Failed to update service item with Id = '{serviceItemId}'.");
+    public static readonly Error NotFound = Error.NotFound(
+        "ServiceItem.NotFound",
+        "Service item was not found.");
 }

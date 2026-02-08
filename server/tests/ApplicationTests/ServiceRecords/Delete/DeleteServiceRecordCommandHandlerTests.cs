@@ -1,8 +1,6 @@
 ﻿using Application.ServiceRecords;
 using Application.ServiceRecords.Delete;
-using Domain.Entities.Services;
 using Domain.Enums;
-using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApplicationTests.ServiceRecords.Delete;
@@ -52,7 +50,7 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(nonExistentRecordId));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -72,7 +70,7 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(serviceRecord.Id));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
@@ -92,11 +90,11 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.NotFound(serviceRecord.Id));
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -112,7 +110,7 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceRecordErrors.NotFound);
     }
 
     [Fact]

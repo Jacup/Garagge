@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Npgsql;
 using Respawn;
 using System.Data.Common;
+using System.Net;
 using Testcontainers.PostgreSql;
 
 namespace ApiIntegrationTests.Fixtures;
@@ -15,26 +16,26 @@ namespace ApiIntegrationTests.Fixtures;
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private DbConnection _dbConnection = null!;
-    
+
     private readonly PostgreSqlContainer _dbContainer = new PostgreSqlBuilder()
         .WithImage("postgres:latest")
         .WithDatabase("test")
         .WithUsername("postgres")
         .WithPassword("postgres")
         .Build();
-    
+
     private Respawner _respawner = null!;
-    
+
     public HttpClient HttpClient { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
-        
+
         _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
-        
+
         HttpClient = CreateClient();
-        
+
         await _dbConnection.OpenAsync();
         await InitializeRespawnerAsync();
     }
@@ -43,7 +44,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
     {
         await _respawner.ResetAsync(_dbConnection);
     }
-    
+
     public new async Task DisposeAsync()
     {
         await _dbContainer.DisposeAsync();
@@ -61,13 +62,51 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>, IAsyn
                 .UseSnakeCaseNamingConvention());
         });
     }
-    
+
     private async Task InitializeRespawnerAsync()
     {
-        _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
+        _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions { SchemasToInclude = ["public"], DbAdapter = DbAdapter.Postgres });
+    }
+
+    public new HttpClient CreateClient()
+    {
+        var handler = Server.CreateHandler();
+        var cookieContainer = new CookieContainer();
+
+        return new HttpClient(new CookieHandler(handler, cookieContainer)) { BaseAddress = new Uri("http://localhost") };
+    }
+}
+
+internal class CookieHandler : DelegatingHandler
+{
+    private readonly CookieContainer _cookieContainer;
+
+    public CookieHandler(HttpMessageHandler innerHandler, System.Net.CookieContainer cookieContainer)
+        : base(innerHandler)
+    {
+        _cookieContainer = cookieContainer;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        var cookieHeader = _cookieContainer.GetCookieHeader(request.RequestUri!);
+        if (!string.IsNullOrEmpty(cookieHeader))
         {
-            SchemasToInclude = [ "public" ],
-            DbAdapter = DbAdapter.Postgres
-        });
+            request.Headers.Add("Cookie", cookieHeader);
+        }
+
+        var response = await base.SendAsync(request, cancellationToken);
+
+        if (response.Headers.TryGetValues("Set-Cookie", out var setCookies))
+        {
+            var cookieList = setCookies.ToList();
+
+            foreach (var cookie in cookieList)
+            {
+                _cookieContainer.SetCookies(request.RequestUri!, cookie);
+            }
+        }
+
+        return response;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Core;
 using Application.Services;
+using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
@@ -193,6 +194,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.LPG,
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 50000,
@@ -203,6 +205,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.LPG,
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
                 Mileage = 49500,
@@ -227,7 +230,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.Code.ShouldBe("Vehicles.CannotRemoveEnergyTypes");
+        result.Error.Code.ShouldBe(VehicleErrors.CannotRemoveEnergyTypes([], 0).Code);
         result.Error.Type.ShouldBe(ErrorType.Conflict);
     }
 
@@ -276,6 +279,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.Diesel,
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 50000,
@@ -286,6 +290,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.LPG,
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-2)),
                 Mileage = 49000,
@@ -296,6 +301,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.Diesel,
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-3)),
                 Mileage = 48500,
@@ -320,7 +326,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.Code.ShouldBe("Vehicles.CannotRemoveEnergyTypes");
+        result.Error.Code.ShouldBe(VehicleErrors.CannotRemoveEnergyTypes([], 0).Code);
         result.Error.Type.ShouldBe(ErrorType.Conflict);
         result.Error.Description.ShouldContain("Diesel");
         result.Error.Description.ShouldContain("LPG");
@@ -556,6 +562,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
+                Vehicle = null!,
                 Type = EnergyType.CNG,
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 30000,
@@ -581,7 +588,7 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.Code.ShouldBe("Vehicles.CannotRemoveEnergyTypes");
+        result.Error.Code.ShouldBe(VehicleErrors.CannotRemoveEnergyTypes([], 0).Code);
         result.Error.Type.ShouldBe(ErrorType.Conflict);
         result.Error.Description.ShouldContain("CNG");
         result.Error.Description.ShouldContain("1");

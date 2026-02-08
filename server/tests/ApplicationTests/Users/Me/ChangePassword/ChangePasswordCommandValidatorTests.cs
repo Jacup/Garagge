@@ -1,8 +1,8 @@
-﻿using Application.Auth;
-using Application.Auth.ChangePassword;
+﻿using Application.Users;
+using Application.Users.Me.ChangePassword;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Auth.ChangePassword;
+namespace ApplicationTests.Users.Me.ChangePassword;
 
 public class ChangePasswordCommandValidatorTests
 {
@@ -19,7 +19,7 @@ public class ChangePasswordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.CurrentPassword)
-            .WithErrorCode(AuthErrors.MissingPassword.Code);
+            .WithErrorCode(UserErrors.PasswordRequired.Code);
     }
     
     [Fact]
@@ -33,7 +33,7 @@ public class ChangePasswordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorCode(AuthErrors.InvalidPassword(8).Code);
+            .WithErrorCode(UserErrors.PasswordTooShort(8).Code);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ChangePasswordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorCode(AuthErrors.InvalidPassword(8).Code);
+            .WithErrorCode(UserErrors.PasswordTooShort(8).Code);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class ChangePasswordCommandValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.NewPassword)
-            .WithErrorCode(AuthErrors.NewPasswordSameAsOld.Code);
+            .WithErrorCode(UserErrors.PasswordSameAsOld.Code);
     }
 
     [Fact]

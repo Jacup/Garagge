@@ -1,7 +1,5 @@
 using Application.ServiceItems;
 using Application.ServiceItems.Delete;
-using Application.ServiceRecords;
-using Domain.Entities.Services;
 using Domain.Enums;
 using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +54,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(nonExistentItemId));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -77,7 +75,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -98,7 +96,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -119,7 +117,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
@@ -140,11 +138,11 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.NotFound(serviceItem.Id));
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -161,7 +159,7 @@ public class DeleteServiceItemCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceItemsErrors.Unauthorized);
+        result.Error.ShouldBe(ServiceItemsErrors.NotFound);
     }
 
     [Fact]

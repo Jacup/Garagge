@@ -17,17 +17,15 @@ public class GetStatsByVehicleIdQueryHandler(
     {
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Where(v => v.Id == request.VehicleId)
+            .Where(v => v.Id == request.VehicleId
+                && v.UserId == userContext.UserId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle is null)
-            return Result.Failure<VehicleStatsDto>(VehicleErrors.NotFound(request.VehicleId));
-
-        if (vehicle.UserId != userContext.UserId)
-            return Result.Failure<VehicleStatsDto>(VehicleErrors.Unauthorized);
+            return Result.Failure<VehicleStatsDto>(VehicleErrors.NotFound);
 
         var dto = await statisticsService.GetVehicleStats(request.VehicleId);
 
-        return Result.Success(dto);
+        return dto;
     }
 }

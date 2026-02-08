@@ -1,11 +1,10 @@
 ﻿using Application.Abstractions.Authentication;
-using Application.Auth;
-using Application.Auth.ChangePassword;
 using Application.Users;
+using Application.Users.Me.ChangePassword;
 using Domain.Entities.Users;
 using Moq;
 
-namespace ApplicationTests.Auth.ChangePassword;
+namespace ApplicationTests.Users.Me.ChangePassword;
 
 public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 {
@@ -30,7 +29,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(UserErrors.NotFound(AuthorizedUserId));
+        result.Error.ShouldBe(UserErrors.NotFound);
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public class ChangePasswordCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(AuthErrors.WrongPassword);
+        result.Error.ShouldBe(UserErrors.PasswordInvalid);
         _passwordHasherMock.Verify(x => x.Verify(currentPassword, hashedPassword), Times.Once);
     }
 

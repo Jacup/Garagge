@@ -17,7 +17,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_UserTriesToAccessOtherUsersEntries_ReturnsUnauthorizedError()
+    public async Task Handle_UserTriesToAccessOtherUsersEntries_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -29,7 +29,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.Forbidden);
     }
 
     [Fact]
@@ -214,6 +214,7 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
+            Vehicle = null!,
             Date = date,
             Mileage = mileage,
             Type = energyType,

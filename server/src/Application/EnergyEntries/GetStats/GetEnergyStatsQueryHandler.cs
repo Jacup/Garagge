@@ -3,7 +3,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Application.Services.EnergyStats;
-using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.EnergyEntries.GetStats;
@@ -18,14 +17,11 @@ internal sealed class GetEnergyStatsQueryHandler(
     {
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Where(v => v.Id == request.VehicleId)
+            .Where(v => v.Id == request.VehicleId && v.UserId == userContext.UserId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle is null)
-            return Result.Failure<EnergyStatsDto>(VehicleErrors.NotFound(request.VehicleId));
-
-        if (vehicle.UserId != userContext.UserId)
-            return Result.Failure<EnergyStatsDto>(EnergyEntryErrors.Unauthorized);
+            return Result.Failure<EnergyStatsDto>(EnergyEntryErrors.NotFound);
 
         var entriesQuery = dbContext.EnergyEntries
             .AsNoTracking()
@@ -56,13 +52,7 @@ internal sealed class GetEnergyStatsQueryHandler(
             .ToArray();
 
         var totalCost = energyStatsService.CalculateTotalCost(entries);
-        
-        return Result.Success(new EnergyStatsDto
-            (
-                vehicle.Id,
-                totalCost,
-                entries.Count,
-                statisticsByUnit)
-        );
+
+        return new EnergyStatsDto(vehicle.Id, totalCost, entries.Count, statisticsByUnit);
     }
 }

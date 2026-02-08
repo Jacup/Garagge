@@ -7,27 +7,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.GetById;
 
-internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUserContext userContext) 
+internal sealed class GetUserByIdQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<GetUserByIdQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(GetUserByIdQuery query, CancellationToken cancellationToken)
     {
-        if (query.UserId != userContext.UserId)
-        {
-            return Result.Failure<UserDto>(UserErrors.Unauthorized);
-        }
-
         var user = await context.Users
             .AsNoTracking()
-            .Where(u => u.Id == query.UserId)
-            .ProjectToType<UserDto>()
+            .Where(u => u.Id == query.UserId && u.Id == userContext.UserId)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
         {
-            return Result.Failure<UserDto>(UserErrors.NotFound(query.UserId));
+            return Result.Failure<UserDto>(UserErrors.NotFound);
         }
 
-        return user;
+        return user.Adapt<UserDto>();
     }
 }

@@ -16,7 +16,7 @@ internal sealed class EnergyEntryFilterService : IEnergyEntryFilterService
 
     public IQueryable<EnergyEntry> ApplyUserFilter(IQueryable<EnergyEntry> query, Guid userId)
     {
-        return query.Where(e => e.Vehicle!.UserId == userId);
+        return query.Where(e => e.Vehicle.UserId == userId);
     }
 
     public IQueryable<EnergyEntry> ApplyVehicleFilter(IQueryable<EnergyEntry> query, Guid vehicleId)

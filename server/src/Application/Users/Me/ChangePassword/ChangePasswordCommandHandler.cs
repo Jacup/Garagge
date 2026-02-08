@@ -2,10 +2,9 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Auth.ChangePassword;
+namespace Application.Users.Me.ChangePassword;
 
 internal sealed class ChangePasswordCommandHandler(IApplicationDbContext context, IUserContext userContext, IPasswordHasher passwordHasher)
     : ICommandHandler<ChangePasswordCommand>
@@ -15,28 +14,21 @@ internal sealed class ChangePasswordCommandHandler(IApplicationDbContext context
         var user = await context.Users.FirstOrDefaultAsync(u => u.Id == userContext.UserId, cancellationToken);
 
         if (user == null)
-            return Result.Failure(UserErrors.NotFound(userContext.UserId));
+            return Result.Failure(UserErrors.NotFound);
 
         if (!passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
-            return Result.Failure(AuthErrors.WrongPassword);
+            return Result.Failure(UserErrors.PasswordInvalid);
 
         user.PasswordHash = passwordHasher.Hash(request.NewPassword);
 
-        try
-        {
-            await context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
-            if (request.LogoutAllDevices)
-            {
-                await context.RefreshTokens
-                    .Where(rt => rt.UserId == user.Id &&
-                                 rt.Id != userContext.SessionId)
-                    .ExecuteDeleteAsync(cancellationToken);
-            }
-        }
-        catch (Exception)
+        if (request.LogoutAllDevices)
         {
-            return Result.Failure(UserErrors.UpdateFailed);
+            await context.RefreshTokens
+                .Where(rt => rt.UserId == user.Id &&
+                             rt.Id != userContext.SessionId)
+                .ExecuteDeleteAsync(cancellationToken);
         }
 
         return Result.Success();

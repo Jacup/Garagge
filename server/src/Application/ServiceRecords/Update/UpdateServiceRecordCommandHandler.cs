@@ -3,7 +3,6 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
 using Application.ServiceItems;
-using Application.Vehicles;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,18 +17,13 @@ internal sealed class UpdateServiceRecordCommandHandler(IApplicationDbContext db
             .Include(sr => sr.Vehicle)
             .Include(sr => sr.Type)
             .Include(sr => sr.Items)
-            .FirstOrDefaultAsync(
-                sr => sr.Id == request.ServiceRecordId && sr.VehicleId == request.VehicleId,
+            .FirstOrDefaultAsync(sr =>
+                    sr.Id == request.ServiceRecordId &&
+                    sr.VehicleId == request.VehicleId,
                 cancellationToken);
 
-        if (serviceRecord is null)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.NotFound(request.ServiceRecordId));
-
-        if (serviceRecord.Vehicle is null)
-            return Result.Failure<ServiceRecordDto>(VehicleErrors.NotFound(request.VehicleId));
-
-        if (serviceRecord.Vehicle.UserId != userContext.UserId)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.Unauthorized);
+        if (serviceRecord?.Vehicle is null || serviceRecord.Vehicle.UserId != userContext.UserId)
+            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.NotFound);
 
         var serviceType = await dbContext.ServiceTypes.FirstOrDefaultAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
 
@@ -44,14 +38,7 @@ internal sealed class UpdateServiceRecordCommandHandler(IApplicationDbContext db
         serviceRecord.TypeId = request.ServiceTypeId;
         serviceRecord.Type = serviceType;
 
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException)
-        {
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.UpdateFailed(request.ServiceRecordId));
-        }
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var dto = new ServiceRecordDto(
             serviceRecord.Id,

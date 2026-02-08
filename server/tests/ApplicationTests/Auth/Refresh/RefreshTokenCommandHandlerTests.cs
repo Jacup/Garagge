@@ -41,7 +41,7 @@ public class RefreshTokenCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(command, CancellationToken.None);
 
         // Assert
-        result.Error.ShouldBe(AuthErrors.InvalidToken);
+        result.Error.ShouldBe(AuthErrors.TokenInvalid);
         result.IsFailure.ShouldBeTrue();
     }
 

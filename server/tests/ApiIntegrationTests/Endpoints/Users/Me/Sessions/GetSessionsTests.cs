@@ -1,6 +1,7 @@
-﻿using System.Net;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
+using System.Net;
 using System.Net.Http.Json;
-using ApiIntegrationTests.Definitions;
 using ApiIntegrationTests.Fixtures;
 using Application.Users.Sessions;
 using Domain.Entities.Auth;
@@ -19,7 +20,7 @@ public class GetSessionsTests : BaseIntegrationTest
     public async Task GetSessions_WhenNotAuthenticated_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Users.GetMeSessions);
+        var response = await Client.GetAsync(ApiV1Definitions.Users.GetMeSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -32,7 +33,7 @@ public class GetSessionsTests : BaseIntegrationTest
         await CreateAndAuthenticateUser();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Users.GetMeSessions);
+        var response = await Client.GetAsync(ApiV1Definitions.Users.GetMeSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -55,7 +56,7 @@ public class GetSessionsTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Users.GetMeSessions);
+        var response = await Client.GetAsync(ApiV1Definitions.Users.GetMeSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -83,7 +84,7 @@ public class GetSessionsTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         // Act
-        var response = await Client.GetAsync(ApiV1Definition.Users.GetMeSessions);
+        var response = await Client.GetAsync(ApiV1Definitions.Users.GetMeSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);

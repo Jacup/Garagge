@@ -84,6 +84,7 @@ public class MapsterMappingTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 1000,
             Type = EnergyType.Gasoline,
@@ -121,6 +122,7 @@ public class MapsterMappingTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 1000,
             Type = EnergyType.Electric,
@@ -158,6 +160,7 @@ public class MapsterMappingTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 5000,
             Type = EnergyType.Electric,
@@ -187,6 +190,7 @@ public class MapsterMappingTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 10000,
             Type = EnergyType.Diesel,
@@ -241,6 +245,7 @@ public class MapsterMappingTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2023, 10, 14),
             Mileage = 1000,
             Type = energyType,

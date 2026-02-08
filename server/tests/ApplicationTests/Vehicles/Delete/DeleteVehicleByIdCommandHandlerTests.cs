@@ -15,22 +15,7 @@ public class DeleteVehicleByIdCommandHandlerTests : InMemoryDbTestBase
     {
         _sut = new DeleteVehicleByIdCommandHandler(Context, UserContextMock.Object);
     }
-
-    [Fact]
-    public async Task Handle_UserNotAuthorized_ShouldReturnUnauthorizedError()
-    {
-        UserContextMock
-            .Setup(o => o.UserId)
-            .Returns(Guid.Empty);
-        
-        var request = new DeleteVehicleByIdCommand(It.IsAny<Guid>());
-        
-        var result = await _sut.Handle(request, CancellationToken.None);
-        
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.Unauthorized);
-    }
-
+    
     [Fact]
     public async Task Handle_VehicleNotFound_ShouldReturnNotFoundError()
     {
@@ -41,7 +26,7 @@ public class DeleteVehicleByIdCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(request, CancellationToken.None);
         
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(requestedId));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
@@ -68,7 +53,7 @@ public class DeleteVehicleByIdCommandHandlerTests : InMemoryDbTestBase
         var result = await _sut.Handle(request, CancellationToken.None);
         
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(requestedId));
+        result.Error.ShouldBe(VehicleErrors.NotFound);
     }
 
     [Fact]
@@ -94,33 +79,5 @@ public class DeleteVehicleByIdCommandHandlerTests : InMemoryDbTestBase
         
         result.IsSuccess.ShouldBeTrue();
         Context.Vehicles.Count().ShouldBe(0);
-    }
-
-    [Fact]
-    public async Task Handle_ExceptionOnDb_ShouldReturnFailure()
-    {
-        SetupAuthorizedUser();
-        
-        var vehicle = new Vehicle {
-            Id = Guid.NewGuid(),
-            Brand = "Audi",
-            Model = "A4",
-            EngineType = EngineType.Fuel,
-            ManufacturedYear = 2010,
-            UserId = AuthorizedUserId
-        };
-        Context.Vehicles.Add(vehicle);
-        await Context.SaveChangesAsync();
-
-        var applicationDbContextMock = new Mock<IApplicationDbContext>();
-        applicationDbContextMock.Setup(o => o.Vehicles).Returns(Context.Vehicles);
-        applicationDbContextMock.Setup(o => o.SaveChangesAsync(It.IsAny<CancellationToken>())).Throws(new Exception("Database error"));
-
-        var mockedSut = new DeleteVehicleByIdCommandHandler(applicationDbContextMock.Object, UserContextMock.Object);
-        var request = new DeleteVehicleByIdCommand(vehicle.Id);
-        
-        var result = await mockedSut.Handle(request, CancellationToken.None);
-        result.IsSuccess.ShouldBeFalse();
-        result.Error.ShouldBe(VehicleErrors.DeleteFailed(vehicle.Id));
     }
 }

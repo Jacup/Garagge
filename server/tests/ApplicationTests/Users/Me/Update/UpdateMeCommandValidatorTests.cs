@@ -1,4 +1,5 @@
 ﻿using Application.Auth;
+using Application.Users;
 using Application.Users.Me.Update;
 using FluentValidation.TestHelper;
 
@@ -69,7 +70,7 @@ public class UpdateMeCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.Email)
-            .WithErrorMessage(AuthErrors.MissingEmail.Description);
+            .WithErrorMessage(UserErrors.EmailRequired.Description);
     }
 
     [Theory]
@@ -84,7 +85,7 @@ public class UpdateMeCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.Email)
-            .WithErrorMessage(AuthErrors.InvalidEmail.Description);
+            .WithErrorMessage(UserErrors.EmailInvalid.Description);
     }
 
     [Fact]

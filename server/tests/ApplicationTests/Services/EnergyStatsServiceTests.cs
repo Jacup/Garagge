@@ -475,6 +475,7 @@ public class EnergyStatsServiceTests
         {
             Id = Guid.NewGuid(),
             VehicleId = Guid.NewGuid(),
+            Vehicle = null!,
             Date = new DateOnly(2024, 1, 1),
             Mileage = mileage,
             Type = energyType,

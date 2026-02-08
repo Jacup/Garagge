@@ -1,21 +1,21 @@
-﻿using Application.Auth.Register;
-using Application.Core;
+﻿using Application.Core;
+using Application.Users;
 using FluentValidation;
 
 namespace Application.Auth.Login;
 
-public class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
+internal class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>
 {
     public LoginUserCommandValidator()
     {
         RuleFor(c => c.Email)
             .NotEmpty()
-            .WithError(AuthErrors.MissingEmail)
+            .WithError(UserErrors.EmailRequired)
             .EmailAddress()
-            .WithError(AuthErrors.InvalidEmail);
+            .WithError(UserErrors.EmailInvalid);
 
         RuleFor(c => c.Password)
             .NotEmpty()
-            .WithError(AuthErrors.MissingPassword);
+            .WithError(UserErrors.PasswordRequired);
     }
 }

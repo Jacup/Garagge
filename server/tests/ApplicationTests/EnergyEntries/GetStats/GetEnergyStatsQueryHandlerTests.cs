@@ -30,11 +30,11 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(VehicleErrors.NotFound(nonExistentVehicleId));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -47,7 +47,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -85,9 +85,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -96,7 +97,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 300,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2);
@@ -132,7 +134,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -141,9 +143,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -152,7 +155,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 240,
             PricePerUnit = 4m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2);
@@ -189,7 +193,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Electric]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -198,9 +202,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -209,9 +214,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 300,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry3 = new EnergyEntry()
+        var entry3 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 18),
             Mileage = 2000,
@@ -220,9 +226,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 50,
             Cost = 100,
             PricePerUnit = 2m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry4 = new EnergyEntry()
+        var entry4 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 19),
             Mileage = 2500,
@@ -231,7 +238,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 120,
             PricePerUnit = 2m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2, entry3, entry4);
@@ -273,7 +281,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -282,9 +290,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -293,9 +302,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 240,
             PricePerUnit = 4m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry3 = new EnergyEntry()
+        var entry3 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 18),
             Mileage = 2000,
@@ -304,7 +314,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 50,
             Cost = 250,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2, entry3);
@@ -337,7 +348,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel, EnergyType.Electric]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -346,9 +357,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -357,9 +369,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 240,
             PricePerUnit = 4m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry3 = new EnergyEntry()
+        var entry3 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 18),
             Mileage = 2000,
@@ -368,7 +381,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 50,
             Cost = 100,
             PricePerUnit = 2m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2, entry3);
@@ -399,7 +413,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -408,7 +422,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.Add(entry1);
@@ -433,7 +448,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -442,9 +457,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = null,
             PricePerUnit = null,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -453,7 +469,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 300,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2);
@@ -482,7 +499,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -491,7 +508,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.Add(entry1);
@@ -519,7 +537,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -528,9 +546,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 50,
             Cost = 250,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -539,9 +558,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 30,
             Cost = 150,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry3 = new EnergyEntry()
+        var entry3 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 18),
             Mileage = 2000,
@@ -550,7 +570,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 35,
             Cost = 175,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2, entry3);
@@ -584,7 +605,7 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
 
         // Gasoline in Liters
-        var entry1 = new EnergyEntry()
+        var entry1 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 16),
             Mileage = 1000,
@@ -593,9 +614,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 40,
             Cost = 200,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry2 = new EnergyEntry()
+        var entry2 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 17),
             Mileage = 1500,
@@ -604,10 +626,11 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 60,
             Cost = 300,
             PricePerUnit = 5m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
         // Diesel in Gallons
-        var entry3 = new EnergyEntry()
+        var entry3 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 18),
             Mileage = 2000,
@@ -616,9 +639,10 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 10,
             Cost = 100,
             PricePerUnit = 10m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
-        var entry4 = new EnergyEntry()
+        var entry4 = new EnergyEntry
         {
             Date = new DateOnly(2020, 01, 19),
             Mileage = 2500,
@@ -627,7 +651,8 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             Volume = 15,
             Cost = 150,
             PricePerUnit = 10m,
-            VehicleId = vehicle.Id
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
         };
 
         Context.EnergyEntries.AddRange(entry1, entry2, entry3, entry4);
@@ -657,4 +682,3 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         gallonStats.AverageConsumption.ShouldBe(3m); // (15/500)*100 = 3 gallons/100km
     }
 }
-

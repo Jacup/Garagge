@@ -1,5 +1,6 @@
-﻿using System.Net;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
+using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Users;
@@ -22,7 +23,7 @@ public class DeleteSessionTests : BaseIntegrationTest
         var sessionId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMeSession.WithId(sessionId));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteMeSession.WithId(sessionId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -37,12 +38,12 @@ public class DeleteSessionTests : BaseIntegrationTest
         var currentSession = await DbContext.RefreshTokens.FirstAsync(rt => rt.UserId == user.Id);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMeSession.WithId(currentSession.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteMeSession.WithId(currentSession.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         var problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.ShouldBeErrorOfType(UserErrors.DeleteCurrentSessionFailed);
+        problemDetails.ShouldBeErrorOfType(UserErrors.DeleteCurrentSession);
     }
 
     [Fact]
@@ -53,12 +54,12 @@ public class DeleteSessionTests : BaseIntegrationTest
         var nonExistentSessionId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMeSession.WithId(nonExistentSessionId));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteMeSession.WithId(nonExistentSessionId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         var problemDetails = await response.GetProblemDetailsAsync();
-        problemDetails.ShouldBeErrorOfType(UserErrors.SessionNotFound(nonExistentSessionId));
+        problemDetails.ShouldBeErrorOfType(UserErrors.SessionNotFound);
     }
 
     [Fact]
@@ -73,7 +74,7 @@ public class DeleteSessionTests : BaseIntegrationTest
         await CreateAndAuthenticateUser();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMeSession.WithId(otherUserSession.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteMeSession.WithId(otherUserSession.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -91,7 +92,7 @@ public class DeleteSessionTests : BaseIntegrationTest
         await DbContext.SaveChangesAsync();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteMeSession.WithId(sessionToDelete.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteMeSession.WithId(sessionToDelete.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);

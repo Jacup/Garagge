@@ -13,20 +13,12 @@ internal sealed class GetUserByEmailQueryHandler(IApplicationDbContext context, 
     {
         var user = await context.Users
             .AsNoTracking()
-            .Where(u => u.Email == query.Email)
-            .ProjectToType<UserDto>()
+            .Where(u => u.Email == query.Email && u.Id == userContext.UserId)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
-        {
-            return Result.Failure<UserDto>(UserErrors.NotFoundByEmail);
-        }
+            return Result.Failure<UserDto>(UserErrors.NotFound);
 
-        if (user.Id != userContext.UserId)
-        {
-            return Result.Failure<UserDto>(UserErrors.Unauthorized);
-        }
-
-        return user;
+        return user.Adapt<UserDto>();
     }
 }

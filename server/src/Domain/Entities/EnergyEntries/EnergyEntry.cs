@@ -16,5 +16,5 @@ public class EnergyEntry : Entity
     public decimal? PricePerUnit { get; set; }
 
     public required Guid VehicleId { get; set; }
-    public Vehicle? Vehicle { get; set; }
+    public required Vehicle Vehicle { get; set; }
 }

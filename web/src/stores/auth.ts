@@ -3,39 +3,28 @@ import { getAuth } from '@/api/generated/auth/auth'
 import { useUserStore } from './user'
 import type { LoginRequest, RegisterRequest } from '@/api/generated/apiV1.schemas'
 import { parseApiError } from '@/utils/error-handler'
+import router from '@/router'
 
 const { postApiAuthLogin, postApiAuthRegister, postApiAuthLogout } = getAuth()
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    accessToken: null as string | null,
-    isSuperAdmin: true as boolean,
-  }),
-
-  persist: true,
+  state: () => ({}),
 
   getters: {
-    isAuthenticated: (state) => !!state.accessToken,
+    isAuthenticated(): boolean {
+      const userStore = useUserStore()
+      return !!userStore.id
+    },
   },
 
   actions: {
-    setToken(token: string | null) {
-      this.accessToken = token
-    },
-
     async login(loginRequest: LoginRequest) {
       const userStore = useUserStore()
 
       try {
-        const response = await postApiAuthLogin(loginRequest)
+        await postApiAuthLogin(loginRequest)
 
-        if (!response.accessToken) {
-          throw new Error('Login failed: No access token received')
-        }
-
-        this.setToken(response.accessToken)
-
-        userStore.fetchUserData()
+        await userStore.fetchUserData()
       } catch (error) {
         const parsedError = parseApiError(error)
         throw new Error(parsedError.message)
@@ -44,15 +33,18 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       const userStore = useUserStore()
+
+      this.$reset()
+      userStore.$reset()
+
       try {
         await postApiAuthLogout()
       } catch (error) {
         console.error('Logout API failed, but clearing local state anyway', error)
-      } finally {
-        this.setToken(null)
-        this.$reset()
-        userStore.$reset()
-        localStorage.clear()
+      }
+
+      if (router.currentRoute.value.name !== 'Login') {
+        router.push({ name: 'Login' })
       }
     },
 
@@ -63,8 +55,6 @@ export const useAuthStore = defineStore('auth', {
         const parsedError = parseApiError(error)
         throw new Error(parsedError.message)
       }
-
-      console.log('Registration successful:')
     },
   },
 })

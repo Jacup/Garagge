@@ -1,4 +1,5 @@
-﻿using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
@@ -21,14 +22,14 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var serviceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicleId, serviceRecordId));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicleId, serviceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
     [Fact]
-    public async Task DeleteServiceRecord_VehicleDoesNotBelongToUser_ReturnsUnauthorized()
+    public async Task DeleteServiceRecord_VehicleDoesNotBelongToUser_ReturnsNotFound()
     {
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
@@ -39,10 +40,10 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         // Verify service record was not deleted
         var recordStillExists = await DbContext.ServiceRecords.AnyAsync(sr => sr.Id == serviceRecord.Id);
@@ -58,7 +59,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var serviceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(nonExistentVehicleId, serviceRecordId));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(nonExistentVehicleId, serviceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -74,7 +75,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var nonExistentServiceRecordId = Guid.NewGuid();
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, nonExistentServiceRecordId));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, nonExistentServiceRecordId));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -92,7 +93,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle1.Id, serviceType.Id);
 
         // Act - trying to delete service record using the wrong vehicle ID
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle2.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle2.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
@@ -117,7 +118,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -134,7 +135,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Regular Maintenance");
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -179,7 +180,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
 
         // Act
         var response = await Client.DeleteAsync(
-            ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+            ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -208,7 +209,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
             mileage: 50000);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -232,7 +233,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
             cost: 1250.50m);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -256,7 +257,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
             notes: "Important notes about this service");
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -283,7 +284,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var serviceRecord3 = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Record 3");
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord2.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord2.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -313,7 +314,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var tireRotationRecord = await CreateServiceRecordAsync(vehicle.Id, tireRotationType.Id);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, oilChangeRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, oilChangeRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -339,7 +340,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var record2 = await CreateServiceRecordAsync(vehicle2.Id, serviceType.Id, "Vehicle 2 Record");
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle1.Id, record1.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle1.Id, record1.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -369,7 +370,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
             serviceDate: oldServiceDate);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -394,7 +395,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
             serviceDate: recentServiceDate);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
+        var response = await Client.DeleteAsync(ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id));
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -417,7 +418,7 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         ServiceType serviceType = await CreateServiceTypeAsync("Test Service");
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
-        var url = ApiV1Definition.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id);
+        var url = ApiV1Definitions.Services.DeleteById.WithIds(vehicle.Id, serviceRecord.Id);
 
         // Act - First deletion
         var firstResponse = await Client.DeleteAsync(url);

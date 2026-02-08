@@ -23,6 +23,7 @@ public class EnergyEntryTests
             Mileage = Mileage,
             Cost = Cost,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
@@ -47,6 +48,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -71,6 +73,7 @@ public class EnergyEntryTests
             Mileage = Mileage,
             Cost = Cost,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
@@ -117,6 +120,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = energyUnit,
             Type = Type
@@ -139,6 +143,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = energyType
@@ -159,6 +164,7 @@ public class EnergyEntryTests
                 Date = _date,
                 Mileage = Mileage,
                 VehicleId = _vehicleId,
+                Vehicle = null!,
                 Volume = Volume,
                 EnergyUnit = EnergyUnit.Liter,
                 Type = fuelType
@@ -178,6 +184,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.kWh,
             Type = EnergyType.Electric
@@ -195,6 +202,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.CubicMeter,
             Type = EnergyType.Hydrogen
@@ -221,6 +229,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = expectedUnit,
             Type = energyType
@@ -240,6 +249,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -256,6 +266,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -276,6 +287,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = volume,
             EnergyUnit = Unit,
             Type = Type,
@@ -299,6 +311,7 @@ public class EnergyEntryTests
             Date = futureDate,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -309,6 +322,7 @@ public class EnergyEntryTests
             Date = pastDate,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -326,6 +340,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type
@@ -343,6 +358,7 @@ public class EnergyEntryTests
             Date = _date,
             Mileage = Mileage,
             VehicleId = _vehicleId,
+            Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type

@@ -1,7 +1,5 @@
-﻿using Api.Extensions;
-using Api.Infrastructure;
-using Application.Auth.Logout;
-using Application.Core;
+﻿using Application.Auth.Logout;
+using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Auth;
@@ -10,22 +8,18 @@ internal sealed class Logout : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/logout", async (ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
+        app.MapPost("auth/logout", async (ISender sender, HttpContext httpContext, CancellationToken cancellationToken) =>
             {
-                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
-                    return Results.NoContent();
-
-                var command = new LogoutUserCommand(refreshToken);
-                var result = await sender.Send(command, cancellationToken);
-
-                var cookieOptions = new CookieOptions
+                if (httpContext.Request.Cookies.TryGetValue(AuthCookieNames.RefreshToken, out var refreshToken) && !string.IsNullOrEmpty(refreshToken))
                 {
-                    HttpOnly = true, Secure = configuration.GetValue<bool>("Security:UseSecureCookies"), SameSite = SameSiteMode.Strict,
-                };
+                    var command = new LogoutUserCommand(refreshToken);
+                    await sender.Send(command, cancellationToken);
+                }
 
-                httpContext.Response.Cookies.Delete("refreshToken", cookieOptions);
+                httpContext.Response.Cookies.Delete(AuthCookieNames.AccessToken, AuthCookieFactory.GetDeleteOptions());
+                httpContext.Response.Cookies.Delete(AuthCookieNames.RefreshToken, AuthCookieFactory.GetDeleteOptions(AuthCookiePaths.AuthRoot));
 
-                return result.Match(Results.NoContent, CustomResults.Problem);
+                return Results.NoContent();
             })
             .AllowAnonymous()
             .WithTags(Tags.Auth);

@@ -1,5 +1,4 @@
-﻿using Application.Abstractions;
-using Application.Abstractions.Services;
+﻿using Application.Abstractions.Services;
 using Application.EnergyEntries;
 using Application.EnergyEntries.Update;
 using Domain.Entities.EnergyEntries;
@@ -20,7 +19,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         _energyCompatibilityServiceMock = new Mock<IVehicleEngineCompatibilityService>();
         _mileageValidatorMock = new Mock<IEnergyEntryMileageValidator>();
         _handler = new UpdateEnergyEntryCommandHandler(Context, UserContextMock.Object, _energyCompatibilityServiceMock.Object, _mileageValidatorMock.Object);
-        
+
         // Setup default behavior
         _energyCompatibilityServiceMock
             .Setup(x => x.IsEnergyTypeCompatibleAsync(It.IsAny<Guid>(), It.IsAny<EnergyType>(), It.IsAny<CancellationToken>()))
@@ -51,6 +50,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicle.Id,
+            Vehicle = null!,
             Date = date ?? new DateOnly(2024, 1, 1),
             Mileage = mileage ?? 1000,
             Type = EnergyType.Gasoline,
@@ -115,7 +115,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound(nonExistentEntryId));
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -133,11 +133,11 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Invalid);
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithUnauthorizedError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsFailureWithNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
@@ -151,7 +151,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.Unauthorized);
+        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb();
         var entry = await CreateEnergyEntryInDb(vehicle);
         var command = CreateValidCommand(vehicle.Id, entry.Id) with { Type = EnergyType.Electric };
-        
+
         _energyCompatibilityServiceMock
             .Setup(x => x.IsEnergyTypeCompatibleAsync(vehicle.Id, EnergyType.Electric, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -172,7 +172,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.IncompatibleEnergyType(vehicle.Id, EnergyType.Electric));
+        result.Error.ShouldBe(EnergyEntryErrors.TypeIncompatible);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb();
         var entry = await CreateEnergyEntryInDb(vehicle);
         var command = CreateValidCommand(vehicle.Id, entry.Id);
-        
+
         _mileageValidatorMock
             .Setup(x => x.IsValid(It.IsAny<IReadOnlyCollection<EnergyEntry>>(), It.IsAny<EnergyEntry>(), It.IsAny<DateOnly>(), It.IsAny<int>()))
             .Returns(false);
@@ -193,7 +193,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.IncorrectMileage);
+        result.Error.ShouldBe(EnergyEntryErrors.MileageIncorrect);
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         var vehicle = await CreateVehicleInDb(EngineType.Hybrid);
         var entry = await CreateEnergyEntryInDb(vehicle);
         var command = CreateValidCommand(vehicle.Id, entry.Id) with { Type = EnergyType.Electric, EnergyUnit = EnergyUnit.kWh };
-        
+
         _energyCompatibilityServiceMock
             .Setup(x => x.IsEnergyTypeCompatibleAsync(vehicle.Id, EnergyType.Electric, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -265,12 +265,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb();
         var entry = await CreateEnergyEntryInDb(vehicle, new DateOnly(2024, 1, 15), 1500);
-        var command = CreateValidCommand(vehicle.Id, entry.Id) with 
-        { 
-            Date = entry.Date, 
-            Mileage = entry.Mileage,
-            Volume = 25
-        };
+        var command = CreateValidCommand(vehicle.Id, entry.Id) with { Date = entry.Date, Mileage = entry.Mileage, Volume = 25 };
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

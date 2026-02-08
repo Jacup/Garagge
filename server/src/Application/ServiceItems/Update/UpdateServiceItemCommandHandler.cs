@@ -2,8 +2,6 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.ServiceRecords;
-using Application.Vehicles;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,22 +15,13 @@ internal sealed class UpdateServiceItemCommandHandler(IApplicationDbContext dbCo
         var serviceItem = await dbContext.ServiceItems
             .Include(si => si.ServiceRecord)
             .ThenInclude(sr => sr!.Vehicle)
-            .FirstOrDefaultAsync(
-                si => si.Id == request.ServiceItemId
-                      && si.ServiceRecordId == request.ServiceRecordId,
+            .FirstOrDefaultAsync(si =>
+                    si.Id == request.ServiceItemId &&
+                    si.ServiceRecordId == request.ServiceRecordId,
                 cancellationToken);
 
-        if (serviceItem is null)
-            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.NotFound(request.ServiceItemId));
-
-        if (serviceItem.ServiceRecord is null)
-            return Result.Failure<ServiceItemDto>(ServiceRecordErrors.NotFound(request.ServiceRecordId));
-
-        if (serviceItem.ServiceRecord.Vehicle is null)
-            return Result.Failure<ServiceItemDto>(VehicleErrors.NotFound(serviceItem.ServiceRecord.VehicleId));
-
-        if (serviceItem.ServiceRecord.Vehicle.UserId != userContext.UserId)
-            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.Unauthorized);
+        if (serviceItem?.ServiceRecord?.Vehicle is null || serviceItem.ServiceRecord.Vehicle.UserId != userContext.UserId)
+            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.NotFound);
 
         serviceItem.Name = request.Name;
         serviceItem.Type = request.Type;
@@ -40,16 +29,9 @@ internal sealed class UpdateServiceItemCommandHandler(IApplicationDbContext dbCo
         serviceItem.Quantity = request.Quantity;
         serviceItem.PartNumber = request.PartNumber;
         serviceItem.Notes = request.Notes;
+        
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        try
-        {
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException)
-        {
-            return Result.Failure<ServiceItemDto>(ServiceItemsErrors.UpdateFailed(request.ServiceItemId));
-        }
-
-        return Result.Success(serviceItem.Adapt<ServiceItemDto>());
+        return serviceItem.Adapt<ServiceItemDto>();
     }
 }

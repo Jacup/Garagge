@@ -19,14 +19,12 @@ internal sealed class GetServiceRecordsQueryHandler(
     {
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Where(v => v.Id == request.VehicleId)
+            .Where(v => v.Id == request.VehicleId && 
+                        v.UserId == userContext.UserId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle is null)
-            return Result.Failure<PagedList<ServiceRecordDto>>(VehicleErrors.NotFound(request.VehicleId));
-
-        if (vehicle.UserId != userContext.UserId)
-            return Result.Failure<PagedList<ServiceRecordDto>>(ServiceRecordErrors.Unauthorized);
+            return Result.Failure<PagedList<ServiceRecordDto>>(VehicleErrors.NotFound);
 
         var serviceRecordsQuery = dbContext.ServiceRecords
             .AsNoTracking()
@@ -91,6 +89,6 @@ internal sealed class GetServiceRecordsQueryHandler(
                 request.PageSize);
         }
 
-        return Result.Success(serviceRecordsDto);
+        return serviceRecordsDto;
     }
 }

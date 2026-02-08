@@ -130,6 +130,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[0].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 15),
                 Mileage = 15000,
                 Type = EnergyType.Gasoline,
@@ -142,6 +143,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[0].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 20),
                 Mileage = 15500,
                 Type = EnergyType.Gasoline,
@@ -154,6 +156,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[2].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 18),
                 Mileage = 10000,
                 Type = EnergyType.Electric,
@@ -165,6 +168,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[2].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 21),
                 Mileage = 10500,
                 Type = EnergyType.Electric,
@@ -175,6 +179,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[2].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 25),
                 Mileage = 11000,
                 Type = EnergyType.Electric,
@@ -187,6 +192,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[4].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 25),
                 Mileage = 11000,
                 Type = EnergyType.Electric,
@@ -197,6 +203,7 @@ public static class DatabaseSeeder
             {
                 Id = Guid.NewGuid(),
                 VehicleId = vehicles[4].Id,
+                Vehicle = null!,
                 Date = new DateOnly(2023, 1, 25),
                 Mileage = 11000,
                 Type = EnergyType.Gasoline,

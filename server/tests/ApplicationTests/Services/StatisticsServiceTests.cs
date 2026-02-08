@@ -283,7 +283,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -294,7 +295,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -305,7 +307,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -333,6 +336,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -342,6 +346,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 3500,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -370,7 +375,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -381,7 +387,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -393,6 +400,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1000,
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -402,6 +410,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 3000,
                 ServiceDate = new DateTime(2024, 2, 15),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -445,6 +454,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = null,
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -472,6 +482,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = null,
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -481,6 +492,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -490,6 +502,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = null,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -517,6 +530,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = null,
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -526,6 +540,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = null,
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -554,7 +569,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -582,6 +598,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -610,7 +627,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -622,6 +640,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1_500_000,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -650,7 +669,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -662,6 +682,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 0,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -689,7 +710,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -701,6 +723,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1000,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -729,7 +752,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -741,6 +765,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 0,
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -768,7 +793,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -780,6 +806,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = i * 500,
                 ServiceDate = new DateTime(2024, 1, 1).AddDays(i),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             })
             .ToList();
@@ -808,7 +835,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -819,7 +847,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -830,7 +859,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 40,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -841,7 +871,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -870,7 +901,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -881,7 +913,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -914,7 +947,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -925,7 +959,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -938,6 +973,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = 200,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -948,6 +984,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 20),
                 ManualCost = 150,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -994,7 +1031,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1005,7 +1043,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1034,6 +1073,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = 300,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -1044,6 +1084,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 20),
                 ManualCost = 250,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1073,7 +1114,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1084,7 +1126,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 75,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1113,7 +1156,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1124,7 +1168,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1153,6 +1198,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = null,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid(),
                 Items = new List<ServiceItem>
                 {
@@ -1203,7 +1249,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 99999.99m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1214,7 +1261,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 88888.88m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1242,7 +1290,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 10.99m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1253,7 +1302,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 15.49m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -1266,6 +1316,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = 99.99m,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1294,7 +1345,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 0,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -1307,6 +1359,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = 0,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1335,7 +1388,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1346,7 +1400,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 45.50m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1357,7 +1412,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1368,7 +1424,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 32.75m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1396,7 +1453,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = i * 10, // 10, 20, 30, ... 5000
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -1409,6 +1467,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1).AddDays(i),
                 ManualCost = i * 5, // 5, 10, 15, ... 2500
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             })
             .ToList();
@@ -1440,7 +1499,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1468,7 +1528,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15.50m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1479,7 +1540,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15.50m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1507,6 +1569,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 10),
                 ManualCost = 200,
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid(),
                 Items = []
             },
@@ -1518,6 +1581,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 20),
                 ManualCost = null, // Will use Items
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid(),
                 Items = new List<ServiceItem>
                 {
@@ -1563,7 +1627,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1574,7 +1639,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1585,7 +1651,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -1597,6 +1664,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 12),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -1606,6 +1674,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 2500,
                 ServiceDate = new DateTime(2024, 1, 18),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1648,7 +1717,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1659,7 +1729,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1686,6 +1757,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 12),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -1695,6 +1767,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 2500,
                 ServiceDate = new DateTime(2024, 2, 5),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1722,7 +1795,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1749,6 +1823,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 20),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1776,7 +1851,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1787,7 +1863,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1798,7 +1875,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1824,6 +1902,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 3, 15, 14, 30, 45),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -1850,7 +1929,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1877,7 +1957,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1904,7 +1985,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1915,7 +1997,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -1926,7 +2009,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -1952,7 +2036,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = i * 10,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -1964,6 +2049,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = i * 500,
                 ServiceDate = new DateTime(2024, 1, 1).AddDays(i),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             })
             .ToList();
@@ -1990,6 +2076,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 15, 0, 0, 0),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -2015,6 +2102,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 15, 23, 59, 59, 999),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -2041,7 +2129,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2052,7 +2141,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -2079,7 +2169,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2090,7 +2181,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>();
@@ -2117,7 +2209,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2128,7 +2221,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2139,7 +2233,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
         var serviceRecords = new List<ServiceRecord>
@@ -2151,6 +2246,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 1500,
                 ServiceDate = new DateTime(2024, 1, 20),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -2160,6 +2256,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 2500,
                 ServiceDate = new DateTime(2024, 2, 28),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             },
             new()
@@ -2169,6 +2266,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Mileage = 3500,
                 ServiceDate = new DateTime(2024, 4, 1),
                 VehicleId = Guid.NewGuid(),
+                Vehicle = null!,
                 TypeId = Guid.NewGuid()
             }
         };
@@ -2213,7 +2311,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2224,7 +2323,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2256,7 +2356,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2267,7 +2368,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2278,7 +2380,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2289,7 +2392,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 48,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2325,7 +2429,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2354,7 +2459,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2365,7 +2471,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 75,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2392,7 +2499,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2403,7 +2511,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2430,7 +2539,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2441,7 +2551,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2470,7 +2581,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2481,7 +2593,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2492,7 +2605,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2503,7 +2617,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2531,7 +2646,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2542,7 +2658,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2553,7 +2670,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 40,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2564,7 +2682,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.CNG,
                 EnergyUnit = EnergyUnit.CubicMeter,
                 Cost = 30,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2575,7 +2694,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Ethanol,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 65,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2586,7 +2706,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Biofuel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 58,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2597,7 +2718,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Hydrogen,
                 EnergyUnit = EnergyUnit.CubicMeter,
                 Cost = 40,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2608,7 +2730,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
                 Cost = 15,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2642,7 +2765,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 99999.99m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2653,7 +2777,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 88888.88m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2679,7 +2804,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = i * 10,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -2708,7 +2834,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2719,7 +2846,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2730,7 +2858,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.LPG,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 40,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2757,7 +2886,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 0,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2768,7 +2898,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 0,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2795,7 +2926,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2806,7 +2938,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 45.50m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2817,7 +2950,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = null,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2828,7 +2962,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 52.75m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2855,7 +2990,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 10.99m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2866,7 +3002,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 15.49m,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2892,7 +3029,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2903,7 +3041,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 55,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             },
             new()
             {
@@ -2914,7 +3053,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Diesel,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 50,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             }
         };
 
@@ -2945,8 +3085,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (50 / 1000) * 100 = 5.0 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 50, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -2975,7 +3137,18 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Arrange
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -2993,9 +3166,42 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (100 / 2000) * 100 = 5.0 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 50, Date = new DateOnly(2024, 1, 10), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 3000, Volume = 50, Date = new DateOnly(2024, 1, 20), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 50, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 10),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 3000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 20),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 50,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3011,9 +3217,42 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Arrange - entries NOT sorted by mileage
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 3000, Volume = 50, Date = new DateOnly(2024, 1, 20), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 50, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 50, Date = new DateOnly(2024, 1, 10), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 3000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 20),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 50,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 10),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3029,8 +3268,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Arrange - same mileage
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3039,7 +3300,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Assert
         result.ShouldBe(0);
     }
-    
+
     [Fact]
     public void CalculateAverageConsumption_DifferentVolumes_SumsCorrectly()
     {
@@ -3048,9 +3309,42 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (90 / 2000) * 100 = 4.5 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 40, Date = new DateOnly(2024, 1, 10), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 48, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 3000, Volume = 45, Date = new DateOnly(2024, 1, 20), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 52, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 40,
+                Date = new DateOnly(2024, 1, 10),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 48,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 3000,
+                Volume = 45,
+                Date = new DateOnly(2024, 1, 20),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 52,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3068,8 +3362,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (50.5 / 1000) * 100 = 5.05 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50.5m, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 49.75m, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50.5m,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 49.75m,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3087,8 +3403,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (50 / 1333) * 100 = 3.75187... → 3.75
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2333, Volume = 40, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2333,
+                Volume = 40,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3106,8 +3444,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (50 / 99000) * 100 = 0.05 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 100000, Volume = 50, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 55, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 100000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 55,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3125,8 +3485,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (0.5 / 1000) * 100 = 0.05 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 0.5m, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 1, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 0.5m, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 1, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 0.5m,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 1,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 0.5m,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 1,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3144,8 +3526,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (100 / 1000) * 100 = 10.0 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 100, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 120, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 100, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 120, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 100,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 120,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 100,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 120,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3164,8 +3568,30 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (60 / 1000) * 100 = 6.0 kWh/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 60, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Electric, EnergyUnit = EnergyUnit.kWh, Cost = 15, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 60, Date = new DateOnly(2024, 1, 15), Type = EnergyType.Electric, EnergyUnit = EnergyUnit.kWh, Cost = 15, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 60,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Cost = 15,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 60,
+                Date = new DateOnly(2024, 1, 15),
+                Type = EnergyType.Electric,
+                EnergyUnit = EnergyUnit.kWh,
+                Cost = 15,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3191,7 +3617,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -3210,10 +3637,54 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Consumption: (155 / 3000) * 100 = 5.17 l/100km
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 60, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 72, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 2000, Volume = 50, Date = new DateOnly(2024, 1, 10), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 3000, Volume = 45, Date = new DateOnly(2024, 1, 20), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 54, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 4000, Volume = 55, Date = new DateOnly(2024, 2, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 66, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 60,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 72,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 2000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 10),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 3000,
+                Volume = 45,
+                Date = new DateOnly(2024, 1, 20),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 54,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 4000,
+                Volume = 55,
+                Date = new DateOnly(2024, 2, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 66,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3237,7 +3708,8 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Cost = 60,
-                VehicleId = Guid.NewGuid()
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
             })
             .ToList();
 
@@ -3256,9 +3728,42 @@ public class StatisticsServiceTests : InMemoryDbTestBase
         // Arrange - entries at specific mileages
         var entries = new List<EnergyEntry>
         {
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 0, Volume = 60, Date = new DateOnly(2024, 1, 1), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 72, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 500, Volume = 50, Date = new DateOnly(2024, 1, 10), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() },
-            new EnergyEntry { Id = Guid.NewGuid(), Mileage = 1000, Volume = 50, Date = new DateOnly(2024, 1, 20), Type = EnergyType.Gasoline, EnergyUnit = EnergyUnit.Liter, Cost = 60, VehicleId = Guid.NewGuid() }
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 0,
+                Volume = 60,
+                Date = new DateOnly(2024, 1, 1),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 72,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 500,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 10),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            },
+            new EnergyEntry
+            {
+                Id = Guid.NewGuid(),
+                Mileage = 1000,
+                Volume = 50,
+                Date = new DateOnly(2024, 1, 20),
+                Type = EnergyType.Gasoline,
+                EnergyUnit = EnergyUnit.Liter,
+                Cost = 60,
+                VehicleId = Guid.NewGuid(),
+                Vehicle = null!
+            }
         };
 
         // Act
@@ -3272,4 +3777,3 @@ public class StatisticsServiceTests : InMemoryDbTestBase
 
     #endregion
 }
-

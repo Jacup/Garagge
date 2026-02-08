@@ -1,6 +1,6 @@
-﻿namespace ApiIntegrationTests.Definitions;
+﻿namespace ApiIntegrationTests.Contracts;
 
-public static class ApiV1Definition
+public static class ApiV1Definitions
 {
     private const string ApiBase = "/api";
 
@@ -13,19 +13,18 @@ public static class ApiV1Definition
         public const string Register = $"{ApiBase}/{AuthBase}/register";
         public const string Refresh = $"{ApiBase}/{AuthBase}/refresh";
         public const string Logout = $"{ApiBase}/{AuthBase}/logout";
-        public const string ChangePassword = $"{ApiBase}/{AuthBase}/change-password";
     }
 
     // ==================== USERS MANAGEMENT ====================
     public static class Users
     {
         private const string UsersBase = "users";
-        // Current user endpoints
-        public static string GetMe = $"{ApiBase}/{UsersBase}/me";
-        public static string UpdateMe = $"{ApiBase}/{UsersBase}/me";
-        public static string DeleteMe = $"{ApiBase}/{UsersBase}/me";
 
-        // Admin only - User management
+        public const string GetMe = $"{ApiBase}/{UsersBase}/me";
+        public const string UpdateMe = $"{ApiBase}/{UsersBase}/me";
+        public const string DeleteMe = $"{ApiBase}/{UsersBase}/me";
+        public const string ChangePassword = $"{ApiBase}/{UsersBase}/me/change-password";
+
         public static string GetAll = $"{ApiBase}/{UsersBase}";
         public static string Create = $"{ApiBase}/{UsersBase}";
         
@@ -442,14 +441,14 @@ public static class ApiEndpointExtensions
 {
     /// <summary>
     /// Format URL with single parameter
-    /// Usage: ApiV1Definition.Users.GetById.WithId(userId)
+    /// Usage: ApiV1Definitions.Users.GetById.WithId(userId)
     /// </summary>
     public static string WithId(this string urlTemplate, object id)
         => string.Format(urlTemplate, id);
 
     /// <summary>
     /// Format URL with two parameters  
-    /// Usage: ApiV1Definition.Organizations.RemoveUser.WithIds(orgId, userId)
+    /// Usage: ApiV1Definitions.Organizations.RemoveUser.WithIds(orgId, userId)
     /// </summary>
     public static string WithIds(this string urlTemplate, object id1, object id2)
         => string.Format(urlTemplate, id1, id2);
@@ -473,7 +472,7 @@ public class VehicleTests : BaseIntegrationTest
     {
         var vehicleId = Guid.NewGuid();
         var response = await Client.GetAsync(
-            ApiV1Definition.Vehicles.GetById.WithId(vehicleId));
+            ApiV1Definitions.Vehicles.GetById.WithId(vehicleId));
         
         response.EnsureSuccessStatusCode();
     }
@@ -485,7 +484,7 @@ public class VehicleTests : BaseIntegrationTest
         var entryData = new { Amount = 50.5, Date = DateTime.UtcNow, Cost = 200 };
         
         var response = await Client.PostAsJsonAsync(
-            ApiV1Definition.EnergyEntries.Create.WithId(vehicleId), 
+            ApiV1Definitions.EnergyEntries.Create.WithId(vehicleId), 
             entryData);
             
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -498,7 +497,7 @@ public class VehicleTests : BaseIntegrationTest
         var userId = Guid.NewGuid();
         
         var response = await Client.DeleteAsync(
-            ApiV1Definition.Organizations.RemoveUser.WithIds(orgId, userId));
+            ApiV1Definitions.Organizations.RemoveUser.WithIds(orgId, userId));
             
         response.EnsureSuccessStatusCode();
     }
@@ -509,7 +508,7 @@ public class VehicleTests : BaseIntegrationTest
         var vehicleId = Guid.NewGuid();
         
         var response = await Client.GetAsync(
-            ApiV1Definition.EnergyEntries.GetStats.WithId(vehicleId));
+            ApiV1Definitions.EnergyEntries.GetStats.WithId(vehicleId));
             
         var stats = await response.Content.ReadFromJsonAsync<EnergyStatsDto>();
         Assert.NotNull(stats);

@@ -1,5 +1,6 @@
-﻿using System.Net;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using ApiIntegrationTests.Contracts.V1;
+using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Users;
@@ -19,7 +20,7 @@ public class DeleteSessionsTests : BaseIntegrationTest
     public async Task DeleteSessions_WhenNotAuthenticated_ReturnsUnauthorized()
     {
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteAllSessions);
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteAllSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -47,7 +48,7 @@ public class DeleteSessionsTests : BaseIntegrationTest
         DbContext.RefreshTokens.Count().ShouldBe(2);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteAllSessions);
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteAllSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -91,7 +92,7 @@ public class DeleteSessionsTests : BaseIntegrationTest
         DbContext.RefreshTokens.Count(rt => rt.UserId == user.Id).ShouldBe(2);
 
         // Act
-        var response = await Client.DeleteAsync(ApiV1Definition.Users.DeleteAllSessions);
+        var response = await Client.DeleteAsync(ApiV1Definitions.Users.DeleteAllSessions);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);

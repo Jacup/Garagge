@@ -31,10 +31,7 @@ internal sealed class UpdateEnergyEntry : IEndpoint
 
                     Result<EnergyEntryDto> result = await sender.Send(command, cancellationToken);
 
-                    return result.Match(
-                        chargingEntry => Results.Created($"/vehicles/{chargingEntry.VehicleId}/energy-entries/{chargingEntry.Id}", chargingEntry),
-                        CustomResults.Problem
-                    );
+                    return result.Match(Results.Ok, CustomResults.Problem);
                 })
             .Produces<EnergyEntryDto>()
             .Produces(StatusCodes.Status400BadRequest)
@@ -46,10 +43,10 @@ internal sealed class UpdateEnergyEntry : IEndpoint
 }
 
 internal sealed record EnergyEntryUpdateRequest(
-        DateOnly Date,
-        int Mileage,
-        EnergyType Type,
-        EnergyUnit EnergyUnit,
-        decimal Volume,
-        decimal? Cost,
-        decimal? PricePerUnit);
+    DateOnly Date,
+    int Mileage,
+    EnergyType Type,
+    EnergyUnit EnergyUnit,
+    decimal Volume,
+    decimal? Cost,
+    decimal? PricePerUnit);

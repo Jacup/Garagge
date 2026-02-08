@@ -7,24 +7,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Me.Get;
 
-internal sealed class GetMeQueryHandler(IApplicationDbContext context, IUserContext userContext) 
+internal sealed class GetMeQueryHandler(IApplicationDbContext context, IUserContext userContext)
     : IQueryHandler<GetMeQuery, UserDto>
 {
     public async Task<Result<UserDto>> Handle(GetMeQuery query, CancellationToken cancellationToken)
     {
-        var userId = userContext.UserId;
-        
         var user = await context.Users
             .AsNoTracking()
-            .Where(u => u.Id == userId)
-            .ProjectToType<UserDto>()
+            .Where(u => u.Id == userContext.UserId)
             .SingleOrDefaultAsync(cancellationToken);
 
         if (user is null)
-        {
-            return Result.Failure<UserDto>(UserErrors.NotFound(userId));
-        }
+            return Result.Failure<UserDto>(UserErrors.NotFound);
 
-        return user;
+        return user.Adapt<UserDto>();
     }
 }

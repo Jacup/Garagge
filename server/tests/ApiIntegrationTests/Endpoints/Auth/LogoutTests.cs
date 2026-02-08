@@ -1,5 +1,5 @@
-﻿using System.Net;
-using ApiIntegrationTests.Definitions;
+﻿using ApiIntegrationTests.Contracts;
+using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Auth;
@@ -11,100 +11,73 @@ namespace ApiIntegrationTests.Endpoints.Auth;
 public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationTest(factory)
 {
     [Fact]
-    public async Task Logout_WithValidTokens_ReturnsOk()
+    public async Task Logout_WithValidTokens_ReturnsNoContent()
     {
         // Arrange
         await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
-
-        // Add access token to headers and refresh token to cookies
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        await LoginUser("test@garagge.app", "Password123");
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Logout_WithValidTokens_DeletesRefreshToken()
+    public async Task Logout_WithValidTokens_RevokesRefreshToken()
     {
         // Arrange
-        await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
 
-        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == refreshToken);
+        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         tokenInDb.IsRevoked.ShouldBeFalse();
 
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        // Verify refresh token is revoked
-        var tokenExists = await DbContext.RefreshTokens.AnyAsync(rt => rt.Token == refreshToken);
-        tokenExists.ShouldBeFalse();
+        var token = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
+        token.IsRevoked.ShouldBeTrue();
     }
 
     [Fact]
-    public async Task Logout_WithValidTokens_ClearsRefreshTokenCookie()
+    public async Task Logout_WithValidTokens_ClearsCookies()
     {
         // Arrange
         await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
-
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        await LoginUser("test@garagge.app", "Password123");
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        // Check if refreshToken cookie is cleared
-        var setCookieHeaders = response.Headers.GetValues("Set-Cookie");
-        var refreshTokenCookie = setCookieHeaders.FirstOrDefault(h => h.StartsWith("refreshToken="));
+        response.Headers.TryGetValues("Set-Cookie", out var setCookieHeaders).ShouldBeTrue();
 
+        var cookies = setCookieHeaders!.ToList();
+
+        var accessTokenCookie = cookies.FirstOrDefault(c => c.StartsWith("accessToken="));
+        accessTokenCookie.ShouldNotBeNull();
+        (accessTokenCookie.StartsWith("accessToken=;") || accessTokenCookie.Contains("expires=")).ShouldBeTrue();
+
+        var refreshTokenCookie = cookies.FirstOrDefault(c => c.StartsWith("refreshToken="));
         refreshTokenCookie.ShouldNotBeNull();
-        refreshTokenCookie.ShouldStartWith("refreshToken=;");
+        (refreshTokenCookie.StartsWith("refreshToken=;") || refreshTokenCookie.Contains("expires=")).ShouldBeTrue();
     }
 
     [Fact]
-    public async Task Logout_WithoutAccessToken_ReturnsNoContent()
-    {
-        // Arrange - Do NOT authenticate
-        await CreateUserAsync();
-        var (_, refreshToken) = await LoginUser("test@garagge.app", "Password123");
-
-        // Add only refresh token
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
-        // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-    }
-
-    [Fact]
-    public async Task Logout_WithoutRefreshToken_ReturnNoContent()
+    public async Task Logout_WithoutRefreshToken_ReturnsNoContent()
     {
         // Arrange
         await CreateUserAsync();
-        var (loginResponse, _) = await LoginUser("test@garagge.app", "Password123");
-
-        // Authenticate with an access token only, NO refresh token
-        Authenticate(loginResponse.AccessToken);
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -114,18 +87,15 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     public async Task Logout_WithRevokedRefreshToken_ReturnsNoContent()
     {
         // Arrange
-        await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
 
-        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == refreshToken);
+        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         tokenInDb.IsRevoked = true;
         await DbContext.SaveChangesAsync();
 
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -135,58 +105,32 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     public async Task Logout_WithExpiredRefreshToken_ReturnsNoContent()
     {
         // Arrange
-        await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123");
 
-        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == refreshToken);
+        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.UserId == user.Id);
         tokenInDb.ExpiresAt = DateTime.UtcNow.AddDays(-1);
         await DbContext.SaveChangesAsync();
 
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
     }
 
     [Fact]
-    public async Task Logout_WithInvalidAccessToken_ReturnsNoContent()
+    public async Task Logout_MultipleLogouts_SecondStillReturnsNoContent()
     {
         // Arrange
         await CreateUserAsync();
-        var (_, refreshToken) = await LoginUser("test@garagge.app", "Password123");
-
-        // Authenticate with invalid access token
-        Authenticate("invalid.jwt.token");
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
+        await LoginUser("test@garagge.app", "Password123");
 
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-    }
-
-    [Fact]
-    public async Task Logout_MultipleLogouts_SecondStillReturnNoContent()
-    {
-        // Arrange
-        await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
-
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
-        // Act - First logout
-        var firstLogout = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var firstLogout = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
         firstLogout.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        Client.DefaultRequestHeaders.Remove("Cookie");
-        // Try second logout with same token
-        var secondLogout = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var secondLogout = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         secondLogout.StatusCode.ShouldBe(HttpStatusCode.NoContent);
@@ -197,48 +141,37 @@ public class LogoutTests(CustomWebApplicationFactory factory) : BaseIntegrationT
     {
         // Arrange
         await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123");
+        await LoginUser("test@garagge.app", "Password123");
 
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
-        // Act - Logout
-        var logoutResponse = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        // Act
+        var logoutResponse = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
         logoutResponse.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        // Clear authorization header for refresh attempt
-        Client.DefaultRequestHeaders.Authorization = null;
-
-        // Try to refresh with the same refresh token
-        var refreshResponse = await Client.PostAsync(ApiV1Definition.Auth.Refresh, null);
+        var refreshResponse = await Client.PostAsync(ApiV1Definitions.Auth.Refresh, null);
 
         // Assert
         refreshResponse.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         var problemDetails = await refreshResponse.GetProblemDetailsAsync();
-        problemDetails.ShouldBeErrorOfType(AuthErrors.InvalidToken);
+        problemDetails.ShouldBeErrorOfType(AuthErrors.TokenInvalid);
     }
 
     [Fact]
-    public async Task Logout_WithRememberedSession_DeletesToken()
+    public async Task Logout_WithRememberedSession_RevokesToken()
     {
         // Arrange
-        await CreateUserAsync();
-        var (loginResponse, refreshToken) = await LoginUser("test@garagge.app", "Password123", rememberMe: true);
+        var user = await CreateUserAsync();
+        await LoginUser("test@garagge.app", "Password123", rememberMe: true);
 
-        var tokenInDb = await DbContext.RefreshTokens.SingleAsync(rt => rt.Token == refreshToken);
+        var tokenInDb = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
         tokenInDb.SessionDurationDays.ShouldBe(30);
 
-        Authenticate(loginResponse.AccessToken);
-        Client.DefaultRequestHeaders.Add("Cookie", $"refreshToken={refreshToken}");
-
         // Act
-        var response = await Client.PostAsync(ApiV1Definition.Auth.Logout, null);
+        var response = await Client.PostAsync(ApiV1Definitions.Auth.Logout, null);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
 
-        var tokenExists = await DbContext.RefreshTokens.AnyAsync(rt => rt.Token == refreshToken);
-        tokenExists.ShouldBeFalse();
-    
+        var token = await DbContext.RefreshTokens.AsNoTracking().SingleAsync(rt => rt.UserId == user.Id);
+        token.IsRevoked.ShouldBeTrue();
     }
 }

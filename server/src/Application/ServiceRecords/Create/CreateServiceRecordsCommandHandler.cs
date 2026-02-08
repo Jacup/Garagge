@@ -16,16 +16,16 @@ internal sealed class CreateServiceRecordsCommandHandler(
 {
     public async Task<Result<ServiceRecordDto>> Handle(CreateServiceRecordCommand request, CancellationToken cancellationToken)
     {
+        var userId = userContext.UserId;
+
         var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Where(v => v.Id == request.VehicleId)
+            .Where(v => v.Id == request.VehicleId &&
+                        v.UserId == userId)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (vehicle is null)
-            return Result.Failure<ServiceRecordDto>(VehicleErrors.NotFound(request.VehicleId));
-
-        if (vehicle.UserId != userContext.UserId)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.Unauthorized);
+            return Result.Failure<ServiceRecordDto>(VehicleErrors.NotFound);
 
         var serviceType = await dbContext.ServiceTypes
             .FirstOrDefaultAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
@@ -63,18 +63,11 @@ internal sealed class CreateServiceRecordsCommandHandler(
         foreach (ServiceItem serviceItem in items)
             record.Items.Add(serviceItem);
 
-        try
-        {
-            await dbContext.ServiceRecords.AddAsync(record, cancellationToken);
-            await dbContext.SaveChangesAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.CreateFailed);
-        }
+        await dbContext.ServiceRecords.AddAsync(record, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         var dto = new ServiceRecordDto(
-            record!.Id,
+            record.Id,
             record.Title,
             record.Notes,
             record.Mileage,
@@ -99,6 +92,6 @@ internal sealed class CreateServiceRecordsCommandHandler(
             record.UpdatedDate
         );
 
-        return Result.Success(dto);
+        return dto;
     }
 }
