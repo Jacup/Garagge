@@ -1,5 +1,4 @@
-﻿using Application.Auth;
-using Application.Users;
+﻿using Application.Users;
 using Application.Users.Me.Update;
 using FluentValidation.TestHelper;
 

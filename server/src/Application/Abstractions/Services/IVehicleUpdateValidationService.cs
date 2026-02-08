@@ -1,5 +1,5 @@
 ﻿using Application.Core;
-using Application.Vehicles.Update;
+using Application.Features.Vehicles.Update;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 

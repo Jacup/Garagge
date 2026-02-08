@@ -1,7 +1,7 @@
-﻿using Application.ServiceItems.Create;
+﻿using Application.Features.Vehicles;
+using Application.ServiceItems.Create;
 using Application.ServiceRecords;
 using Application.ServiceRecords.Create;
-using Application.Vehicles;
 using Domain.Enums;
 using Domain.Enums.Services;
 using Microsoft.EntityFrameworkCore;

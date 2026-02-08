@@ -1,8 +1,8 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Vehicles;
-using Application.Vehicles.Create;
+using Application.Features.Vehicles;
+using Application.Features.Vehicles.Create;
 using Domain.Enums;
 using MediatR;
 

@@ -2,7 +2,7 @@
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
-using Application.Vehicles;
+using Application.Features.Vehicles;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using System.Net;

@@ -3,7 +3,7 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
-using Application.Vehicles;
+using Application.Features.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Mapster;
 using Microsoft.EntityFrameworkCore;

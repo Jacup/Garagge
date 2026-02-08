@@ -1,7 +1,6 @@
 ﻿using Application.EnergyEntries;
 using Application.EnergyEntries.GetStats;
 using Application.Services.EnergyStats;
-using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Enums;
 

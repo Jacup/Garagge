@@ -2,8 +2,8 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
+using Application.Features.Vehicles;
 using Application.ServiceItems;
-using Application.Vehicles;
 using Domain.Entities.Services;
 using Microsoft.EntityFrameworkCore;
 

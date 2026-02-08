@@ -3,8 +3,8 @@ using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Abstractions.Services;
 using Application.Core;
+using Application.Features.Vehicles;
 using Application.ServiceItems;
-using Application.Vehicles;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.ServiceRecords.Get;

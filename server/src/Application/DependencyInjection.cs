@@ -35,9 +35,9 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
 
-        // Configure Mapster for enum mapping
         TypeAdapterConfig.GlobalSettings.Default.PreserveReference(true);
-
+        ValidatorOptions.Global.DefaultRuleLevelCascadeMode = CascadeMode.Stop;
+        
         return services;
     }
 }

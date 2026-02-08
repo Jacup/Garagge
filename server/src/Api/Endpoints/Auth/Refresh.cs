@@ -1,7 +1,7 @@
 ﻿using Api.Infrastructure;
-using Application.Auth;
-using Application.Auth.Refresh;
 using Application.Core;
+using Application.Features.Auth;
+using Application.Features.Auth.Refresh;
 using Infrastructure.Authentication;
 using MediatR;
 

@@ -1,6 +1,6 @@
 ﻿using Application.Core;
+using Application.Features.Vehicles;
 using Application.Services;
-using Application.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;
 using Domain.Enums;

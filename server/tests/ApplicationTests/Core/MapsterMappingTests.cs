@@ -1,5 +1,5 @@
 using Application.EnergyEntries;
-using Application.Vehicles;
+using Application.Features.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;
 using Domain.Enums;

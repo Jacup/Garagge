@@ -6,7 +6,7 @@ using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Moq;
 
-namespace ApplicationTests.EnergyEntries;
+namespace ApplicationTests.EnergyEntries.UpdateEnergyEntry;
 
 public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
 {

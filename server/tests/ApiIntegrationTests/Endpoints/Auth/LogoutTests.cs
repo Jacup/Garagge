@@ -2,7 +2,7 @@
 using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
-using Application.Auth;
+using Application.Features.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiIntegrationTests.Endpoints.Auth;

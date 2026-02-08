@@ -1,7 +1,7 @@
-﻿using Application.ServiceRecords;
+﻿using Application.Features.Vehicles;
+using Application.ServiceRecords;
 using Application.ServiceRecords.Get;
 using Application.Services;
-using Application.Vehicles;
 using Domain.Enums;
 
 namespace ApplicationTests.ServiceRecords.Get;

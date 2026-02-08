@@ -1,7 +1,7 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Vehicles.Delete;
+using Application.Features.Vehicles.Delete;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles;

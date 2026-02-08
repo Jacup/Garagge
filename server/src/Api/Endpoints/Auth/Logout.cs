@@ -1,4 +1,4 @@
-﻿using Application.Auth.Logout;
+﻿using Application.Features.Auth.Logout;
 using Infrastructure.Authentication;
 using MediatR;
 

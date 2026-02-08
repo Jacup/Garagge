@@ -1,7 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Data;
 using Application.Dashboard.GetStats;
-using Application.Vehicles.Stats;
+using Application.Features.Vehicles.Stats;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Services;
 using Domain.Entities.Vehicles;

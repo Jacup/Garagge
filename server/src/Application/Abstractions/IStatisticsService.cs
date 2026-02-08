@@ -1,5 +1,5 @@
 ﻿using Application.Dashboard.GetStats;
-using Application.Vehicles.Stats;
+using Application.Features.Vehicles.Stats;
 
 namespace Application.Abstractions;
 

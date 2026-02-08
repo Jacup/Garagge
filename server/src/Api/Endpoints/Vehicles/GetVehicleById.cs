@@ -1,8 +1,8 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Vehicles;
-using Application.Vehicles.GetById;
+using Application.Features.Vehicles;
+using Application.Features.Vehicles.GetById;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles;
