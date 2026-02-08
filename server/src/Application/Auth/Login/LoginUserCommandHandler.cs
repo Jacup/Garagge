@@ -56,8 +56,8 @@ internal sealed class LoginUserCommandHandler(
         context.RefreshTokens.Add(refreshToken);
         await context.SaveChangesAsync(cancellationToken);
 
-        string token = tokenProvider.Create(user, sessionId);
+        string accessToken = tokenProvider.Create(user, sessionId);
 
-        return new LoginUserResponse(token, refreshToken.Token, refreshTokenExpiration);
+        return new LoginUserResponse(accessToken, refreshToken.Token, refreshTokenExpiration);
     }
 }

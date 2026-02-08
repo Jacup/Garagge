@@ -1,6 +1,5 @@
-﻿using Api.Extensions;
-using Api.Infrastructure;
-using Application.Auth.Logout;
+﻿using Application.Auth.Logout;
+using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Auth;
@@ -9,21 +8,16 @@ internal sealed class Logout : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("auth/logout", async (ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
+        app.MapPost("auth/logout", async (ISender sender, HttpContext httpContext, CancellationToken cancellationToken) =>
             {
-                if (httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken) && !string.IsNullOrEmpty(refreshToken))
+                if (httpContext.Request.Cookies.TryGetValue(AuthCookieNames.RefreshToken, out var refreshToken) && !string.IsNullOrEmpty(refreshToken))
                 {
                     var command = new LogoutUserCommand(refreshToken);
                     await sender.Send(command, cancellationToken);
                 }
 
-                var cookieOptions = new CookieOptions
-                {
-                    HttpOnly = true, Secure = configuration.GetValue<bool>("Security:UseSecureCookies"), SameSite = SameSiteMode.Strict,
-                };
-
-                httpContext.Response.Cookies.Delete("accessToken", new CookieOptions(cookieOptions) { Path = "/" });
-                httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions(cookieOptions) { Path = "/api/auth/" });
+                httpContext.Response.Cookies.Delete(AuthCookieNames.AccessToken, AuthCookieFactory.GetDeleteOptions());
+                httpContext.Response.Cookies.Delete(AuthCookieNames.RefreshToken, AuthCookieFactory.GetDeleteOptions(AuthCookiePaths.AuthRoot));
 
                 return Results.NoContent();
             })

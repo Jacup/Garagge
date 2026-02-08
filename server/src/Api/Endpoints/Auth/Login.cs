@@ -2,6 +2,7 @@
 using Application.Auth;
 using Application.Auth.Login;
 using Application.Core;
+using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Auth;
@@ -22,20 +23,17 @@ internal sealed class Login : IEndpoint
 
                     if (result.IsFailure)
                         return CustomResults.Problem(result);
-                    
-                    var baseCookieOptions = new CookieOptions
-                    {
-                        HttpOnly = true,
-                        Secure = configuration.GetValue<bool>("Security:UseSecureCookies"),
-                        SameSite = SameSiteMode.Strict,
-                    };
 
-                    httpContext.Response.Cookies.Append("accessToken", result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/", Expires = null});
-                    httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, new CookieOptions(baseCookieOptions)
-                    {
-                        Path = "/api/auth/",
-                        Expires = request.RememberMe ? result.Value.RefreshTokenExpiresAt : null
-                    });
+                    httpContext.Response.Cookies.Append(
+                        AuthCookieNames.AccessToken,
+                        result.Value.AccessToken,
+                        AuthCookieFactory.GetDefaultOptions(configuration));
+
+                    httpContext.Response.Cookies.Append(
+                        AuthCookieNames.RefreshToken,
+                        result.Value.RefreshToken,
+                        AuthCookieFactory.GetRefreshTokenOptions(configuration, request.RememberMe ? result.Value.RefreshTokenExpiresAt : null)
+                    );
 
                     return Results.NoContent();
                 })

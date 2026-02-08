@@ -13,7 +13,7 @@ internal sealed class Refresh : IEndpoint
     {
         app.MapPost("auth/refresh", async (ISender sender, HttpContext httpContext, IConfiguration configuration, CancellationToken cancellationToken) =>
             {
-                if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+                if (!httpContext.Request.Cookies.TryGetValue(AuthCookieNames.RefreshToken, out var refreshToken))
                 {
                     return CustomResults.Problem(Result.Failure(AuthErrors.TokenInvalid));
                 }
@@ -33,23 +33,8 @@ internal sealed class Refresh : IEndpoint
                     return CustomResults.Problem(result);
                 }
 
-                var baseCookieOptions = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = configuration.GetValue<bool>("Security:UseSecureCookies"),
-                    SameSite = SameSiteMode.Strict,
-                    Expires = result.Value.RefreshTokenExpiresAt
-                };
-
-                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, new CookieOptions(baseCookieOptions) { Path = "/" });
-                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken,
-                    new CookieOptions(baseCookieOptions) { Path = "/api/auth/" });
-
-                var atOptions = AuthCookieFactory.GetDefaultOptions(configuration);
-                var rtOptions = AuthCookieFactory.GetRefreshTokenOptions(configuration, result.Value.RefreshTokenExpiresAt);
-
-                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, atOptions);
-                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken, rtOptions);
+                httpContext.Response.Cookies.Append(AuthCookieNames.AccessToken, result.Value.AccessToken, AuthCookieFactory.GetDefaultOptions(configuration));
+                httpContext.Response.Cookies.Append(AuthCookieNames.RefreshToken, result.Value.RefreshToken, AuthCookieFactory.GetRefreshTokenOptions(configuration, result.Value.RefreshTokenExpiresAt));
                 
                 return Results.NoContent();
             })

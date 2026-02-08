@@ -1,9 +1,8 @@
-﻿using Application.Auth;
-using Application.Auth.ChangePassword;
-using Application.Users;
+﻿using Application.Users;
+using Application.Users.Me.ChangePassword;
 using FluentValidation.TestHelper;
 
-namespace ApplicationTests.Auth.ChangePassword;
+namespace ApplicationTests.Users.Me.ChangePassword;
 
 public class ChangePasswordCommandValidatorTests
 {

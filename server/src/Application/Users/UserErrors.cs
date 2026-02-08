@@ -18,7 +18,7 @@ public static class UserErrors
 
     public static readonly Error EmailInvalid = Error.Validation(
         "User.EmailInvalid",
-        "Email is not valid");
+        "Email is not valid.");
 
     public static readonly Error EmailNotUnique = Error.Conflict(
         "User.EmailNotUnique",
@@ -27,6 +27,10 @@ public static class UserErrors
     public static readonly Error PasswordRequired = Error.Validation(
         "User.PasswordRequired",
         "Password is required.");
+    
+    public static readonly Error PasswordInvalid = Error.Validation(
+        "User.PasswordInvalid",
+        "Password is not valid.");
 
     public static Error PasswordTooShort(int minPasswordLength) => Error.Validation(
         "User.PasswordTooShort",
@@ -39,12 +43,7 @@ public static class UserErrors
     public static readonly Error NotFound = Error.NotFound(
         "User.NotFound",
         "User was not found.");
-
-    // the below errors should be reviewed
-    public static readonly Error UpdateFailed = Error.Problem(
-        "User.UpdateFailed",
-        "Update user failed");
-
+    
     public static Error Unauthorized => Error.Unauthorized(
         "User.Unauthorized",
         "You are not authorized to perform this action.");
@@ -54,7 +53,7 @@ public static class UserErrors
         "Cannot delete current session.");
 
     public static readonly Error DeleteSessionFailed = Error.Failure(
-        "User.SessionsDeleteFailed",
+        "User.SessionsDelete",
         "Delete session failed");
 
     public static readonly Error SessionNotFound = Error.NotFound(

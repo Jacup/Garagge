@@ -13,19 +13,18 @@ public static class ApiV1Definitions
         public const string Register = $"{ApiBase}/{AuthBase}/register";
         public const string Refresh = $"{ApiBase}/{AuthBase}/refresh";
         public const string Logout = $"{ApiBase}/{AuthBase}/logout";
-        public const string ChangePassword = $"{ApiBase}/{AuthBase}/change-password";
     }
 
     // ==================== USERS MANAGEMENT ====================
     public static class Users
     {
         private const string UsersBase = "users";
-        // Current user endpoints
-        public static string GetMe = $"{ApiBase}/{UsersBase}/me";
-        public static string UpdateMe = $"{ApiBase}/{UsersBase}/me";
-        public static string DeleteMe = $"{ApiBase}/{UsersBase}/me";
 
-        // Admin only - User management
+        public const string GetMe = $"{ApiBase}/{UsersBase}/me";
+        public const string UpdateMe = $"{ApiBase}/{UsersBase}/me";
+        public const string DeleteMe = $"{ApiBase}/{UsersBase}/me";
+        public const string ChangePassword = $"{ApiBase}/{UsersBase}/me/change-password";
+
         public static string GetAll = $"{ApiBase}/{UsersBase}";
         public static string Create = $"{ApiBase}/{UsersBase}";
         

@@ -1,16 +1,16 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.Auth.ChangePassword;
 using Application.Core;
+using Application.Users.Me.ChangePassword;
 using MediatR;
 
-namespace Api.Endpoints.Auth;
+namespace Api.Endpoints.Users.Me;
 
 internal sealed class ChangePassword : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPut("auth/change-password", async (ChangePasswordRequest request, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPut("users/me/change-password", async (ChangePasswordRequest request, ISender sender, CancellationToken cancellationToken) =>
             {
                 var command = new ChangePasswordCommand(request.CurrentPassword, request.NewPassword, request.LogoutAllDevices);
 
@@ -20,7 +20,7 @@ internal sealed class ChangePassword : IEndpoint
             })
             .RequireAuthorization()
             .Produces(StatusCodes.Status400BadRequest)
-            .WithTags(Tags.Auth);
+            .WithTags(Tags.Users);
     }
 }
 

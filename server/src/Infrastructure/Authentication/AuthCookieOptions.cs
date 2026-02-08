@@ -26,12 +26,16 @@ public static class AuthCookieFactory
         Path = AuthCookiePaths.Root
     };
 
-    public static CookieOptions GetRefreshTokenOptions(IConfiguration config, DateTimeOffset expires)
+    public static CookieOptions GetRefreshTokenOptions(IConfiguration config, DateTimeOffset? expires)
     {
         var options = GetDefaultOptions(config, expires);
         options.Path = AuthCookiePaths.AuthRoot;
+
         return options;
     }
 
-    public static CookieOptions GetDeleteOptions(string path = AuthCookiePaths.Root) => new() { HttpOnly = true, Path = path };
+    public static CookieOptions GetDeleteOptions(string path = AuthCookiePaths.Root) => new()
+    {
+        HttpOnly = true, Path = path
+    };
 }

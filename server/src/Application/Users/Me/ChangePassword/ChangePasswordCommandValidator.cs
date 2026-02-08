@@ -1,8 +1,7 @@
 ﻿using Application.Core;
-using Application.Users;
 using FluentValidation;
 
-namespace Application.Auth.ChangePassword;
+namespace Application.Users.Me.ChangePassword;
 
 internal sealed class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
 {
