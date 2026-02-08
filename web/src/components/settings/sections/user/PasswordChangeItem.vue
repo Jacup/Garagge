@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { getAuth } from '@/api/generated/auth/auth'
+import { getUsers } from '@/api/generated/users/users'
 import { parseApiError } from '@/utils/error-handler'
 import { useNotificationsStore } from '@/stores/notifications'
 
-const { putApiAuthChangePassword } = getAuth()
+const { putApiUsersMeChangePassword } = getUsers()
 const notifications = useNotificationsStore()
 
 const isExpanded = ref(false)
@@ -31,7 +31,7 @@ const handleUpdate = async () => {
   error.value = ''
 
   try {
-    await putApiAuthChangePassword({
+    await putApiUsersMeChangePassword({
       currentPassword: form.value.currentPassword,
       newPassword: form.value.newPassword,
       logoutAllDevices: form.value.logoutAll,

@@ -1,14 +1,11 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../auth'
-import { useUserStore } from '../user'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
-import type { LoginRequest, RegisterRequest, LoginResponse } from '@/api/generated/apiV1.schemas'
+import type { LoginRequest, RegisterRequest } from '@/api/generated/apiV1.schemas'
 
 const app = createApp({})
 
-// Define mocks at module level
 const { mockPostApiAuthLogin, mockPostApiAuthLogout, mockPostApiAuthRegister } = vi.hoisted(() => {
   return {
     mockPostApiAuthLogin: vi.fn(),
@@ -35,24 +32,36 @@ vi.mock('axios', () => {
   }
 })
 
+const mockFetchUserData = vi.fn()
+const mockUserReset = vi.fn()
+const mockUserId = vi.fn(() => '')
+
 vi.mock('../user', () => {
-  const mockFetchUserData = vi.fn()
-  const mockReset = vi.fn()
   return {
     useUserStore: vi.fn(() => ({
       fetchUserData: mockFetchUserData,
-      $reset: mockReset,
+      $reset: mockUserReset,
+      id: mockUserId(),
     })),
   }
 })
 
+vi.mock('@/router', () => ({
+  default: {
+    push: vi.fn(),
+    currentRoute: {
+      value: { name: 'Home' },
+    },
+  },
+}))
+
 describe('Auth Store', () => {
   beforeEach(() => {
-    const pinia = createPinia().use(piniaPluginPersistedstate)
+    const pinia = createPinia()
     app.use(pinia)
     setActivePinia(pinia)
-    localStorage.clear()
     vi.clearAllMocks()
+    mockUserId.mockReturnValue('')
   })
 
   afterEach(() => {
@@ -60,61 +69,41 @@ describe('Auth Store', () => {
   })
 
   describe('state', () => {
-    it('initializes with null access token', () => {
+    it('initializes with empty state', () => {
       const store = useAuthStore()
 
-      expect(store.accessToken).toBeNull()
+      expect(store.$state).toEqual({})
     })
   })
 
   describe('getters', () => {
-    it('isAuthenticated returns false when accessToken is null', () => {
+    it('isAuthenticated returns false when user has no id', () => {
+      mockUserId.mockReturnValue('')
       const store = useAuthStore()
 
       expect(store.isAuthenticated).toBe(false)
     })
 
-    it('isAuthenticated returns true when accessToken is set', () => {
+    it('isAuthenticated returns true when user has id', () => {
+      mockUserId.mockReturnValue('user-id-123')
       const store = useAuthStore()
-      store.setToken('test-token')
 
       expect(store.isAuthenticated).toBe(true)
     })
 
-    it('isAuthenticated returns false when accessToken is empty string', () => {
+    it('isAuthenticated returns false when user id is null', () => {
+      mockUserId.mockReturnValue(null!)
       const store = useAuthStore()
-      store.setToken('')
 
       expect(store.isAuthenticated).toBe(false)
     })
   })
 
   describe('actions', () => {
-    describe('setToken', () => {
-      it('sets access token correctly', () => {
-        const store = useAuthStore()
-
-        store.setToken('my-token')
-
-        expect(store.accessToken).toBe('my-token')
-        expect(store.isAuthenticated).toBe(true)
-      })
-
-      it('clears access token when set to null', () => {
-        const store = useAuthStore()
-        store.setToken('my-token')
-
-        store.setToken(null)
-
-        expect(store.accessToken).toBeNull()
-        expect(store.isAuthenticated).toBe(false)
-      })
-    })
-
     describe('login', () => {
-      it('successfully logs in and sets token', async () => {
-        mockPostApiAuthLogin.mockResolvedValue({ accessToken: 'new-token' })
-        const mockUserStore = useUserStore()
+      it('successfully logs in and fetches user data', async () => {
+        mockPostApiAuthLogin.mockResolvedValue(undefined)
+        mockFetchUserData.mockResolvedValue(undefined)
 
         const store = useAuthStore()
         const loginRequest: LoginRequest = {
@@ -125,29 +114,13 @@ describe('Auth Store', () => {
 
         await store.login(loginRequest)
 
-        expect(store.accessToken).toBe('new-token')
-        expect(store.isAuthenticated).toBe(true)
-        expect(mockUserStore.fetchUserData).toHaveBeenCalled()
         expect(mockPostApiAuthLogin).toHaveBeenCalledWith(loginRequest)
-      })
-
-      it('throws error when login response has no access token', async () => {
-        mockPostApiAuthLogin.mockResolvedValue({} as LoginResponse)
-        useUserStore()
-
-        const store = useAuthStore()
-        const loginRequest: LoginRequest = {
-          email: 'test@test.com',
-          password: 'password',
-          rememberMe: false,
-        }
-
-        await expect(store.login(loginRequest)).rejects.toThrow('Login failed: No access token received')
+        expect(mockFetchUserData).toHaveBeenCalled()
       })
 
       it('calls API with correct login request', async () => {
-        mockPostApiAuthLogin.mockResolvedValue({ accessToken: 'token' })
-        useUserStore()
+        mockPostApiAuthLogin.mockResolvedValue(undefined)
+        mockFetchUserData.mockResolvedValue(undefined)
 
         const store = useAuthStore()
         const loginRequest: LoginRequest = {
@@ -159,64 +132,93 @@ describe('Auth Store', () => {
         await store.login(loginRequest)
 
         expect(mockPostApiAuthLogin).toHaveBeenCalledWith(loginRequest)
+        expect(mockFetchUserData).toHaveBeenCalled()
+      })
+
+      it('throws error when login fails', async () => {
+        const error = Object.assign(new Error('Invalid credentials'), {
+          isAxiosError: true,
+          response: {
+            status: 401,
+            data: { message: 'Invalid credentials' },
+          },
+        })
+
+        mockPostApiAuthLogin.mockRejectedValue(error)
+
+        const store = useAuthStore()
+        const loginRequest: LoginRequest = {
+          email: 'test@test.com',
+          password: 'wrong-password',
+          rememberMe: false,
+        }
+
+        await expect(store.login(loginRequest)).rejects.toThrow('Invalid credentials')
+        expect(mockFetchUserData).not.toHaveBeenCalled()
+      })
+
+      it('throws error when fetchUserData fails', async () => {
+        mockPostApiAuthLogin.mockResolvedValue(undefined)
+        const error = Object.assign(new Error('Failed to fetch user'), {
+          isAxiosError: true,
+          response: {
+            status: 500,
+          },
+        })
+        mockFetchUserData.mockRejectedValue(error)
+
+        const store = useAuthStore()
+        const loginRequest: LoginRequest = {
+          email: 'test@test.com',
+          password: 'password',
+          rememberMe: false,
+        }
+
+        await expect(store.login(loginRequest)).rejects.toThrow('Failed to fetch user')
       })
     })
 
     describe('logout', () => {
       it('successfully logs out and clears state', async () => {
         mockPostApiAuthLogout.mockResolvedValue(undefined)
-        const mockUserStore = useUserStore()
 
         const store = useAuthStore()
-        store.setToken('test-token')
-        localStorage.setItem('test-key', 'test-value')
 
         await store.logout()
 
-        expect(store.accessToken).toBeNull()
-        expect(store.isAuthenticated).toBe(false)
-        expect(mockUserStore.$reset).toHaveBeenCalled()
-        expect(localStorage.length).toBe(0)
         expect(mockPostApiAuthLogout).toHaveBeenCalled()
+        expect(store.$reset).toBeDefined()
+        expect(mockUserReset).toHaveBeenCalled()
       })
 
       it('clears state even when logout API fails', async () => {
         mockPostApiAuthLogout.mockRejectedValue(new Error('API error'))
-        const mockUserStore = useUserStore()
 
         const store = useAuthStore()
-        store.setToken('test-token')
-        localStorage.setItem('test-key', 'test-value')
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
         await store.logout()
 
-        expect(store.accessToken).toBeNull()
-        expect(store.isAuthenticated).toBe(false)
-        expect(mockUserStore.$reset).toHaveBeenCalled()
-        expect(localStorage.length).toBe(0)
+        expect(mockUserReset).toHaveBeenCalled()
         expect(consoleErrorSpy).toHaveBeenCalledWith('Logout API failed, but clearing local state anyway', expect.any(Error))
 
         consoleErrorSpy.mockRestore()
       })
 
-      it('resets store state on logout', async () => {
+      it('resets both auth and user stores on logout', async () => {
         mockPostApiAuthLogout.mockResolvedValue(undefined)
-        useUserStore()
 
         const store = useAuthStore()
-        store.setToken('token123')
 
         await store.logout()
 
-        expect(store.accessToken).toBeNull()
+        expect(mockUserReset).toHaveBeenCalled()
       })
     })
 
     describe('register', () => {
       it('successfully registers user', async () => {
-        mockPostApiAuthRegister.mockResolvedValue('success')
-        const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+        mockPostApiAuthRegister.mockResolvedValue(undefined)
 
         const store = useAuthStore()
         const registerRequest: RegisterRequest = {
@@ -229,9 +231,6 @@ describe('Auth Store', () => {
         await store.register(registerRequest)
 
         expect(mockPostApiAuthRegister).toHaveBeenCalledWith(registerRequest)
-        expect(consoleSpy).toHaveBeenCalledWith('Registration successful:')
-
-        consoleSpy.mockRestore()
       })
 
       it('handles 400 bad request error', async () => {
@@ -294,21 +293,6 @@ describe('Auth Store', () => {
         }
 
         await expect(store.register(registerRequest)).rejects.toThrow('Network error')
-      })
-
-      it('does not throw exception on any error type', async () => {
-        mockPostApiAuthRegister.mockRejectedValue(new Error('Some error'))
-
-        const store = useAuthStore()
-        const registerRequest: RegisterRequest = {
-          email: 'test@test.com',
-          password: 'password123',
-          firstName: 'Test',
-          lastName: 'User',
-        }
-
-        // Should throw error from handler
-        await expect(store.register(registerRequest)).rejects.toThrow('Some error')
       })
     })
   })

@@ -8,14 +8,12 @@ import router from '@/router'
 const { postApiAuthLogin, postApiAuthRegister, postApiAuthLogout } = getAuth()
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
-    isSuperAdmin: true as boolean,
-  }),
+  state: () => ({}),
 
   getters: {
     isAuthenticated(): boolean {
       const userStore = useUserStore()
-      return userStore.id == '' ? false : true
+      return !!userStore.id
     },
   },
 
@@ -35,15 +33,19 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       const userStore = useUserStore()
+
+      this.$reset()
+      userStore.$reset()
+
       try {
         await postApiAuthLogout()
       } catch (error) {
         console.error('Logout API failed, but clearing local state anyway', error)
-      } finally {
-        this.$reset()
-        userStore.$reset()
       }
-      router.push({ name: 'Login' })
+
+      if (router.currentRoute.value.name !== 'Login') {
+        router.push({ name: 'Login' })
+      }
     },
 
     async register(registerRequest: RegisterRequest) {
