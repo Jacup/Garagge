@@ -2,9 +2,9 @@
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
 using Application.Features.Auth.Register;
-using Application.Users;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.Users;
 
 namespace ApiIntegrationTests.Endpoints.Auth;
 

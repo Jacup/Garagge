@@ -1,17 +1,17 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Users.Me.Delete;
+using Application.Features.Users.Me.Delete;
 using Infrastructure.Authentication;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me;
 
-public class DeleteMe : IEndpoint
+internal sealed class DeleteMe : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete("users/me", async (ISender sender,HttpContext httpContext,  CancellationToken cancellationToken) =>
+        app.MapDelete("users/me", async (ISender sender, HttpContext httpContext, CancellationToken cancellationToken) =>
             {
                 var query = new DeleteMeCommand();
 

@@ -1,8 +1,7 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries.Delete;
+using Application.Features.EnergyEntries.Delete;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles.EnergyEntries;
@@ -21,12 +20,10 @@ internal sealed class DeleteEnergyEntry : IEndpoint
 
                     return result.Match(Results.NoContent, CustomResults.Problem);
                 })
+            .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.EnergyEntries);
     }
 }

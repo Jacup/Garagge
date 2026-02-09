@@ -3,7 +3,6 @@ using ApiIntegrationTests.Contracts.V1;
 using System.Net;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
-using Application.Users;
 using Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 

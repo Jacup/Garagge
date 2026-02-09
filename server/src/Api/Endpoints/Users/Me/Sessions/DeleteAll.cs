@@ -1,6 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.Users.Sessions.DeleteAll;
+using Application.Features.Users.Sessions.DeleteAll;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me.Sessions;

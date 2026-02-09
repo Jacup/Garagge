@@ -1,7 +1,7 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Users.Me.ChangePassword;
+using Application.Features.Users.Me.ChangePassword;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me;

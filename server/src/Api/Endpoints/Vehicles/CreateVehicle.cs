@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Api.Endpoints.Vehicles;
 
-internal sealed class CreateVehicle : IEndpoint
+internal sealed class CreateVehicle() : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

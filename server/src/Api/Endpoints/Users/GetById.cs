@@ -1,9 +1,9 @@
 ﻿using Api.Infrastructure;
-using Application.Users.GetById;
 using MediatR;
 using Api.Extensions;
 using Application.Core;
-using Application.Users;
+using Application.Features.Users;
+using Application.Features.Users.GetById;
 
 namespace Api.Endpoints.Users;
 

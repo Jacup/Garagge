@@ -2,7 +2,7 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Users;
+using Application.Features.Users;
 using Domain.Entities.Users;
 using Microsoft.EntityFrameworkCore;
 

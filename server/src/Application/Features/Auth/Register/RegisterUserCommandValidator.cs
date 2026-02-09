@@ -1,5 +1,5 @@
 ﻿using Application.Core;
-using Application.Users;
+using Application.Features.Users;
 using FluentValidation;
 
 namespace Application.Features.Auth.Register;

@@ -1,4 +1,4 @@
-using Application.EnergyEntries;
+using Application.Features.EnergyEntries;
 using Application.Features.Vehicles;
 using Domain.Entities.EnergyEntries;
 using Domain.Entities.Vehicles;

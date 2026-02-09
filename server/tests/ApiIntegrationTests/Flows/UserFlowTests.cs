@@ -1,11 +1,11 @@
 ﻿using ApiIntegrationTests.Contracts;
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
-using Application.Users;
 using Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.Users;
 
 namespace ApiIntegrationTests.Flows;
 

@@ -1,9 +1,8 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries;
-using Application.EnergyEntries.GetStats;
+using Application.Features.EnergyEntries;
+using Application.Features.EnergyEntries.GetStats;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +25,10 @@ internal sealed class GetEnergyStats : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
+            .RequireAuthorization()
             .Produces<EnergyStatsDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.EnergyEntries);
     }
 }

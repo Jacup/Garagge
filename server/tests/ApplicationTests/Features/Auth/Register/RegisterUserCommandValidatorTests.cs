@@ -1,5 +1,5 @@
 using Application.Features.Auth.Register;
-using Application.Users;
+using Application.Features.Users;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.Features.Auth.Register;
