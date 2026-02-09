@@ -2,10 +2,10 @@
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
 using Application.Core;
-using Application.ServiceRecords;
 using Domain.Enums.Services;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.ServiceRecords;
 
 namespace ApiIntegrationTests.Flows;
 

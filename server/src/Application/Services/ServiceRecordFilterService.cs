@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Services;
-using Application.ServiceRecords.Get;
+using Application.Features.ServiceRecords.Get;
 using Domain.Entities.Services;
 
 namespace Application.Services;

@@ -1,8 +1,8 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.ServiceRecords;
-using Application.ServiceRecords.GetById;
+using Application.Features.ServiceRecords;
+using Application.Features.ServiceRecords.GetById;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,9 +27,7 @@ internal sealed class GetServiceRecordById : IEndpoint
             .RequireAuthorization()
             .Produces<ServiceRecordDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
             .WithTags(Tags.ServiceRecords);
     }
 }

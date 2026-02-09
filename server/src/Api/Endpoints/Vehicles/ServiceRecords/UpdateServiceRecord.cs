@@ -1,8 +1,8 @@
-﻿﻿using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.ServiceRecords;
-using Application.ServiceRecords.Update;
+using Application.Features.ServiceRecords;
+using Application.Features.ServiceRecords.Update;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,9 +38,7 @@ internal sealed class UpdateServiceRecord : IEndpoint
             .RequireAuthorization()
             .Produces<ServiceRecordDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
             .WithTags(Tags.ServiceRecords);
     }
 }

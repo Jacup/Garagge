@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ServiceRecords\GetById\" />
+      <Folder Include="Features\ServiceRecords\ServiceTypes\" />
     </ItemGroup>
 
 </Project>
