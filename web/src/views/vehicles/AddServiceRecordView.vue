@@ -5,8 +5,10 @@ import { ServiceItemType } from '../../types/serviceItemType'
 
 import type { ServiceTypeDto, ServiceRecordCreateRequest, ServiceItemType as ApiServiceItemType } from '@/api/generated/apiV1.schemas'
 import { getServiceRecords } from '@/api/generated/service-records/service-records'
+import { getServiceTypes } from '@/api/generated/service-types/service-types'
 
-const { getApiVehiclesServiceRecordsTypes, postApiVehiclesVehicleIdServiceRecords } = getServiceRecords()
+const { postApiVehiclesVehicleIdServiceRecords } = getServiceRecords()
+const { getApiVehiclesServiceRecordsTypes } = getServiceTypes()
 
 const route = useRoute()
 const router = useRouter()

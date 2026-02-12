@@ -23,6 +23,6 @@ internal sealed class GetServiceRecordTypes : IEndpoint
             })
             .RequireAuthorization()
             .Produces<ICollection<ServiceTypeDto>>()
-            .WithTags(Tags.ServiceRecords);
+            .WithTags(Tags.ServiceTypes);
     }
 }

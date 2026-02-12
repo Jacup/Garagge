@@ -28,7 +28,7 @@ internal sealed class CreateServiceType : IEndpoint
                 })
             .RequireAuthorization()
             .Produces<ServiceTypeDto>(StatusCodes.Status201Created)
-            .WithTags(Tags.ServiceRecords);
+            .WithTags(Tags.ServiceTypes);
     }
 }
 

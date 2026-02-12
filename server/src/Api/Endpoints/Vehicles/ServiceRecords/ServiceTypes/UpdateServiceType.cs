@@ -28,7 +28,7 @@ internal sealed class UpdateServiceType : IEndpoint
             .RequireAuthorization()
             .Produces<ServiceTypeDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .WithTags(Tags.ServiceRecords);
+            .WithTags(Tags.ServiceTypes);
     }
 }
 

@@ -8,6 +8,7 @@ public static class Tags
     public const string EnergyEntries = "Energy Entries";
     public const string VehicleEnergyTypes = "Vehicle Energy Types";
     public const string ServiceRecords = "Service Records";
+    public const string ServiceTypes = "Service Types";
     public const string ServiceItems = "Service Items";
     public const string Dashboard = "Dashboard";
 }

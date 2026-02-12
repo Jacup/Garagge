@@ -26,6 +26,6 @@ internal sealed class DeleteServiceType : IEndpoint
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithTags(Tags.ServiceRecords);
+            .WithTags(Tags.ServiceTypes);
     }
 }
