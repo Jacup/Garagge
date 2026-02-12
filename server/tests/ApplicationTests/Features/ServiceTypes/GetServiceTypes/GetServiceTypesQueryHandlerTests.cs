@@ -1,7 +1,6 @@
-﻿using Application.Features.ServiceRecords.GetTypes;
-using Application.Features.ServiceRecords.ServiceTypes.GetTypes;
+﻿using Application.Features.ServiceTypes.GetAll;
 
-namespace ApplicationTests.Features.ServiceRecords.ServiceTypes.GetServiceTypes;
+namespace ApplicationTests.Features.ServiceTypes.GetServiceTypes;
 
 public class GetServiceTypesQueryHandlerTests : InMemoryDbTestBase
 {

@@ -1,11 +1,11 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Features.ServiceRecords.ServiceTypes.GetTypes;
+using Application.Features.ServiceRecords;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Features.ServiceRecords.GetTypes;
+namespace Application.Features.ServiceTypes.GetAll;
 
 internal sealed class GetServiceTypesQueryHandler(IApplicationDbContext dbContext)
     : IQueryHandler<GetServiceTypesQuery, ICollection<ServiceTypeDto>>

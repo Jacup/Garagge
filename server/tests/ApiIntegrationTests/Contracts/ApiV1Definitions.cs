@@ -363,6 +363,30 @@ public static class ApiV1Definitions
         public static string DeleteTemplate = $"{ApiBase}/vehicles/{{0}}/service-records-templates/{{1}}";
     }
 
+    // ==================== SERVICE TYPES ====================
+    public static class ServiceTypes
+    {
+        /// <summary>
+        /// Create service record type.
+        /// </summary>
+        public static string Create = $"{ApiBase}/vehicles/service-records/types";
+        
+        /// <summary>
+        /// Create service record type. Use: string.Format(ServiceTypes.Update, serviceTypeId)
+        /// </summary>
+        public static string Update = $"{ApiBase}/vehicles/service-records/types/{{0}}";
+        
+        /// <summary>
+        /// Get service record types. Use: string.Format(ServiceTypes.Delete, serviceTypeId)
+        /// </summary>
+        public static string Delete = $"{ApiBase}/vehicles/service-records/types/{{0}}";
+        
+        /// <summary>
+        /// Get service record types.
+        /// </summary>
+        public static string GetAll = $"{ApiBase}/vehicles/service-records/types";
+    }
+    
     // ==================== INSURANCE MANAGEMENT ====================
     public static class Insurance
     {

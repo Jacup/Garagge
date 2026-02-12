@@ -23,7 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Features\ServiceRecords\ServiceTypes\" />
 	  <Folder Include="ServiceItems\" />
 	</ItemGroup>
 

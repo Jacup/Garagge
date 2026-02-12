@@ -1,8 +1,7 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Features.ServiceRecords;
-using Application.Features.ServiceRecords.GetTypes;
-using Application.Features.ServiceRecords.ServiceTypes.GetTypes;
+using Application.Features.ServiceTypes.GetAll;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
