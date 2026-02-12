@@ -2,11 +2,11 @@
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
-using Application.Auth;
-using Application.Users;
+using Application.Features.Auth;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.Users;
 
 namespace ApiIntegrationTests.Endpoints.Auth;
 

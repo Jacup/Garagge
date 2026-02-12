@@ -2,7 +2,7 @@
 using Application.Abstractions.Authentication;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.Users;
+using Application.Features.Users;
 
 namespace Application.Dashboard.GetStats;
 

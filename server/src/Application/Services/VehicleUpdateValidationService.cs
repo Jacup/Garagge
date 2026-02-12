@@ -1,8 +1,8 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Services;
 using Application.Core;
-using Application.Vehicles;
-using Application.Vehicles.Update;
+using Application.Features.Vehicles;
+using Application.Features.Vehicles.Update;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;

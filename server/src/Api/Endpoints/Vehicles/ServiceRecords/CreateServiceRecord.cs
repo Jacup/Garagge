@@ -2,9 +2,9 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.ServiceItems.Create;
-using Application.ServiceRecords;
-using Application.ServiceRecords.Create;
+using Application.Features.ServiceItems.Create;
+using Application.Features.ServiceRecords;
+using Application.Features.ServiceRecords.Create;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,9 +49,7 @@ internal sealed class CreateServiceRecord : IEndpoint
             .RequireAuthorization()
             .Produces<ServiceRecordDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
             .WithTags(Tags.ServiceRecords);
     }
 }

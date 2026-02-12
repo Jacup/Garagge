@@ -1,7 +1,7 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.Users.Sessions;
-using Application.Users.Sessions.Get;
+using Application.Features.Users.Sessions;
+using Application.Features.Users.Sessions.Get;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me.Sessions;

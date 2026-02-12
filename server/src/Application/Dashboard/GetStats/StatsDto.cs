@@ -1,4 +1,4 @@
-﻿using Application.Vehicles.Stats;
+﻿using Application.Features.Vehicles.Stats;
 
 namespace Application.Dashboard.GetStats;
 

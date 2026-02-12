@@ -309,8 +309,16 @@ export interface ServiceRecordUpdateRequest {
   manualCost: number | null;
 }
 
+export interface ServiceTypeCreateRequest {
+  name: string;
+}
+
 export interface ServiceTypeDto {
   id: string;
+  name: string;
+}
+
+export interface ServiceTypeUpdateRequest {
   name: string;
 }
 

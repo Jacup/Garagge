@@ -8,6 +8,7 @@ import type {
   ServiceRecordUpdateRequest,
 } from '@/api/generated/apiV1.schemas'
 import { getServiceRecords } from '@/api/generated/service-records/service-records'
+import { getServiceTypes } from '@/api/generated/service-types/service-types'
 
 import ServiceDetails from './ServiceDetails.vue'
 import ServiceRecordForm from './ServiceRecordForm.vue'
@@ -29,8 +30,8 @@ const emit = defineEmits<{
   'refresh-data': []
 }>()
 
-const { getApiVehiclesServiceRecordsTypes, postApiVehiclesVehicleIdServiceRecords, putApiVehiclesVehicleIdServiceRecordsServiceRecordId } =
-  getServiceRecords()
+const { postApiVehiclesVehicleIdServiceRecords, putApiVehiclesVehicleIdServiceRecordsServiceRecordId } = getServiceRecords()
+const { getApiVehiclesServiceRecordsTypes } = getServiceTypes()
 const { isMobile } = useResponsiveLayout()
 const { mode, editMetadata, cancelAction, close: closeSheet } = useServiceDetailsState()
 const notifications = useNotificationsStore()
@@ -118,20 +119,14 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
       </v-toolbar>
 
       <div class="d-flex flex-column flex-grow-1 overflow-y-auto">
-        <v-alert v-if="saveError" type="error" variant="tonal" closable class="ma-4 mb-0" @click:close="saveError = null">{{
-          saveError
-        }}</v-alert>
+        <v-alert v-if="saveError" type="error" variant="tonal" closable class="ma-4 mb-0"
+          @click:close="saveError = null">{{
+            saveError
+          }}</v-alert>
 
         <ServiceDetails v-if="mode === 'view'" :record="record" />
-        <ServiceRecordForm
-          v-else
-          :mode="mode"
-          :initial-data="mode === 'edit-metadata' ? record : null"
-          :service-types="serviceTypes"
-          :loading="isSaving"
-          @submit="handleSubmit"
-          @cancel="cancelAction"
-        />
+        <ServiceRecordForm v-else :mode="mode" :initial-data="mode === 'edit-metadata' ? record : null"
+          :service-types="serviceTypes" :loading="isSaving" @submit="handleSubmit" @cancel="cancelAction" />
       </div>
     </v-card>
   </v-dialog>
@@ -148,20 +143,14 @@ const handleSubmit = async (payload: ServiceRecordCreateRequest) => {
       </v-toolbar>
 
       <div class="flex-grow-1 overflow-y-auto d-flex flex-column">
-        <v-alert v-if="saveError" type="error" variant="tonal" closable class="ma-4 mb-0" @click:close="saveError = null">{{
-          saveError
-        }}</v-alert>
+        <v-alert v-if="saveError" type="error" variant="tonal" closable class="ma-4 mb-0"
+          @click:close="saveError = null">{{
+            saveError
+          }}</v-alert>
 
         <ServiceDetails v-if="mode === 'view'" :record="record" />
-        <ServiceRecordForm
-          v-else
-          :mode="mode"
-          :initial-data="mode === 'edit-metadata' ? record : null"
-          :service-types="serviceTypes"
-          :loading="isSaving"
-          @submit="handleSubmit"
-          @cancel="cancelAction"
-        />
+        <ServiceRecordForm v-else :mode="mode" :initial-data="mode === 'edit-metadata' ? record : null"
+          :service-types="serviceTypes" :loading="isSaving" @submit="handleSubmit" @cancel="cancelAction" />
       </div>
     </div>
   </v-navigation-drawer>

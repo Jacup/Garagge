@@ -1,7 +1,6 @@
 ﻿using Application.Abstractions.Data;
 using Application.Abstractions.Services;
 using Application.Core;
-using Application.VehicleEnergyTypes;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;

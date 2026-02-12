@@ -1,8 +1,8 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Users;
-using Application.Users.Me.Get;
+using Application.Features.Users;
+using Application.Features.Users.Me.Get;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me;

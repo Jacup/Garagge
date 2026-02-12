@@ -1,14 +1,14 @@
 using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.Vehicles;
-using Application.Vehicles.Create;
+using Application.Features.Vehicles;
+using Application.Features.Vehicles.Create;
 using Domain.Enums;
 using MediatR;
 
 namespace Api.Endpoints.Vehicles;
 
-internal sealed class CreateVehicle : IEndpoint
+internal sealed class CreateVehicle() : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {

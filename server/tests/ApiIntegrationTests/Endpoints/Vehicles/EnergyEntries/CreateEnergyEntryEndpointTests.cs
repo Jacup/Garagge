@@ -1,12 +1,12 @@
 ﻿using ApiIntegrationTests.Contracts;
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
-using Application.EnergyEntries;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.EnergyEntries;
 
 namespace ApiIntegrationTests.Endpoints.Vehicles.EnergyEntries;
 

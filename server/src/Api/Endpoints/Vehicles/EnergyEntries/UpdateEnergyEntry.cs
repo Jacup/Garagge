@@ -1,9 +1,8 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries;
-using Application.EnergyEntries.Update;
+using Application.Features.EnergyEntries;
+using Application.Features.EnergyEntries.Update;
 using Domain.Enums;
 using MediatR;
 
@@ -33,11 +32,9 @@ internal sealed class UpdateEnergyEntry : IEndpoint
 
                     return result.Match(Results.Ok, CustomResults.Problem);
                 })
+            .RequireAuthorization()
             .Produces<EnergyEntryDto>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.EnergyEntries);
     }
 }

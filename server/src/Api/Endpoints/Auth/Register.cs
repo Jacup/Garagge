@@ -1,7 +1,7 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.Auth.Register;
 using Application.Core;
+using Application.Features.Auth.Register;
 using MediatR;
 
 namespace Api.Endpoints.Auth;

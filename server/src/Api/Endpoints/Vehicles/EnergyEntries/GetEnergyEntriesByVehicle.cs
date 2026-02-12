@@ -1,9 +1,8 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries;
-using Application.EnergyEntries.GetByVehicle;
+using Application.Features.EnergyEntries;
+using Application.Features.EnergyEntries.GetByVehicle;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,12 +27,10 @@ internal sealed class GetEnergyEntriesByVehicle : IEndpoint
 
                 return result.Match(Results.Ok, CustomResults.Problem);
             })
+            .RequireAuthorization()
             .Produces<PagedList<EnergyEntryDto>>()
             .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.EnergyEntries);
     }
 }

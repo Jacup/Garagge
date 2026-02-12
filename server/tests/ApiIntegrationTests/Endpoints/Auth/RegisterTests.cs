@@ -1,10 +1,10 @@
 ﻿using ApiIntegrationTests.Contracts;
 using ApiIntegrationTests.Extensions;
 using ApiIntegrationTests.Fixtures;
-using Application.Auth.Register;
-using Application.Users;
+using Application.Features.Auth.Register;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.Users;
 
 namespace ApiIntegrationTests.Endpoints.Auth;
 
@@ -56,7 +56,6 @@ public class RegisterTests : BaseIntegrationTest
 
         problemDetails.Errors.ShouldNotBeNull();
         problemDetails.Errors.ShouldContain(UserErrors.EmailRequired);
-        problemDetails.Errors.ShouldContain(UserErrors.EmailInvalid);
         
         DbContext.Users.Count().ShouldBe(0);
     }    
@@ -129,7 +128,6 @@ public class RegisterTests : BaseIntegrationTest
     {
         // Act
         var request = new RegisterUserCommand("test@garagge.app", "John", "Doe", "");
-        const int passwordLength = 8;
         
         // Act
         var response = await Client.PostAsJsonAsync(ApiV1Definitions.Auth.Register, request);
@@ -140,7 +138,7 @@ public class RegisterTests : BaseIntegrationTest
         CustomProblemDetails problemDetails = await response.GetProblemDetailsAsync();
 
         problemDetails.Errors.ShouldNotBeNull();
-        problemDetails.Errors.ShouldContain(UserErrors.PasswordTooShort(passwordLength));
+        problemDetails.Errors.ShouldContain(UserErrors.PasswordRequired);
         
         DbContext.Users.Count().ShouldBe(0);
     }

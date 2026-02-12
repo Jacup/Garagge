@@ -1,8 +1,8 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.ServiceRecords;
-using Application.ServiceRecords.Get;
+using Application.Features.ServiceRecords;
+using Application.Features.ServiceRecords.Get;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,8 +42,6 @@ internal sealed class GetServiceRecords : IEndpoint
             })
             .RequireAuthorization()
             .Produces<PagedList<ServiceRecordDto>>()
-            .Produces(StatusCodes.Status401Unauthorized)
-            .Produces(StatusCodes.Status500InternalServerError)
             .WithTags(Tags.ServiceRecords);
     }
 }

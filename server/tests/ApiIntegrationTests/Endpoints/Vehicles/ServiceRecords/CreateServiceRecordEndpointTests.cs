@@ -1,13 +1,13 @@
 ﻿using ApiIntegrationTests.Contracts;
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
-using Application.ServiceRecords;
 using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums.Services;
 using System.Net;
 using System.Net.Http.Json;
+using Application.Features.ServiceRecords;
 
 namespace ApiIntegrationTests.Endpoints.Vehicles.ServiceRecords;
 

@@ -1,9 +1,8 @@
-﻿using Api.Endpoints.Users;
-using Api.Extensions;
+﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.EnergyEntries;
-using Application.EnergyEntries.Create;
+using Application.Features.EnergyEntries;
+using Application.Features.EnergyEntries.Create;
 using Domain.Enums;
 using MediatR;
 
@@ -35,21 +34,20 @@ internal sealed class CreateEnergyEntry : IEndpoint
                         CustomResults.Problem
                     );
                 })
+            .RequireAuthorization()
             .Produces<EnergyEntryDto>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status500InternalServerError)
-            .HasPermission(Permissions.UsersAccess)
             .WithTags(Tags.EnergyEntries);
     }
 }
 
 internal sealed record EnergyEntryCreateRequest(
-        DateOnly Date,
-        int Mileage,
-        EnergyType Type,
-        EnergyUnit EnergyUnit,
-        decimal Volume,
-        decimal? Cost,
-        decimal? PricePerUnit);
-
+    DateOnly Date,
+    int Mileage,
+    EnergyType Type,
+    EnergyUnit EnergyUnit,
+    decimal Volume,
+    decimal? Cost,
+    decimal? PricePerUnit);

@@ -1,6 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.ServiceRecords.Delete;
+using Application.Features.ServiceRecords.Delete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +26,7 @@ internal sealed class DeleteServiceRecord : IEndpoint
                 })
             .RequireAuthorization()
             .Produces(StatusCodes.Status204NoContent)
-            .Produces(StatusCodes.Status401Unauthorized)
             .Produces(StatusCodes.Status404NotFound)
-            .Produces(StatusCodes.Status500InternalServerError)
             .WithTags(Tags.ServiceRecords);
     }
 }

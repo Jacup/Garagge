@@ -3,7 +3,7 @@ using ApiIntegrationTests.Contracts.V1;
 using System.Net;
 using System.Net.Http.Json;
 using ApiIntegrationTests.Fixtures;
-using Application.Users.Sessions;
+using Application.Features.Users.Sessions;
 using Domain.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 

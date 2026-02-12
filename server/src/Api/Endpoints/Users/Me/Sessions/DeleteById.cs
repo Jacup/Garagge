@@ -1,6 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.Users.Sessions.DeleteById;
+using Application.Features.Users.Sessions.DeleteById;
 using MediatR;
 
 namespace Api.Endpoints.Users.Me.Sessions;

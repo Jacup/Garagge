@@ -1,8 +1,8 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
 using Application.Core;
-using Application.ServiceItems;
-using Application.ServiceItems.Update;
+using Application.Features.ServiceItems;
+using Application.Features.ServiceItems.Update;
 using Domain.Enums.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
