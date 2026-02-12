@@ -1,6 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.ServiceItems.Delete;
+using Application.Features.ServiceItems.Delete;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

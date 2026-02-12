@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
-using Application.ServiceItems.Create;
+using Application.Features.ServiceItems.Create;
 
 namespace Application.Features.ServiceRecords.Create;
 

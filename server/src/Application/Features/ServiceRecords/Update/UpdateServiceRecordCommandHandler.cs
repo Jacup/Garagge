@@ -2,7 +2,7 @@
 using Application.Abstractions.Data;
 using Application.Abstractions.Messaging;
 using Application.Core;
-using Application.ServiceItems;
+using Application.Features.ServiceItems;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 

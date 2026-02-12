@@ -1,6 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Infrastructure;
-using Application.VehicleEnergyTypes.GetSupportedForEngine;
+using Application.Features.VehicleEnergyTypes.GetSupportedForEngine;
 using Domain.Enums;
 using MediatR;
 
