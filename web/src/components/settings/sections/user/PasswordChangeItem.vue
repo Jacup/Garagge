@@ -57,9 +57,13 @@ const handleUpdate = async () => {
 <template>
   <v-list-group v-model="isExpanded" class="md3-list-group">
     <template #activator="{ props, isOpen }">
-      <v-list-item v-bind="props" class="md3-list-group-activator" :class="{ 'is-open': isOpen }">
+      <v-list-item 
+      v-bind="props"
+      prepend-icon="mdi-form-textbox-password"
+      class="md3-list-group-activator" 
+      :class="{ 'is-open': isOpen }">
         <v-list-item-title>Password</v-list-item-title>
-        <v-list-item-subtitle v-if="!isExpanded"> Change your account password </v-list-item-subtitle>
+        <v-list-item-subtitle> Change your account password </v-list-item-subtitle>
       </v-list-item>
     </template>
 
@@ -70,8 +74,8 @@ const handleUpdate = async () => {
           label="Current password"
           type="password"
           variant="outlined"
-          density="compact"
-          class="my-2"
+          density="comfortable"
+          class="mt-4 mb-2"
           :rules="[rules.required]"
           required
         />
@@ -81,8 +85,8 @@ const handleUpdate = async () => {
           label="New password"
           type="password"
           variant="outlined"
-          density="compact"
-          class="my-4"
+          density="comfortable"
+          class="my-2"
           :rules="[rules.required, rules.passwordMinLength]"
           required
         />
@@ -103,7 +107,7 @@ const handleUpdate = async () => {
           </v-alert>
         </v-expand-transition>
 
-        <div class="d-flex justify-end mt-4">
+        <div class="d-flex justify-end ga-2 mt-2">
           <v-btn color="primary" variant="flat" :loading="loading" type="submit"> Update Password </v-btn>
         </div>
       </v-form>

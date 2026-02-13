@@ -119,7 +119,7 @@ const handleUpdate = async () => {
         type="email"
         variant="outlined"
         density="comfortable"
-        class="my-2"
+        class="mt-4 mb-2"
         :rules="[rules.required, rules.validEmail]"
         :error-messages="apiErrors.email"
         @update:model-value="clearFieldError('email')"
