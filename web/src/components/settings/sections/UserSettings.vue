@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/user'
+
 import PasswordChangeItem from '@/components/settings/sections/user/PasswordChangeItem.vue'
+import UserDetailsItem from '@/components/settings/sections/user/UserDetailsItem.vue'
+
 const userStore = useUserStore()
 </script>
 
@@ -15,20 +18,7 @@ const userStore = useUserStore()
     </template>
   </v-list-item>
 
-  <v-list-item class="inner-item">
-    <v-list-item-title>Email</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.email }} </v-list-item-subtitle>
-  </v-list-item>
-
-  <v-list-item class="inner-item">
-    <v-list-item-title>First name</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.profile?.firstName }} </v-list-item-subtitle>
-  </v-list-item>
-
-  <v-list-item class="inner-item">
-    <v-list-item-title>Last name</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.profile?.lastName }} </v-list-item-subtitle>
-  </v-list-item>
+  <UserDetailsItem />
 
   <PasswordChangeItem />
 </template>

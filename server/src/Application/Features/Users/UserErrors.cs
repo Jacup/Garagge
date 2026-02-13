@@ -7,11 +7,19 @@ public static class UserErrors
     public static readonly Error FirstNameRequired = Error.Validation(
         "User.FirstNameRequired",
         "First name is required.");
-
+    
+    public static Error FirstNameTooLong(int length) => Error.Validation(
+        "User.FirstNameTooLong",
+        $"First name cannot exceed {length} characters.");
+    
     public static readonly Error LastNameRequired = Error.Validation(
         "User.LastNameRequired",
-        "Last name is required.");
+        "Last Name is required.");
 
+    public static Error LastNameTooLong(int length) => Error.Validation(
+        "User.LastNameTooLong",
+        $"Last Name cannot exceed {length} characters.");
+    
     public static readonly Error EmailRequired = Error.Validation(
         "User.EmailRequired",
         "Email is required");
