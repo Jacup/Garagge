@@ -23,7 +23,10 @@ const copyId = () => {
 </script>
 
 <template>
-  <v-list-item class="inner-item" lines="two">
+  <v-list-item lines="two">
+    <template #prepend>
+      <v-icon icon="mdi-identifier" />
+    </template>
     <v-text-field
       v-model="userStore.id"
       label="User ID"

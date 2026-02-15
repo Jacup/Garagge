@@ -1,25 +1,31 @@
 <script lang="ts" setup>
-defineProps<{
+import { ref } from 'vue'
+
+const props = defineProps<{
   value: string
   title: string
   subtitle?: string
   icon: string
 }>()
+
+const opened = ref<string[]>([])
+
+const handleUpdate = (newOpened: any[]) => {
+  if (!newOpened.includes(props.value)) {
+    opened.value = []
+    return
+  }
+
+  const activeSubGroups = newOpened.filter((item) => item !== props.value)
+  opened.value = [props.value, ...activeSubGroups.slice(-1)]
+}
 </script>
 
 <template>
-  <v-list class="md3-list">
-    <v-list-group :value="value" class="md3-list-group" :aria-label="`${title} settings section`">
-      <template v-slot:activator="{ props, isOpen }">
-        <v-list-item
-          v-bind="props"
-          lines="two"
-          :title="title"
-          :subtitle="subtitle"
-          :prepend-icon="icon"
-          class="md3-list-group-activator"
-          :class="{ 'is-open': isOpen }"
-        />
+  <v-list :opened="opened" @update:opened="handleUpdate" rounded class="material-list">
+    <v-list-group :value="value">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-list-item v-bind="activatorProps" lines="two" :title="title" :subtitle="subtitle" :prepend-icon="icon" />
       </template>
 
       <slot></slot>

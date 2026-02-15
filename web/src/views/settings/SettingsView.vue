@@ -25,6 +25,5 @@ import SessionSettings from '@/components/settings/sections/SessionsSettings.vue
 .settings-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 </style>

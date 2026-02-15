@@ -111,57 +111,72 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-  <v-list-item class="inner-item" lines="three">
-    <v-form ref="formRef" v-model="isFormValid" :disabled="loading" @submit.prevent="handleUpdate">
-      <v-text-field
-        v-model="form.email"
-        label="Email"
-        type="email"
-        variant="outlined"
-        density="comfortable"
-        class="py-2"
-        :rules="[rules.required, rules.validEmail]"
-        :error-messages="apiErrors.email"
-        @update:model-value="clearFieldError('email')"
-        required
-      />
+  <v-list-group value="personal-details">
+    <template v-slot:activator="{ props }">
+      <v-list-item v-bind="props" lines="two" subtitle="Change your account details" prepend-icon="mdi-account-edit-outline">
+        <template #title>
+          <div class="d-flex ga-2">
+            Personal details
+            <v-chip v-if="isDirty" size="small" density="compact" color="warning" class="suggestion-chip" variant="outlined">
+              Unsaved changes
+            </v-chip>
+          </div>
+        </template>
+      </v-list-item>
+    </template>
 
-      <v-text-field
-        v-model="form.firstName"
-        label="First name"
-        variant="outlined"
-        density="comfortable"
-        class="pb-2"
-        counter="64"
-        maxlength="64"
-        :rules="[rules.required]"
-        :error-messages="apiErrors.firstName"
-        @update:model-value="clearFieldError('firstName')"
-      />
+    <v-list-item lines="three">
+      <v-form ref="formRef" v-model="isFormValid" :disabled="loading" @submit.prevent="handleUpdate">
+        <v-text-field
+          v-model="form.email"
+          label="Email"
+          type="email"
+          variant="outlined"
+          density="comfortable"
+          class="py-2"
+          :rules="[rules.required, rules.validEmail]"
+          :error-messages="apiErrors.email"
+          @update:model-value="clearFieldError('email')"
+          required
+        />
 
-      <v-text-field
-        v-model="form.lastName"
-        label="Last name"
-        variant="outlined"
-        density="comfortable"
-        class="pb-2"
-        counter="64"
-        maxlength="64"
-        :rules="[rules.required]"
-        :error-messages="apiErrors.lastName"
-        @update:model-value="clearFieldError('lastName')"
-      />
+        <v-text-field
+          v-model="form.firstName"
+          label="First name"
+          variant="outlined"
+          density="comfortable"
+          class="pb-2"
+          counter="64"
+          maxlength="64"
+          :rules="[rules.required]"
+          :error-messages="apiErrors.firstName"
+          @update:model-value="clearFieldError('firstName')"
+        />
 
-      <v-expand-transition>
-        <v-alert v-if="error" type="error" variant="tonal" closable class="mb-4" @click:close="error = ''">
-          {{ error }}
-        </v-alert>
-      </v-expand-transition>
+        <v-text-field
+          v-model="form.lastName"
+          label="Last name"
+          variant="outlined"
+          density="comfortable"
+          class="pb-2"
+          counter="64"
+          maxlength="64"
+          :rules="[rules.required]"
+          :error-messages="apiErrors.lastName"
+          @update:model-value="clearFieldError('lastName')"
+        />
 
-      <div class="d-flex justify-end ga-2">
-        <v-btn variant="text" :disabled="!isDirty || loading" @click="resetForm"> Reset </v-btn>
-        <v-btn color="primary" variant="flat" :loading="loading" :disabled="!isDirty || !isFormValid" type="submit"> Save Changes </v-btn>
-      </div>
-    </v-form>
-  </v-list-item>
+        <v-expand-transition>
+          <v-alert v-if="error" type="error" variant="tonal" closable class="mb-4" @click:close="error = ''">
+            {{ error }}
+          </v-alert>
+        </v-expand-transition>
+
+        <div class="d-flex justify-end ga-2">
+          <v-btn variant="text" :disabled="!isDirty || loading" @click="resetForm"> Reset </v-btn>
+          <v-btn color="primary" variant="flat" :loading="loading" :disabled="!isDirty || !isFormValid" type="submit"> Save Changes </v-btn>
+        </div>
+      </v-form>
+    </v-list-item>
+  </v-list-group>
 </template>
