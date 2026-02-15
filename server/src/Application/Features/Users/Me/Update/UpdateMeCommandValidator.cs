@@ -12,13 +12,19 @@ public class UpdateMeCommandValidator : AbstractValidator<UpdateMeCommand>
             .WithError(UserErrors.EmailRequired)
             .EmailAddress()
             .WithError(UserErrors.EmailInvalid);
+
+        const int maximumLength = 64;
         
         RuleFor(c => c.FirstName)
             .NotEmpty()
-            .WithError(UserErrors.FirstNameRequired);
+            .WithError(UserErrors.FirstNameRequired)
+            .MaximumLength(maximumLength)
+            .WithError(UserErrors.FirstNameTooLong(maximumLength));
         
         RuleFor(c => c.LastName)
             .NotEmpty()
-            .WithError(UserErrors.LastNameRequired);
+            .WithError(UserErrors.LastNameRequired)
+            .MaximumLength(maximumLength)
+            .WithError(UserErrors.LastNameTooLong(maximumLength));
     }
 }

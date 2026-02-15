@@ -14,7 +14,10 @@
   $tooltip-background-color: rgb(var(--v-theme-inverse-surface)),
   $tooltip-padding: 2px 8px,
 
-  $menu-content-border-radius: 16px
+  $menu-content-border-radius: 16px,
+
+  $list-rounded-border-radius: 16px,
+  $list-padding: 0px
 );
 
 // Custom utility classes
@@ -131,4 +134,11 @@
 
 .v-overlay__content > .v-list .v-list-item__append .v-list-item__spacer {
   width: 8px !important;
+}
+
+.suggestion-chip {
+  border-radius: 8px !important;
+  border: 1px solid rgb(var(--v-theme-outline-variant)) !important;
+  font-weight: 500 !important;
+  line-height: 20px !important;
 }

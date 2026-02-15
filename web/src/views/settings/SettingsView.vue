@@ -6,7 +6,7 @@ import SessionSettings from '@/components/settings/sections/SessionsSettings.vue
 </script>
 
 <template>
-  <v-list lines="two" class="md3-list">
+  <div class="settings-container">
     <SettingsGroup value="app-settings" title="App settings" icon="mdi-cog-outline">
       <AppSettings />
     </SettingsGroup>
@@ -18,7 +18,12 @@ import SessionSettings from '@/components/settings/sections/SessionsSettings.vue
     <SettingsGroup value="your-devices" title="Your devices" subtitle="Manage your active sessions" icon="mdi-monitor-cellphone">
       <SessionSettings />
     </SettingsGroup>
-  </v-list>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.settings-container {
+  display: flex;
+  flex-direction: column;
+}
+</style>

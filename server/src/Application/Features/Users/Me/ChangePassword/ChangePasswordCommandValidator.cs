@@ -15,6 +15,7 @@ internal sealed class ChangePasswordCommandValidator : AbstractValidator<ChangeP
         
         RuleFor(c => c.NewPassword)
             .NotEmpty()
+            .WithError(UserErrors.NewPasswordRequired)
             .MinimumLength(minPasswordLength)
             .WithError(UserErrors.PasswordTooShort(minPasswordLength));
         

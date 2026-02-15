@@ -11,6 +11,8 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     fullName: (state) => (state.profile ? `${state.profile.firstName} ${state.profile.lastName}` : ''),
+    firstName: (state) => state.profile?.firstName || '',
+    lastName: (state) => state.profile?.lastName || '',
     email: (state) => state.profile?.email || '',
     id: (state) => state.profile?.id || '',
   },

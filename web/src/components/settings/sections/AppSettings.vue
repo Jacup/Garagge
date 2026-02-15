@@ -18,12 +18,9 @@ const languages = [
 </script>
 
 <template>
-  <v-list-item title="App Theme" subtitle="Select your preference" class="inner-item">
+  <v-list-item title="Theme" subtitle="Select your preference">
     <template #prepend>
-      <v-icon
-        :icon="theme === 'light' ? 'mdi-white-balance-sunny' : theme === 'dark' ? 'mdi-moon-waning-crescent' : 'mdi-brightness-auto'"
-        class="ml-2 mr-4 text-medium-emphasis"
-      ></v-icon>
+      <v-icon icon="mdi-theme-light-dark"></v-icon>
     </template>
 
     <template #append>
@@ -35,9 +32,9 @@ const languages = [
     </template>
   </v-list-item>
 
-  <v-list-item title="Language" class="inner-item">
+  <v-list-item title="Language">
     <template #prepend>
-      <v-icon icon="mdi-translate" class="ml-2 mr-4 text-medium-emphasis"></v-icon>
+      <v-icon icon="mdi-translate"></v-icon>
     </template>
 
     <template #append>

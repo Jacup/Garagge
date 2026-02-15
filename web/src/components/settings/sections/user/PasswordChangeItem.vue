@@ -1,110 +1,170 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { getUsers } from '@/api/generated/users/users'
+import type { ChangePasswordRequest } from '@/api/generated/apiV1.schemas'
 import { parseApiError } from '@/utils/error-handler'
 import { useNotificationsStore } from '@/stores/notifications'
+
+import type { ValidationErrorDetail } from '@/types/api-errors'
 
 const { putApiUsersMeChangePassword } = getUsers()
 const notifications = useNotificationsStore()
 
-const isExpanded = ref(false)
-const loading = ref(false)
-const error = ref('')
 const formRef = ref()
+const loading = ref(false)
+const globalError = ref('')
+const isFormValid = ref(false)
 
-const form = ref({
+const showCurrentPassword = ref(false)
+const showNewPassword = ref(false)
+
+const form = ref<ChangePasswordRequest>({
   currentPassword: '',
   newPassword: '',
-  logoutAll: false,
+  logoutAllDevices: false,
+})
+
+const apiErrors = ref({
+  currentPassword: '',
+  newPassword: '',
 })
 
 const rules = {
-  required: (value: string | null) => !!value || 'This field is required.',
-  passwordMinLength: (value: string) => value.length >= 8 || 'Password must be at least 8 characters long.',
+  required: (v: string | null) => !!v || 'This field is required',
+  minLength: (v: string) => v.length >= 8 || 'At least 8 characters',
 }
+
+const isDirty = computed(() => {
+  return !!form.value.currentPassword || !!form.value.newPassword
+})
 
 const handleUpdate = async () => {
   const { valid } = await formRef.value.validate()
   if (!valid) return
 
   loading.value = true
-  error.value = ''
+  clearErrors()
 
   try {
     await putApiUsersMeChangePassword({
       currentPassword: form.value.currentPassword,
       newPassword: form.value.newPassword,
-      logoutAllDevices: form.value.logoutAll,
+      logoutAllDevices: form.value.logoutAllDevices,
     })
 
-    notifications.show('Password changed successfully.')
-    if (formRef.value) {
-      formRef.value.reset()
-    }
-  } catch (err) {
-    const parsedError = parseApiError(err)
-    if (parsedError) {
-      error.value = parsedError.message
+    notifications.show('Password changed successfully')
+    resetForm()
+  } catch (err: unknown) {
+    const parsed = parseApiError(err)
+
+    if (parsed.isValidationError) {
+      const unmatchedErrors: string[] = []
+
+      parsed.validationErrors?.forEach((e: ValidationErrorDetail) => {
+        const desc = e.description || 'Invalid value'
+
+        if (e.code?.includes('CurrentPassword')) {
+          apiErrors.value.currentPassword = desc
+        } else if (e.code?.includes('NewPassword')) {
+          apiErrors.value.newPassword = desc
+        } else {
+          unmatchedErrors.push(desc)
+        }
+      })
+
+      if (unmatchedErrors.length > 0) {
+        globalError.value = unmatchedErrors.join('\n')
+      }
     } else {
-      error.value = 'Failed to change password.'
+      globalError.value = parsed.message || 'Failed to change password.'
     }
   } finally {
     loading.value = false
   }
 }
+
+const clearErrors = () => {
+  apiErrors.value = { currentPassword: '', newPassword: '' }
+  globalError.value = ''
+}
+
+const resetForm = async () => {
+  form.value = {
+    currentPassword: '',
+    newPassword: '',
+    logoutAllDevices: false,
+  }
+
+  clearErrors()
+  await nextTick()
+  formRef.value?.resetValidation()
+}
 </script>
 
 <template>
-  <v-list-group v-model="isExpanded" class="md3-list-group">
-    <template #activator="{ props, isOpen }">
-      <v-list-item v-bind="props" class="md3-list-group-activator" :class="{ 'is-open': isOpen }">
-        <v-list-item-title>Password</v-list-item-title>
-        <v-list-item-subtitle v-if="!isExpanded"> Change your account password </v-list-item-subtitle>
+  <v-list-group value="password">
+    <template v-slot:activator="{ props }">
+      <v-list-item v-bind="props" lines="two" subtitle="Change your password" prepend-icon="mdi-form-textbox-password">
+        <template #title>
+          <div class="d-flex ga-2">
+            Password
+            <v-chip v-if="isDirty" size="small" density="compact" color="warning" class="suggestion-chip" variant="outlined">
+              Unsaved changes
+            </v-chip>
+          </div>
+        </template>
       </v-list-item>
     </template>
 
-    <v-list-item class="inner-item">
-      <v-form ref="formRef" :disabled="loading" @submit.prevent="handleUpdate">
+    <v-list-item lines="three">
+      <v-form ref="formRef" v-model="isFormValid" :disabled="loading" @submit.prevent="handleUpdate">
         <v-text-field
           v-model="form.currentPassword"
           label="Current password"
-          type="password"
           variant="outlined"
-          density="compact"
-          class="my-2"
+          density="comfortable"
+          class="py-2"
+          :type="showCurrentPassword ? 'text' : 'password'"
+          :append-inner-icon="showCurrentPassword ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append-inner="showCurrentPassword = !showCurrentPassword"
           :rules="[rules.required]"
-          required
+          :error-messages="apiErrors.currentPassword"
+          @update:model-value="apiErrors.currentPassword = ''"
         />
 
         <v-text-field
           v-model="form.newPassword"
           label="New password"
-          type="password"
           variant="outlined"
-          density="compact"
-          class="my-4"
-          :rules="[rules.required, rules.passwordMinLength]"
-          required
+          density="comfortable"
+          counter
+          class="pb-2"
+          :type="showNewPassword ? 'text' : 'password'"
+          :append-inner-icon="showNewPassword ? 'mdi-eye-off' : 'mdi-eye'"
+          @click:append-inner="showNewPassword = !showNewPassword"
+          :rules="[rules.required, rules.minLength]"
+          :error-messages="apiErrors.newPassword"
+          @update:model-value="apiErrors.newPassword = ''"
         />
 
         <div class="d-flex align-center justify-space-between mb-4 w-100">
-          <div class="pr-2 flex-grow-1 flex-shrink-1" style="min-width: 0">
-            <div class="text-body-medium text-wrap">Logout from all devices</div>
-            <div class="text-caption text-secondary text-wrap">Highly recommended if you think your account is compromised</div>
+          <div class="pr-2 flex-grow-1">
+            <div class="text-body-2 font-weight-medium">Logout from all devices</div>
+            <div class="text-caption text-medium-emphasis">Highly recommended if you think your account is compromised</div>
           </div>
-          <div class="flex-shrink-0">
-            <v-switch v-model="form.logoutAll" color="primary" hide-details inset />
-          </div>
+          <v-switch v-model="form.logoutAllDevices" color="primary" hide-details inset density="compact" />
         </div>
 
         <v-expand-transition>
-          <v-alert v-if="error" type="error" variant="tonal" closable class="mb-4" @click:close="error = ''">
-            {{ error }}
+          <v-alert v-if="globalError" type="error" variant="tonal" closable class="mb-4" @click:close="globalError = ''">
+            {{ globalError }}
           </v-alert>
         </v-expand-transition>
 
-        <div class="d-flex justify-end mt-4">
-          <v-btn color="primary" variant="flat" :loading="loading" type="submit"> Update Password </v-btn>
+        <div class="d-flex justify-end ga-2">
+          <v-btn variant="text" :disabled="!isDirty || loading" @click="resetForm"> Reset </v-btn>
+
+          <v-btn color="primary" variant="flat" :loading="loading" :disabled="!isFormValid" type="submit"> Save Changes </v-btn>
         </div>
       </v-form>
     </v-list-item>

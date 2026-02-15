@@ -1,34 +1,54 @@
 <script lang="ts" setup>
 import { useUserStore } from '@/stores/user'
+
 import PasswordChangeItem from '@/components/settings/sections/user/PasswordChangeItem.vue'
+import UserDetailsItem from '@/components/settings/sections/user/UserDetailsItem.vue'
+import { useNotificationsStore } from '@/stores/notifications'
+
 const userStore = useUserStore()
+const notifications = useNotificationsStore()
+
+const copyId = () => {
+  if (userStore.id) {
+    navigator.clipboard
+      .writeText(userStore.id)
+      .then(() => {
+        notifications.show('User ID copied to clipboard.')
+      })
+      .catch(() => {
+        notifications.show('Failed to copy User ID.')
+      })
+  }
+}
 </script>
 
 <template>
-  <v-list-item class="inner-item">
-    <v-list-item-title>User ID</v-list-item-title>
-    <v-list-item-subtitle>
-      {{ userStore.id }}
-    </v-list-item-subtitle>
-    <template #append>
-      <v-btn icon="mdi-content-copy" variant="text" size="small" disabled></v-btn>
+  <v-list-item lines="two">
+    <template #prepend>
+      <v-icon icon="mdi-identifier" />
     </template>
+    <v-text-field
+      v-model="userStore.id"
+      label="User ID"
+      variant="outlined"
+      density="comfortable"
+      readonly
+      hide-details
+      append-icon="mdi-content-copy"
+      @click:append="copyId()"
+      class="monospace-input py-2"
+    />
   </v-list-item>
 
-  <v-list-item class="inner-item">
-    <v-list-item-title>Email</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.email }} </v-list-item-subtitle>
-  </v-list-item>
-
-  <v-list-item class="inner-item">
-    <v-list-item-title>First name</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.profile?.firstName }} </v-list-item-subtitle>
-  </v-list-item>
-
-  <v-list-item class="inner-item">
-    <v-list-item-title>Last name</v-list-item-title>
-    <v-list-item-subtitle> {{ userStore.profile?.lastName }} </v-list-item-subtitle>
-  </v-list-item>
+  <UserDetailsItem />
 
   <PasswordChangeItem />
 </template>
+
+<style lang="css" scoped>
+.monospace-input :deep(input) {
+  font-family: monospace, monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+</style>
