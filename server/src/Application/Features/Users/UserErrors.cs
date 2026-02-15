@@ -43,7 +43,11 @@ public static class UserErrors
     public static Error PasswordTooShort(int minPasswordLength) => Error.Validation(
         "User.PasswordTooShort",
         $"Password must be at least {minPasswordLength} characters long.");
-
+    
+    public static readonly Error NewPasswordRequired = Error.Validation(
+        "User.NewPasswordRequired",
+        "Password is required.");
+    
     public static readonly Error PasswordSameAsOld = Error.Validation(
         "User.PasswordSameAsOld",
         "New password must be different from current password.");

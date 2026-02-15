@@ -44,7 +44,7 @@ public class RegisterUserCommandValidatorTests
         // Act & Assert
         var result = _sut.TestValidate(command);
         result.ShouldHaveValidationErrorFor(x => x.LastName)
-              .WithErrorMessage("Last name is required.");
+              .WithErrorMessage("Last Name is required.");
     }
 
     [Fact]
