@@ -10,7 +10,7 @@ const props = defineProps<{
 
 const opened = ref<string[]>([])
 
-const handleUpdate = (newOpened: any[]) => {
+const handleUpdate = (newOpened: string[]) => {
   if (!newOpened.includes(props.value)) {
     opened.value = []
     return

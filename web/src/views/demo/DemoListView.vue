@@ -1,17 +1,3 @@
-<script>
-import { ref } from 'vue'
-
-const admins = [
-  ['Management', 'mdi-account-multiple-outline'],
-  ['Settings', 'mdi-cog-outline'],
-]
-const cruds = [
-  ['Create', 'mdi-plus-outline'],
-  ['Read', 'mdi-file-outline'],
-  ['Update', 'mdi-update'],
-  ['Delete', 'mdi-delete'],
-]
-</script>
 <template>
   <h1>1. Basic list</h1>
   <div class="ma-4">

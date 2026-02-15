@@ -5,6 +5,8 @@ import type { ChangePasswordRequest } from '@/api/generated/apiV1.schemas'
 import { parseApiError } from '@/utils/error-handler'
 import { useNotificationsStore } from '@/stores/notifications'
 
+import type { ValidationErrorDetail } from '@/types/api-errors'
+
 const { putApiUsersMeChangePassword } = getUsers()
 const notifications = useNotificationsStore()
 
@@ -52,35 +54,32 @@ const handleUpdate = async () => {
 
     notifications.show('Password changed successfully')
     resetForm()
-  } catch (err: any) {
-    handleApiError(err)
+  } catch (err: unknown) {
+    const parsed = parseApiError(err)
+
+    if (parsed.isValidationError) {
+      const unmatchedErrors: string[] = []
+
+      parsed.validationErrors?.forEach((e: ValidationErrorDetail) => {
+        const desc = e.description || 'Invalid value'
+
+        if (e.code?.includes('CurrentPassword')) {
+          apiErrors.value.currentPassword = desc
+        } else if (e.code?.includes('NewPassword')) {
+          apiErrors.value.newPassword = desc
+        } else {
+          unmatchedErrors.push(desc)
+        }
+      })
+
+      if (unmatchedErrors.length > 0) {
+        globalError.value = unmatchedErrors.join('\n')
+      }
+    } else {
+      globalError.value = parsed.message || 'Failed to change password.'
+    }
   } finally {
     loading.value = false
-  }
-}
-
-const handleApiError = (err: any) => {
-  if (err.response?.status === 400 && err.response?.data?.errors) {
-    const backendErrors = err.response.data.errors
-    const unmatchedErrors: string[] = []
-
-    backendErrors.forEach((e: any) => {
-      const desc = e.description || 'Invalid value'
-      if (e.code?.includes('CurrentPassword')) {
-        apiErrors.value.currentPassword = desc
-      } else if (e.code?.includes('NewPassword')) {
-        apiErrors.value.newPassword = desc
-      } else {
-        unmatchedErrors.push(desc)
-      }
-    })
-
-    if (unmatchedErrors.length > 0) {
-      globalError.value = unmatchedErrors.join('\n')
-    }
-  } else {
-    const parsedError = parseApiError(err)
-    globalError.value = parsedError?.message || 'Failed to update password'
   }
 }
 

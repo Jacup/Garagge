@@ -6,6 +6,8 @@ import { getUsers } from '@/api/generated/users/users'
 import type { UserUpdateMeRequest } from '@/api/generated/apiV1.schemas'
 import { parseApiError } from '@/utils/error-handler'
 
+import type { ValidationErrorDetail } from '@/types/api-errors'
+
 const { putApiUsersMe } = getUsers()
 const userStore = useUserStore()
 const notifications = useNotificationsStore()
@@ -81,12 +83,13 @@ const handleUpdate = async () => {
     userStore.fetchUserData()
 
     notifications.show('User details updated successfully.')
-  } catch (err: any) {
-    if (err.response?.status === 400 && err.response?.data?.errors) {
-      const backendErrors = err.response.data.errors
+  } catch (err: unknown) {
+    const parsed = parseApiError(err)
+
+    if (parsed.isValidationError) {
       const unmatchedErrors: string[] = []
 
-      backendErrors.forEach((e: any) => {
+      parsed.validationErrors?.forEach((e: ValidationErrorDetail) => {
         const desc = e.description || 'Invalid value'
 
         if (e.code?.includes('LastName')) apiErrors.value.lastName = desc
@@ -101,8 +104,7 @@ const handleUpdate = async () => {
         error.value = unmatchedErrors.join('\n')
       }
     } else {
-      const parsedError = parseApiError(err)
-      error.value = parsedError?.message || 'Failed to update user details.'
+      error.value = parsed.message || 'Failed to update user details.'
     }
   } finally {
     loading.value = false

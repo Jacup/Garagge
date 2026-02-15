@@ -9,10 +9,11 @@ import VehicleView from '@/views/vehicles/VehicleView.vue'
 import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
 import SettingsView from '@/views/settings/SettingsView.vue'
 
-import DemoList from '@/views/demo/DemoList.vue'
+import DemoListView from '@/views/demo/DemoListView.vue'
 
 import ApplicationLayout from '@/layouts/ApplicationLayout.vue'
 import SetupLayout from '@/layouts/SetupLayout.vue'
+
 import { useUserStore } from '@/stores/user'
 
 const routes = [
@@ -70,10 +71,10 @@ const routes = [
         name: 'Settings',
         component: SettingsView,
       },
-            {
+      {
         path: 'demo/list',
         name: 'Demo List',
-        component: DemoList,
+        component: DemoListView,
       },
     ],
   },
