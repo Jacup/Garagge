@@ -23,7 +23,7 @@ const copyId = () => {
 </script>
 
 <template>
-  <v-list-item class="inner-item">
+  <v-list-item class="inner-item" lines="two">
     <v-text-field
       v-model="userStore.id"
       label="User ID"
@@ -33,7 +33,7 @@ const copyId = () => {
       hide-details
       append-icon="mdi-content-copy"
       @click:append="copyId()"
-      class="my-2"
+      class="monospace-input py-2"
     />
   </v-list-item>
 
@@ -41,3 +41,11 @@ const copyId = () => {
 
   <PasswordChangeItem />
 </template>
+
+<style lang="css" scoped>
+.monospace-input :deep(input) {
+  font-family: monospace, monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+</style>

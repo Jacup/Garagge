@@ -111,7 +111,7 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-  <v-list-item class="inner-item">
+  <v-list-item class="inner-item" lines="three">
     <v-form ref="formRef" v-model="isFormValid" :disabled="loading" @submit.prevent="handleUpdate">
       <v-text-field
         v-model="form.email"
@@ -119,7 +119,7 @@ const handleUpdate = async () => {
         type="email"
         variant="outlined"
         density="comfortable"
-        class="mt-4 mb-2"
+        class="py-2"
         :rules="[rules.required, rules.validEmail]"
         :error-messages="apiErrors.email"
         @update:model-value="clearFieldError('email')"
@@ -131,7 +131,7 @@ const handleUpdate = async () => {
         label="First name"
         variant="outlined"
         density="comfortable"
-        class="mb-2"
+        class="pb-2"
         counter="64"
         maxlength="64"
         :rules="[rules.required]"
@@ -144,7 +144,7 @@ const handleUpdate = async () => {
         label="Last name"
         variant="outlined"
         density="comfortable"
-        class="mb-2"
+        class="pb-2"
         counter="64"
         maxlength="64"
         :rules="[rules.required]"
@@ -158,9 +158,8 @@ const handleUpdate = async () => {
         </v-alert>
       </v-expand-transition>
 
-      <div class="d-flex justify-end ga-2 mt-2">
+      <div class="d-flex justify-end ga-2">
         <v-btn variant="text" :disabled="!isDirty || loading" @click="resetForm"> Reset </v-btn>
-
         <v-btn color="primary" variant="flat" :loading="loading" :disabled="!isDirty || !isFormValid" type="submit"> Save Changes </v-btn>
       </div>
     </v-form>

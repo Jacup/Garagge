@@ -8,19 +8,21 @@ defineProps<{
 </script>
 
 <template>
-  <v-list-group :value="value" class="md3-list-group">
-    <template v-slot:activator="{ props, isOpen }">
-      <v-list-item
-        v-bind="props"
-        lines="two"
-        :title="title"
-        :subtitle="subtitle"
-        :prepend-icon="icon"
-        class="md3-list-group-activator"
-        :class="{ 'is-open': isOpen }"
-      />
-    </template>
+  <v-list class="md3-list">
+    <v-list-group :value="value" class="md3-list-group" :aria-label="`${title} settings section`">
+      <template v-slot:activator="{ props, isOpen }">
+        <v-list-item
+          v-bind="props"
+          lines="two"
+          :title="title"
+          :subtitle="subtitle"
+          :prepend-icon="icon"
+          class="md3-list-group-activator"
+          :class="{ 'is-open': isOpen }"
+        />
+      </template>
 
-    <slot></slot>
-  </v-list-group>
+      <slot></slot>
+    </v-list-group>
+  </v-list>
 </template>
