@@ -7,7 +7,9 @@ import LoginView from '../views/auth/LoginView.vue'
 import VehiclesView from '@/views/vehicles/VehiclesView.vue'
 import VehicleView from '@/views/vehicles/VehicleView.vue'
 import AddServiceRecordView from '@/views/vehicles/AddServiceRecordView.vue'
+
 import SettingsView from '@/views/settings/SettingsView.vue'
+import AdministrationView from '@/views/settings/AdministrationView.vue'
 
 import DemoListView from '@/views/demo/DemoListView.vue'
 
@@ -70,6 +72,11 @@ const routes = [
         path: 'settings',
         name: 'Settings',
         component: SettingsView,
+      },
+      {
+        path: 'administration-settings',
+        name: 'Administration',
+        component: AdministrationView,
       },
       {
         path: 'demo/list',
