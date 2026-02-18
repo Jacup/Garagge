@@ -8,7 +8,6 @@ import { useNotificationsStore } from '@/stores/notifications'
 
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
 import ServiceTypeDialog from '@/components/settings/administration/ServicesGroupItems/ServiceTypeDialog.vue'
-import { fi } from 'vuetify/locale'
 
 const {
   getApiVehiclesServiceRecordsTypes,
