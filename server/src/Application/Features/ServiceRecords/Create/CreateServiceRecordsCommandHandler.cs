@@ -25,19 +25,12 @@ internal sealed class CreateServiceRecordsCommandHandler(
         if (vehicle is null)
             return Result.Failure<ServiceRecordDto>(VehicleErrors.NotFound);
 
-        var serviceType = await dbContext.ServiceTypes
-            .FirstOrDefaultAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
-
-        if (serviceType is null)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.ServiceTypeNotFound(request.ServiceTypeId));
-
         var serviceRecordId = Guid.NewGuid();
         var record = new ServiceRecord
         {
             Id = serviceRecordId,
             VehicleId = request.VehicleId,
-            TypeId = request.ServiceTypeId,
-            Type = serviceType,
+            Type = request.Type,
             ServiceDate = DateTime.SpecifyKind(request.ServiceDate, DateTimeKind.Utc),
             Title = request.Title,
             Notes = request.Notes,
@@ -67,12 +60,11 @@ internal sealed class CreateServiceRecordsCommandHandler(
         var dto = new ServiceRecordDto(
             record.Id,
             record.Title,
+            record.Type,
             record.Notes,
             record.Mileage,
             record.ServiceDate,
             record.TotalCost,
-            record.TypeId,
-            record.Type!.Name,
             record.Items.Select(si => new ServiceItemDto(
                 si.Id,
                 si.Name,

@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Features.ServiceItems.Create;
 using Application.Features.ServiceRecords.Create;
+using Domain.Enums.Services;
 using FluentValidation.TestHelper;
 using Moq;
 
@@ -22,7 +23,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Title_IsEmpty_HasValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { Title = string.Empty };
+        var command = CreateValidCommand() with
+        {
+            Title = string.Empty
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -36,7 +40,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Title_IsNull_HasValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { Title = null! };
+        var command = CreateValidCommand() with
+        {
+            Title = null!
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -51,7 +58,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var longTitle = new string('A', 65);
-        var command = CreateValidCommand() with { Title = longTitle };
+        var command = CreateValidCommand() with
+        {
+            Title = longTitle
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -66,7 +76,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var maxLengthTitle = new string('A', 64);
-        var command = CreateValidCommand() with { Title = maxLengthTitle };
+        var command = CreateValidCommand() with
+        {
+            Title = maxLengthTitle
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -89,11 +102,30 @@ public class CreateServiceRecordsCommandValidatorTests
     }
 
     [Fact]
+    public void Type_IsInvalid_HasValidationErrors()
+    {
+        // Arrange
+        var command = CreateValidCommand() with
+        {
+            Type = (ServiceRecordType)99
+        };
+
+        // Act
+        var result = _validator.TestValidate(command);
+
+        // Assert
+        result.ShouldNotHaveValidationErrorFor(x => x.Type);
+    }
+
+    [Fact]
     public void Notes_ExceedsMaxLength_HasValidationError()
     {
         // Arrange
         var longNotes = new string('A', 501);
-        var command = CreateValidCommand() with { Notes = longNotes };
+        var command = CreateValidCommand() with
+        {
+            Notes = longNotes
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -108,7 +140,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var maxLengthNotes = new string('A', 500);
-        var command = CreateValidCommand() with { Notes = maxLengthNotes };
+        var command = CreateValidCommand() with
+        {
+            Notes = maxLengthNotes
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -121,7 +156,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Notes_IsNull_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { Notes = null };
+        var command = CreateValidCommand() with
+        {
+            Notes = null
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -134,7 +172,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Notes_IsEmpty_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { Notes = string.Empty };
+        var command = CreateValidCommand() with
+        {
+            Notes = string.Empty
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -147,7 +188,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Mileage_IsNegative_HasValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { Mileage = -1 };
+        var command = CreateValidCommand() with
+        {
+            Mileage = -1
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -163,7 +207,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Mileage_IsNegative_HasValidationError_Theory(int mileage)
     {
         // Arrange
-        var command = CreateValidCommand() with { Mileage = mileage };
+        var command = CreateValidCommand() with
+        {
+            Mileage = mileage
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -177,7 +224,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Mileage_IsZero_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { Mileage = 0 };
+        var command = CreateValidCommand() with
+        {
+            Mileage = 0
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -193,7 +243,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Mileage_IsValid_PassesValidation(int mileage)
     {
         // Arrange
-        var command = CreateValidCommand() with { Mileage = mileage };
+        var command = CreateValidCommand() with
+        {
+            Mileage = mileage
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -206,7 +259,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void Mileage_IsNull_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { Mileage = null };
+        var command = CreateValidCommand() with
+        {
+            Mileage = null
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -220,7 +276,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var futureDate = _currentDateTime.AddDays(1);
-        var command = CreateValidCommand() with { ServiceDate = futureDate };
+        var command = CreateValidCommand() with
+        {
+            ServiceDate = futureDate
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -235,7 +294,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var today = _currentDateTime.Date;
-        var command = CreateValidCommand() with { ServiceDate = today };
+        var command = CreateValidCommand() with
+        {
+            ServiceDate = today
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -249,7 +311,10 @@ public class CreateServiceRecordsCommandValidatorTests
     {
         // Arrange
         var pastDate = _currentDateTime.AddDays(-1);
-        var command = CreateValidCommand() with { ServiceDate = pastDate };
+        var command = CreateValidCommand() with
+        {
+            ServiceDate = pastDate
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -262,7 +327,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ServiceDate_IsDefault_HasValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { ServiceDate = default };
+        var command = CreateValidCommand() with
+        {
+            ServiceDate = default
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -275,7 +343,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ManualCost_IsNegative_HasValidationError()
     {
         // Arrange
-        var command = CreateValidCommand() with { ManualCost = -0.01m };
+        var command = CreateValidCommand() with
+        {
+            ManualCost = -0.01m
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -292,7 +363,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ManualCost_IsNegative_HasValidationError_Theory(decimal cost)
     {
         // Arrange
-        var command = CreateValidCommand() with { ManualCost = cost };
+        var command = CreateValidCommand() with
+        {
+            ManualCost = cost
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -306,7 +380,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ManualCost_IsZero_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { ManualCost = 0m };
+        var command = CreateValidCommand() with
+        {
+            ManualCost = 0m
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -322,7 +399,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ManualCost_IsValid_PassesValidation(decimal cost)
     {
         // Arrange
-        var command = CreateValidCommand() with { ManualCost = cost };
+        var command = CreateValidCommand() with
+        {
+            ManualCost = cost
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -335,7 +415,10 @@ public class CreateServiceRecordsCommandValidatorTests
     public void ManualCost_IsNull_PassesValidation()
     {
         // Arrange
-        var command = CreateValidCommand() with { ManualCost = null };
+        var command = CreateValidCommand() with
+        {
+            ManualCost = null
+        };
 
         // Act
         var result = _validator.TestValidate(command);
@@ -364,7 +447,7 @@ public class CreateServiceRecordsCommandValidatorTests
         var command = new CreateServiceRecordCommand(
             "Basic service",
             _currentDateTime.Date,
-            Guid.NewGuid(),
+            ServiceRecordType.Other,
             Guid.NewGuid(),
             null,
             null,
@@ -383,7 +466,7 @@ public class CreateServiceRecordsCommandValidatorTests
         return new CreateServiceRecordCommand(
             "Oil Change",
             _currentDateTime.Date,
-            Guid.NewGuid(),
+            ServiceRecordType.Other,
             Guid.NewGuid(),
             "Regular maintenance",
             15000,
@@ -391,4 +474,3 @@ public class CreateServiceRecordsCommandValidatorTests
             new List<CreateServiceItemCommand>());
     }
 }
-

@@ -14,6 +14,11 @@ public class ServiceRecordConfiguration : IEntityTypeConfiguration<ServiceRecord
             .IsRequired()
             .HasMaxLength(64);
 
+        builder
+            .Property(sr => sr.Type)
+            .IsRequired()
+            .HasConversion<string>();
+        
         builder.Property(sr => sr.Notes)
             .HasMaxLength(500);
 
@@ -22,13 +27,6 @@ public class ServiceRecordConfiguration : IEntityTypeConfiguration<ServiceRecord
         
         builder.Property(sr => sr.ManualCost)
             .HasPrecision(18, 2);
-        
-        builder
-            .HasOne(sr => sr.Type)
-            .WithMany(st => st.ServiceRecords)
-            .HasForeignKey(sr => sr.TypeId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
         
         builder
             .HasMany(sr => sr.Items)

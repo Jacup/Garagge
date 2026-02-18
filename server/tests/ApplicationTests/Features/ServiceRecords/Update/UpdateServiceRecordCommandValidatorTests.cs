@@ -1,5 +1,6 @@
-﻿using Application.Abstractions;
+﻿﻿using Application.Abstractions;
 using Application.Features.ServiceRecords.Update;
+using Domain.Enums.Services;
 using FluentValidation.TestHelper;
 using Moq;
 
@@ -45,19 +46,6 @@ public class UpdateServiceRecordCommandValidatorTests
             .WithErrorMessage("Vehicle ID is required.");
     }
 
-    [Fact]
-    public void ServiceTypeId_IsEmpty_HasValidationError()
-    {
-        // Arrange
-        var command = CreateValidCommand() with { ServiceTypeId = Guid.Empty };
-
-        // Act
-        var result = _validator.TestValidate(command);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(x => x.ServiceTypeId)
-            .WithErrorMessage("Service type ID is required.");
-    }
 
     [Fact]
     public void Title_IsEmpty_HasValidationError()
@@ -380,7 +368,7 @@ public class UpdateServiceRecordCommandValidatorTests
             Guid.NewGuid(),
             "Basic service",
             _currentDateTime.Date,
-            Guid.NewGuid(),
+            ServiceRecordType.Other,
             Guid.NewGuid(),
             null,
             null,
@@ -401,7 +389,7 @@ public class UpdateServiceRecordCommandValidatorTests
             Guid.Empty,
             "",
             _currentDateTime.AddDays(1),
-            Guid.Empty,
+            ServiceRecordType.Other,
             Guid.Empty,
             new string('A', 501),
             -1,
@@ -417,9 +405,8 @@ public class UpdateServiceRecordCommandValidatorTests
         result.ShouldHaveValidationErrorFor(x => x.Mileage);
         result.ShouldHaveValidationErrorFor(x => x.ServiceDate);
         result.ShouldHaveValidationErrorFor(x => x.ManualCost);
-        result.ShouldHaveValidationErrorFor(x => x.ServiceTypeId);
         result.ShouldHaveValidationErrorFor(x => x.VehicleId);
-        result.Errors.Count.ShouldBe(8);
+        result.Errors.Count.ShouldBe(7);
     }
 
     private UpdateServiceRecordCommand CreateValidCommand()
@@ -428,7 +415,7 @@ public class UpdateServiceRecordCommandValidatorTests
             Guid.NewGuid(),
             "Oil Change",
             _currentDateTime.Date,
-            Guid.NewGuid(),
+            ServiceRecordType.OilAndFilters,
             Guid.NewGuid(),
             "Regular maintenance",
             15000,

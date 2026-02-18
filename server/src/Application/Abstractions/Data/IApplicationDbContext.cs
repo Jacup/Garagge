@@ -18,7 +18,6 @@ public interface IApplicationDbContext
     DbSet<EnergyEntry> EnergyEntries { get; }
     
     DbSet<ServiceRecord> ServiceRecords { get; }
-    DbSet<ServiceType> ServiceTypes { get; }
     DbSet<ServiceItem> ServiceItems { get; }
     
     DatabaseFacade Database { get; }

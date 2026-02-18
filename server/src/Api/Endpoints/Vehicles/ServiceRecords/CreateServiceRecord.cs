@@ -5,6 +5,7 @@ using Application.Core;
 using Application.Features.ServiceItems.Create;
 using Application.Features.ServiceRecords;
 using Application.Features.ServiceRecords.Create;
+using Domain.Enums.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ internal sealed class CreateServiceRecord : IEndpoint
                     var query = new CreateServiceRecordCommand(
                         request.Title,
                         request.ServiceDate,
-                        request.ServiceTypeId,
+                        request.Type,
                         vehicleId,
                         request.Notes,
                         request.Mileage,
@@ -57,7 +58,7 @@ internal sealed class CreateServiceRecord : IEndpoint
 internal sealed record ServiceRecordCreateRequest(
     string Title,
     DateTime ServiceDate,
-    Guid ServiceTypeId,
+    ServiceRecordType Type,
     string? Notes,
     int? Mileage,
     decimal? ManualCost,

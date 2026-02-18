@@ -34,7 +34,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(owner);
-        ServiceType serviceType = await CreateServiceTypeAsync();
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
         await CreateAndAuthenticateUser();
@@ -89,7 +88,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle1 = await CreateVehicleAsync(user);
         Vehicle vehicle2 = await CreateVehicleAsync(user, "Honda", "Civic");
-        ServiceType serviceType = await CreateServiceTypeAsync();
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle1.Id, serviceType.Id);
 
         // Act - trying to delete service record using the wrong vehicle ID
@@ -114,7 +112,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
 
         // Act
@@ -131,7 +128,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id, "Regular Maintenance");
 
         // Act
@@ -153,7 +149,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(vehicle.Id, serviceType.Id);
         
         var item1 = new ServiceItem
@@ -225,7 +220,6 @@ public class DeleteServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Repair");
         ServiceRecord serviceRecord = await CreateServiceRecordAsync(
             vehicle.Id,
             serviceType.Id,
