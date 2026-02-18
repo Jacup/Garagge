@@ -1,12 +1,11 @@
 @use 'vuetify/settings' with (
-  $dialog-elevation: 6,
-
   $dialog-card-header-padding: 24px 24px 16px 24px,
-  $dialog-card-text-padding: 0px 24px 24px 24px,
+
+  // MD3: 24dp
   $rounded: (
-    'md-medium': 12px,
-    'md-16px': 16px,
-  ),
+      'md-medium': 12px,
+      'md-16px': 16px,
+    ),
   $btn-group-height: 40px,
 
   // tooltip
@@ -76,7 +75,11 @@
   align-items: flex-end !important; // Align menu items to the right
 }
 
-.dialog-card {
+.basic-dialog-container {
+  min-width: 280px;
+  max-width: 560px;
+}
+.basic-dialog {
   background-color: rgb(var(--v-theme-surface-container-high));
   border-radius: 28px !important;
   min-width: 280px;
@@ -84,10 +87,14 @@
 
   &.v-card .v-card-title {
     color: rgb(var(--v-theme-on-surface));
+    line-height: 32px;
+    font-size: 24px;
+    font-weight: 400;
   }
 
   &.v-card .v-card-text {
     color: rgb(var(--v-theme-on-surface-variant));
+    padding: 0 24px 24px 24px;
   }
 
   &.v-card .v-card-actions {
