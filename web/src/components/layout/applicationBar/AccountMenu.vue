@@ -34,6 +34,7 @@ const handleLogout = async () => {
       <v-list class="md3-list">
         <v-list-item class="md3-list-item" disabled prepend-icon="mdi-account" to="/profile" title="Profile" />
         <v-list-item class="md3-list-item" prepend-icon="mdi-cog" to="/settings" title="Settings" />
+        <v-list-item class="md3-list-item" prepend-icon="mdi-wrench" to="/administration-settings" title="Administration" />
       </v-list>
       <v-card-actions class="pt-4 pb-0 px-0">
         <v-btn variant="tonal" prepend-icon="mdi-logout" block @click="handleLogout"> Logout </v-btn>
