@@ -1,101 +1,169 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
+import { useFormatting } from '@/composables/useFormatting'
+import { serviceUtils } from '@/utils/serviceUtils'
 import type { ServiceRecordDto } from '@/api/generated/apiV1.schemas'
+import InteractiveItem from '@/components/common/InteractiveItem.vue'
 
 interface Props {
   items: ServiceRecordDto[]
+  modelValue?: string[]
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: () => [],
+})
 
 const emit = defineEmits<{
-  select: [record: ServiceRecordDto]
+  (e: 'select', id: string): void
+  (e: 'delete', id: string): void
+  (e: 'update:modelValue', ids: string[]): void
 }>()
 
-const handleRowClick = (item: ServiceRecordDto) => {
-  emit('select', item)
+const { formatDate, formatCurrency } = useFormatting()
+const { getIconForServiceType } = serviceUtils()
+
+const selectedIds = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+})
+
+const isSelected = (id: string | undefined): boolean => {
+  return id ? selectedIds.value.includes(id) : false
 }
 
-const getIconForServiceType = (type: string | undefined): string => {
-  switch (type) {
-    case 'General':
-      return 'mdi-cog'
-    case 'OilChange':
-      return 'mdi-oil'
-    case 'Brakes':
-      return 'mdi-car-brake-abs'
-    case 'Tires':
-      return 'mdi-tire'
-    case 'Engine':
-      return 'mdi-engine'
-    case 'Transmission':
-      return 'mdi-car-shift-pattern'
-    case 'Suspension':
-      return 'mdi-car-esp'
-    case 'Electrical':
-      return 'mdi-flash'
-    case 'Bodywork':
-      return 'mdi-hammer-wrench'
-    case 'Interior':
-      return 'mdi-car-seat'
-    case 'Inspection':
-      return 'mdi-clipboard-check-outline'
-    case 'Emergency':
-      return 'mdi-alert-decagram'
-    case 'Other':
-      return 'mdi-help-circle-outline'
-    default:
-      return 'mdi-tools'
+const toggleSelection = (id: string | undefined) => {
+  if (!id) return
+
+  const currentIds = [...selectedIds.value]
+  const index = currentIds.indexOf(id)
+
+  if (index === -1) {
+    currentIds.push(id)
+  } else {
+    currentIds.splice(index, 1)
   }
+
+  selectedIds.value = currentIds
 }
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('pl-PL', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
+const handleSelectedUpdate = (item: ServiceRecordDto) => {
+  toggleSelection(item.id)
+}
+
+const handleRowClick = (item: ServiceRecordDto) => {
+  emit('select', item.id)
+}
+
+const handleLongPress = (item: ServiceRecordDto) => {
+  toggleSelection(item.id)
+}
+
+const handleDelete = (item: ServiceRecordDto) => {
+  emit('delete', item.id)
 }
 </script>
 
 <template>
-  <v-list lines="two">
-    <v-list-item v-for="record in items" :key="record.id" :title="record.title" class="list-item" @click="handleRowClick(record)">
-      <template #prepend>
-        <v-badge color="info" :model-value="record.serviceItems && record.serviceItems.length > 0" :content="record.serviceItems.length">
-          <v-avatar color="primary-container">
-            <v-icon :icon="getIconForServiceType(record.type)" color="on-primary-container"></v-icon>
-          </v-avatar>
-        </v-badge>
-      </template>
-      <template v-slot:subtitle>
-        {{ formatDate(record.serviceDate) }}
-        <span v-if="record.mileage"> • {{ record.mileage }} km</span>
-      </template>
-      <template v-slot:append>
-        <div v-if="record.totalCost" class="trailing-supporting-text">
-          {{ new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(record.totalCost) }}
-        </div>
-      </template>
-    </v-list-item>
+  <v-list lines="two" class="material-list" rounded>
+    <transition-group name="list" tag="div">
+      <div
+        v-for="record in items"
+        :key="record.id"
+        class="list-item-wrapper"
+        :class="{
+          'material-list__item--selected': isSelected(record.id),
+        }"
+      >
+        <InteractiveItem
+          :selected="isSelected(record.id)"
+          @update:selected="handleSelectedUpdate(record)"
+          @delete="handleDelete(record)"
+          @click="handleRowClick(record)"
+          @long-press="handleLongPress(record)"
+        >
+          <template #default="{ selected, onIndicatorClick }">
+            <v-list-item link :active="selected">
+              <template #prepend>
+                <div class="avatar-flip-container mr-3" @click.stop="onIndicatorClick">
+                  <div class="avatar-flipper" :class="{ flipped: selected }">
+                    <div class="avatar-front">
+                      <v-badge color="info" :model-value="!!record.serviceItems?.length" :content="record.serviceItems?.length">
+                        <v-avatar color="primary" variant="tonal">
+                          <v-icon :icon="getIconForServiceType(record.type)" color="primary" />
+                        </v-avatar>
+                      </v-badge>
+                    </div>
+                    <div class="avatar-back">
+                      <v-avatar color="secondary" variant="flat">
+                        <v-icon icon="mdi-check" color="on-secondary" />
+                      </v-avatar>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template #title>{{ record.type }}</template>
+
+              <template #subtitle>
+                {{ formatDate(record.serviceDate) }}
+                <span v-if="record.mileage"> • {{ record.mileage }} km</span>
+              </template>
+
+              <template #append>
+                <div v-if="record.totalCost" class="trailing-supporting-text">
+                  {{ formatCurrency(record.totalCost) }}
+                </div>
+              </template>
+            </v-list-item>
+          </template>
+        </InteractiveItem>
+      </div>
+    </transition-group>
   </v-list>
 </template>
 
-<style scoped>
-.list-item {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  margin-bottom: 2px !important;
-  border-radius: 4px !important;
+<style scoped lang="scss">
+.avatar-flip-container {
+  width: 40px;
+  height: 40px;
+  perspective: 1000px;
+  cursor: pointer;
 }
 
-.list-item:first-child {
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
+.avatar-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
 }
 
-.list-item:last-child {
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
-  margin-bottom: 0 !important;
+.avatar-flipper.flipped {
+  transform: rotateY(180deg);
+}
+
+.avatar-front,
+.avatar-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+}
+
+.avatar-front {
+  transform: rotateY(0deg);
+  z-index: 2;
+}
+
+.avatar-back {
+  transform: rotateY(180deg);
+  z-index: 1;
 }
 
 .trailing-supporting-text {
@@ -104,5 +172,20 @@ const formatDate = (dateString: string) => {
   font-weight: 500;
   line-height: 16px;
   letter-spacing: 0.5px;
+}
+
+.list-leave-active {
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+  transition: all 0.2s ease;
+}
+
+.list-leave-to {
+  opacity: 0;
+}
+
+.list-move {
+  transition: transform 0.4s cubic-bezier(0.55, 0, 0.1, 1);
 }
 </style>

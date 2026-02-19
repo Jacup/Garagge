@@ -31,10 +31,10 @@ const handleLogout = async () => {
       <template v-slot:title> {{ userStore.fullName }} </template>
       <template v-slot:subtitle>{{ userStore.profile?.email }}</template>
 
-      <v-list class="md3-list">
-        <v-list-item class="md3-list-item" disabled prepend-icon="mdi-account" to="/profile" title="Profile" />
-        <v-list-item class="md3-list-item" prepend-icon="mdi-cog" to="/settings" title="Settings" />
-        <v-list-item class="md3-list-item" prepend-icon="mdi-wrench" to="/administration-settings" title="Administration" />
+      <v-list rounded class="material-list">
+        <v-list-item :active="false" disabled prepend-icon="mdi-account" to="/profile" title="Profile" />
+        <v-list-item :active="false" prepend-icon="mdi-cog" to="/settings" title="Settings" />
+        <v-list-item :active="false" prepend-icon="mdi-wrench" to="/administration-settings" title="Administration" />
       </v-list>
       <v-card-actions class="pt-4 pb-0 px-0">
         <v-btn variant="tonal" prepend-icon="mdi-logout" block @click="handleLogout"> Logout </v-btn>
@@ -52,25 +52,5 @@ const handleLogout = async () => {
 :deep(.v-card-item) {
   padding: 0 !important;
   margin-bottom: 16px;
-}
-
-.md3-list {
-  background-color: transparent !important;
-  padding: 0px;
-}
-.md3-list-item {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  margin-bottom: 2px !important;
-  border-radius: 2px !important;
-}
-
-.md3-list-item:first-child {
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-}
-
-.md3-list-item:last-child {
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
 }
 </style>

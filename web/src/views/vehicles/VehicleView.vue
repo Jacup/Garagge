@@ -77,8 +77,6 @@ const summaryStats = computed(() => {
 const activeTab = ref('overview')
 const editVehicleDialog = ref(false)
 
-const selectedServiceRecords = ref<string[]>([])
-
 async function loadVehicle() {
   if (!vehicleId.value) {
     error.value = 'No vehicle ID provided'
@@ -323,12 +321,7 @@ watch(activeTab, () => {
       </v-window-item>
 
       <v-window-item value="service">
-        <VehicleServiceTab
-          :vehicle-id="vehicle.id!"
-          :selected-service-records="selectedServiceRecords"
-          :mock-stats="mockStats"
-          @update:selected-service-records="selectedServiceRecords = $event"
-        />
+        <VehicleServiceTab :vehicle-id="vehicle.id!" :mock-stats="mockStats" />
       </v-window-item>
     </v-window>
   </div>

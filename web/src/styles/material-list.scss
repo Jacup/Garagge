@@ -1,15 +1,31 @@
 .material-list {
-  margin: 8px 0px;
   background-color: transparent;
+
   .v-list-item,
   .v-list-group {
-    margin-bottom: 2px !important;
+    margin-bottom: 0 !important;
     transition: margin-bottom 0.2s ease;
+  }
+
+  .v-list-item:not(:last-child),
+  .v-list-group:not(:last-child),
+  .list-item-wrapper:not(:last-child) .v-list-item {
+    margin-bottom: 2px !important;
   }
 
   .v-list-item {
     background-color: rgba(var(--v-theme-primary), 0.08) !important;
     border-radius: 4px !important;
+    transition:
+      border-radius 0.4s cubic-bezier(0.55, 0, 0.1, 1),
+      background-color 0.4s cubic-bezier(0.55, 0, 0.1, 1),
+      color 0.4s cubic-bezier(0.55, 0, 0.1, 1) !important;
+  }
+
+  .material-list__item--selected .v-list-item {
+    background-color: rgba(var(--v-theme-secondary-container), 1) !important;
+    color: rgb(var(--v-theme-on-secondary-container)) !important;
+    border-radius: 16px !important;
   }
 
   .v-list-group:last-child {
@@ -30,17 +46,31 @@
 }
 
 .material-list-inner {
-  margin: 8px 0px;
   background-color: transparent;
+
   .v-list-item,
   .v-list-group {
-    margin-bottom: 2px !important;
+    margin-bottom: 0 !important;
     transition: margin-bottom 0.2s ease;
+  }
+
+  .v-list-item:not(:last-child),
+  .v-list-group:not(:last-child),
+  .list-item-wrapper:not(:last-child) .v-list-item {
+    margin-bottom: 2px !important;
   }
 
   .v-list-item {
     background-color: rgb(var(--v-theme-background)) !important;
     border-radius: 4px !important;
+    transition:
+      border-radius 0.4s cubic-bezier(0.55, 0, 0.1, 1),
+      background-color 0.4s cubic-bezier(0.55, 0, 0.1, 1),
+      color 0.4s cubic-bezier(0.55, 0, 0.1, 1) !important;
+  }
+
+  .material-list__item--selected .v-list-item {
+    border-radius: 16px !important;
   }
 
   .v-list-group:last-child {
