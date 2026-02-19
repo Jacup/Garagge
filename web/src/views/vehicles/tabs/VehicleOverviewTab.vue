@@ -118,24 +118,17 @@ onMounted(() => {
   </v-row>
   <v-row>
     <v-col cols="12" md="4" xl="3">
-      <v-list lines="two" class="pt-0">
-        <v-list-item
-          v-if="vehicle.manufacturedYear"
-          class="list-item"
-          prepend-icon="mdi-calendar"
-          :title="vehicle.manufacturedYear"
-          subtitle="Year"
-        />
-        <v-list-item v-if="vehicle.type" class="list-item" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
-        <v-list-item v-if="vehicle.vin" class="list-item" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
+      <v-list class="material-list mt-0" rounded lines="two">
+        <v-list-item v-if="vehicle.manufacturedYear" prepend-icon="mdi-calendar" :title="vehicle.manufacturedYear" subtitle="Year" />
+        <v-list-item v-if="vehicle.type" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
+        <v-list-item v-if="vehicle.vin" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
       </v-list>
 
-      <v-list lines="two">
-        <v-list-item class="list-item" prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
+      <v-list class="material-list mb-0" rounded lines="two">
+        <v-list-item prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
         <v-list-item
           v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
           lines="one"
-          class="list-item"
           :prepend-icon="vehicle.engineType === 'Electric' ? 'mdi-ev-station' : 'mdi-gas-station-outline'"
         >
           <template #title>
@@ -188,24 +181,18 @@ onMounted(() => {
         </v-col>
       </v-row>
     </v-col>
-    <v-col cols="5" xl="4">
+    <v-col cols="12" md="6" xl="4">
       <VehicleActivity :vehicleActivities="vehicleStats?.vehicleActivities ?? []" />
     </v-col>
   </v-row>
 
   <v-row>
     <v-col v-if="isMobile">
-      <v-list lines="one" selectable>
-        <v-list-item class="list-item" prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
-        <v-list-item class="list-item" prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
-        <v-list-item class="list-item" prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
-        <v-list-item
-          class="list-item"
-          prepend-icon="mdi-delete-outline"
-          title="Delete vehicle"
-          base-color="error"
-          @click="() => (showDeleteDialog = true)"
-        />
+      <v-list class="material-list" lines="one" rounded selectable>
+        <v-list-item prepend-icon="mdi-view-grid-plus-outline" title="Add to homepage" disabled />
+        <v-list-item prepend-icon="mdi-swap-horizontal" title="Transfer vehicle ownership" disabled />
+        <v-list-item prepend-icon="mdi-account-multiple-outline" title="Manage accessibility" disabled />
+        <v-list-item prepend-icon="mdi-delete-outline" title="Delete vehicle" base-color="error" @click="() => (showDeleteDialog = true)" />
       </v-list>
     </v-col>
     <v-col cols="12">
@@ -327,22 +314,5 @@ onMounted(() => {
   gap: 12px;
   height: 100%;
   justify-content: center;
-}
-
-.list-item {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  margin-bottom: 2px !important;
-  border-radius: 2px !important;
-}
-
-.list-item:first-child {
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-}
-
-.list-item:last-child {
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
-  margin-bottom: 0 !important;
 }
 </style>
