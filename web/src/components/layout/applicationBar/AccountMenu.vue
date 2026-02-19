@@ -53,24 +53,4 @@ const handleLogout = async () => {
   padding: 0 !important;
   margin-bottom: 16px;
 }
-
-.md3-list {
-  background-color: transparent !important;
-  padding: 0px;
-}
-.md3-list-item {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  margin-bottom: 2px !important;
-  border-radius: 2px !important;
-}
-
-.md3-list-item:first-child {
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-}
-
-.md3-list-item:last-child {
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
-}
 </style>

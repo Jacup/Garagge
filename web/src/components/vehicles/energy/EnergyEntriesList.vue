@@ -62,7 +62,7 @@ const toggleSelection = (id: string | undefined) => {
   selectedIds.value = currentIds
 }
 
-const handleSelectedUpdate = (item: EnergyEntryDto, value: boolean) => {
+const handleSelectedUpdate = (item: EnergyEntryDto) => {
   toggleSelection(item.id)
 }
 
@@ -92,7 +92,7 @@ const handleDelete = (item: EnergyEntryDto) => {
       >
         <InteractiveItem
           :selected="isSelected(entry.id)"
-          @update:selected="handleSelectedUpdate(entry, $event)"
+          @update:selected="handleSelectedUpdate(entry)"
           @delete="handleDelete(entry)"
           @click="handleRowClick(entry)"
           @long-press="handleLongPress(entry)"
@@ -118,8 +118,8 @@ const handleDelete = (item: EnergyEntryDto) => {
 
               <template #title> {{ entry.type }} • {{ entry.volume }} {{ formatEnergyUnit(entry.energyUnit) }} </template>
 
-              <template #subtitle class="text-caption text-medium-emphasis">
-                {{ formatDate(entry.date) }} • {{ formatMileage(entry.mileage) }}
+              <template #subtitle>
+                <div class="text-caption text-medium-emphasis">{{ formatDate(entry.date) }} • {{ formatMileage(entry.mileage) }}</div>
               </template>
 
               <template #append>

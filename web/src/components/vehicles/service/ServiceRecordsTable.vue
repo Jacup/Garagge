@@ -9,6 +9,7 @@ interface Props {
   page: number
   itemsPerPage: number
   selectedId?: string | null
+  selectedIds?: string[]
 }
 
 const props = defineProps<Props>()
@@ -18,12 +19,25 @@ const emit = defineEmits<{
   'update:page': [value: number]
   'update:items-per-page': [value: number]
   'update:sort-by': [value: { key: string; order: string }[]]
+  'update:selectedIds': [ids: string[]]
+  'delete-selected': []
 }>()
 
-const selectedIds = computed(() => props.selectedId ? [props.selectedId] : [])
+const tableSelectedIds = computed({
+  get: () => props.selectedIds ?? [],
+  set: (val: string[]) => emit('update:selectedIds', val),
+})
 
-// Table configuration
+const hasSelection = computed(() => tableSelectedIds.value.length > 0)
+const selectedCount = computed(() => tableSelectedIds.value.length)
+
 const headers = [
+  {
+    title: '',
+    key: 'data-table-select',
+    sortable: false,
+    width: '48px',
+  },
   {
     title: 'Title',
     key: 'title',
@@ -51,13 +65,12 @@ const headers = [
   },
 ]
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('pl-PL', {
+const formatDate = (dateString: string) =>
+  new Date(dateString).toLocaleDateString('pl-PL', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   })
-}
 
 const formatCurrency = (value: number | undefined) => {
   if (!value) return 'N/A'
@@ -65,45 +78,86 @@ const formatCurrency = (value: number | undefined) => {
 }
 
 const handleRowClick = (_event: Event, { item }: { item: ServiceRecordDto }) => {
-  emit('select', item)
+  if (!hasSelection.value) {
+    emit('select', item)
+  }
 }
 </script>
 
 <template>
-<v-data-table-server
-    :model-value="selectedIds"
-    item-value="id"
-    :headers="headers"
-    :items="items"
-    :items-length="totalCount"
-    :loading="loading"
-    :page="page"
-    :items-per-page="itemsPerPage"
-    select-strategy="single"
-    hover
-    @update:page="emit('update:page', $event)"
-    @update:items-per-page="emit('update:items-per-page', $event)"
-    @update:sort-by="emit('update:sort-by', $event)"
-    @click:row="handleRowClick"
-    density="comfortable"
-    class="service-records-table cursor-pointer"
-    fixed-header
-    bg-color="transparent"
-    :row-props="{ class: 'service-table-row' }"
-  >
-    <template #[`item.serviceDate`]="{ item }">
-      {{ formatDate(item.serviceDate) }}
-    </template>
-    <template #[`item.mileage`]="{ item }">
-      {{ item.mileage ? item.mileage.toLocaleString('pl-PL') + ' km' : 'N/A' }}
-    </template>
-    <template #[`item.totalCost`]="{ item }">
-      {{ formatCurrency(item.totalCost) }}
-    </template>
-  </v-data-table-server>
+  <div>
+    <!-- Context bar -->
+    <v-fade-transition mode="out-in" duration="200">
+      <div v-if="hasSelection" key="context-bar" class="context-bar d-flex align-center rounded-pill px-2 mb-3">
+        <v-tooltip text="Clear selection" location="bottom" open-delay="200">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn v-bind="tooltipProps" icon="mdi-close" variant="text" density="comfortable" @click="emit('update:selectedIds', [])" />
+          </template>
+        </v-tooltip>
+
+        <span class="text-subtitle-2 font-weight-medium ml-2"> {{ selectedCount }} selected </span>
+
+        <v-spacer />
+
+        <v-tooltip text="Delete selected" location="bottom" open-delay="200">
+          <template #activator="{ props: tooltipProps }">
+            <v-btn
+              v-bind="tooltipProps"
+              icon="mdi-delete"
+              variant="text"
+              color="error"
+              density="comfortable"
+              @click="emit('delete-selected')"
+            />
+          </template>
+        </v-tooltip>
+      </div>
+      <div v-else key="standard-bar" class="d-flex justify-end align-center w-100 py-1">
+        <v-btn icon="mdi-filter-variant" variant="text" disabled />
+      </div>
+    </v-fade-transition>
+
+    <!-- Table -->
+    <v-data-table-server
+      v-model="tableSelectedIds"
+      item-value="id"
+      :headers="headers"
+      :items="items"
+      :items-length="totalCount"
+      :loading="loading"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      show-select
+      hover
+      @update:page="emit('update:page', $event)"
+      @update:items-per-page="emit('update:items-per-page', $event)"
+      @update:sort-by="emit('update:sort-by', $event)"
+      @click:row="handleRowClick"
+      density="comfortable"
+      class="service-records-table cursor-pointer"
+      fixed-header
+      bg-color="transparent"
+      :row-props="{ class: 'service-table-row' }"
+    >
+      <template #[`item.serviceDate`]="{ item }">
+        {{ formatDate(item.serviceDate) }}
+      </template>
+      <template #[`item.mileage`]="{ item }">
+        {{ item.mileage ? item.mileage.toLocaleString('pl-PL') + ' km' : 'N/A' }}
+      </template>
+      <template #[`item.totalCost`]="{ item }">
+        {{ formatCurrency(item.totalCost) }}
+      </template>
+    </v-data-table-server>
+  </div>
 </template>
 
 <style scoped>
+.context-bar {
+  background-color: rgb(var(--v-theme-secondary-container));
+  color: rgb(var(--v-theme-on-secondary-container));
+  min-height: 48px;
+}
 
 .service-records-table :deep(.service-table-header) {
   background-color: rgba(var(--v-theme-primary), 0.2) !important;

@@ -46,7 +46,7 @@ const toggleSelection = (id: string | undefined) => {
   selectedIds.value = currentIds
 }
 
-const handleSelectedUpdate = (item: VehicleDto, value: boolean) => {
+const handleSelectedUpdate = (item: VehicleDto) => {
   toggleSelection(item.id)
 }
 
@@ -67,7 +67,7 @@ const handleDelete = (item: VehicleDto) => {
   <v-list :lines="showDetails ? 'two' : 'one'" class="material-list" rounded>
     <transition-group name="list" tag="div">
       <div
-        v-for="(record, index) in items"
+        v-for="record in items"
         :key="record.id"
         class="list-item-wrapper"
         :class="{
@@ -76,7 +76,7 @@ const handleDelete = (item: VehicleDto) => {
       >
         <InteractiveItem
           :selected="isSelected(record.id)"
-          @update:selected="handleSelectedUpdate(record, $event)"
+          @update:selected="handleSelectedUpdate(record)"
           @delete="handleDelete(record)"
           @click="handleRowClick(record)"
           @long-press="handleLongPress(record)"
