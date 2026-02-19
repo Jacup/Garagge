@@ -59,9 +59,9 @@ const itemCount = computed(() => props.record?.serviceItems.length ?? 0)
           <v-btn v-if="record?.id" size="small" prepend-icon="mdi-plus" @click="itemState.create(record.id)"> Add Item </v-btn>
         </div>
 
-        <v-list density="comfortable" class="pa-0 mb-4">
+        <v-list density="comfortable" rounded class="material-list pa-0 mb-4">
           <template v-for="item in record.serviceItems" :key="item.id">
-            <v-list-item class="list-item" lines="two">
+            <v-list-item lines="two">
               <template #prepend>
                 <v-avatar color="secondary-container" class="font-weight-bold text-body-2 mr-2"> {{ item.quantity }}x </v-avatar>
               </template>
@@ -125,23 +125,6 @@ const itemCount = computed(() => props.record?.serviceItems.length ?? 0)
   color: rgb(var(--v-theme-on-surface-variant)) !important;
   border-radius: 8px !important;
   font-weight: 500;
-}
-
-.list-item {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-  margin-bottom: 2px !important;
-  border-radius: 2px !important;
-}
-
-.list-item:first-child {
-  border-top-left-radius: 12px !important;
-  border-top-right-radius: 12px !important;
-}
-
-.list-item:last-child {
-  border-bottom-left-radius: 12px !important;
-  border-bottom-right-radius: 12px !important;
-  margin-bottom: 0 !important;
 }
 
 .scroll-container {
