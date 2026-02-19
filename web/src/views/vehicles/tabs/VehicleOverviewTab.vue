@@ -118,13 +118,13 @@ onMounted(() => {
   </v-row>
   <v-row>
     <v-col cols="12" md="4" xl="3">
-      <v-list class="material-list mt-0" rounded lines="two">
+      <v-list class="material-list" rounded lines="two">
         <v-list-item v-if="vehicle.manufacturedYear" prepend-icon="mdi-calendar" :title="vehicle.manufacturedYear" subtitle="Year" />
         <v-list-item v-if="vehicle.type" prepend-icon="mdi-car-outline" :title="vehicle.type" subtitle="Type" />
         <v-list-item v-if="vehicle.vin" prepend-icon="mdi-pound" :title="vehicle.vin" subtitle="VIN" />
       </v-list>
 
-      <v-list class="material-list mb-0" rounded lines="two">
+      <v-list class="material-list mt-4" rounded lines="two">
         <v-list-item prepend-icon="mdi-engine-outline" :title="vehicle.engineType" subtitle="Engine Type" />
         <v-list-item
           v-if="vehicle.allowedEnergyTypes && vehicle.allowedEnergyTypes.length > 0"
