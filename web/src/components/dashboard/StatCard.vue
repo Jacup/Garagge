@@ -55,7 +55,7 @@ const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
   <v-card
     class="overflow-hidden position-relative h-100 d-flex flex-column"
     :color="accentColor"
-    rounded="xl"
+    rounded="md-16px"
     variant="tonal"
     role="article"
     :aria-label="`${metric?.value ?? 'N/A'} ${metric?.subtitle ? '- ' + metric.subtitle : ''}`"
@@ -64,32 +64,29 @@ const textColorClass = computed(() => `text-on-${props.accentColor}-container`)
       <v-icon :icon="icon" size="180" :color="accentColor"></v-icon>
     </div>
 
-    <div class="card-container pa-5">
-      <div class="card-header">
-        <div class="card-header-title text-body-2 text-uppercase font-weight-bold">
-          {{ title }}
-        </div>
-        <div class="card-header-subtitle text-caption font-weight-medium opacity-60">
-          {{ metric?.subtitle }}
-        </div>
+    <template #title>
+      {{ title }}
+    </template>
+
+    <template #subtitle>
+      {{ metric?.subtitle || '\u00A0' }}
+    </template>
+
+    <template #text>
+      <div class="stat-card-value text-h5 font-weight-black text-high-emphasis">
+        {{ metric?.value ?? 'N/A' }}
       </div>
 
-      <div>
-        <div class="stat-card-value text-h4 font-weight-black text-high-emphasis">
-          {{ metric?.value ?? 'N/A' }}
-        </div>
-
-        <div class="stat-card-chips d-flex align-center mt-1">
-          <v-chip v-if="chipValue" size="x-small" :color="chipColor" variant="flat" class="suggestion-chip">
-            <v-icon v-if="chipIcon" start size="small" :icon="chipIcon"></v-icon>
-            {{ chipValue }}
-          </v-chip>
-          <span v-if="chipAppendText" class="text-caption font-weight-bold opacity-60 text-truncate ml-1" :class="textColorClass">
-            {{ chipAppendText }}
-          </span>
-        </div>
+      <div class="stat-card-chips d-flex align-center mt-1">
+        <v-chip v-if="chipValue" size="x-small" :color="chipColor" variant="flat" class="suggestion-chip">
+          <v-icon v-if="chipIcon" start size="small" :icon="chipIcon"></v-icon>
+          {{ chipValue }}
+        </v-chip>
+        <span v-if="chipAppendText" class="text-caption font-weight-bold opacity-60 text-truncate ml-1" :class="textColorClass">
+          {{ chipAppendText }}
+        </span>
       </div>
-    </div>
+    </template>
   </v-card>
 </template>
 

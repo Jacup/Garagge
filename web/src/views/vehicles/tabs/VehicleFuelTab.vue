@@ -6,7 +6,13 @@ import { useEnergyEntriesState } from '@/composables/vehicles/useEnergyEntriesSt
 import { useNotificationsStore } from '@/stores/notifications'
 
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { EnergyEntryDto, EnergyStatsDto, EnergyType } from '@/api/generated/apiV1.schemas'
+import {
+  NullableOfContextTrend,
+  NullableOfTrendMode,
+  type EnergyEntryDto,
+  type EnergyStatsDto,
+  type EnergyType,
+} from '@/api/generated/apiV1.schemas'
 
 import EnergyEntriesList from '@/components/vehicles/energy/EnergyEntriesList.vue'
 import EnergyEntriesTable from '@/components/vehicles/energy/EnergyEntriesTable.vue'
@@ -14,6 +20,11 @@ import EnergyStatCard from '@/components/vehicles/energy/EnergyStatCard.vue'
 
 import EnergyEntryDialog from '@/components/vehicles/energy/EnergyEntryDialog.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'
+import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
+import StatCard from '@/components/dashboard/StatCard.vue'
+import EnergyStatsSection from '@/components/vehicles/energy/EnergyStatsSection.vue'
+import EnergyPriceChart from '@/components/vehicles/energy/charts/EnergyPriceChart.vue'
+import EnergyChartsSection from '@/components/vehicles/energy/charts/EnergyChartsSection.vue'
 
 interface Props {
   vehicleId: string
@@ -190,142 +201,118 @@ watch(selectedEnergyTypeFilters, () => {
   resetList()
   loadEnergyEntries()
 })
+
+const dataPeriod = ref<0 | 1 | 2 | 3>(1)
+const viewModeOptions = [
+  { value: 3 as const, text: 'Week' },
+  { value: 2 as const, text: 'Month' },
+  { value: 1 as const, text: 'Year' },
+  { value: 0 as const, text: 'Lifetime' },
+]
+
+const energyTypeStats = [
+  {
+    type: 'Gasoline',
+    itemsCount: 12 as number,
+    totalCost: 1200.5 as number,
+    totalVolume: 100.42 as number,
+    averageConsumption: 8.3 as number,
+    averagePricePerUnit: 12.23 as number,
+    averageCostPer100km: 96.23 as number,
+  },
+  {
+    type: 'Electricity',
+    itemsCount: 8 as number,
+    totalCost: 1000 as number,
+    totalVolume: 500 as number,
+    averageConsumption: 6 as number,
+    averagePricePerUnit: 12.5 as number,
+    averageCostPer100km: 75 as number,
+  },
+]
+const fuelEntries: FuelPriceEntry[] = [
+  // Diesel
+  { datetime: '2025-02-25T08:00:00', pricePerUnit: 1.72, type: 'Diesel' }, // ~4 tyg. temu
+  { datetime: '2025-03-18T11:30:00', pricePerUnit: 1.68, type: 'Diesel' },
+  { datetime: '2025-05-05T09:15:00', pricePerUnit: 1.75, type: 'Diesel' },
+  { datetime: '2025-06-20T14:00:00', pricePerUnit: 1.8, type: 'Diesel' },
+  { datetime: '2025-08-01T10:00:00', pricePerUnit: 1.77, type: 'Diesel' },
+  { datetime: '2025-09-14T08:45:00', pricePerUnit: 1.65, type: 'Diesel' },
+  { datetime: '2025-11-02T12:00:00', pricePerUnit: 1.6, type: 'Diesel' },
+  { datetime: '2025-12-28T09:00:00', pricePerUnit: 1.58, type: 'Diesel' },
+  { datetime: '2026-01-15T10:00:00', pricePerUnit: 1.62, type: 'Diesel' }, // ~5 tyg. temu
+  { datetime: '2026-02-10T09:00:00', pricePerUnit: 1.64, type: 'Diesel' }, // ~12 dni temu (month)
+  { datetime: '2026-02-17T08:30:00', pricePerUnit: 1.66, type: 'Diesel' }, // ~5 dni temu (week)
+  { datetime: '2026-02-21T07:00:00', pricePerUnit: 1.67, type: 'Diesel' }, // wczoraj
+
+  // Petrol 95
+  { datetime: '2025-03-10T10:00:00', pricePerUnit: 1.88, type: 'Petrol 95' },
+  { datetime: '2025-04-22T13:00:00', pricePerUnit: 1.92, type: 'Petrol 95' },
+  { datetime: '2025-06-05T09:30:00', pricePerUnit: 1.95, type: 'Petrol 95' },
+  { datetime: '2025-07-19T11:00:00', pricePerUnit: 1.89, type: 'Petrol 95' },
+  { datetime: '2025-09-30T14:30:00', pricePerUnit: 1.82, type: 'Petrol 95' },
+  { datetime: '2025-11-18T08:00:00', pricePerUnit: 1.78, type: 'Petrol 95' },
+  { datetime: '2026-01-07T10:15:00', pricePerUnit: 1.8, type: 'Petrol 95' },
+  { datetime: '2026-01-28T11:00:00', pricePerUnit: 1.83, type: 'Petrol 95' }, // ~3 tyg. temu (month)
+  { datetime: '2026-02-08T14:00:00', pricePerUnit: 1.86, type: 'Petrol 95' }, // ~2 tyg. temu (month)
+  { datetime: '2026-02-16T12:00:00', pricePerUnit: 1.88, type: 'Petrol 95' }, // ~6 dni temu (week)
+  { datetime: '2026-02-20T16:30:00', pricePerUnit: 1.9, type: 'Petrol 95' }, // przedwczoraj
+]
 </script>
 
 <template>
-  <template v-if="isMobile">
-    <div class="topbar-container">
-      <v-fade-transition mode="out-in" duration="200">
-        <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2 py-1" key="context-bar">
-          <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
-            <template #activator="{ props }">
-              <v-btn v-bind="props" icon="mdi-close" variant="text" @click="clearSelection"></v-btn>
-            </template>
-          </v-tooltip>
-
-          <div class="text-subtitle-1 font-weight-medium ml-2">{{ selectedCount }} items selected</div>
-
-          <v-spacer></v-spacer>
-          <v-tooltip text="Delete selected fuel entries" location="bottom" open-delay="200" close-delay="500">
-            <template #activator="{ props }">
-              <v-btn v-bind="props" icon="mdi-delete" variant="text" color="error" @click="showBulkDeleteDialog = true"></v-btn>
-            </template>
-          </v-tooltip>
-        </div>
-
-        <div v-else class="d-flex justify-space-between align-center w-100 py-1" key="standard-bar">
-          <v-spacer />
-          <v-btn icon="mdi-filter-variant" variant="text" disabled></v-btn>
-        </div>
-      </v-fade-transition>
+  <v-row class="ma-0 mb-4">
+    <div class="d-flex flex-row align-center w-100">
+      <v-spacer />
+      <ConnectedButtonGroup v-model="dataPeriod" :options="viewModeOptions" mandatory />
     </div>
+  </v-row>
 
-    <v-infinite-scroll :key="infiniteScrollKey" :onLoad="loadMore" :items="energyEntries">
-      <EnergyEntriesList v-model="selectedEntryIds" :items="energyEntries" @delete="openSingleDeleteDialog" />
-      <template v-slot:empty>
-        <div class="pa-4 text-center text-medium-emphasis text-caption">No more records</div>
-      </template>
-    </v-infinite-scroll>
-  </template>
+  <v-row>
+    <v-col cols="12" md="9">
+      <v-row>
+        <v-col cols="12" sm="4">
+          <StatCard
+            title="Driving cost"
+            :metric="{
+              value: '32,50 PLN',
+              subtitle: 'per 100 km',
+              contextValue: '12%',
+              contextAppendText: 'vs last month',
+              contextTrend: NullableOfContextTrend.Up,
+              contextTrendMode: NullableOfTrendMode.Bad,
+            }"
+            icon="mdi-gauge"
+            accent-color="primary"
+          />
+        </v-col>
+        <v-col cols="12" sm="4">
+          <StatCard title="Fuel cost" :metric="{ value: '2 450 PLN' }" icon="mdi-cash-multiple" accent-color="secondary" />
+        </v-col>
+        <v-col cols="12" sm="4">
+          <StatCard title="Distance driven" :metric="{ value: '1200 km' }" icon="mdi-map-marker-distance" accent-color="tertiary" />
+        </v-col>
 
-  <template v-else>
-    <v-row class="equal-height-row">
-      <v-col cols="12">
-        <v-card class="fuel-card" variant="flat" rounded="md-16px">
-          <v-row class="fuel-container-row no-gutters mx-4 my-4" dense>
-            <div class="table-container-flex">
-              <div class="topbar-container mb-3">
-                <v-fade-transition mode="out-in" duration="200">
-                  <div v-if="hasSelection" class="context-bar d-flex align-center w-100 rounded-pill px-2" key="context-bar">
-                    <v-tooltip text="Clear Selection" location="bottom" open-delay="200" close-delay="500">
-                      <template #activator="{ props }">
-                        <v-btn v-bind="props" icon="mdi-close" variant="text" density="comfortable" @click="clearSelection" />
-                      </template>
-                    </v-tooltip>
+        <v-col cols="12">
+          <EnergyChartsSection :entries="fuelEntries" :data-period="dataPeriod" />
+        </v-col>
+      </v-row>
+    </v-col>
 
-                    <span class="text-subtitle-2 font-weight-medium ml-2">{{ selectedCount }} selected</span>
+    <v-col cols="12" md="3">
+      <EnergyStatsSection :stats="energyTypeStats" />
+    </v-col>
+  </v-row>
 
-                    <v-spacer />
+  <v-divider class="my-6"></v-divider>
 
-                    <v-tooltip text="Delete selected" location="bottom" open-delay="200" close-delay="500">
-                      <template #activator="{ props }">
-                        <v-btn
-                          v-bind="props"
-                          icon="mdi-delete"
-                          variant="text"
-                          color="error"
-                          density="comfortable"
-                          @click="showBulkDeleteDialog = true"
-                        />
-                      </template>
-                    </v-tooltip>
-                  </div>
+  <v-row>
+    <v-col cols="12">
+      <v-card variant="flat" color="secondary-container" height="400" title="Records history table"> </v-card>
+    </v-col>
+  </v-row>
 
-                  <div v-else class="d-flex justify-space-between align-center w-100" key="standard-bar">
-                    <v-spacer />
-                    <v-chip-group v-model="selectedEnergyTypeFilters" multiple filter class="pr-1" selected-class="filter-chip-selected">
-                      <v-chip
-                        v-for="energyType in allowedEnergyTypes"
-                        :key="energyType"
-                        :value="energyType"
-                        filter
-                        variant="outlined"
-                        class="filter-chip"
-                      >
-                        {{ energyType }}
-                      </v-chip>
-                    </v-chip-group>
-                  </div>
-                </v-fade-transition>
-              </div>
-
-              <EnergyEntriesTable
-                :items="energyEntries"
-                :total-count="totalCount"
-                :loading="energyEntriesLoading"
-                :page="page"
-                :items-per-page="itemsPerPage"
-                v-model:selectedIds="selectedEntryIds"
-                @update:page="handlePageChange"
-                @update:items-per-page="handlePageSizeChange"
-                @edit="openEditDialog"
-                @delete="(item) => openSingleDeleteDialog(item.id)"
-              />
-            </div>
-
-            <div class="statistics-container-flex">
-              <v-row>
-                <v-col cols="6">
-                  <EnergyStatCard
-                    title="Average Consumption"
-                    title-prepend-icon="mdi-gauge"
-                    subtitle="This year"
-                    value="8.2"
-                    value-append="L/100km"
-                    trend-icon="mdi-arrow-bottom-right"
-                    trend="-0.5%"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <EnergyStatCard
-                    title="Average Consumption"
-                    title-prepend-icon="mdi-gauge"
-                    subtitle="This year"
-                    value="8"
-                    value-append="L/100km"
-                    trend-icon="mdi-arrow-bottom-right"
-                    trend="+10%"
-                  />
-                </v-col>
-              </v-row>
-            </div>
-          </v-row>
-        </v-card>
-      </v-col>
-    </v-row>
-  </template>
-
-  <EnergyEntryDialog
+  <!-- <EnergyEntryDialog
     :model-value="showEntryDialog"
     :vehicleId="vehicleId"
     :entry="selectedEntry"
@@ -345,7 +332,7 @@ watch(selectedEnergyTypeFilters, () => {
     :is-open="showBulkDeleteDialog"
     :on-confirm="confirmBulkDelete"
     :on-cancel="() => (showBulkDeleteDialog = false)"
-  />
+  /> -->
 </template>
 
 <style scoped lang="scss">
@@ -353,6 +340,8 @@ watch(selectedEnergyTypeFilters, () => {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
 }
 
+.fuel-type-stats-card {
+}
 .fuel-container-row {
   display: flex;
   flex-wrap: wrap;
