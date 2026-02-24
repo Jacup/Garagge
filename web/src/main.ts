@@ -8,6 +8,7 @@ import { useAuthStore } from './stores/auth'
 
 import 'vuetify/styles'
 import './styles/material-list.scss'
+import './styles/chips.scss'
 
 const app = createApp(App)
 

@@ -24,7 +24,7 @@ import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import EnergyStatsSection from '@/components/vehicles/energy/EnergyStatsSection.vue'
 import EnergyPriceChart from '@/components/vehicles/energy/charts/EnergyPriceChart.vue'
-import EnergyChartsSection from '@/components/vehicles/energy/charts/EnergyChartsSection.vue'
+import EnergyChartsSection, { type EnergyChartEntryDto } from '@/components/vehicles/energy/charts/EnergyChartsSection.vue'
 
 interface Props {
   vehicleId: string
@@ -230,33 +230,33 @@ const energyTypeStats = [
     averageCostPer100km: 75 as number,
   },
 ]
-const fuelEntries: FuelPriceEntry[] = [
-  // Diesel
-  { datetime: '2025-02-25T08:00:00', pricePerUnit: 1.72, type: 'Diesel' }, // ~4 tyg. temu
-  { datetime: '2025-03-18T11:30:00', pricePerUnit: 1.68, type: 'Diesel' },
-  { datetime: '2025-05-05T09:15:00', pricePerUnit: 1.75, type: 'Diesel' },
-  { datetime: '2025-06-20T14:00:00', pricePerUnit: 1.8, type: 'Diesel' },
-  { datetime: '2025-08-01T10:00:00', pricePerUnit: 1.77, type: 'Diesel' },
-  { datetime: '2025-09-14T08:45:00', pricePerUnit: 1.65, type: 'Diesel' },
-  { datetime: '2025-11-02T12:00:00', pricePerUnit: 1.6, type: 'Diesel' },
-  { datetime: '2025-12-28T09:00:00', pricePerUnit: 1.58, type: 'Diesel' },
-  { datetime: '2026-01-15T10:00:00', pricePerUnit: 1.62, type: 'Diesel' }, // ~5 tyg. temu
-  { datetime: '2026-02-10T09:00:00', pricePerUnit: 1.64, type: 'Diesel' }, // ~12 dni temu (month)
-  { datetime: '2026-02-17T08:30:00', pricePerUnit: 1.66, type: 'Diesel' }, // ~5 dni temu (week)
-  { datetime: '2026-02-21T07:00:00', pricePerUnit: 1.67, type: 'Diesel' }, // wczoraj
+const chartEntries: EnergyChartEntryDto[] = [
+  { date: '2025-02-25T08:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.88, consumption: null, cost: null },
+  { date: '2025-03-18T11:30:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.92, consumption: 4.2, cost: 38.4 },
+  { date: '2025-05-05T09:15:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.95, consumption: 3.8, cost: 39.0 },
+  { date: '2025-06-20T14:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.91, consumption: 4.5, cost: 38.2 },
+  { date: '2025-08-01T10:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.89, consumption: 5.1, cost: 37.8 },
+  { date: '2025-09-14T08:45:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.85, consumption: 4.0, cost: 37.0 },
+  { date: '2025-11-02T12:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.82, consumption: 4.8, cost: 36.4 },
+  { date: '2025-12-28T09:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.8, consumption: 5.3, cost: 36.0 },
+  { date: '2026-01-15T10:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.83, consumption: 5.0, cost: 36.6 },
+  { date: '2026-02-10T09:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.86, consumption: 4.6, cost: 37.2 },
+  { date: '2026-02-17T08:30:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.88, consumption: 4.3, cost: 37.6 },
+  { date: '2026-02-21T07:00:00', type: 'Gasoline', energyUnit: 'Liter', pricePerUnit: 1.87, consumption: 4.1, cost: 37.4 },
 
-  // Petrol 95
-  { datetime: '2025-03-10T10:00:00', pricePerUnit: 1.88, type: 'Petrol 95' },
-  { datetime: '2025-04-22T13:00:00', pricePerUnit: 1.92, type: 'Petrol 95' },
-  { datetime: '2025-06-05T09:30:00', pricePerUnit: 1.95, type: 'Petrol 95' },
-  { datetime: '2025-07-19T11:00:00', pricePerUnit: 1.89, type: 'Petrol 95' },
-  { datetime: '2025-09-30T14:30:00', pricePerUnit: 1.82, type: 'Petrol 95' },
-  { datetime: '2025-11-18T08:00:00', pricePerUnit: 1.78, type: 'Petrol 95' },
-  { datetime: '2026-01-07T10:15:00', pricePerUnit: 1.8, type: 'Petrol 95' },
-  { datetime: '2026-01-28T11:00:00', pricePerUnit: 1.83, type: 'Petrol 95' }, // ~3 tyg. temu (month)
-  { datetime: '2026-02-08T14:00:00', pricePerUnit: 1.86, type: 'Petrol 95' }, // ~2 tyg. temu (month)
-  { datetime: '2026-02-16T12:00:00', pricePerUnit: 1.88, type: 'Petrol 95' }, // ~6 dni temu (week)
-  { datetime: '2026-02-20T16:30:00', pricePerUnit: 1.9, type: 'Petrol 95' }, // przedwczoraj
+  { date: '2025-02-25T08:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.68, consumption: null, cost: null },
+  { date: '2025-03-05T19:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.68, consumption: 18.2, cost: 13.6 },
+  { date: '2025-03-20T20:30:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.65, consumption: 17.8, cost: 13.0 },
+  { date: '2025-04-10T18:45:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.62, consumption: 16.5, cost: 12.4 },
+  { date: '2025-05-22T21:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.6, consumption: 15.9, cost: 12.0 },
+  { date: '2025-07-08T20:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.58, consumption: 15.2, cost: 11.6 },
+  { date: '2025-08-19T19:30:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.6, consumption: 15.8, cost: 12.0 },
+  { date: '2025-10-03T20:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.63, consumption: 17.1, cost: 12.6 },
+  { date: '2025-11-15T19:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.66, consumption: 19.4, cost: 13.2 },
+  { date: '2025-12-10T20:30:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.7, consumption: 21.0, cost: 14.0 },
+  { date: '2026-01-22T19:15:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.68, consumption: 20.2, cost: 13.6 },
+  { date: '2026-02-12T20:00:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.65, consumption: 18.8, cost: 13.0 },
+  { date: '2026-02-19T19:30:00', type: 'Electric', energyUnit: 'kWh', pricePerUnit: 0.64, consumption: 17.9, cost: 12.8 },
 ]
 </script>
 
@@ -294,7 +294,7 @@ const fuelEntries: FuelPriceEntry[] = [
         </v-col>
 
         <v-col cols="12">
-          <EnergyChartsSection :entries="fuelEntries" :data-period="dataPeriod" />
+          <EnergyChartsSection :entries="chartEntries" :data-period="dataPeriod" />
         </v-col>
       </v-row>
     </v-col>
@@ -312,7 +312,7 @@ const fuelEntries: FuelPriceEntry[] = [
     </v-col>
   </v-row>
 
-  <!-- <EnergyEntryDialog
+  <EnergyEntryDialog
     :model-value="showEntryDialog"
     :vehicleId="vehicleId"
     :entry="selectedEntry"
@@ -332,7 +332,7 @@ const fuelEntries: FuelPriceEntry[] = [
     :is-open="showBulkDeleteDialog"
     :on-confirm="confirmBulkDelete"
     :on-cancel="() => (showBulkDeleteDialog = false)"
-  /> -->
+  />
 </template>
 
 <style scoped lang="scss">
