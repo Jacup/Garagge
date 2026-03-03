@@ -5,7 +5,7 @@ import { NullableOfContextTrend, NullableOfTrendMode, type EnergyStatsDto, type 
 
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
-import EnergyStatsSection from '@/components/vehicles/energy/EnergyStatsSection.vue'
+import EnergyStatsSection from '@/components/vehicles/energy/stats/EnergyStatsSection.vue'
 import EnergyChartsSection, { type EnergyChartEntryDto } from '@/components/vehicles/energy/charts/EnergyChartsSection.vue'
 import EnergyEntriesSection from '@/components/vehicles/energy/entriesData/EnergyEntriesSection.vue'
 
@@ -20,7 +20,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   'entry-changed': []
 }>()
-
 
 const dataPeriod = ref<0 | 1 | 2 | 3>(1)
 const viewModeOptions = [
