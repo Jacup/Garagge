@@ -337,7 +337,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -347,7 +347,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -401,7 +401,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -411,7 +411,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 15),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -455,7 +455,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -483,7 +483,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -493,7 +493,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -503,7 +503,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -531,7 +531,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -541,7 +541,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 15),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -599,7 +599,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -641,7 +641,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -683,7 +683,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -724,7 +724,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -766,7 +766,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -807,7 +807,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1).AddDays(i),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             })
             .ToList();
 
@@ -974,7 +974,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 200,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -985,7 +985,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 150,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1074,7 +1074,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 300,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -1085,7 +1085,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 250,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1199,7 +1199,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = null,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid(),
+                Type = ServiceRecordType.Other,
                 Items = new List<ServiceItem>
                 {
                     new()
@@ -1317,7 +1317,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 99.99m,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1360,7 +1360,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 0,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1468,7 +1468,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = i * 5, // 5, 10, 15, ... 2500
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             })
             .ToList();
 
@@ -1570,7 +1570,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = 200,
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid(),
+                Type = ServiceRecordType.Other,
                 Items = []
             },
             new()
@@ -1582,7 +1582,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ManualCost = null, // Will use Items
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid(),
+                Type = ServiceRecordType.Other,
                 Items = new List<ServiceItem>
                 {
                     new()
@@ -1665,7 +1665,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 12),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -1675,7 +1675,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 18),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1758,7 +1758,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 12),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -1768,7 +1768,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 5),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1824,7 +1824,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 20),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -1903,7 +1903,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 3, 15, 14, 30, 45),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -2050,7 +2050,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 1).AddDays(i),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             })
             .ToList();
 
@@ -2077,7 +2077,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 15, 0, 0, 0),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -2103,7 +2103,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 15, 23, 59, 59, 999),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 
@@ -2247,7 +2247,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 1, 20),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -2257,7 +2257,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 2, 28),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             },
             new()
             {
@@ -2267,7 +2267,7 @@ public class StatisticsServiceTests : InMemoryDbTestBase
                 ServiceDate = new DateTime(2024, 4, 1),
                 VehicleId = Guid.NewGuid(),
                 Vehicle = null!,
-                TypeId = Guid.NewGuid()
+                Type = ServiceRecordType.Other
             }
         };
 

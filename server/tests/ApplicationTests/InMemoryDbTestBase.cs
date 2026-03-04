@@ -66,31 +66,49 @@ public abstract class InMemoryDbTestBase : IDisposable
         return vehicle;
     }
 
-    protected async Task<ServiceType> CreateServiceTypeInDb(string name = "Test Service Type")
-    {
-        var serviceType = new ServiceType { Id = Guid.NewGuid(), Name = name };
-
-        Context.ServiceTypes.Add(serviceType);
-        await Context.SaveChangesAsync();
-        return serviceType;
-    }
 
     protected async Task<ServiceRecord> CreateServiceRecordInDb(
         Guid vehicleId,
-        Guid serviceTypeId,
         string title = "Test Service Record",
         DateTime? serviceDate = null,
         int? mileage = null,
         decimal? manualCost = null,
+        string? notes = null,
+        ServiceRecordType type = ServiceRecordType.Other)
+    {
+        var serviceRecord = new ServiceRecord
+        {
+            Id = Guid.NewGuid(),
+            VehicleId = vehicleId,
+            Type = type,
+            Title = title,
+            ServiceDate = serviceDate ?? DateTime.UtcNow.Date,
+            Notes = notes,
+            Mileage = mileage,
+            ManualCost = manualCost
+        };
+
+        Context.ServiceRecords.Add(serviceRecord);
+        await Context.SaveChangesAsync();
+        return serviceRecord;
+    }
+
+    protected async Task<ServiceRecord> CreateServiceRecordInDb(
+        Guid vehicleId,
+        ServiceRecordType type,
+        string title,
+        DateTime serviceDate,
+        int mileage,
+        decimal manualCost,
         string? notes = null)
     {
         var serviceRecord = new ServiceRecord
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
-            TypeId = serviceTypeId,
+            Type = type,
             Title = title,
-            ServiceDate = serviceDate ?? DateTime.UtcNow.Date,
+            ServiceDate = serviceDate,
             Notes = notes,
             Mileage = mileage,
             ManualCost = manualCost

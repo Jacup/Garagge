@@ -20,9 +20,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -42,7 +41,7 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
         var nonExistentRecordId = Guid.NewGuid();
-        
+
         var command = new DeleteServiceRecordCommand(nonExistentRecordId, vehicle.Id);
 
         // Act
@@ -59,10 +58,9 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id);
         var nonExistentVehicleId = Guid.NewGuid();
-        
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, nonExistentVehicleId);
 
         // Act
@@ -80,9 +78,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var vehicle1 = await CreateVehicleInDb([EnergyType.Gasoline]);
         var vehicle2 = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle1.Id, serviceType.Id);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle1.Id);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle2.Id);
 
         // Act
@@ -100,9 +97,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var otherUserId = Guid.NewGuid();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline], otherUserId);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -119,11 +115,10 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id);
         await CreateServiceItemInDb(serviceRecord.Id, "Oil Filter");
         await CreateServiceItemInDb(serviceRecord.Id, "Engine Oil");
-        
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -146,9 +141,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -167,11 +161,10 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
-        var serviceRecord1 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Record 1");
-        var serviceRecord2 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Record 2");
-        var serviceRecord3 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Record 3");
-        
+        var serviceRecord1 = await CreateServiceRecordInDb(vehicle.Id, "Record 1");
+        var serviceRecord2 = await CreateServiceRecordInDb(vehicle.Id, "Record 2");
+        var serviceRecord3 = await CreateServiceRecordInDb(vehicle.Id, "Record 3");
+
         var command = new DeleteServiceRecordCommand(serviceRecord2.Id, vehicle.Id);
 
         // Act
@@ -186,6 +179,7 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var remainingRecords = await Context.ServiceRecords
             .Where(sr => sr.VehicleId == vehicle.Id)
             .ToListAsync();
+
         remainingRecords.Count.ShouldBe(2);
         remainingRecords.ShouldContain(sr => sr.Id == serviceRecord1.Id);
         remainingRecords.ShouldContain(sr => sr.Id == serviceRecord3.Id);
@@ -197,9 +191,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Inspection");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, mileage: 50000);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, mileage: 50000);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -217,9 +210,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Repair");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, manualCost: 250.50m);
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, manualCost: 250.50m);
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act
@@ -237,9 +229,8 @@ public class DeleteServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Custom");
-        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, notes: "Important notes about this service");
-        
+        var serviceRecord = await CreateServiceRecordInDb(vehicle.Id, notes: "Important notes about this service");
+
         var command = new DeleteServiceRecordCommand(serviceRecord.Id, vehicle.Id);
 
         // Act

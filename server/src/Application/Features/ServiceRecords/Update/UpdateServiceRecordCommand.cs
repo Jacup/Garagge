@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Messaging;
+using Domain.Enums.Services;
 
 namespace Application.Features.ServiceRecords.Update;
 
@@ -6,7 +7,7 @@ public record UpdateServiceRecordCommand(
     Guid ServiceRecordId,
     string Title,
     DateTime ServiceDate,
-    Guid ServiceTypeId,
+    ServiceRecordType Type,
     Guid VehicleId,
     string? Notes = null,
     int? Mileage = null,

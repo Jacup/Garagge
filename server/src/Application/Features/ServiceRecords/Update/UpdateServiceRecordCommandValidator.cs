@@ -16,9 +16,11 @@ internal sealed class UpdateServiceRecordCommandValidator : AbstractValidator<Up
             .NotEmpty()
             .WithError(ServiceRecordErrors.VehicleIdRequired);
 
-        RuleFor(x => x.ServiceTypeId)
+        RuleFor(x => x.Type)
             .NotEmpty()
-            .WithError(ServiceRecordErrors.ServiceTypeIdRequired);
+            .WithError(ServiceRecordErrors.TypeRequired)
+            .IsInEnum()
+            .WithError(ServiceRecordErrors.TypeRequired);
 
         RuleFor(x => x.Title)
             .NotEmpty()

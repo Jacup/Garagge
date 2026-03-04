@@ -28,7 +28,6 @@ internal sealed class GetServiceRecordsQueryHandler(
 
         var serviceRecordsQuery = dbContext.ServiceRecords
             .AsNoTracking()
-            .Include(sr => sr.Type)
             .Include(sr => sr.Items)
             .Where(sr => sr.VehicleId == request.VehicleId);
 
@@ -40,12 +39,11 @@ internal sealed class GetServiceRecordsQueryHandler(
             .Select(sr => new ServiceRecordDto(
                 sr.Id,
                 sr.Title,
+                sr.Type,
                 sr.Notes,
                 sr.Mileage,
                 sr.ServiceDate,
                 sr.TotalCost,
-                sr.TypeId,
-                sr.Type!.Name,
                 sr.Items.Select(si => new ServiceItemDto(
                     si.Id, 
                     si.Name, 

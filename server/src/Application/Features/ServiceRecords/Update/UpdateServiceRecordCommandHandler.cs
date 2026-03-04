@@ -15,7 +15,6 @@ internal sealed class UpdateServiceRecordCommandHandler(IApplicationDbContext db
     {
         var serviceRecord = await dbContext.ServiceRecords
             .Include(sr => sr.Vehicle)
-            .Include(sr => sr.Type)
             .Include(sr => sr.Items)
             .FirstOrDefaultAsync(sr =>
                     sr.Id == request.ServiceRecordId &&
@@ -25,30 +24,23 @@ internal sealed class UpdateServiceRecordCommandHandler(IApplicationDbContext db
         if (serviceRecord?.Vehicle is null || serviceRecord.Vehicle.UserId != userContext.UserId)
             return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.NotFound);
 
-        var serviceType = await dbContext.ServiceTypes.FirstOrDefaultAsync(t => t.Id == request.ServiceTypeId, cancellationToken);
-
-        if (serviceType is null)
-            return Result.Failure<ServiceRecordDto>(ServiceRecordErrors.ServiceTypeNotFound(request.ServiceTypeId));
-
         serviceRecord.Title = request.Title;
         serviceRecord.Notes = request.Notes;
         serviceRecord.Mileage = request.Mileage;
         serviceRecord.ServiceDate = request.ServiceDate;
         serviceRecord.ManualCost = request.ManualCost;
-        serviceRecord.TypeId = request.ServiceTypeId;
-        serviceRecord.Type = serviceType;
+        serviceRecord.Type = request.Type;
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
         var dto = new ServiceRecordDto(
             serviceRecord.Id,
             serviceRecord.Title,
+            serviceRecord.Type,
             serviceRecord.Notes,
             serviceRecord.Mileage,
             serviceRecord.ServiceDate,
             serviceRecord.TotalCost,
-            serviceRecord.TypeId,
-            serviceRecord.Type.Name,
             serviceRecord.Items.Select(si => si.Adapt<ServiceItemDto>()).ToList(),
             serviceRecord.VehicleId,
             serviceRecord.CreatedDate,

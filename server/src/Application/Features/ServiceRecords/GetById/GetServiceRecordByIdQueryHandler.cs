@@ -15,7 +15,6 @@ internal sealed class GetServiceRecordByIdQueryHandler(IApplicationDbContext con
         var serviceRecord = await context.ServiceRecords
             .AsNoTracking()
             .Include(sr => sr.Vehicle)
-            .Include(sr => sr.Type)
             .Include(sr => sr.Items)
             .FirstOrDefaultAsync(sr => 
                     sr.Id == request.ServiceRecordId && 
@@ -29,12 +28,11 @@ internal sealed class GetServiceRecordByIdQueryHandler(IApplicationDbContext con
         var dto = new ServiceRecordDto(
             serviceRecord.Id,
             serviceRecord.Title,
+            serviceRecord.Type,
             serviceRecord.Notes,
             serviceRecord.Mileage,
             serviceRecord.ServiceDate,
             serviceRecord.TotalCost,
-            serviceRecord.TypeId,
-            serviceRecord.Type?.Name ?? string.Empty,
             serviceRecord.Items.Select(si => new ServiceItemDto(
                 si.Id,
                 si.Name,
