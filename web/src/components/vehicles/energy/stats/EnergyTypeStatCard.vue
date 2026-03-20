@@ -21,16 +21,16 @@ defineProps<{
     <v-card-title class="d-flex flex-row text-subtitle-1 font-weight-bold pt-3">
       {{ stats.type }}
       <v-spacer />
-      <v-chip size="small"  color="tertiary" variant="flat" class="suggestion-chip"> {{ stats.itemsCount }} entries </v-chip>
+      <v-chip size="small" color="tertiary" variant="flat" class="suggestion-chip"> {{ stats.itemsCount }} entries </v-chip>
     </v-card-title>
-<v-divider />
+    <v-divider />
     <v-card-text class="py-2 px-4">
       <v-list density="compact" bg-color="transparent">
         <v-list-item
           v-for="item in [
-            { label: 'Consumption', value: formatConsumption(stats.averageConsumption) },
             { label: 'Total cost', value: formatCurrency(stats.totalCost) },
             { label: 'Total volume', value: formatVolume(stats.totalVolume) },
+            { label: 'Avg. consumption', value: formatConsumption(stats.averageConsumption) },
             { label: 'Avg. price', value: formatCurrencyPerUnit(stats.averagePricePerUnit) },
             { label: 'Cost / 100 km', value: formatCurrency(stats.averageCostPer100km) },
           ]"

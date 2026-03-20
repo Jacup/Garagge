@@ -1,15 +1,19 @@
-﻿using Domain.Entities.EnergyEntries;
-using Domain.Enums;
+﻿using Application.Features.EnergyEntries;
+using Domain.Entities.EnergyEntries;
 
 namespace Application.Services.EnergyStats;
 
 public interface IEnergyStatsService
 {
-    EnergyUnitStats CalculateStatisticsForUnit(EnergyUnit unit, IReadOnlyCollection<EnergyEntry> entries);
-    
-    decimal CalculateAverageConsumption(IReadOnlyCollection<EnergyEntry> entries);
-    decimal CalculateTotalVolume(IReadOnlyCollection<EnergyEntry> entries);
     decimal CalculateTotalCost(IReadOnlyCollection<EnergyEntry> entries);
-    decimal CalculateAveragePricePerUnit(IReadOnlyCollection<EnergyEntry> entries);
-}
 
+    int CalculateDistanceDriven(IReadOnlyCollection<EnergyEntry> entries);
+
+    EnergyTypeStatsDto[] CalculateStatsByType(IReadOnlyCollection<EnergyEntry> entries);
+
+    decimal CalculateAverageConsumption(IReadOnlyCollection<EnergyEntry> entries);
+
+    decimal CalculateAveragePricePerUnit(IReadOnlyCollection<EnergyEntry> entries);
+
+    decimal CalculateTotalVolume(IReadOnlyCollection<EnergyEntry> entries);
+}
