@@ -1,126 +1,101 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Release version (e.g., 0.3.0)'
-        required: true
-        type: string
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  prepare-release:
+  release:
     runs-on: ubuntu-latest
-    
+
+    permissions:
+      contents: write
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GITHUB_TOKEN }}
-      
-    - name: Validate version format
-      run: |
-        if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "Error: Version must be in format X.Y.Z (e.g., 0.3.0)"
-          exit 1
-        fi
-        
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '9.0.x'
-        
-    - name: Update .csproj version
-      run: |
-        echo "Updating version to ${{ github.event.inputs.version }}"
-        find ./server -name "*.csproj" -type f -exec sed -i "s|<Version>.*</Version>|<Version>${{ github.event.inputs.version }}</Version>|g" {} \;
-        
-        echo "Modified files:"
-        find ./server -name "*.csproj" -type f -exec echo "=== {} ===" \; -exec grep -A 2 -B 2 "<Version>" {} \; || true
-        
-    - name: Test build
-      working-directory: ./server
-      run: |
-        echo "Testing build with new version..."
-        dotnet restore Garagge.sln
-        dotnet build Garagge.sln --configuration Release --no-restore
-        
-    - name: Commit version changes
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add "server/*.csproj"
-        git add "server/src/**/*.csproj" || true
-        
-        if git diff --staged --quiet; then
-          echo "No changes to commit - version might already be up to date"
-        else
-          git commit -m "Bump version to ${{ github.event.inputs.version }}"
-          git push
-        fi
-        
-    - name: Create and push tag
-      run: |
-        git tag "v${{ github.event.inputs.version }}" -m "Release version ${{ github.event.inputs.version }}"
-        git push origin "v${{ github.event.inputs.version }}"
-        
-    - name: Generate release notes
-      id: release_notes
-      run: |
-        PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-        
-        if [ -z "$PREVIOUS_TAG" ]; then
-          echo "First release - no previous version to compare"
-          cat << 'EOF' > release_notes.txt
-        🎉 First release of Garagge v${{ github.event.inputs.version }}
-        
-        ## Features
-        - Modern vehicle management application
-        - Built with .NET
-        
-        **Author**: Jakub Gramburg
-        EOF
-        else
-          echo "Generating notes from $PREVIOUS_TAG to v${{ github.event.inputs.version }}"
-          COMMIT_LOG=$(git log --pretty=format:"- %s (%h)" "$PREVIOUS_TAG"..HEAD --reverse)
-          cat << EOF > release_notes.txt
-        ## What's Changed in v${{ github.event.inputs.version }}
-        
-        $COMMIT_LOG
-        
-        **Full Changelog**: https://github.com/Jacup/Garagge/compare/$PREVIOUS_TAG...v${{ github.event.inputs.version }}
-        EOF
-        fi
-        
-        echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-        cat release_notes.txt >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-        
-    - name: Create GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ github.event.inputs.version }}
-        name: Garagge v${{ github.event.inputs.version }}
-        body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
-        draft: false
-        prerelease: false
-        token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Build release package
-      working-directory: ./server
-      run: |
-        echo "Building release package..."
-        dotnet publish Garagge.sln --configuration Release --output ../publish
-        
-        cd ../publish
-        tar -czf ../garagge-v${{ github.event.inputs.version }}-linux-x64.tar.gz *
-        cd ..
-        
-    - name: Upload release assets
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: v${{ github.event.inputs.version }}
-        files: garagge-v${{ github.event.inputs.version }}-linux-x64.tar.gz
-        token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.ref_name }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format X.Y.Z (e.g., 0.5.4). Found: $VERSION"
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Update .csproj version
+        run: |
+          find ./server -name "*.csproj" -type f \
+            -exec sed -i "s|<Version>.*</Version>|<Version>${{ github.ref_name }}</Version>|g" {} \;
+
+      - name: Build and test
+        working-directory: ./server
+        run: |
+          dotnet restore Garagge.sln
+          dotnet build Garagge.sln --configuration Release --no-restore
+
+      - name: Commit version bump
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add "server/*.csproj"
+          git add "server/src/**/*.csproj" || true
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Bump version to ${{ github.ref_name }}"
+            git push origin main
+          fi
+
+      - name: Log in to Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ github.ref_name }}
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          file: server/src/Api/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          no-cache: true
+          build-args: |
+            VERSION=${{ github.ref_name }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
