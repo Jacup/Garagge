@@ -3,11 +3,12 @@ import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import VueApexCharts from 'vue3-apexcharts'
 import type { ApexOptions } from 'apexcharts'
-import type { EnergyChartEntryDto } from './EnergyChartsSection.vue'
+import type { EnergyType, EnergyUnit, StatsPeriod } from '@/api/generated/apiV1.schemas'
+import { StatsPeriod as SP } from '@/api/generated/apiV1.schemas'
 
 const props = defineProps<{
-  entries: Pick<EnergyChartEntryDto, 'date' | 'type' | 'pricePerUnit'>[]
-  dataPeriod: 0 | 1 | 2 | 3
+  entries: { date: string; type: EnergyType; pricePerUnit: number }[]
+  dataPeriod: StatsPeriod
 }>()
 
 const theme = useTheme()
@@ -15,7 +16,7 @@ const theme = useTheme()
 const xRange = computed(() => {
   const now = new Date()
 
-  if (props.dataPeriod === 0) {
+  if (props.dataPeriod === SP.Lifetime) {
     const oldest = props.entries.reduce((min, e) => {
       const t = new Date(e.date).getTime()
       return t < min ? t : min
@@ -23,57 +24,40 @@ const xRange = computed(() => {
     return { min: oldest, max: now.getTime() }
   }
 
-  if (props.dataPeriod === 3) {
+  if (props.dataPeriod === SP.Week) {
     const mon = new Date(now)
     const day = now.getDay() === 0 ? 6 : now.getDay() - 1
     mon.setDate(now.getDate() - day)
     mon.setHours(0, 0, 0, 0)
-
     const sun = new Date(mon)
     sun.setDate(mon.getDate() + 6)
     sun.setHours(23, 59, 59, 999)
-
     return { min: mon.getTime(), max: sun.getTime() }
   }
 
-  if (props.dataPeriod === 2) {
+  if (props.dataPeriod === SP.Month) {
     const start = new Date(now.getFullYear(), now.getMonth(), 1)
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
     return { min: start.getTime(), max: end.getTime() }
   }
 
-  if (props.dataPeriod === 1) {
-    const start = new Date(now.getFullYear(), 0, 1)
-    const end = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
-    return { min: start.getTime(), max: end.getTime() }
-  }
-
-  return { min: now.getTime(), max: now.getTime() }
+  // Year
+  const start = new Date(now.getFullYear(), 0, 1)
+  const end = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
+  return { min: start.getTime(), max: end.getTime() }
 })
 
 const xAxisConfig = computed(() => {
   switch (props.dataPeriod) {
-    case 3:
-      return {
-        tickAmount: 7,
-        format: 'dd MMM',
-      }
-    case 2:
-      return {
-        tickAmount: 8,
-        format: 'dd MMM',
-      }
-    case 1: 
-      return {
-        tickAmount: 12,
-        format: 'MMM yy',
-      }
-    case 0: 
+    case SP.Week:
+      return { tickAmount: 7, format: 'dd MMM' }
+    case SP.Month:
+      return { tickAmount: 8, format: 'dd MMM' }
+    case SP.Year:
+      return { tickAmount: 12, format: 'MMM yy' }
+    case SP.Lifetime:
     default:
-      return {
-        tickAmount: undefined,
-        format: 'MMM yy',
-      }
+      return { tickAmount: undefined, format: 'MMM yy' }
   }
 })
 
@@ -86,16 +70,8 @@ const series = computed(() => {
   const groups = new Map<string, { x: number; y: number }[]>()
 
   for (const entry of props.entries) {
-    if (entry.pricePerUnit === null) {
-      continue
-    }
-
     const t = new Date(entry.date).getTime()
-
-    if (!groups.has(entry.type)) {
-      groups.set(entry.type, [])
-    }
-
+    if (!groups.has(entry.type)) groups.set(entry.type, [])
     groups.get(entry.type)!.push({ x: t, y: entry.pricePerUnit })
   }
 
@@ -116,26 +92,15 @@ const chartOptions = computed(
       animations: {
         enabled: true,
         speed: 600,
-        animateGradually: {
-          enabled: true,
-          delay: 100,
-        },
-        dynamicAnimation: {
-          enabled: true,
-          speed: 400,
-        },
+        animateGradually: { enabled: true, delay: 100 },
+        dynamicAnimation: { enabled: true, speed: 400 },
       },
     },
     colors: palette.value,
-    stroke: {
-      curve: 'smooth',
-    },
+    stroke: { curve: 'smooth' },
     markers: {
       size: 0,
-      hover: {
-        size: 5,
-        sizeOffset: 3,
-      },
+      hover: { size: 5, sizeOffset: 3 },
     },
     xaxis: {
       type: 'datetime',
@@ -169,7 +134,7 @@ const chartOptions = computed(
       strokeDashArray: 0,
       xaxis: { lines: { show: false } },
       yaxis: { lines: { show: true } },
-      padding: { left: 8, right: 16, bottom: 24},
+      padding: { left: 8, right: 16, bottom: 24 },
     },
     tooltip: {
       x: { format: 'dd MMM yyyy' },
@@ -181,14 +146,8 @@ const chartOptions = computed(
       fontFamily: 'inherit',
       fontSize: '14px',
       offsetY: 0,
-      labels: {
-        colors: theme.current.value.colors['on-surface'],
-      },
-      markers: {
-        size: 5,
-        offsetX: -5,
-        shape: 'circle' as const,
-      },
+      labels: { colors: theme.current.value.colors['on-surface'] },
+      markers: { size: 5, offsetX: -5, shape: 'circle' as const },
       itemMargin: { horizontal: 12 },
     },
     dataLabels: { enabled: false },

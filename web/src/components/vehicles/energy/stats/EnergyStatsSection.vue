@@ -1,16 +1,9 @@
 <script setup lang="ts">
+import type { EnergyTypeStatsDto } from '@/api/generated/apiV1.schemas'
 import EnergyTypeStatCard from './EnergyTypeStatCard.vue'
 
 defineProps<{
-  stats: {
-    type: string
-    itemsCount: number
-    totalCost: number
-    totalVolume: number
-    averageConsumption: number
-    averagePricePerUnit: number
-    averageCostPer100km: number
-  }[]
+  stats: EnergyTypeStatsDto[]
 }>()
 </script>
 

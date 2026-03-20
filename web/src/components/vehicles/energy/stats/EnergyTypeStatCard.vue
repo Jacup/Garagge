@@ -1,18 +1,11 @@
 <script setup lang="ts">
+import type { EnergyTypeStatsDto } from '@/api/generated/apiV1.schemas'
 import { useFormatting } from '@/composables/useFormatting'
 
 const { formatCurrency, formatCurrencyPerUnit, formatConsumption, formatVolume } = useFormatting()
 
 defineProps<{
-  stats: {
-    type: string
-    itemsCount: number
-    totalCost: number
-    totalVolume: number
-    averageConsumption: number
-    averagePricePerUnit: number
-    averageCostPer100km: number
-  }
+  stats: EnergyTypeStatsDto
 }>()
 </script>
 
@@ -46,5 +39,3 @@ defineProps<{
     </v-card-text>
   </v-card>
 </template>
-
-<style lang="css" scoped></style>

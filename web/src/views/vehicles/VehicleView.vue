@@ -1,14 +1,13 @@
+<!-- VehicleView.vue -->
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
-import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
-import type { VehicleDto, VehicleUpdateRequest, EnergyStatsDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, VehicleUpdateRequest } from '@/api/generated/apiV1.schemas'
 
 import VehicleOverviewTab from '@/views/vehicles/tabs/VehicleOverviewTab.vue'
 import VehicleFuelTab from '@/views/vehicles/tabs/VehicleFuelTab.vue'
 import VehicleServiceTab from '@/views/vehicles/tabs/VehicleServiceTab.vue'
-
 import VehicleFormDialog from '@/components/vehicles/VehicleFormDialog.vue'
 import { useLayoutFab } from '@/composables/useLayoutFab'
 import { useAppBar } from '@/composables/useAppBar'
@@ -20,7 +19,6 @@ const notifications = useNotificationsStore()
 const route = useRoute()
 
 const { getApiVehiclesId, putApiVehiclesId } = getVehicles()
-const { getApiVehiclesVehicleIdEnergyEntriesStats } = getEnergyEntries()
 const { registerFab, registerFabMenu, unregisterFab } = useLayoutFab()
 const { close: closeServiceDetailsSheet } = useServiceDetailsState()
 const { setContextBar, resetToSearch } = useAppBar()
@@ -32,48 +30,6 @@ const vehicleId = ref(route.params.id as string)
 const vehicle = ref<VehicleDto | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
-
-const energystats = ref<EnergyStatsDto | null>(null)
-const statsLoading = ref(false)
-const globalStats = ref<EnergyStatsDto | null>(null)
-
-const getUnitLabel = (unit: string | undefined): string => {
-  if (!unit) return ''
-  switch (unit) {
-    case 'Liter':
-      return 'L'
-    case 'Gallon':
-      return 'gal'
-    case 'CubicMeter':
-      return 'm³'
-    case 'kWh':
-      return 'kWh'
-    default:
-      return unit
-  }
-}
-
-const summaryStats = computed(() => {
-  if (!globalStats.value) return null
-
-  const firstUnit = globalStats.value.energyUnitStats[0]
-
-  const consumptions = globalStats.value.energyUnitStats
-    .filter((stat) => stat.averageConsumption && stat.averageConsumption > 0)
-    .map((stat) => ({
-      value: stat.averageConsumption,
-      unit: stat.unit === 'kWh' ? 'kWh/100km' : 'L/100km',
-    }))
-
-  return {
-    totalEntries: globalStats.value.totalEntries,
-    totalCost: globalStats.value.totalCost,
-    totalVolume: firstUnit?.totalVolume ?? 0,
-    volumeUnit: getUnitLabel(firstUnit?.unit),
-    consumptions: consumptions,
-  }
-})
-
 const activeTab = ref('overview')
 const editVehicleDialog = ref(false)
 
@@ -93,66 +49,15 @@ async function loadVehicle() {
       {
         icon: 'mdi-pencil-outline',
         label: 'Edit',
-        action: () => {
-          editVehicleDialog.value = true
-        },
+        action: () => { editVehicleDialog.value = true },
       },
     ])
-    await loadGlobalStats()
   } catch (err) {
     console.error('Failed to load vehicle:', err)
     error.value = 'Failed to load vehicle data'
   } finally {
     loading.value = false
   }
-}
-
-async function loadEnergyStats() {
-  if (!vehicleId.value) return
-
-  try {
-    statsLoading.value = true
-    const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
-      energyTypes: undefined,
-    })
-    energystats.value = response
-  } catch (err) {
-    console.error('Failed to load energy stats:', err)
-    energystats.value = null
-  } finally {
-    statsLoading.value = false
-  }
-}
-
-async function loadGlobalStats() {
-  if (!vehicleId.value) return
-
-  try {
-    const response = await getApiVehiclesVehicleIdEnergyEntriesStats(vehicleId.value, {
-      energyTypes: undefined,
-    })
-    globalStats.value = response
-    energystats.value = response
-  } catch (err) {
-    console.error('Failed to load global stats:', err)
-    globalStats.value = null
-  }
-}
-
-const mockStats = {
-  totalDistance: 12450,
-  totalFuelCost: 2340,
-  avgConsumption: 7.2,
-  lastFuelCost: 320.5,
-  avgFuelPrice: 6.45,
-  lastFuelDate: '2024-12-20',
-  monthlyFuelCost: 650.0,
-  totalServiceCost: 2350.0,
-}
-
-function handleEnergyEntryChanged() {
-  loadEnergyStats()
-  loadGlobalStats()
 }
 
 function openEditVehicleDialog() {
@@ -171,8 +76,8 @@ async function handleVehicleUpdated(vehicleData: VehicleUpdateRequest) {
     notifications.show('Vehicle updated successfully.')
     closeEditVehicleDialog()
     await loadVehicle()
-  } catch (error) {
-    console.error('Failed to update vehicle:', error)
+  } catch (err) {
+    console.error('Failed to update vehicle:', err)
   }
 }
 
@@ -188,9 +93,7 @@ const updateFabForTab = () => {
           text: 'Add Fuel',
           action: () => {
             activeTab.value = 'fuel'
-            nextTick(() => {
-              energyEntriesState.openCreateDialog()
-            })
+            nextTick(() => energyEntriesState.openCreateDialog())
           },
         },
         {
@@ -200,9 +103,7 @@ const updateFabForTab = () => {
           color: 'secondary',
           action: () => {
             activeTab.value = 'service'
-            nextTick(() => {
-              detailsState.create()
-            })
+            nextTick(() => detailsState.create())
           },
         },
       ],
@@ -217,9 +118,7 @@ const updateFabForTab = () => {
     registerFab({
       icon: 'mdi-plus',
       text: 'Add Service',
-      action: () => {
-        detailsState.create()
-      },
+      action: () => detailsState.create(),
     })
   }
 }
@@ -229,13 +128,8 @@ onMounted(async () => {
   updateFabForTab()
 })
 
-onBeforeUnmount(() => {
-  resetToSearch()
-})
-
-onUnmounted(() => {
-  unregisterFab()
-})
+onBeforeUnmount(() => resetToSearch())
+onUnmounted(() => unregisterFab())
 
 watch(activeTab, () => {
   updateFabForTab()
@@ -246,10 +140,10 @@ watch(activeTab, () => {
 <template>
   <div v-if="loading" class="page-content">
     <div class="d-flex align-center mb-6">
-      <v-skeleton-loader type="button" width="40" height="40" class="mr-4"></v-skeleton-loader>
+      <v-skeleton-loader type="button" width="40" height="40" class="mr-4" />
       <div class="flex-grow-1">
-        <v-skeleton-loader type="heading" width="200" class="mb-2"></v-skeleton-loader>
-        <v-skeleton-loader type="text" width="300"></v-skeleton-loader>
+        <v-skeleton-loader type="heading" width="200" class="mb-2" />
+        <v-skeleton-loader type="text" width="300" />
       </div>
     </div>
     <section class="summary-section mb-6">
@@ -257,8 +151,8 @@ watch(activeTab, () => {
         <v-col v-for="n in 4" :key="n" cols="12" sm="6" md="3">
           <v-card class="card-background summary-card" height="120">
             <v-card-text>
-              <v-skeleton-loader type="text" width="60%" class="mb-2"></v-skeleton-loader>
-              <v-skeleton-loader type="heading" width="80%"></v-skeleton-loader>
+              <v-skeleton-loader type="text" width="60%" class="mb-2" />
+              <v-skeleton-loader type="heading" width="80%" />
             </v-card-text>
           </v-card>
         </v-col>
@@ -305,8 +199,6 @@ watch(activeTab, () => {
         <VehicleOverviewTab
           :vehicle="vehicle"
           :last-entered-mileage="1234"
-          :global-stats="globalStats"
-          :summary-stats="summaryStats"
           @edit="openEditVehicleDialog"
         />
       </v-window-item>
@@ -314,14 +206,13 @@ watch(activeTab, () => {
       <v-window-item value="fuel">
         <VehicleFuelTab
           :vehicle-id="vehicle.id!"
-          :allowedEnergyTypes="vehicle?.allowedEnergyTypes"
-          :energystats="energystats"
-          @entry-changed="handleEnergyEntryChanged"
+          :allowed-energy-types="vehicle.allowedEnergyTypes"
+          @entry-changed="loadVehicle"
         />
       </v-window-item>
 
       <v-window-item value="service">
-        <VehicleServiceTab :vehicle-id="vehicle.id!" :mock-stats="mockStats" />
+        <VehicleServiceTab :vehicle-id="vehicle.id!" />
       </v-window-item>
     </v-window>
   </div>
@@ -333,7 +224,6 @@ watch(activeTab, () => {
   </div>
 
   <VehicleFormDialog
-    ref="vehicleFormDialogRef"
     :is-open="editVehicleDialog"
     :vehicle="vehicle"
     @update:is-open="editVehicleDialog = $event"
@@ -342,38 +232,6 @@ watch(activeTab, () => {
 </template>
 
 <style scoped>
-/* Layout */
-.details-container {
-  background-color: rgba(var(--v-theme-primary), 0.08) !important;
-}
-
-.details-items-container {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  display: flex;
-  flex-direction: row;
-  gap: 24px;
-  align-items: center;
-}
-
-.details-item {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-}
-
-.details-item-data {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.details-item-label {
-  font-weight: 400;
-  color: rgba(var(--v-theme-on-surface-variant), 0.8);
-}
-
 .tabs-container {
   background-color: rgba(var(--v-theme-primary), 0.08) !important;
   border-radius: 9999px;
@@ -381,18 +239,6 @@ watch(activeTab, () => {
 
 .selected-tab {
   background-color: rgb(var(--v-theme-secondary-container));
-}
-
-.equal-height-row {
-  align-items: stretch;
-}
-
-.equal-height-row .v-col {
-  display: flex;
-}
-
-.equal-height-row .v-card {
-  flex: 1;
 }
 
 .card-background {
@@ -403,10 +249,7 @@ watch(activeTab, () => {
   border-radius: 16px;
 }
 
-.summary-section,
-.details-section,
-.fuel-section,
-.service-section {
+.summary-section {
   scroll-margin-top: 80px;
   margin-bottom: 24px;
 }
@@ -421,14 +264,10 @@ watch(activeTab, () => {
 }
 
 @media (max-width: 599px) {
-  .summary-card {
-    margin-bottom: 8px;
-  }
+  .summary-card { margin-bottom: 8px; }
 }
 
 @media (min-width: 600px) and (max-width: 959px) {
-  .summary-card {
-    margin-bottom: 12px;
-  }
+  .summary-card { margin-bottom: 12px; }
 }
 </style>

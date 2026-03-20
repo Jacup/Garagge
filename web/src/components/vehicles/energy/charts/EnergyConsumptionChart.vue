@@ -3,12 +3,12 @@ import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import VueApexCharts from 'vue3-apexcharts'
 import type { ApexOptions } from 'apexcharts'
-import type { EnergyChartEntryDto } from './EnergyChartsSection.vue'
-import type { EnergyUnit } from '@/api/generated/apiV1.schemas'
+import type { EnergyType, EnergyUnit, StatsPeriod } from '@/api/generated/apiV1.schemas'
+import { StatsPeriod as SP } from '@/api/generated/apiV1.schemas'
 
 const props = defineProps<{
-  entries: Pick<EnergyChartEntryDto, 'date' | 'type' | 'energyUnit' | 'consumption'>[]
-  dataPeriod: 0 | 1 | 2 | 3
+  entries: { date: string; type: EnergyType; energyUnit: EnergyUnit; consumption: number }[]
+  dataPeriod: StatsPeriod
 }>()
 
 const theme = useTheme()
@@ -16,7 +16,7 @@ const theme = useTheme()
 const xRange = computed(() => {
   const now = new Date()
 
-  if (props.dataPeriod === 0) {
+  if (props.dataPeriod === SP.Lifetime) {
     const oldest = props.entries.reduce((min, e) => {
       const t = new Date(e.date).getTime()
       return t < min ? t : min
@@ -24,7 +24,7 @@ const xRange = computed(() => {
     return { min: oldest, max: now.getTime() }
   }
 
-  if (props.dataPeriod === 3) {
+  if (props.dataPeriod === SP.Week) {
     const mon = new Date(now)
     const day = now.getDay() === 0 ? 6 : now.getDay() - 1
     mon.setDate(now.getDate() - day)
@@ -35,12 +35,13 @@ const xRange = computed(() => {
     return { min: mon.getTime(), max: sun.getTime() }
   }
 
-  if (props.dataPeriod === 2) {
+  if (props.dataPeriod === SP.Month) {
     const start = new Date(now.getFullYear(), now.getMonth(), 1)
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
     return { min: start.getTime(), max: end.getTime() }
   }
 
+  // Year
   const start = new Date(now.getFullYear(), 0, 1)
   const end = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999)
   return { min: start.getTime(), max: end.getTime() }
@@ -48,13 +49,14 @@ const xRange = computed(() => {
 
 const xAxisConfig = computed(() => {
   switch (props.dataPeriod) {
-    case 3:
+    case SP.Week:
       return { tickAmount: 7, format: 'dd MMM' }
-    case 2:
+    case SP.Month:
       return { tickAmount: 8, format: 'dd MMM' }
-    case 1:
+    case SP.Year:
       return { tickAmount: 12, format: 'MMM yy' }
-    case 0:
+    case SP.Lifetime:
+    default:
       return { tickAmount: undefined, format: 'MMM yy' }
   }
 })
@@ -64,17 +66,13 @@ const palette = computed(() => {
   return [c.primary, c.tertiary, c.secondary, c.error, c.success, c.warning, c.info]
 })
 
-const unitLabel = (unit: EnergyUnit | undefined): string => {
-  if (!unit) return ''
-  return (
-    {
-      Liter: 'L/100km',
-      Gallon: 'gal/100mi',
-      CubicMeter: 'm³/100km',
-      kWh: 'kWh/100km',
-    }[unit] ?? ''
-  )
-}
+const unitLabel = (unit: EnergyUnit): string =>
+  ({
+    Liter: 'L/100km',
+    Gallon: 'gal/100mi',
+    CubicMeter: 'm³/100km',
+    kWh: 'kWh/100km',
+  })[unit] ?? ''
 
 const axes = computed(() => {
   const seen = new Set<string>()
@@ -91,8 +89,8 @@ const axes = computed(() => {
 const series = computed(() =>
   axes.value.map(({ type }) => {
     const data = props.entries
-      .filter((e) => e.type === type && e.consumption !== null)
-      .map((e) => ({ x: new Date(e.date).getTime(), y: e.consumption! }))
+      .filter((e) => e.type === type)
+      .map((e) => ({ x: new Date(e.date).getTime(), y: e.consumption }))
       .sort((a, b) => a.x - b.x)
     return { name: type, data }
   }),
@@ -134,9 +132,7 @@ const chartOptions = computed(
       },
     },
     colors: palette.value,
-    stroke: {
-      curve: 'smooth',
-    },
+    stroke: { curve: 'smooth' },
     markers: {
       size: 0,
       hover: { size: 5, sizeOffset: 3 },
@@ -171,7 +167,7 @@ const chartOptions = computed(
       y: {
         formatter: (val: number, { seriesIndex }: { seriesIndex: number }) => {
           const unit = axes.value[seriesIndex]?.unit
-          const label = unitLabel(unit)
+          const label = unit ? unitLabel(unit) : ''
           return label ? `${val.toFixed(2)} ${label}` : val.toFixed(2)
         },
       },
@@ -182,14 +178,8 @@ const chartOptions = computed(
       fontFamily: 'inherit',
       fontSize: '14px',
       offsetY: 0,
-      labels: {
-        colors: theme.current.value.colors['on-surface'],
-      },
-      markers: {
-        size: 5,
-        offsetX: -5,
-        shape: 'circle' as const,
-      },
+      labels: { colors: theme.current.value.colors['on-surface'] },
+      markers: { size: 5, offsetX: -5, shape: 'circle' as const },
       itemMargin: { horizontal: 12 },
     },
     dataLabels: { enabled: false },

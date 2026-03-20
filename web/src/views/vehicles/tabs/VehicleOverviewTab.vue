@@ -15,14 +15,6 @@ import { useNotificationsStore } from '@/stores/notifications'
 interface Props {
   vehicle: VehicleDto
   lastEnteredMileage: number | null
-  globalStats: EnergyStatsDto | null
-  summaryStats: {
-    totalEntries: number
-    totalCost: number
-    totalVolume: number
-    volumeUnit: string
-    consumptions: Array<{ value: number | undefined; unit: string }>
-  } | null
 }
 
 const emit = defineEmits<{

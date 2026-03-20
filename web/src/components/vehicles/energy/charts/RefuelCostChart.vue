@@ -3,11 +3,12 @@ import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import VueApexCharts from 'vue3-apexcharts'
 import type { ApexOptions } from 'apexcharts'
-import type { EnergyChartEntryDto } from './EnergyChartsSection.vue'
+import type { EnergyType, StatsPeriod } from '@/api/generated/apiV1.schemas'
+import { StatsPeriod as SP } from '@/api/generated/apiV1.schemas'
 
 const props = defineProps<{
-  entries: Pick<EnergyChartEntryDto, 'date' | 'type' | 'cost'>[]
-  dataPeriod: 0 | 1 | 2 | 3
+  entries: { date: string; type: EnergyType; cost: number }[]
+  dataPeriod: StatsPeriod
 }>()
 
 const theme = useTheme()
@@ -41,8 +42,7 @@ const monthKey = (date: Date): string => {
 const categories = computed((): string[] => {
   const now = new Date()
 
-  if (props.dataPeriod === 3) {
-    // 7 dni bieżącego tygodnia
+  if (props.dataPeriod === SP.Week) {
     const mon = startOfWeek(now)
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(mon)
@@ -51,8 +51,7 @@ const categories = computed((): string[] => {
     })
   }
 
-  if (props.dataPeriod === 2) {
-    // tygodnie bieżącego miesiąca (poniedziałki)
+  if (props.dataPeriod === SP.Month) {
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
     const weeks: string[] = []
@@ -64,7 +63,7 @@ const categories = computed((): string[] => {
     return weeks
   }
 
-  if (props.dataPeriod === 1) {
+  if (props.dataPeriod === SP.Year) {
     return Array.from({ length: 12 }, (_, i) => {
       const m = String(i + 1).padStart(2, '0')
       return `${now.getFullYear()}-${m}`
@@ -86,21 +85,18 @@ const categories = computed((): string[] => {
 })
 
 const entryBucketKey = (date: Date): string => {
-  if (props.dataPeriod === 3) return localDateKey(date)
-  if (props.dataPeriod === 2) return localDateKey(startOfWeek(date))
+  if (props.dataPeriod === SP.Week) return localDateKey(date)
+  if (props.dataPeriod === SP.Month) return localDateKey(startOfWeek(date))
   return monthKey(date)
 }
 
-const types = computed((): string[] => {
-  const set = new Set(props.entries.map((e) => e.type))
-  return Array.from(set).sort()
-})
+const types = computed((): string[] => Array.from(new Set(props.entries.map((e) => e.type))).sort())
 
 const series = computed(() =>
   types.value.map((type) => {
     const buckets = new Map<string, number>()
     for (const e of props.entries) {
-      if (e.type !== type || e.cost === null) continue
+      if (e.type !== type) continue
       const key = entryBucketKey(new Date(e.date))
       buckets.set(key, (buckets.get(key) ?? 0) + e.cost)
     }
@@ -113,13 +109,13 @@ const series = computed(() =>
 
 const xAxisFormat = computed(() => {
   switch (props.dataPeriod) {
-    case 3:
+    case SP.Week:
+    case SP.Month:
       return 'dd MMM'
-    case 2:
-      return 'dd MMM'
-    case 1:
+    case SP.Year:
       return 'MMM'
-    case 0:
+    case SP.Lifetime:
+    default:
       return 'MMM yy'
   }
 })
@@ -182,7 +178,7 @@ const chartOptions = computed(
       padding: { left: 8, right: 16, bottom: 24 },
     },
     tooltip: {
-      x: { format: props.dataPeriod <= 1 ? 'MMM yyyy' : 'dd MMM yyyy' },
+      x: { format: props.dataPeriod === SP.Year || props.dataPeriod === SP.Lifetime ? 'MMM yyyy' : 'dd MMM yyyy' },
       y: { formatter: (val: number) => `${val.toFixed(2)} €` },
       theme: theme.global.name.value,
       style: { fontFamily: 'inherit' },
@@ -191,14 +187,8 @@ const chartOptions = computed(
       fontFamily: 'inherit',
       fontSize: '14px',
       offsetY: 0,
-      labels: {
-        colors: theme.current.value.colors['on-surface'],
-      },
-      markers: {
-        size: 5,
-        offsetX: -5,
-        shape: 'circle' as const,
-      },
+      labels: { colors: theme.current.value.colors['on-surface'] },
+      markers: { size: 5, offsetX: -5, shape: 'circle' as const },
       itemMargin: { horizontal: 12 },
     },
     dataLabels: { enabled: false },

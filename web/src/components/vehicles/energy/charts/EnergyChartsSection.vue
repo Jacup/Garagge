@@ -4,21 +4,11 @@ import EnergyPriceChart from '@/components/vehicles/energy/charts/EnergyPriceCha
 import ChartSelector, { type ChartType } from '@/components/vehicles/energy/charts/ChartSelector.vue'
 import EnergyConsumptionChart from './EnergyConsumptionChart.vue'
 import RefuelCostChart from './RefuelCostChart.vue'
-
-import type { EnergyType, EnergyUnit } from '@/api/generated/apiV1.schemas'
-
-export interface EnergyChartEntryDto {
-  date: string
-  type: EnergyType
-  energyUnit: EnergyUnit
-  pricePerUnit: number | null
-  consumption: number | null
-  cost: number | null
-}
+import type { EnergyEntryDto, StatsPeriod } from '@/api/generated/apiV1.schemas'
 
 const props = defineProps<{
-  entries: EnergyChartEntryDto[]
-  dataPeriod: 0 | 1 | 2 | 3
+  entries: EnergyEntryDto[]
+  dataPeriod: StatsPeriod
 }>()
 
 const selectedChart = ref<ChartType>('price')
