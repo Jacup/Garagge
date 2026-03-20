@@ -11,8 +11,8 @@ internal sealed class GetEnergyStatsQueryValidator : AbstractValidator<GetEnergy
             .NotEmpty()
             .WithError(EnergyEntryErrors.VehicleIdRequired);
         
-        RuleForEach(x => x.EnergyTypes)
+        RuleFor(x => x.Period)
             .IsInEnum()
-            .WithError(EnergyEntryErrors.TypeInvalid);
+            .WithError(EnergyEntryErrors.PeriodInvalid);
     }
 }

@@ -15,9 +15,6 @@ import { useServiceDetailsState } from '@/composables/vehicles/useServiceDetails
 
 interface Props {
   vehicleId: string
-  mockStats: {
-    totalServiceCost: number
-  }
 }
 
 const props = defineProps<Props>()

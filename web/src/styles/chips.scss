@@ -1,0 +1,21 @@
+.filter-chip {
+  background-color: transparent !important;
+  color: rgb(var(--v-theme-on-surface-variant)) !important;
+  border-color: rgb(var(--v-theme-outline)) !important;
+  border-radius: 8px !important;
+}
+
+.filter-chip-selected {
+  background-color: rgb(var(--v-theme-secondary-container)) !important;
+  border-width: 0 !important;
+  color: rgb(var(--v-theme-on-secondary-container)) !important;
+  border-radius: 8px !important;
+}
+
+.filter-chip :deep(.v-icon) {
+  color: rgb(var(--v-theme-on-surface-variant)) !important;
+}
+
+.filter-chip-selected :deep(.v-icon) {
+  color: rgb(var(--v-theme-on-secondary-container)) !important;
+}

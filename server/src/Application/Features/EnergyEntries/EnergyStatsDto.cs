@@ -1,10 +1,10 @@
-﻿using Domain.Entities.EnergyEntries;
-
-namespace Application.Features.EnergyEntries;
+﻿namespace Application.Features.EnergyEntries;
 
 public record EnergyStatsDto(
     Guid VehicleId,
-    decimal TotalCost,
+    decimal TotalFuelCost,
     int TotalEntries,
-    EnergyUnitStats[] EnergyUnitStats
+    int DistanceDriven,
+    EnergyTypeStatsDto[] StatsByType,
+    EnergyEntryDto[] ChartEntries
 );

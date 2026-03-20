@@ -1,5 +1,5 @@
 ﻿using Application.Features.EnergyEntries.GetStats;
-using Domain.Enums;
+using Domain.Enums.Energy;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.Features.EnergyEntries.GetStats;
@@ -17,7 +17,7 @@ public class GetEnergyStatsQueryValidatorTests
     public void VehicleId_IsEmpty_HasValidationError()
     {
         // Arrange
-        var query = new GetEnergyStatsQuery(Guid.Empty, [EnergyType.Gasoline]);
+        var query = new GetEnergyStatsQuery(Guid.Empty, StatsPeriod.Lifetime);
 
         // Act
         var result = _validator.TestValidate(query);
@@ -28,42 +28,28 @@ public class GetEnergyStatsQueryValidatorTests
     }
 
     [Fact]
-    public void EnergyTypes_IsEmpty_PassesValidation()
+    public void Period_IsInvalidEnumValue_HasValidationError()
     {
         // Arrange
-        var query = new GetEnergyStatsQuery(Guid.NewGuid(), []);
+        var query = new GetEnergyStatsQuery(Guid.NewGuid(), (StatsPeriod)999);
 
         // Act
         var result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.EnergyTypes);
+        result.ShouldHaveValidationErrorFor(x => x.Period);
     }
-    
+
     [Fact]
-    public void EnergyTypes_MultipleValues_PassesValidation()
+    public void Period_IsValidEnumValue_PassesValidation()
     {
         // Arrange
-        var query = new GetEnergyStatsQuery(Guid.NewGuid(), [EnergyType.Gasoline, EnergyType.Electric]);
+        var query = new GetEnergyStatsQuery(Guid.NewGuid(), StatsPeriod.Month);
 
         // Act
         var result = _validator.TestValidate(query);
 
         // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.EnergyTypes);
+        result.ShouldNotHaveValidationErrorFor(x => x.Period);
     }
-    [Fact]
-    public void Request_IsValid_PassesValidation()
-    {
-        // Arrange
-        var query = new GetEnergyStatsQuery(Guid.NewGuid(), [EnergyType.Gasoline]);
-
-        // Act
-        var result = _validator.TestValidate(query);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.VehicleId);
-        result.ShouldNotHaveValidationErrorFor(x => x.EnergyTypes);
-    }
-
 }

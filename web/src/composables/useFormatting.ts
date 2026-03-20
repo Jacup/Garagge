@@ -4,7 +4,7 @@ export function useFormatting() {
     return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
   }
 
-    const formatCurrencyString = (value: string | undefined | null) => {
+  const formatCurrencyString = (value: string | undefined | null) => {
     if (!value || isNaN(Number(value))) return '-'
 
     const parsedValue = Number(value)
@@ -42,5 +42,28 @@ export function useFormatting() {
     })
   }
 
-  return { formatCurrency, formatCurrencyString, formatDate, formatMileage, formatDateTime, formatDateOnly }
+  const formatVolume = (volume: number | undefined | null) => {
+    return volume ? `${volume} l` : '-'
+  }
+
+  const formatConsumption = (consumption: number | undefined | null) => {
+    return consumption ? `${consumption} l/100km` : '-'
+  }
+
+  const formatCurrencyPerUnit = (value: number | undefined | null) => {
+    if (!value) return '-'
+    return `${new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)}/l`
+  }
+
+  return {
+    formatCurrency,
+    formatCurrencyString,
+    formatCurrencyPerUnit,
+    formatDate,
+    formatMileage,
+    formatDateTime,
+    formatDateOnly,
+    formatVolume,
+    formatConsumption,
+  }
 }

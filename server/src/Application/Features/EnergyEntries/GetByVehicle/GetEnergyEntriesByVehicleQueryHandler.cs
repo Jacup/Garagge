@@ -41,7 +41,8 @@ internal sealed class GetEnergyEntriesByVehicleQueryHandler(
                 ee.EnergyUnit,
                 ee.Volume,
                 ee.Cost,
-                ee.PricePerUnit
+                ee.PricePerUnit,
+                0
             ));
 
         var energyEntriesDto = await PagedList<EnergyEntryDto>.CreateAsync(

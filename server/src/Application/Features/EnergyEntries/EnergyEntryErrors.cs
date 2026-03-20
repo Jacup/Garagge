@@ -1,5 +1,6 @@
 using Application.Core;
 using Domain.Enums;
+using Domain.Enums.Energy;
 
 namespace Application.Features.EnergyEntries;
 
@@ -8,15 +9,19 @@ public static class EnergyEntryErrors
     public static readonly Error IdRequired = Error.Validation(
         "EnergyEntry.IdRequired",
         "ID is required.");
-    
+
     public static readonly Error VehicleIdRequired = Error.Validation(
         "EnergyEntry.VehicleIdRequired",
         "Vehicle ID is required.");
 
+    public static readonly Error VehicleNotFound = Error.Validation(
+        "EnergyEntry.VehicleNotFound",
+        "Vehicle was not found.");
+    
     public static readonly Error UserIdRequired = Error.Validation(
         "EnergyEntry.UserIdRequired",
         "User ID is required.");
-    
+
     public static readonly Error DateRequired = Error.Validation(
         "EnergyEntry.DateRequired",
         "Date is required.");
@@ -40,6 +45,10 @@ public static class EnergyEntryErrors
     public static readonly Error TypeInvalid = Error.Validation(
         "EnergyEntry.TypeInvalid",
         $"Energy type is invalid. Valid values are: {string.Join(", ", Enum.GetNames<EnergyType>())}.");
+
+    public static readonly Error PeriodInvalid = Error.Validation(
+        "EnergyEntry.PeriodInvalid",
+        $"Period is invalid. Valid values are: {string.Join(", ", Enum.GetNames<StatsPeriod>())}.");
 
     public static readonly Error EnergyUnitRequired = Error.Validation(
         "EnergyEntry.EnergyUnitRequired",
@@ -72,11 +81,11 @@ public static class EnergyEntryErrors
     public static readonly Error PageInvalid = Error.Validation(
         "EnergyEntry.PageInvalid",
         "Page must be greater than 0.");
-    
+
     public static readonly Error PageSizeInvalid = Error.Validation(
         "EnergyEntry.PageSizeInvalid",
         "Page size must be between 1 and 100.");
-    
+
     public static readonly Error Forbidden = Error.Forbidden(
         "EnergyEntry.Forbidden",
         "You are not authorized to perform this action.");

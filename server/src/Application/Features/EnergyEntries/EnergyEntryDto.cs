@@ -13,4 +13,6 @@ public record EnergyEntryDto(
     EnergyUnit EnergyUnit,
     decimal Volume,
     decimal? Cost,
-    decimal? PricePerUnit);
+    decimal? PricePerUnit,
+    decimal? Consumption
+);

@@ -3,7 +3,7 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Features.EnergyEntries;
 using Application.Features.EnergyEntries.GetStats;
-using Domain.Enums;
+using Domain.Enums.Energy;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +17,9 @@ internal sealed class GetEnergyStats : IEndpoint
                 Guid vehicleId,
                 ISender sender,
                 CancellationToken cancellationToken,
-                [FromQuery] EnergyType[]? energyTypes) =>
+                [FromQuery] StatsPeriod period = StatsPeriod.Year) =>
             {
-                var query = new GetEnergyStatsQuery(vehicleId, energyTypes ?? []);
+                var query = new GetEnergyStatsQuery(vehicleId, period);
 
                 Result<EnergyStatsDto> result = await sender.Send(query, cancellationToken);
 

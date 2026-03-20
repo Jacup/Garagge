@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
-using Domain.Enums;
+using Domain.Enums.Energy;
 
 namespace Application.Features.EnergyEntries.GetStats;
 
-public sealed record GetEnergyStatsQuery(Guid VehicleId, EnergyType[] EnergyTypes) : IQuery<EnergyStatsDto>;
+public sealed record GetEnergyStatsQuery(Guid VehicleId, StatsPeriod Period) : IQuery<EnergyStatsDto>;

@@ -21,7 +21,6 @@ interface Emits {
 const props = defineProps<Props>()
 defineEmits<Emits>()
 
-// Function to get the correct icon based on selection state
 function getIcon(option: ButtonOption) {
   const isSelected = props.modelValue === option.value
   return isSelected && option.selectedIcon ? option.selectedIcon : option.icon
@@ -35,7 +34,7 @@ function getIcon(option: ButtonOption) {
     :mandatory="mandatory"
     variant="flat"
     color="secondary"
-    :class="['connected-button-group']"
+    class="connected-button-group"
   >
     <v-tooltip
       v-for="option in options"
@@ -46,13 +45,7 @@ function getIcon(option: ButtonOption) {
       class="tooltip-plain"
     >
       <template #activator="{ props }">
-        <v-btn class="button"
-          v-bind="props"
-          :value="option.value"
-          :icon="getIcon(option)"
-          :text="option.text"
-          size="small"
-        />
+        <v-btn class="button" v-bind="props" :value="option.value" :icon="getIcon(option)" :text="option.text" />
       </template>
     </v-tooltip>
   </v-btn-toggle>
