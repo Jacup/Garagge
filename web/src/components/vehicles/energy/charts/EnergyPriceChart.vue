@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import VueApexCharts from 'vue3-apexcharts'
 import type { ApexOptions } from 'apexcharts'
-import type { EnergyType, EnergyUnit, StatsPeriod } from '@/api/generated/apiV1.schemas'
+import type { EnergyType, StatsPeriod } from '@/api/generated/apiV1.schemas'
 import { StatsPeriod as SP } from '@/api/generated/apiV1.schemas'
 
 const props = defineProps<{

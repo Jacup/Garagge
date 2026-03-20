@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
-import type { VehicleDto, EnergyStatsDto, VehicleStatsDto } from '@/api/generated/apiV1.schemas'
+import type { VehicleDto, VehicleStatsDto } from '@/api/generated/apiV1.schemas'
 import { getVehicles } from '@/api/generated/vehicles/vehicles'
 import RecordInfo from '@/components/common/RecordInfo.vue'
 import DeleteDialog from '@/components/common/DeleteDialog.vue'

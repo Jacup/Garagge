@@ -3,10 +3,8 @@ import { ref, watch } from 'vue'
 import { getEnergyEntries } from '@/api/generated/energy-entries/energy-entries'
 import {
   StatsPeriod,
-  type EnergyEntryDto,
   type EnergyStatsDto,
   type EnergyType,
-  type EnergyTypeStatsDto,
 } from '@/api/generated/apiV1.schemas'
 
 import ConnectedButtonGroup from '@/components/common/ConnectedButtonGroup.vue'
