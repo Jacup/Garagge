@@ -3,17 +3,28 @@ using Application.Features.EnergyEntries.GetStats;
 using Application.Services.EnergyStats;
 using Domain.Entities.EnergyEntries;
 using Domain.Enums;
+using Domain.Enums.Energy;
+using Moq;
+using TestUtils.Fakes;
 
 namespace ApplicationTests.Features.EnergyEntries.GetStats;
 
 public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
 {
     private readonly GetEnergyStatsQueryHandler _handler;
+    private readonly Mock<IEnergyStatsService> _energyStatsServiceMock;
 
     public GetEnergyStatsQueryHandlerTests()
     {
-        IEnergyStatsService energyStatsService = new EnergyStatsService();
-        _handler = new GetEnergyStatsQueryHandler(Context, UserContextMock.Object, energyStatsService);
+        _energyStatsServiceMock = new Mock<IEnergyStatsService>();
+        TestDateTimeProvider dateTimeProvider = new(new DateTime(2024, 01, 01));
+
+        _handler = new GetEnergyStatsQueryHandler(
+            Context,
+            UserContextMock.Object,
+            _energyStatsServiceMock.Object,
+            dateTimeProvider
+        );
     }
 
     [Fact]
@@ -21,41 +32,40 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var nonExistentVehicleId = Guid.NewGuid();
-        var query = new GetEnergyStatsQuery(nonExistentVehicleId, []);
+        var query = new GetEnergyStatsQuery(Guid.NewGuid(), StatsPeriod.Lifetime);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
+        result.Error.ShouldBe(EnergyEntryErrors.VehicleNotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleNotOwnedByUser_ReturnsNotFoundError()
+    public async Task Handle_VehicleNotOwnedByUser_ReturnsVehicleNotFoundError()
     {
         // Arrange
         SetupAuthorizedUser();
         var otherUserId = Guid.NewGuid();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline], otherUserId);
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
+        var query = new GetEnergyStatsQuery(vehicle.Id, StatsPeriod.Lifetime);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(EnergyEntryErrors.NotFound);
+        result.Error.ShouldBe(EnergyEntryErrors.VehicleNotFound);
     }
 
     [Fact]
-    public async Task Handle_VehicleHasNoEnergyEntries_ReturnsEmptyStats()
+    public async Task Handle_VehicleHasNoEntries_ReturnsEmptyStats()
     {
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
+        var query = new GetEnergyStatsQuery(vehicle.Id, StatsPeriod.Lifetime);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -63,21 +73,28 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
         result.Value.VehicleId.ShouldBe(vehicle.Id);
-        result.Value.TotalCost.ShouldBe(0);
+        result.Value.TotalFuelCost.ShouldBe(0);
         result.Value.TotalEntries.ShouldBe(0);
-        result.Value.EnergyUnitStats.ShouldBeEmpty();
+        result.Value.DistanceDriven.ShouldBe(0);
+        result.Value.StatsByType.ShouldBeEmpty();
+        result.Value.ChartEntries.ShouldBeEmpty();
+
+        _energyStatsServiceMock.Verify(
+            s => s.CalculateTotalCost(It.IsAny<IReadOnlyCollection<EnergyEntry>>()),
+            Times.Never
+        );
     }
 
     [Fact]
-    public async Task Handle_SingleUnitSingleType_CalculatesStatsCorrectly()
+    public async Task Handle_VehicleHasEntries_DelegatesToEnergyStatsService()
     {
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry
+        Context.EnergyEntries.Add(new EnergyEntry
         {
-            Date = new DateOnly(2020, 01, 16),
+            Date = new DateOnly(2023, 12, 29),
             Mileage = 1000,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
@@ -86,24 +103,27 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             PricePerUnit = 5m,
             VehicleId = vehicle.Id,
             Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 300,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
+        });
 
-        Context.EnergyEntries.AddRange(entry1, entry2);
         await Context.SaveChangesAsync();
 
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
+        var expectedTotalCost = 200m;
+        var expectedDistance = 0;
+        var expectedStatsByType = Array.Empty<EnergyTypeStatsDto>();
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateTotalCost(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(expectedTotalCost);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateDistanceDriven(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(expectedDistance);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateStatsByType(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(expectedStatsByType);
+
+        var query = new GetEnergyStatsQuery(vehicle.Id, StatsPeriod.Lifetime);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -111,447 +131,113 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
         // Assert
         result.IsSuccess.ShouldBeTrue();
         result.Value.VehicleId.ShouldBe(vehicle.Id);
-        result.Value.TotalCost.ShouldBe(500);
-        result.Value.TotalEntries.ShouldBe(2);
-        result.Value.EnergyUnitStats.Length.ShouldBe(1);
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.Unit.ShouldBe(EnergyUnit.Liter);
-        literStats.EntriesCount.ShouldBe(2);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.TotalVolume.ShouldBe(100);
-        literStats.TotalCost.ShouldBe(500);
-        literStats.AverageConsumption.ShouldBe(12m); // (60/500)*100 = 12 l/100km
-        literStats.AveragePricePerUnit.ShouldBe(5m);
-        literStats.AverageCostPer100km.ShouldBe(0.6m); // (12/100)*5 = 0.6
-    }
-
-    [Fact]
-    public async Task Handle_SingleUnitMultipleTypes_GroupsByUnit()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Diesel,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 240,
-            PricePerUnit = 4m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.VehicleId.ShouldBe(vehicle.Id);
-        result.Value.TotalCost.ShouldBe(440);
-        result.Value.TotalEntries.ShouldBe(2);
-        result.Value.EnergyUnitStats.Length.ShouldBe(1);
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.Unit.ShouldBe(EnergyUnit.Liter);
-        literStats.EntriesCount.ShouldBe(2);
-        literStats.EnergyTypes.Count.ShouldBe(2);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Diesel);
-        literStats.TotalVolume.ShouldBe(100);
-        literStats.TotalCost.ShouldBe(440);
-        literStats.AverageConsumption.ShouldBe(12m); // (60/500)*100 = 12 l/100km
-        literStats.AveragePricePerUnit.ShouldBe(4.5m);
-    }
-
-    [Fact]
-    public async Task Handle_MultipleUnits_GroupsCorrectly()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Electric]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 300,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry3 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 18),
-            Mileage = 2000,
-            Type = EnergyType.Electric,
-            EnergyUnit = EnergyUnit.kWh,
-            Volume = 50,
-            Cost = 100,
-            PricePerUnit = 2m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry4 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 19),
-            Mileage = 2500,
-            Type = EnergyType.Electric,
-            EnergyUnit = EnergyUnit.kWh,
-            Volume = 60,
-            Cost = 120,
-            PricePerUnit = 2m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2, entry3, entry4);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.VehicleId.ShouldBe(vehicle.Id);
-        result.Value.TotalCost.ShouldBe(720);
-        result.Value.TotalEntries.ShouldBe(4);
-        result.Value.EnergyUnitStats.Length.ShouldBe(2);
-
-        var literStats = result.Value.EnergyUnitStats.First(s => s.Unit == EnergyUnit.Liter);
-        literStats.EntriesCount.ShouldBe(2);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.TotalVolume.ShouldBe(100);
-        literStats.TotalCost.ShouldBe(500);
-        literStats.AverageConsumption.ShouldBe(12m);
-        literStats.AveragePricePerUnit.ShouldBe(5m);
-
-        var kWhStats = result.Value.EnergyUnitStats.First(s => s.Unit == EnergyUnit.kWh);
-        kWhStats.EntriesCount.ShouldBe(2);
-        kWhStats.EnergyTypes.ShouldContain(EnergyType.Electric);
-        kWhStats.TotalVolume.ShouldBe(110);
-        kWhStats.TotalCost.ShouldBe(220);
-        kWhStats.AverageConsumption.ShouldBe(12m); // (60/500)*100 = 12 kWh/100km
-        kWhStats.AveragePricePerUnit.ShouldBe(2m);
-    }
-
-    [Fact]
-    public async Task Handle_FilterBySingleEnergyType_ReturnsFilteredStats()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Diesel,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 240,
-            PricePerUnit = 4m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry3 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 18),
-            Mileage = 2000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 50,
-            Cost = 250,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2, entry3);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, [EnergyType.Gasoline]);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(450); // Only Gasoline entries
-        result.Value.TotalEntries.ShouldBe(2);
-        result.Value.EnergyUnitStats.Length.ShouldBe(1);
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.Unit.ShouldBe(EnergyUnit.Liter);
-        literStats.EntriesCount.ShouldBe(2);
-        literStats.EnergyTypes.Count.ShouldBe(1);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.TotalVolume.ShouldBe(90);
-        literStats.AverageConsumption.ShouldBe(5m); // (50/1000)*100 = 5 l/100km
-    }
-
-    [Fact]
-    public async Task Handle_FilterByMultipleEnergyTypes_ReturnsFilteredStats()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel, EnergyType.Electric]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Diesel,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 240,
-            PricePerUnit = 4m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry3 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 18),
-            Mileage = 2000,
-            Type = EnergyType.Electric,
-            EnergyUnit = EnergyUnit.kWh,
-            Volume = 50,
-            Cost = 100,
-            PricePerUnit = 2m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2, entry3);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, [EnergyType.Gasoline, EnergyType.Diesel]);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(440); // Excludes Electric
-        result.Value.TotalEntries.ShouldBe(2);
-        result.Value.EnergyUnitStats.Length.ShouldBe(1);
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.Unit.ShouldBe(EnergyUnit.Liter);
-        literStats.EnergyTypes.Count.ShouldBe(2);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Diesel);
-    }
-
-    [Fact]
-    public async Task Handle_FilterReturnsNoEntries_ReturnsEmptyStats()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.Add(entry1);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, [EnergyType.Diesel]);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(0);
-        result.Value.TotalEntries.ShouldBe(0);
-        result.Value.EnergyUnitStats.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public async Task Handle_EntriesWithNullCost_CalculatesCorrectly()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = null,
-            PricePerUnit = null,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 300,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(300); // Only counts non-null costs
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.TotalVolume.ShouldBe(100);
-        literStats.TotalCost.ShouldBe(300);
-        literStats.AveragePricePerUnit.ShouldBe(5m); // Only counts non-null prices
-        literStats.AverageCostPer100km.ShouldBe(0.6m); // (12/100)*5
-    }
-
-    [Fact]
-    public async Task Handle_SingleEntry_ReturnsZeroConsumption()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.Add(entry1);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
+        result.Value.TotalFuelCost.ShouldBe(expectedTotalCost);
         result.Value.TotalEntries.ShouldBe(1);
+        result.Value.DistanceDriven.ShouldBe(expectedDistance);
+        result.Value.StatsByType.ShouldBe(expectedStatsByType);
 
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.EntriesCount.ShouldBe(1);
-        literStats.AverageConsumption.ShouldBe(0);
-        literStats.AverageCostPer100km.ShouldBe(0);
+        _energyStatsServiceMock.Verify(
+            s => s.CalculateTotalCost(It.IsAny<IReadOnlyCollection<EnergyEntry>>()),
+            Times.Once
+        );
+
+        _energyStatsServiceMock.Verify(
+            s => s.CalculateDistanceDriven(It.IsAny<IReadOnlyCollection<EnergyEntry>>()),
+            Times.Once
+        );
+
+        _energyStatsServiceMock.Verify(
+            s => s.CalculateStatsByType(It.IsAny<IReadOnlyCollection<EnergyEntry>>()),
+            Times.Once
+        );
     }
 
     [Fact]
-    public async Task Handle_MultipleEntriesForConsumption_CalculatesAverageCorrectly()
+    public async Task Handle_VehicleHasEntries_MapsChartEntriesCorrectly()
     {
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
 
-        var entry1 = new EnergyEntry
+        var entry = new EnergyEntry
         {
-            Date = new DateOnly(2020, 01, 16),
+            Date = new DateOnly(2023, 12, 29),
             Mileage = 1000,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
-            Volume = 50,
-            Cost = 250,
+            Volume = 40,
+            Cost = 200,
             PricePerUnit = 5m,
             VehicleId = vehicle.Id,
             Vehicle = null!,
         };
-        var entry2 = new EnergyEntry
+
+        Context.EnergyEntries.Add(entry);
+        await Context.SaveChangesAsync();
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateTotalCost(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(200m);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateDistanceDriven(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(0);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateStatsByType(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns([]);
+
+        var query = new GetEnergyStatsQuery(vehicle.Id, StatsPeriod.Lifetime);
+
+        // Act
+        var result = await _handler.Handle(query, CancellationToken.None);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+        result.Value.ChartEntries.Length.ShouldBe(1);
+
+        var chartEntry = result.Value.ChartEntries[0];
+        chartEntry.VehicleId.ShouldBe(vehicle.Id);
+        chartEntry.Date.ShouldBe(entry.Date);
+        chartEntry.Mileage.ShouldBe(entry.Mileage);
+        chartEntry.Type.ShouldBe(entry.Type);
+        chartEntry.EnergyUnit.ShouldBe(entry.EnergyUnit);
+        chartEntry.Volume.ShouldBe(entry.Volume);
+        chartEntry.Cost.ShouldBe(entry.Cost);
+        chartEntry.PricePerUnit.ShouldBe(entry.PricePerUnit);
+        chartEntry.Consumption.ShouldBe(0);
+    }
+
+    [Theory]
+    [InlineData(StatsPeriod.Week, 1)]
+    [InlineData(StatsPeriod.Month, 1)]
+    [InlineData(StatsPeriod.Year, 1)]
+    [InlineData(StatsPeriod.Lifetime, 2)]
+    public async Task Handle_PeriodFilter_FiltersEntriesCorrectly(StatsPeriod period, int expectedEntryCount)
+    {
+        // Arrange
+        SetupAuthorizedUser();
+        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
+
+        // 3 days before the mocked "now" (2024-01-01) — within all periods
+        var recentEntry = new EnergyEntry
         {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
+            Date = new DateOnly(2023, 12, 29),
+            Mileage = 1000,
+            Type = EnergyType.Gasoline,
+            EnergyUnit = EnergyUnit.Liter,
+            Volume = 40,
+            Cost = 200,
+            PricePerUnit = 5m,
+            VehicleId = vehicle.Id,
+            Vehicle = null!,
+        };
+
+        // Over a year before "now" — only included in Lifetime
+        var oldEntry = new EnergyEntry
+        {
+            Date = new DateOnly(2022, 01, 01),
+            Mileage = 500,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
             Volume = 30,
@@ -560,124 +246,29 @@ public class GetEnergyStatsQueryHandlerTests : InMemoryDbTestBase
             VehicleId = vehicle.Id,
             Vehicle = null!,
         };
-        var entry3 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 18),
-            Mileage = 2000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 35,
-            Cost = 175,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
 
-        Context.EnergyEntries.AddRange(entry1, entry2, entry3);
+        Context.EnergyEntries.AddRange(recentEntry, oldEntry);
         await Context.SaveChangesAsync();
 
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateTotalCost(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(0m);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateDistanceDriven(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns(0);
+
+        _energyStatsServiceMock
+            .Setup(s => s.CalculateStatsByType(It.IsAny<IReadOnlyCollection<EnergyEntry>>()))
+            .Returns([]);
+
+        var query = new GetEnergyStatsQuery(vehicle.Id, period);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
 
         // Assert
         result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(575);
-        result.Value.TotalEntries.ShouldBe(3);
-
-        var literStats = result.Value.EnergyUnitStats[0];
-        literStats.TotalVolume.ShouldBe(115);
-        // Consumption 1: (30/500)*100 = 6 l/100km
-        // Consumption 2: (35/500)*100 = 7 l/100km
-        // Average: (6+7)/2 = 6.5 l/100km
-        literStats.AverageConsumption.ShouldBe(6.5m);
-        literStats.AveragePricePerUnit.ShouldBe(5m);
-        literStats.AverageCostPer100km.ShouldBe(0.325m); // (6.5/100)*5
-    }
-
-    [Fact]
-    public async Task Handle_MixedUnitsAndTypes_CalculatesSeparately()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline, EnergyType.Diesel]);
-
-        // Gasoline in Liters
-        var entry1 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 16),
-            Mileage = 1000,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 40,
-            Cost = 200,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry2 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 17),
-            Mileage = 1500,
-            Type = EnergyType.Gasoline,
-            EnergyUnit = EnergyUnit.Liter,
-            Volume = 60,
-            Cost = 300,
-            PricePerUnit = 5m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        // Diesel in Gallons
-        var entry3 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 18),
-            Mileage = 2000,
-            Type = EnergyType.Diesel,
-            EnergyUnit = EnergyUnit.Gallon,
-            Volume = 10,
-            Cost = 100,
-            PricePerUnit = 10m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-        var entry4 = new EnergyEntry
-        {
-            Date = new DateOnly(2020, 01, 19),
-            Mileage = 2500,
-            Type = EnergyType.Diesel,
-            EnergyUnit = EnergyUnit.Gallon,
-            Volume = 15,
-            Cost = 150,
-            PricePerUnit = 10m,
-            VehicleId = vehicle.Id,
-            Vehicle = null!,
-        };
-
-        Context.EnergyEntries.AddRange(entry1, entry2, entry3, entry4);
-        await Context.SaveChangesAsync();
-
-        var query = new GetEnergyStatsQuery(vehicle.Id, []);
-
-        // Act
-        var result = await _handler.Handle(query, CancellationToken.None);
-
-        // Assert
-        result.IsSuccess.ShouldBeTrue();
-        result.Value.TotalCost.ShouldBe(750);
-        result.Value.TotalEntries.ShouldBe(4);
-        result.Value.EnergyUnitStats.Length.ShouldBe(2);
-
-        var literStats = result.Value.EnergyUnitStats.First(s => s.Unit == EnergyUnit.Liter);
-        literStats.EntriesCount.ShouldBe(2);
-        literStats.EnergyTypes.ShouldContain(EnergyType.Gasoline);
-        literStats.TotalVolume.ShouldBe(100);
-        literStats.AverageConsumption.ShouldBe(12m);
-
-        var gallonStats = result.Value.EnergyUnitStats.First(s => s.Unit == EnergyUnit.Gallon);
-        gallonStats.EntriesCount.ShouldBe(2);
-        gallonStats.EnergyTypes.ShouldContain(EnergyType.Diesel);
-        gallonStats.TotalVolume.ShouldBe(25);
-        gallonStats.AverageConsumption.ShouldBe(3m); // (15/500)*100 = 3 gallons/100km
+        result.Value.TotalEntries.ShouldBe(expectedEntryCount);
     }
 }
