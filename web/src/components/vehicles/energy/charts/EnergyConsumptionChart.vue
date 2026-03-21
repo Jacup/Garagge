@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 import VueApexCharts from 'vue3-apexcharts'
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions, ApexFormatterOpts } from 'apexcharts'
 import type { EnergyType, EnergyUnit, StatsPeriod } from '@/api/generated/apiV1.schemas'
 import { StatsPeriod as SP } from '@/api/generated/apiV1.schemas'
 
@@ -165,8 +165,8 @@ const chartOptions = computed(
     tooltip: {
       x: { format: 'dd MMM yyyy' },
       y: {
-        formatter: (val: number, { seriesIndex }: { seriesIndex: number }) => {
-          const unit = axes.value[seriesIndex]?.unit
+        formatter: (val: number, opts?: ApexFormatterOpts) => {
+          const unit = axes.value[opts?.seriesIndex ?? 0]?.unit
           const label = unit ? unitLabel(unit) : ''
           return label ? `${val.toFixed(2)} ${label}` : val.toFixed(2)
         },
