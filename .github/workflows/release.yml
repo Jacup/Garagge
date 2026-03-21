@@ -34,36 +34,6 @@ jobs:
             exit 1
           fi
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Update .csproj version
-        run: |
-          find ./server -name "*.csproj" -type f \
-            -exec sed -i "s|<Version>.*</Version>|<Version>${{ github.ref_name }}</Version>|g" {} \;
-
-      - name: Build and test
-        working-directory: ./server
-        run: |
-          dotnet restore Garagge.sln
-          dotnet build Garagge.sln --configuration Release --no-restore
-
-      - name: Commit version bump
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add "server/*.csproj"
-          git add "server/src/**/*.csproj" || true
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Bump version to ${{ github.ref_name }}"
-            git push origin main
-          fi
-
       - name: Log in to Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
