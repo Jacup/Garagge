@@ -60,7 +60,11 @@ public static class EnergyEntryErrors
 
     public static readonly Error VolumeInvalid = Error.Validation(
         "EnergyEntry.VolumeInvalid",
-        "Volume must be greater than 0.");
+        "Volume must be greater than 0."); 
+    
+    public static readonly Error IsPartialRequired = Error.Validation(
+        "EnergyEntry.IsPartialRequired",
+        "IsPartial is required.");
 
     public static readonly Error CostInvalid = Error.Validation(
         "EnergyEntry.CostInvalid",

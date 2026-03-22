@@ -24,6 +24,7 @@ internal sealed class UpdateEnergyEntry : IEndpoint
                         request.Type,
                         request.EnergyUnit,
                         request.Volume,
+                        request.IsPartial,
                         request.Cost,
                         request.PricePerUnit
                     );
@@ -45,5 +46,6 @@ internal sealed record EnergyEntryUpdateRequest(
     EnergyType Type,
     EnergyUnit EnergyUnit,
     decimal Volume,
+    bool IsPartial,
     decimal? Cost,
     decimal? PricePerUnit);

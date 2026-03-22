@@ -90,6 +90,7 @@ public class MapsterMappingTests
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
             Volume = 50.5m,
+            IsPartial = false,
             Cost = 120.75m,
             PricePerUnit = 2.40m,
             CreatedDate = DateTime.UtcNow,
@@ -108,6 +109,7 @@ public class MapsterMappingTests
         dto.Type.ShouldBe(energyEntry.Type);
         dto.EnergyUnit.ShouldBe(energyEntry.EnergyUnit);
         dto.Volume.ShouldBe(energyEntry.Volume);
+        dto.IsPartial.ShouldBe(energyEntry.IsPartial);
         dto.Cost.ShouldBe(energyEntry.Cost);
         dto.PricePerUnit.ShouldBe(energyEntry.PricePerUnit);
         dto.CreatedDate.ShouldBe(energyEntry.CreatedDate);
@@ -128,6 +130,7 @@ public class MapsterMappingTests
             Type = EnergyType.Electric,
             EnergyUnit = EnergyUnit.kWh,
             Volume = 30.0m,
+            IsPartial = false,
             Cost = null,
             PricePerUnit = null,
             CreatedDate = DateTime.UtcNow,
@@ -146,6 +149,7 @@ public class MapsterMappingTests
         dto.Type.ShouldBe(energyEntry.Type);
         dto.EnergyUnit.ShouldBe(energyEntry.EnergyUnit);
         dto.Volume.ShouldBe(energyEntry.Volume);
+        dto.IsPartial.ShouldBe(energyEntry.IsPartial);
         dto.Cost.ShouldBeNull();
         dto.PricePerUnit.ShouldBeNull();
         dto.CreatedDate.ShouldBe(energyEntry.CreatedDate);
@@ -166,6 +170,7 @@ public class MapsterMappingTests
             Type = EnergyType.Electric,
             EnergyUnit = EnergyUnit.kWh,
             Volume = 25.0m,
+            IsPartial = false,
             Cost = 15.50m,
             PricePerUnit = 0.62m,
             CreatedDate = DateTime.UtcNow,
@@ -196,6 +201,7 @@ public class MapsterMappingTests
             Type = EnergyType.Diesel,
             EnergyUnit = EnergyUnit.Liter,
             Volume = 45.0m,
+            IsPartial = false,
             Cost = 70.0m,
             PricePerUnit = 1.56m,
             CreatedDate = DateTime.UtcNow,
@@ -251,6 +257,7 @@ public class MapsterMappingTests
             Type = energyType,
             EnergyUnit = energyUnit,
             Volume = 50.0m,
+            IsPartial = false,
             Cost = 100.0m,
             PricePerUnit = 2.0m,
             CreatedDate = DateTime.UtcNow,

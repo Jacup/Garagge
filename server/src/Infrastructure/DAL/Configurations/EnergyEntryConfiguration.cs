@@ -28,6 +28,10 @@ public class EnergyEntryConfiguration : IEntityTypeConfiguration<EnergyEntry>
             .IsRequired()
             .HasPrecision(18, 2);
 
+        builder.Property(e => e.IsPartial)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         builder.Property(e => e.Cost)
             .HasPrecision(18, 2);
 

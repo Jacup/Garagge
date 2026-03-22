@@ -340,6 +340,7 @@ public class CreateEnergyEntryCommandValidatorTests
             Type: EnergyType.Gasoline,
             EnergyUnit: EnergyUnit.Liter,
             Volume: 50.0m,
+            IsPartial:false,
             Cost: 100.0m,
             PricePerUnit: 2.0m);
     }

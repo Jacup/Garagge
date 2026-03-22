@@ -39,6 +39,10 @@ internal sealed class CreateEnergyEntryCommandValidator : AbstractValidator<Crea
         RuleFor(x => x.Volume)
             .GreaterThan(0)
             .WithError(EnergyEntryErrors.VolumeInvalid);
+        
+        RuleFor(x => x.IsPartial)
+            .NotEmpty()
+            .WithError(EnergyEntryErrors.IsPartialRequired);
 
         RuleFor(x => x.Cost)
             .GreaterThan(0)

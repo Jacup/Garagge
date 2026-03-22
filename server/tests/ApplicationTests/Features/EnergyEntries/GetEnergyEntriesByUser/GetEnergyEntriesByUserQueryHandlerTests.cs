@@ -220,12 +220,14 @@ public class GetEnergyEntriesByUserQueryHandlerTests : InMemoryDbTestBase
             Type = energyType,
             EnergyUnit = energyType == EnergyType.Electric ? EnergyUnit.kWh : EnergyUnit.Liter,
             Volume = 50m,
+            IsPartial = false,
             Cost = 100m,
             PricePerUnit = 2m
         };
 
         Context.EnergyEntries.Add(energyEntry);
         await Context.SaveChangesAsync();
+
         return energyEntry;
     }
 }

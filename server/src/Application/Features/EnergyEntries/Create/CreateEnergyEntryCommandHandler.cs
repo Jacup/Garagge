@@ -49,6 +49,7 @@ internal sealed class CreateEnergyEntryCommandHandler(
             Type = request.Type,
             EnergyUnit = request.EnergyUnit,
             Volume = request.Volume,
+            IsPartial = request.IsPartial,
             Cost = request.Cost,
             PricePerUnit = request.PricePerUnit,
         };

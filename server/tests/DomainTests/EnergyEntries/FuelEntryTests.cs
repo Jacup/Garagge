@@ -13,6 +13,7 @@ public class EnergyEntryTests
     private const EnergyUnit Unit = EnergyUnit.Liter;
     private const EnergyType Type = EnergyType.Gasoline;
     private const decimal PricePerUnit = 2.65m;
+    private const bool IsPartial = false;
 
     [Fact]
     public void Constructor_ValidProperties_CreatesEntityWithCorrectData()
@@ -27,7 +28,8 @@ public class EnergyEntryTests
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
-            PricePerUnit = PricePerUnit
+            PricePerUnit = PricePerUnit,
+            IsPartial = IsPartial
         };
 
         energyEntry.Date.ShouldBe(_date);
@@ -38,6 +40,7 @@ public class EnergyEntryTests
         energyEntry.EnergyUnit.ShouldBe(Unit);
         energyEntry.Type.ShouldBe(Type);
         energyEntry.PricePerUnit.ShouldBe(PricePerUnit);
+        energyEntry.IsPartial.ShouldBe(IsPartial);
     }
 
     [Fact]
@@ -51,7 +54,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.Date.ShouldBe(_date);
@@ -77,7 +81,8 @@ public class EnergyEntryTests
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
-            PricePerUnit = PricePerUnit
+            PricePerUnit = PricePerUnit,
+            IsPartial = IsPartial
         };
 
         var newDate = new DateOnly(2024, 2, 20);
@@ -123,7 +128,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = energyUnit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.EnergyUnit.ShouldBe(energyUnit);
@@ -146,7 +152,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = energyType
+            Type = energyType,
+            IsPartial = IsPartial
         };
 
         energyEntry.Type.ShouldBe(energyType);
@@ -167,7 +174,8 @@ public class EnergyEntryTests
                 Vehicle = null!,
                 Volume = Volume,
                 EnergyUnit = EnergyUnit.Liter,
-                Type = fuelType
+                Type = fuelType,
+                IsPartial = IsPartial
             };
 
             energyEntry.Type.ShouldBe(fuelType);
@@ -187,7 +195,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.kWh,
-            Type = EnergyType.Electric
+            Type = EnergyType.Electric,
+            IsPartial = IsPartial
         };
 
         energyEntry.Type.ShouldBe(EnergyType.Electric);
@@ -205,7 +214,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.CubicMeter,
-            Type = EnergyType.Hydrogen
+            Type = EnergyType.Hydrogen,
+            IsPartial = IsPartial
         };
 
         energyEntry.Type.ShouldBe(EnergyType.Hydrogen);
@@ -232,7 +242,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = expectedUnit,
-            Type = energyType
+            Type = energyType,
+            IsPartial = IsPartial
         };
 
         energyEntry.Type.ShouldBe(energyType);
@@ -252,7 +263,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.Id.ShouldBe(customId);
@@ -269,7 +281,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.Vehicle.ShouldBeNull(); // Navigation property starts as null
@@ -292,7 +305,8 @@ public class EnergyEntryTests
             EnergyUnit = Unit,
             Type = Type,
             PricePerUnit = pricePerUnit,
-            Cost = expectedCost
+            Cost = expectedCost,
+            IsPartial = IsPartial
         };
 
         energyEntry.Cost.ShouldBe(expectedCost);
@@ -314,7 +328,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         var pastEntry = new EnergyEntry
@@ -325,7 +340,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         futureEntry.Date.ShouldBe(futureDate);
@@ -343,7 +359,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.CreatedDate.ShouldBe(default);
@@ -361,7 +378,8 @@ public class EnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.DomainEvents.ShouldBeEmpty();

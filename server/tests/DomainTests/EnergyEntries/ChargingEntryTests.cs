@@ -13,6 +13,7 @@ public class ChargingEnergyEntryTests
     private const EnergyUnit Unit = EnergyUnit.kWh;
     private const EnergyType Type = EnergyType.Electric;
     private const decimal PricePerUnit = 2.01m;
+    private const bool IsPartial = false;
 
     [Fact]
     public void Constructor_ValidElectricEnergyEntry_CreatesEntityWithCorrectData()
@@ -27,7 +28,8 @@ public class ChargingEnergyEntryTests
             Volume = Volume,
             EnergyUnit = Unit,
             Type = Type,
-            PricePerUnit = PricePerUnit
+            PricePerUnit = PricePerUnit,
+            IsPartial = IsPartial
         };
 
         energyEntry.Date.ShouldBe(_date);
@@ -51,7 +53,8 @@ public class ChargingEnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.Date.ShouldBe(_date);
@@ -62,6 +65,7 @@ public class ChargingEnergyEntryTests
         energyEntry.Type.ShouldBe(Type);
         energyEntry.Cost.ShouldBeNull();
         energyEntry.PricePerUnit.ShouldBeNull();
+        energyEntry.IsPartial.ShouldBe(IsPartial);
     }
 
     [Fact]
@@ -75,13 +79,14 @@ public class ChargingEnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = EnergyUnit.kWh,
-            Type = EnergyType.Electric
+            Type = EnergyType.Electric,
+            IsPartial = IsPartial
         };
 
         energyEntry.EnergyUnit.ShouldBe(EnergyUnit.kWh);
         energyEntry.Type.ShouldBe(EnergyType.Electric);
     }
-    
+
     [Theory]
     [InlineData(42.5, EnergyUnit.kWh)]
     [InlineData(150.0, EnergyUnit.kWh)]
@@ -96,7 +101,8 @@ public class ChargingEnergyEntryTests
             Vehicle = null!,
             Volume = volume,
             EnergyUnit = unit,
-            Type = EnergyType.Electric
+            Type = EnergyType.Electric,
+            IsPartial = IsPartial
         };
 
         energyEntry.Volume.ShouldBe(volume);
@@ -114,7 +120,8 @@ public class ChargingEnergyEntryTests
             Vehicle = null!,
             Volume = Volume,
             EnergyUnit = Unit,
-            Type = Type
+            Type = Type,
+            IsPartial = IsPartial
         };
 
         energyEntry.Vehicle.ShouldBeNull();
@@ -138,7 +145,8 @@ public class ChargingEnergyEntryTests
             EnergyUnit = Unit,
             Type = Type,
             PricePerUnit = pricePerUnit,
-            Cost = expectedCost
+            Cost = expectedCost,
+            IsPartial = IsPartial
         };
 
         energyEntry.Cost.ShouldBe(expectedCost);

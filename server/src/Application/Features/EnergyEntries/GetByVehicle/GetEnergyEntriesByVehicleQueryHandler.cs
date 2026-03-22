@@ -40,6 +40,7 @@ internal sealed class GetEnergyEntriesByVehicleQueryHandler(
                 ee.Type,
                 ee.EnergyUnit,
                 ee.Volume,
+                ee.IsPartial,
                 ee.Cost,
                 ee.PricePerUnit,
                 0

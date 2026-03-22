@@ -199,7 +199,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 50000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40
+                Volume = 40,
+                IsPartial = false,
             },
             new()
             {
@@ -210,7 +211,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
                 Mileage = 49500,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 35
+                Volume = 35,
+                IsPartial = false,
             }
         };
 
@@ -284,7 +286,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 50000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 50
+                Volume = 50,
+                IsPartial = false,
             },
             new()
             {
@@ -295,7 +298,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-2)),
                 Mileage = 49000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40
+                Volume = 40,
+                IsPartial = false,
             },
             new()
             {
@@ -306,7 +310,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-3)),
                 Mileage = 48500,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 45
+                Volume = 45,
+                IsPartial = false,
             }
         };
 
@@ -567,7 +572,8 @@ public class VehicleUpdateValidationServiceTests : InMemoryDbTestBase
                 Date = DateOnly.FromDateTime(DateTime.Now),
                 Mileage = 30000,
                 EnergyUnit = EnergyUnit.kWh,
-                Volume = 10
+                Volume = 10,
+                IsPartial = false,
             }
         };
 
