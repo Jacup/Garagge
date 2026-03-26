@@ -1,4 +1,4 @@
-﻿using Application.Core;
+﻿﻿using Application.Core;
 
 namespace Application.Features.ServiceRecords;
 
@@ -12,9 +12,9 @@ public static class ServiceRecordErrors
         "ServiceRecord.VehicleIdRequired",
         "Vehicle ID is required.");
 
-    public static readonly Error ServiceTypeIdRequired = Error.Validation(
-        "ServiceRecord.ServiceTypeIdRequired",
-        "Service type ID is required.");
+    public static readonly Error TypeRequired = Error.Validation(
+        "ServiceRecord.TypeRequired",
+        "Type is required.");
 
     public static readonly Error TitleRequired = Error.Validation(
         "ServiceRecord.TitleRequired",
@@ -28,6 +28,10 @@ public static class ServiceRecordErrors
         "ServiceRecord.NotesTooLong",
         $"Notes cannot exceed {maxLength} characters.");
 
+    public static readonly Error TypeInvalid = Error.Validation(
+        "ServiceRecord.TypeInvalid",
+        "Type is not a valid enum value.");
+    
     public static readonly Error MileageNegative = Error.Validation(
         "ServiceRecord.MileageNegative",
         "Mileage cannot be negative.");
@@ -44,13 +48,9 @@ public static class ServiceRecordErrors
         "ServiceRecord.ManualCostNegative",
         "Manual cost cannot be negative.");
 
-    public static Error ServiceTypeNotFound(Guid serviceTypeId) => Error.NotFound(
-        "ServiceRecord.ServiceTypeNotFound",
-        $"Service type with ID '{serviceTypeId}' was not found.");
-
     public static readonly Error NotFound = Error.NotFound(
         "ServiceRecord.NotFound",
-        "Service record was not found.");
+        "Service record was not found");
 
     public static readonly Error PageInvalid = Error.Validation(
         "EnergyEntry.PageInvalid",

@@ -3,6 +3,7 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Features.ServiceRecords;
 using Application.Features.ServiceRecords.Get;
+using Domain.Enums.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ internal sealed class GetServiceRecords : IEndpoint
                 [FromQuery] int page = 1,
                 [FromQuery] int pageSize = 10,
                 [FromQuery] string? searchTerm = null,
-                [FromQuery] Guid? serviceTypeId = null,
+                [FromQuery] ServiceRecordType? type = null,
                 [FromQuery] DateTime? dateFrom = null,
                 [FromQuery] DateTime? dateTo = null,
                 [FromQuery] string? sortBy = null,
@@ -30,7 +31,7 @@ internal sealed class GetServiceRecords : IEndpoint
                     page,
                     pageSize,
                     searchTerm,
-                    serviceTypeId,
+                    type,
                     dateFrom,
                     dateTo,
                     sortBy,

@@ -17,6 +17,12 @@ internal sealed class CreateServiceRecordsCommandValidator : AbstractValidator<C
             .MaximumLength(titleMaximumLength)
             .WithError(ServiceRecordErrors.TitleTooLong(titleMaximumLength));
 
+        RuleFor(x => x.Type)
+            .NotEmpty()
+            .WithError(ServiceRecordErrors.TypeRequired)
+            .IsInEnum()
+            .WithError(ServiceRecordErrors.TypeInvalid);
+
         RuleFor(x => x.Notes)
             .MaximumLength(notesMaximumLength)
             .When(x => !string.IsNullOrEmpty(x.Notes))

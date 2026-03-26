@@ -1,7 +1,6 @@
 ﻿using ApiIntegrationTests.Contracts;
 using ApiIntegrationTests.Contracts.V1;
 using ApiIntegrationTests.Fixtures;
-using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums.Services;
@@ -23,9 +22,9 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         var request = CreateValidRequest();
 
         // Act
-        var response = 
+        var response =
             await Client.PostAsJsonAsync(ApiV1Definitions.Services.Create.WithId(vehicleId),
-            request);
+                request);
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
@@ -37,11 +36,10 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         // Arrange
         User owner = await CreateUserAsync("owner@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(owner);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         await CreateAndAuthenticateUser();
 
-        var request = CreateValidRequest(serviceType.Id);
+        var request = CreateValidRequest();
 
         // Act
         var response = await Client.PostAsJsonAsync(
@@ -58,33 +56,12 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         // Arrange
         await CreateAndAuthenticateUser();
         var nonExistentVehicleId = Guid.NewGuid();
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
-        var request = CreateValidRequest(serviceType.Id);
+        var request = CreateValidRequest();
 
         // Act
         var response = await Client.PostAsJsonAsync(
             ApiV1Definitions.Services.Create.WithId(nonExistentVehicleId),
-            request);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
-    public async Task CreateServiceRecord_ServiceTypeDoesNotExist_ReturnsNotFound()
-    {
-        // Arrange
-        await CreateAndAuthenticateUser();
-        User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
-        Vehicle vehicle = await CreateVehicleAsync(user);
-
-        var nonExistentServiceTypeId = Guid.NewGuid();
-        var request = CreateValidRequest(nonExistentServiceTypeId);
-
-        // Act
-        var response = await Client.PostAsJsonAsync(
-            ApiV1Definitions.Services.Create.WithId(vehicle.Id),
             request);
 
         // Assert
@@ -102,9 +79,8 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
 
-        var request = CreateValidRequest(serviceType.Id);
+        var request = CreateValidRequest(ServiceRecordType.OilAndFilters);
 
         // Act
         var response = await Client.PostAsJsonAsync(
@@ -123,7 +99,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
 
         var serviceDate = new DateTime(2024, 11, 5, 10, 30, 0, DateTimeKind.Utc);
         var request = new ServiceRecordCreateRequest(
@@ -132,7 +107,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: 15000,
             ServiceDate: serviceDate,
             ManualCost: 150.75m,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.OilAndFilters,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -151,8 +126,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         result.Mileage.ShouldBe(15000);
         result.ServiceDate.ShouldBe(serviceDate);
         result.TotalCost.ShouldBe(150.75m);
-        result.TypeId.ShouldBe(serviceType.Id);
-        result.Type.ShouldBe("Oil Change");
+        result.Type.ShouldBe(ServiceRecordType.OilAndFilters);
         result.VehicleId.ShouldBe(vehicle.Id);
         result.CreatedDate.ShouldNotBe(default);
         result.UpdatedDate.ShouldNotBe(default);
@@ -165,9 +139,8 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
-        var request = CreateValidRequest(serviceType.Id, "Test Service");
+        var request = CreateValidRequest(ServiceRecordType.OilAndFilters, "Test Service");
 
         // Act
         var response = await Client.PostAsJsonAsync(
@@ -182,7 +155,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         recordInDb.ShouldNotBeNull();
         recordInDb.Title.ShouldBe("Test Service");
         recordInDb.VehicleId.ShouldBe(vehicle.Id);
-        recordInDb.TypeId.ShouldBe(serviceType.Id);
+        recordInDb.Type.ShouldBe(ServiceRecordType.OilAndFilters);
     }
 
     [Fact]
@@ -192,7 +165,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Basic Service",
@@ -200,7 +172,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -230,25 +202,24 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync("Oil Change");
 
         var serviceItems = new List<ServiceItemCreateRequest>
         {
-            new ServiceItemCreateRequest(
+            new(
                 Name: "Engine Oil 5W-30",
                 Type: ServiceItemType.Part,
                 UnitPrice: 45.00m,
                 Quantity: 5,
                 PartNumber: "12345",
                 Notes: "Premium synthetic oil"),
-            new ServiceItemCreateRequest(
+            new(
                 Name: "Oil Filter",
                 Type: ServiceItemType.Part,
                 UnitPrice: 15.00m,
                 Quantity: 1,
                 PartNumber: "67890",
                 Notes: null),
-            new ServiceItemCreateRequest(
+            new(
                 Name: "Labor",
                 Type: ServiceItemType.Labor,
                 UnitPrice: 80.00m,
@@ -263,7 +234,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: 15000,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.OilAndFilters,
             ServiceItems: serviceItems);
 
         // Act
@@ -288,12 +259,10 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var serviceItems = new List<ServiceItemCreateRequest>
         {
-            new ServiceItemCreateRequest("Part A", ServiceItemType.Part, 10.00m, 2, null, null),
-            new ServiceItemCreateRequest("Part B", ServiceItemType.Part, 5.00m, 3, null, null)
+            new("Part A", ServiceItemType.Part, 10.00m, 2, null, null), new("Part B", ServiceItemType.Part, 5.00m, 3, null, null)
         };
 
         var request = new ServiceRecordCreateRequest(
@@ -302,7 +271,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: 100m, // Should be ignored when items exist
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: serviceItems);
 
         // Act
@@ -325,7 +294,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Service",
@@ -333,7 +301,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: 125.50m,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -360,7 +328,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "",
@@ -368,7 +335,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -387,7 +354,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var longTitle = new string('A', 65); // Max is 64
         var request = new ServiceRecordCreateRequest(
@@ -396,7 +362,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -415,7 +381,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var longNotes = new string('A', 501); // Max is 500
         var request = new ServiceRecordCreateRequest(
@@ -424,7 +389,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -443,7 +408,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Service",
@@ -451,7 +415,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: -100,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -470,7 +434,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Service",
@@ -478,7 +441,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: -50.00m,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -497,7 +460,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var futureDate = DateTime.UtcNow.AddDays(1);
         var request = new ServiceRecordCreateRequest(
@@ -506,7 +468,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: futureDate,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -529,7 +491,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var maxLengthTitle = new string('A', 64);
         var request = new ServiceRecordCreateRequest(
@@ -538,7 +499,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -557,7 +518,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var maxLengthNotes = new string('A', 500);
         var request = new ServiceRecordCreateRequest(
@@ -566,7 +526,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -585,7 +545,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Initial Service",
@@ -593,7 +552,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: 0,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -614,7 +573,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Warranty Service",
@@ -622,7 +580,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: 0m,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -643,7 +601,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var today = DateTime.UtcNow.Date;
         var request = new ServiceRecordCreateRequest(
@@ -652,7 +609,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: today,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -671,7 +628,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var pastDate = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var request = new ServiceRecordCreateRequest(
@@ -680,7 +636,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: pastDate,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -699,7 +655,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "High Mileage Service",
@@ -707,7 +662,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: 999999,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -726,7 +681,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var request = new ServiceRecordCreateRequest(
             Title: "Expensive Service",
@@ -734,7 +688,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: 99999.99m,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: new List<ServiceItemCreateRequest>());
 
         // Act
@@ -753,7 +707,6 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
         await CreateAndAuthenticateUser();
         User user = DbContext.Users.First(u => u.Email == "test@garagge.app");
         Vehicle vehicle = await CreateVehicleAsync(user);
-        ServiceType serviceType = await CreateServiceTypeAsync();
 
         var serviceItems = Enumerable.Range(1, 50)
             .Select(i => new ServiceItemCreateRequest(
@@ -771,7 +724,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: null,
             ServiceDate: DateTime.UtcNow,
             ManualCost: null,
-            ServiceTypeId: serviceType.Id,
+            Type: ServiceRecordType.Other,
             ServiceItems: serviceItems);
 
         // Act
@@ -791,7 +744,7 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
     #region Helper Methods
 
     private static ServiceRecordCreateRequest CreateValidRequest(
-        Guid? serviceTypeId = null,
+        ServiceRecordType type = ServiceRecordType.OilAndFilters,
         string title = "Oil Change")
     {
         return new ServiceRecordCreateRequest(
@@ -800,10 +753,9 @@ public class CreateServiceRecordEndpointTests(CustomWebApplicationFactory factor
             Mileage: 15000,
             ServiceDate: DateTime.UtcNow.AddDays(-1),
             ManualCost: 150.00m,
-            ServiceTypeId: serviceTypeId ?? Guid.NewGuid(),
+            Type: type,
             ServiceItems: new List<ServiceItemCreateRequest>());
     }
 
     #endregion
 }
-

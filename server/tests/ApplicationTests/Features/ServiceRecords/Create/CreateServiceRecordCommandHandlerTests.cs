@@ -23,12 +23,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.OilAndFilters,
             vehicle.Id,
             "Used synthetic oil",
             15000,
@@ -46,9 +45,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.Value.Mileage.ShouldBe(15000);
         result.Value.ServiceDate.ShouldBe(new DateTime(2024, 11, 5));
         result.Value.TotalCost.ShouldBe(150.50m);
-        result.Value.TypeId.ShouldBe(serviceType.Id);
-        result.Value.Type.ShouldNotBeNull();
-        result.Value.Type.ShouldBe("Oil Change");
+        result.Value.Type.ShouldBe(ServiceRecordType.OilAndFilters);
 
         var addedEntity = Context.ServiceRecords.SingleOrDefault(sr => sr.Id == result.Value.Id);
 
@@ -59,7 +56,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         addedEntity.ServiceDate.ShouldBe(new DateTime(2024, 11, 5));
         addedEntity.ManualCost.ShouldBe(150.50m);
         addedEntity.VehicleId.ShouldBe(vehicle.Id);
-        addedEntity.TypeId.ShouldBe(serviceType.Id);
+        addedEntity.Type.ShouldBe(ServiceRecordType.OilAndFilters);
     }
 
     [Fact]
@@ -68,12 +65,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Inspection");
 
         var command = new CreateServiceRecordCommand(
             "Basic inspection",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.OilAndFilters,
             vehicle.Id,
             null,
             null,
@@ -91,6 +87,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.Value.Mileage.ShouldBeNull();
         result.Value.TotalCost.ShouldBe(0m);
         result.Value.ServiceDate.ShouldBe(new DateTime(2024, 11, 5));
+        result.Value.Type.ShouldBe(ServiceRecordType.OilAndFilters);
     }
 
     [Fact]
@@ -99,12 +96,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var nonExistentVehicleId = Guid.NewGuid();
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.OilAndFilters,
             nonExistentVehicleId,
             null,
             15000,
@@ -126,12 +122,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         SetupAuthorizedUser();
         var otherUserId = Guid.NewGuid();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline], otherUserId);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.OilAndFilters,
             vehicle.Id,
             null,
             15000,
@@ -147,43 +142,16 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
     }
 
     [Fact]
-    public async Task Handle_ServiceTypeNotFound_ReturnsServiceTypeNotFoundError()
-    {
-        // Arrange
-        SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var nonExistentServiceTypeId = Guid.NewGuid();
-
-        var command = new CreateServiceRecordCommand(
-            "Regular oil change",
-            new DateTime(2024, 11, 5),
-            nonExistentServiceTypeId,
-            vehicle.Id,
-            null,
-            15000,
-            150.50m,
-            new List<CreateServiceItemCommand>());
-
-        // Act
-        var result = await _handler.Handle(command, CancellationToken.None);
-
-        // Assert
-        result.IsFailure.ShouldBeTrue();
-        result.Error.ShouldBe(ServiceRecordErrors.ServiceTypeNotFound(nonExistentServiceTypeId));
-    }
-    
-    [Fact]
     public async Task Handle_ValidCommand_GeneratesNewGuidForServiceRecordId()
     {
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var command = new CreateServiceRecordCommand(
             "Regular oil change",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.OilAndFilters,
             vehicle.Id,
             null,
             15000,
@@ -204,12 +172,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Major Service");
 
         var command = new CreateServiceRecordCommand(
             "Major Service at 500K",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "High mileage service",
             500000,
@@ -231,12 +198,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Engine Replacement");
 
         var command = new CreateServiceRecordCommand(
             "Engine replacement",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Full engine swap",
             150000,
@@ -257,13 +223,12 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
 
         var longNotes = new string('A', 1000);
         var command = new CreateServiceRecordCommand(
             "Detailed maintenance",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             longNotes,
             15000,
@@ -277,20 +242,19 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Notes.ShouldBe(longNotes);
     }
-    
+
     [Fact]
     public async Task Handle_WithPastDate_CreatesServiceRecordSuccessfully()
     {
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Historical Service");
 
         var pastDate = new DateTime(2020, 1, 1);
         var command = new CreateServiceRecordCommand(
             "Historical maintenance",
             pastDate,
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Service from 2020",
             10000,
@@ -311,12 +275,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var command1 = new CreateServiceRecordCommand(
             "First oil change",
             new DateTime(2024, 1, 1),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             null,
             10000,
@@ -326,7 +289,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command2 = new CreateServiceRecordCommand(
             "Second oil change",
             new DateTime(2024, 6, 1),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             null,
             20000,
@@ -352,12 +315,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Initial Setup");
 
         var command = new CreateServiceRecordCommand(
             "Initial setup",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Brand new car",
             0,
@@ -378,12 +340,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Warranty Service");
 
         var command = new CreateServiceRecordCommand(
             "Warranty repair",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Covered under warranty",
             15000,
@@ -404,7 +365,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -437,7 +397,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Complete oil change",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Full service with premium oil",
             15000,
@@ -480,7 +440,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Tire Rotation");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -497,7 +456,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Tire rotation",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             null,
             20000,
@@ -519,7 +478,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Brake Service");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -544,7 +502,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Brake replacement",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Front brake pads",
             25000,
@@ -575,7 +533,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Major Service");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -632,7 +589,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Comprehensive service",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Complete checkup with filters",
             30000,
@@ -666,7 +623,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Custom Work");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -683,7 +639,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Custom repair",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             null,
             15000,
@@ -708,7 +664,6 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Quote");
 
         var serviceItems = new List<CreateServiceItemCommand>
         {
@@ -725,7 +680,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Service quote",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Just a quote, no work done yet",
             15000,
@@ -747,12 +702,11 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Quick Service");
 
         var command = new CreateServiceRecordCommand(
             "Quick fix",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Minor adjustment",
             15000,
@@ -774,9 +728,9 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Complex Repair");
 
         var serviceItems = new List<CreateServiceItemCommand>();
+
         for (int i = 1; i <= 20; i++)
         {
             serviceItems.Add(new CreateServiceItemCommand(
@@ -792,7 +746,7 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         var command = new CreateServiceRecordCommand(
             "Complex repair with many parts",
             new DateTime(2024, 11, 5),
-            serviceType.Id,
+            ServiceRecordType.Other,
             vehicle.Id,
             "Multiple component replacement",
             50000,
@@ -815,4 +769,3 @@ public class CreateServiceRecordCommandHandlerTests : InMemoryDbTestBase
         recordInDb.Items.Count.ShouldBe(20);
     }
 }
-

@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions.Messaging;
 using Application.Core;
+using Domain.Enums.Services;
 
 namespace Application.Features.ServiceRecords.Get;
 
@@ -8,7 +9,7 @@ public sealed record GetServiceRecordsQuery(
     int Page,
     int PageSize,
     string? SearchTerm = null,
-    Guid? ServiceTypeId = null,
+    ServiceRecordType? Type = null,
     DateTime? DateFrom = null,
     DateTime? DateTo = null,
     string? SortBy = null,

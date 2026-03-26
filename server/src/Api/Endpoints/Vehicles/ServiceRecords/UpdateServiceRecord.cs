@@ -3,6 +3,7 @@ using Api.Infrastructure;
 using Application.Core;
 using Application.Features.ServiceRecords;
 using Application.Features.ServiceRecords.Update;
+using Domain.Enums.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ internal sealed class UpdateServiceRecord : IEndpoint
                         serviceRecordId,
                         request.Title,
                         request.ServiceDate,
-                        request.ServiceTypeId,
+                        request.Type,
                         vehicleId,
                         request.Notes,
                         request.Mileage,
@@ -46,7 +47,7 @@ internal sealed class UpdateServiceRecord : IEndpoint
 internal sealed record ServiceRecordUpdateRequest(
     string Title,
     DateTime ServiceDate,
-    Guid ServiceTypeId,
+    ServiceRecordType Type,
     string? Notes,
     int? Mileage,
     decimal? ManualCost);

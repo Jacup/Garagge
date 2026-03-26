@@ -1,4 +1,6 @@
-﻿namespace ApiIntegrationTests.Contracts.V1;
+﻿﻿namespace ApiIntegrationTests.Contracts.V1;
+
+using Domain.Enums.Services;
 
 internal sealed record ServiceRecordCreateRequest(
     string Title,
@@ -6,7 +8,7 @@ internal sealed record ServiceRecordCreateRequest(
     int? Mileage,
     DateTime ServiceDate,
     decimal? ManualCost,
-    Guid ServiceTypeId,
+    ServiceRecordType Type,
     ICollection<ServiceItemCreateRequest> ServiceItems);
     
 internal sealed record ServiceRecordUpdateRequest(
@@ -15,4 +17,4 @@ internal sealed record ServiceRecordUpdateRequest(
     int? Mileage,
     DateTime ServiceDate,
     decimal? ManualCost,
-    Guid ServiceTypeId);
+    ServiceRecordType Type);

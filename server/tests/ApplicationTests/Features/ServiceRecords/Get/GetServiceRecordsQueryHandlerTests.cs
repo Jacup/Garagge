@@ -2,6 +2,7 @@
 using Application.Features.Vehicles;
 using Application.Services;
 using Domain.Enums;
+using Domain.Enums.Services;
 
 namespace ApplicationTests.Features.ServiceRecords.Get;
 
@@ -71,9 +72,8 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
-        var record1 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Oil Change", new DateTime(2023, 10, 15), 1000, 150.50m);
-        var record2 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Tire Rotation", new DateTime(2023, 10, 10), 950, 75.00m);
+        var record1 = await CreateServiceRecordInDb(vehicle.Id, "Oil Change", new DateTime(2023, 10, 15), 1000, 150.50m);
+        var record2 = await CreateServiceRecordInDb(vehicle.Id, "Tire Rotation", new DateTime(2023, 10, 10), 950, 75.00m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20);
 
@@ -94,11 +94,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
         for (int i = 0; i < 5; i++)
         {
-            await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
+            await CreateServiceRecordInDb(vehicle.Id, $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
         }
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 2);
@@ -122,11 +121,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
         for (int i = 0; i < 5; i++)
         {
-            await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
+            await CreateServiceRecordInDb(vehicle.Id, $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
         }
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 2, 2);
@@ -150,11 +148,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
         for (int i = 0; i < 5; i++)
         {
-            await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
+            await CreateServiceRecordInDb(vehicle.Id,  $"Service {i}", new DateTime(2023, 10, i + 1), 1000 + i * 100, 100m + i * 10);
         }
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 3, 2);
@@ -178,11 +175,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Oil Change", new DateTime(2023, 10, 15), 1000, 150m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Tire Rotation", new DateTime(2023, 10, 14), 950, 75m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Oil Filter Replacement", new DateTime(2023, 10, 13), 900, 50m);
+        await CreateServiceRecordInDb(vehicle.Id, "Oil Change", new DateTime(2023, 10, 15), 1000, 150m);
+        await CreateServiceRecordInDb(vehicle.Id, "Tire Rotation", new DateTime(2023, 10, 14), 950, 75m);
+        await CreateServiceRecordInDb(vehicle.Id, "Oil Filter Replacement", new DateTime(2023, 10, 13), 900, 50m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, SearchTerm: "Oil");
 
@@ -202,11 +198,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 15), 1000, 150m, "Changed synthetic oil");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 14), 950, 75m, "Regular maintenance");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 13), 900, 50m, "Used synthetic products");
+        await CreateServiceRecordInDb(vehicle.Id, "Service 1", new DateTime(2023, 10, 15), 1000, 150m, "Changed synthetic oil");
+        await CreateServiceRecordInDb(vehicle.Id, "Service 2", new DateTime(2023, 10, 14), 950, 75m, "Regular maintenance");
+        await CreateServiceRecordInDb(vehicle.Id, "Service 3", new DateTime(2023, 10, 13), 900, 50m, "Used synthetic products");
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, SearchTerm: "synthetic");
 
@@ -225,14 +220,12 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType1 = await CreateServiceTypeInDb("Oil Change");
-        var serviceType2 = await CreateServiceTypeInDb("Tire Service");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType1.Id, "Oil Change 1", new DateTime(2023, 10, 15), 1000, 150m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType2.Id, "Tire Rotation", new DateTime(2023, 10, 14), 950, 75m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType1.Id, "Oil Change 2", new DateTime(2023, 10, 13), 900, 150m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Oil Change 1", new DateTime(2023, 10, 15), 1000, 150m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Tires, "Tire Rotation", new DateTime(2023, 10, 14), 950, 75m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Oil Change 2", new DateTime(2023, 10, 13), 900, 150m);
 
-        var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, ServiceTypeId: serviceType1.Id);
+        var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, Type: ServiceRecordType.OilAndFilters);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -241,7 +234,7 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         result.IsSuccess.ShouldBeTrue();
         result.Value.Items.Count.ShouldBe(2);
         result.Value.TotalCount.ShouldBe(2);
-        result.Value.Items.ShouldAllBe(sr => sr.TypeId == serviceType1.Id);
+        result.Value.Items.ShouldAllBe(sr => sr.Type == ServiceRecordType.OilAndFilters);
     }
 
     [Fact]
@@ -250,11 +243,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 20), 1100, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 20), 1100, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, DateFrom: new DateTime(2023, 10, 10));
 
@@ -274,11 +266,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 20), 1100, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 20), 1100, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, DateTo: new DateTime(2023, 10, 10));
 
@@ -298,12 +289,11 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 9, 1), 1000, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 5), 1050, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 15), 1100, 100m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 4", new DateTime(2023, 11, 1), 1150, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 9, 1), 1000, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 5), 1050, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 15), 1100, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 4", new DateTime(2023, 11, 1), 1150, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, DateFrom: new DateTime(2023, 10, 1), DateTo: new DateTime(2023, 10, 31));
 
@@ -323,20 +313,18 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType1 = await CreateServiceTypeInDb("Oil Change");
-        var serviceType2 = await CreateServiceTypeInDb("Tire Service");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType1.Id, "Oil Change Premium", new DateTime(2023, 10, 5), 1000, 150m, "Premium oil used");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType1.Id, "Oil Change Standard", new DateTime(2023, 10, 15), 1050, 100m, "Standard oil");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType2.Id, "Tire Rotation Premium", new DateTime(2023, 10, 10), 1100, 75m, "Premium service");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType1.Id, "Oil Change Premium", new DateTime(2023, 11, 1), 1150, 150m, "Premium oil");
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Oil Change Premium", new DateTime(2023, 10, 5), 1000, 150m, "Premium oil used");
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Oil Change Standard", new DateTime(2023, 10, 15), 1050, 100m, "Standard oil");
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Tires, "Tire Rotation Premium", new DateTime(2023, 10, 10), 1100, 75m, "Premium service");
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Oil Change Premium", new DateTime(2023, 11, 1), 1150, 150m, "Premium oil");
 
         var query = new GetServiceRecordsQuery(
             vehicle.Id, 
             1, 
             20, 
             SearchTerm: "Premium",
-            ServiceTypeId: serviceType1.Id,
+            Type: ServiceRecordType.OilAndFilters,
             DateFrom: new DateTime(2023, 10, 1),
             DateTo: new DateTime(2023, 10, 31));
 
@@ -357,11 +345,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        var record1 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
-        var record2 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
-        var record3 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 10), 1100, 100m);
+        var record1 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 10, 1), 1000, 100m);
+        var record2 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 15), 1050, 100m);
+        var record3 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 10), 1100, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20);
 
@@ -382,11 +369,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        var record1 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 15), 1000, 100m);
-        var record2 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 10), 1050, 100m);
-        var record3 = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 1), 1100, 100m);
+        var record1 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 10, 15), 1000, 100m);
+        var record2 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 10), 1050, 100m);
+        var record3 = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 1), 1100, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, SortBy: "servicedate", SortDescending: false);
 
@@ -407,11 +393,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 1", new DateTime(2023, 10, 15), 1000, 50m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 2", new DateTime(2023, 10, 10), 1500, 150m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service 3", new DateTime(2023, 10, 1), 1200, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 1", new DateTime(2023, 10, 15), 1000, 50m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 2", new DateTime(2023, 10, 10), 1500, 150m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service 3", new DateTime(2023, 10, 1), 1200, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, SortBy: "mileage", SortDescending: true);
 
@@ -432,11 +417,10 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
         
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "C Service", new DateTime(2023, 10, 15), 1000, 150m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "A Service", new DateTime(2023, 10, 10), 1050, 50m);
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "B Service", new DateTime(2023, 10, 1), 1100, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "C Service", new DateTime(2023, 10, 15), 1000, 150m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "A Service", new DateTime(2023, 10, 10), 1050, 50m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "B Service", new DateTime(2023, 10, 1), 1100, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20, SortBy: "title", SortDescending: false);
 
@@ -457,9 +441,8 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Oil Change");
         var serviceDate = new DateTime(2023, 10, 15, 10, 30, 0);
-        var record = await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Premium Oil Change", serviceDate, 1000, 150.75m, "Used synthetic oil");
+        var record = await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.OilAndFilters, "Premium Oil Change", serviceDate, 1000, 150.75m, "Used synthetic oil");
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20);
 
@@ -477,8 +460,7 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         dto.Mileage.ShouldBe(1000);
         dto.ServiceDate.ShouldBe(serviceDate);
         dto.TotalCost.ShouldBe(150.75m);
-        dto.TypeId.ShouldBe(serviceType.Id);
-        dto.Type.ShouldBe("Oil Change");
+        dto.Type.ShouldBe(ServiceRecordType.OilAndFilters);
         dto.VehicleId.ShouldBe(vehicle.Id);
         dto.CreatedDate.ShouldNotBe(default);
         dto.UpdatedDate.ShouldNotBe(default);
@@ -490,8 +472,7 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service", new DateTime(2023, 10, 15), 1000, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service", new DateTime(2023, 10, 15), 1000, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20);
 
@@ -509,8 +490,7 @@ public class GetServiceRecordsQueryHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb([EnergyType.Gasoline]);
-        var serviceType = await CreateServiceTypeInDb("Maintenance");
-        await CreateServiceRecordInDb(vehicle.Id, serviceType.Id, "Service", new DateTime(2023, 10, 15), null, 100m);
+        await CreateServiceRecordInDb(vehicle.Id, ServiceRecordType.Other, "Service", new DateTime(2023, 10, 15), null, 100m);
 
         var query = new GetServiceRecordsQuery(vehicle.Id, 1, 20);
 

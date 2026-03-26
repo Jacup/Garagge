@@ -1,4 +1,5 @@
-﻿using Application.Features.ServiceRecords.Get;
+﻿﻿using Application.Features.ServiceRecords.Get;
+using Domain.Enums.Services;
 using FluentValidation.TestHelper;
 
 namespace ApplicationTests.Features.ServiceRecords.Get;
@@ -296,32 +297,6 @@ public class GetServiceRecordsQueryValidatorTests
     }
 
     [Fact]
-    public void Validate_WhenServiceTypeIdIsNull_ShouldNotHaveError()
-    {
-        // Arrange
-        var query = new GetServiceRecordsQuery(Guid.NewGuid(), 1, 10, ServiceTypeId: null);
-
-        // Act
-        var result = _validator.TestValidate(query);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(q => q.ServiceTypeId);
-    }
-
-    [Fact]
-    public void Validate_WhenServiceTypeIdIsProvided_ShouldNotHaveError()
-    {
-        // Arrange
-        var query = new GetServiceRecordsQuery(Guid.NewGuid(), 1, 10, ServiceTypeId: Guid.NewGuid());
-
-        // Act
-        var result = _validator.TestValidate(query);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(q => q.ServiceTypeId);
-    }
-
-    [Fact]
     public void Validate_WhenAllParametersAreValid_ShouldNotHaveAnyErrors()
     {
         // Arrange
@@ -330,7 +305,7 @@ public class GetServiceRecordsQueryValidatorTests
             Page: 1,
             PageSize: 20,
             SearchTerm: "oil",
-            ServiceTypeId: Guid.NewGuid(),
+            Type: ServiceRecordType.OilAndFilters,
             DateFrom: new DateTime(2024, 1, 1),
             DateTo: new DateTime(2024, 12, 31),
             SortBy: "servicedate",

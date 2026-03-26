@@ -9,6 +9,7 @@ using Domain.Entities.Services;
 using Domain.Entities.Users;
 using Domain.Entities.Vehicles;
 using Domain.Enums;
+using Domain.Enums.Services;
 using Infrastructure.DAL;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,6 +27,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         {
             PropertyNameCaseInsensitive = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
+
         DefaultJsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     }
 
@@ -116,9 +118,14 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
         // Add energy types if provided
         var energyTypesToAdd = energyTypes ?? [EnergyType.Gasoline];
+
         foreach (var energyType in energyTypesToAdd)
         {
-            var vehicleEnergyType = new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = energyType };
+            var vehicleEnergyType = new VehicleEnergyType
+            {
+                Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = energyType
+            };
+
             DbContext.VehicleEnergyTypes.Add(vehicleEnergyType);
         }
 
@@ -130,6 +137,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
     protected async Task<Vehicle> CreateVehicleAsync(string brand = "Toyota", string model = "Corolla")
     {
         var user = DbContext.Users.FirstOrDefault(u => u.Email == "test@garagge.app");
+
         if (user == null)
         {
             throw new InvalidOperationException("No authenticated user found. Call CreateAndAuthenticateUser() first.");
@@ -138,37 +146,20 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         return await CreateVehicleAsync(user, brand, model);
     }
 
-    protected async Task<ServiceType> CreateServiceTypeAsync(string name = "Maintenance")
-    {
-        var serviceType = new ServiceType { Id = Guid.NewGuid(), Name = name };
-
-        DbContext.ServiceTypes.Add(serviceType);
-        await DbContext.SaveChangesAsync();
-
-        return serviceType;
-    }
-
     protected async Task<ServiceRecord> CreateServiceRecordAsync(
         Guid vehicleId,
-        Guid typeId,
+        ServiceRecordType type = ServiceRecordType.Other,
         string title = "Oil Change",
         DateTime? serviceDate = null,
         int? mileage = null,
         decimal? cost = null,
         string? notes = null)
     {
-        var serviceType = await DbContext.ServiceTypes.FindAsync(typeId);
-        if (serviceType == null)
-        {
-            throw new InvalidOperationException($"ServiceType with Id {typeId} not found");
-        }
-
         var serviceRecord = new ServiceRecord
         {
             Id = Guid.NewGuid(),
             VehicleId = vehicleId,
-            TypeId = typeId,
-            Type = serviceType,
+            Type = type,
             Title = title,
             ServiceDate = serviceDate.HasValue ? DateTime.SpecifyKind(serviceDate.Value, DateTimeKind.Utc) : DateTime.UtcNow.AddDays(-1),
             Mileage = mileage,
@@ -182,7 +173,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
         return serviceRecord;
     }
 
-    protected async Task<ServiceItem> CreateServiceItemAsync(
+    protected async Task CreateServiceItemAsync(
         Guid serviceRecordId,
         string name = "Service Item",
         decimal unitPrice = 100m,
@@ -195,7 +186,7 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
             Id = Guid.NewGuid(),
             ServiceRecordId = serviceRecordId,
             Name = name,
-            Type = Domain.Enums.Services.ServiceItemType.Part,
+            Type = ServiceItemType.Part,
             UnitPrice = unitPrice,
             Quantity = quantity,
             PartNumber = partNumber,
@@ -204,13 +195,6 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
         DbContext.ServiceItems.Add(serviceItem);
         await DbContext.SaveChangesAsync();
-
-        return serviceItem;
-    }
-
-    protected void Authenticate(string accessToken)
-    {
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
     }
 
     public async Task InitializeAsync()
@@ -221,14 +205,15 @@ public class BaseIntegrationTest : IClassFixture<CustomWebApplicationFactory>, I
 
     public Task DisposeAsync()
     {
-        _scope?.Dispose();
-        DbContext?.Dispose();
+        _scope.Dispose();
+        DbContext.Dispose();
+
         return Task.CompletedTask;
     }
 
     private void RefreshServices()
     {
-        _scope?.Dispose();
+        _scope.Dispose();
         _scope = Factory.Services.CreateScope();
         DbContext = _scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     }

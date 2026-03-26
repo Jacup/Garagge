@@ -8,18 +8,19 @@ internal sealed class ServiceRecordFilterService : IServiceRecordFilterService
 {
     public IQueryable<ServiceRecord> ApplyFilters(IQueryable<ServiceRecord> query, GetServiceRecordsQuery request)
     {
+        if (request.Type != null)
+        {
+            query = query.Where(sr => sr.Type == request.Type.Value);
+        }
+
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var searchTerm = request.SearchTerm.ToLower().Trim();
 
             query = query.Where(sr =>
                 sr.Title.ToLower().Contains(searchTerm) ||
+                sr.Type.ToString().ToLower().Contains(searchTerm) ||
                 (sr.Notes != null && sr.Notes.ToLower().Contains(searchTerm)));
-        }
-
-        if (request.ServiceTypeId.HasValue)
-        {
-            query = query.Where(sr => sr.TypeId == request.ServiceTypeId.Value);
         }
 
         if (request.DateFrom.HasValue)
