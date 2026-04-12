@@ -15,7 +15,8 @@ public class EnergyEntryMileageValidatorTests
             Mileage = mileage,
             Type = 0,
             EnergyUnit = 0,
-            Volume = 1
+            Volume = 1,
+            IsPartial = false,
         };
 
     [Fact]

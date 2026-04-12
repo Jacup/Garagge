@@ -10,6 +10,7 @@ public sealed record CreateEnergyEntryCommand(
     EnergyType Type,
     EnergyUnit EnergyUnit,
     decimal Volume,
+    bool IsPartial,
     decimal? Cost,
     decimal? PricePerUnit)
     : ICommand<EnergyEntryDto>;

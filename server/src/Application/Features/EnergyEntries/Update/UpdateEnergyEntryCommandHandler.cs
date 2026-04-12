@@ -45,6 +45,7 @@ internal sealed class UpdateEnergyEntryCommandHandler(
         energyEntry.Type = request.Type;
         energyEntry.EnergyUnit = request.EnergyUnit;
         energyEntry.Volume = request.Volume;
+        energyEntry.IsPartial = request.IsPartial;
         energyEntry.Cost = request.Cost;
         energyEntry.PricePerUnit = request.PricePerUnit;
 

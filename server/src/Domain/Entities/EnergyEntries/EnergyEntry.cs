@@ -11,6 +11,7 @@ public class EnergyEntry : Entity
     public required EnergyType Type { get; set; }
     public required EnergyUnit EnergyUnit { get; set; }
     public required decimal Volume { get; set; }
+    public required bool IsPartial { get; set; }
 
     public decimal? Cost { get; set; }
     public decimal? PricePerUnit { get; set; }

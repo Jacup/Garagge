@@ -40,6 +40,10 @@ internal sealed class UpdateEnergyEntryCommandValidator : AbstractValidator<Upda
             .GreaterThan(0)
             .WithError(EnergyEntryErrors.VolumeInvalid);
 
+        RuleFor(x => x.IsPartial)
+            .NotEmpty()
+            .WithError(EnergyEntryErrors.IsPartialRequired);
+        
         RuleFor(x => x.Cost)
             .GreaterThan(0)
             .When(x => x.Cost.HasValue)

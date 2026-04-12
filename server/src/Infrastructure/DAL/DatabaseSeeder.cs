@@ -136,6 +136,7 @@ public static class DatabaseSeeder
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
                 Volume = 25.5m,
+                IsPartial = false,
                 Cost = 50.75m,
                 PricePerUnit = 5.50m
             },
@@ -148,6 +149,7 @@ public static class DatabaseSeeder
                 Mileage = 15500,
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
+                IsPartial = false,
                 Volume = 25.0m,
             },
 
@@ -161,6 +163,7 @@ public static class DatabaseSeeder
                 Mileage = 10000,
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
+                IsPartial = false,
                 Volume = 80.0m,
                 Cost = 150.00m,
             },
@@ -173,6 +176,7 @@ public static class DatabaseSeeder
                 Mileage = 10500,
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
+                IsPartial = false,
                 Volume = 80.0m,
             },
             new()
@@ -184,6 +188,7 @@ public static class DatabaseSeeder
                 Mileage = 11000,
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
+                IsPartial = false,
                 Volume = 80.0m,
             },
 
@@ -197,6 +202,7 @@ public static class DatabaseSeeder
                 Mileage = 11000,
                 Type = EnergyType.Electric,
                 EnergyUnit = EnergyUnit.kWh,
+                IsPartial = false,
                 Volume = 80.0m,
             },
             new()
@@ -208,6 +214,7 @@ public static class DatabaseSeeder
                 Mileage = 11000,
                 Type = EnergyType.Gasoline,
                 EnergyUnit = EnergyUnit.Liter,
+                IsPartial = false,
                 Volume = 30.0m,
                 Cost = 250.00m,
             },

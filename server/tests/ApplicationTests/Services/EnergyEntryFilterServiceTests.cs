@@ -245,7 +245,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 1),
                 Mileage = 1000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 50m
+                Volume = 50m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -257,7 +258,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 2),
                 Mileage = 1100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 45m
+                Volume = 45m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -269,7 +271,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 3),
                 Mileage = 2000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 55m
+                Volume = 55m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -281,7 +284,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 4),
                 Mileage = 3000,
                 EnergyUnit = EnergyUnit.kWh,
-                Volume = 30m
+                Volume = 30m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -293,7 +297,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 5),
                 Mileage = 1500,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40m
+                Volume = 40m,
+                IsPartial = false,
             }
         ];
     }
@@ -328,7 +333,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 1),
                 Mileage = 1000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 50m
+                Volume = 50m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -340,7 +346,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 2),
                 Mileage = 1100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 45m
+                Volume = 45m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -352,7 +359,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 3),
                 Mileage = 1200,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 55m
+                Volume = 55m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -364,7 +372,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 4),
                 Mileage = 2000,
                 EnergyUnit = EnergyUnit.kWh,
-                Volume = 30m
+                Volume = 30m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -376,7 +385,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 5),
                 Mileage = 2100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40m
+                Volume = 40m,
+                IsPartial = false,
             }
         ];
     }
@@ -394,7 +404,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 1),
                 Mileage = 1000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 50m
+                Volume = 50m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -406,7 +417,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 2),
                 Mileage = 1100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 45m
+                Volume = 45m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -418,7 +430,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 3),
                 Mileage = 1200,
                 EnergyUnit = EnergyUnit.kWh,
-                Volume = 30m
+                Volume = 30m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -430,7 +443,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 4),
                 Mileage = 2000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40m
+                Volume = 40m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -442,7 +456,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 5),
                 Mileage = 2100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 55m
+                Volume = 55m,
+                IsPartial = false,
             }
         ];
     }
@@ -460,7 +475,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 15),
                 Mileage = 1000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 50m
+                Volume = 50m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -472,7 +488,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 15),
                 Mileage = 1100,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 45m
+                Volume = 45m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -484,7 +501,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 16),
                 Mileage = 950,
                 EnergyUnit = EnergyUnit.kWh,
-                Volume = 30m
+                Volume = 30m,
+                IsPartial = false,
             },
 
             new EnergyEntry
@@ -496,7 +514,8 @@ public class EnergyEntryFilterServiceTests
                 Date = new DateOnly(2023, 10, 10),
                 Mileage = 2000,
                 EnergyUnit = EnergyUnit.Liter,
-                Volume = 40m
+                Volume = 40m,
+                IsPartial = false,
             }
         ];
     }

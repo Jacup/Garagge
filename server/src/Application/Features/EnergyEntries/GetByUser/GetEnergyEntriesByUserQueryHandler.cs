@@ -38,6 +38,7 @@ internal sealed class GetEnergyEntriesByUserQueryHandler(
                 ee.Type,
                 ee.EnergyUnit,
                 ee.Volume,
+                ee.IsPartial,
                 ee.Cost,
                 ee.PricePerUnit,
                 0

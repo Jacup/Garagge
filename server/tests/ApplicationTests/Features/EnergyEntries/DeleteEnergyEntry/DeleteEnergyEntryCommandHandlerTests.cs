@@ -139,6 +139,7 @@ public class DeleteEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Type = energyType,
             EnergyUnit = energyType == EnergyType.Electric ? EnergyUnit.kWh : EnergyUnit.Liter,
             Volume = 50m,
+            IsPartial = false,
             Cost = 100m,
             PricePerUnit = 2m
         };

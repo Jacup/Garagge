@@ -94,7 +94,10 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline); // Vehicle supports only Gasoline
-        var command = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Electric }; // Try to add Electricity
+        var command = CreateValidCommand(vehicle.Id) with
+        {
+            Type = EnergyType.Electric
+        }; // Try to add Electricity
 
         // Setup mock to return false for an incompatible energy type
         _energyCompatibilityServiceMock
@@ -126,12 +129,17 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Mileage = 2000, // Higher mileage
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
-            Volume = 50m
+            Volume = 50m,
+            IsPartial = false,
         };
+
         Context.EnergyEntries.Add(existingEntry);
         await Context.SaveChangesAsync();
 
-        var command = CreateValidCommand(vehicle.Id) with { Mileage = 1500 }; // Lower mileage
+        var command = CreateValidCommand(vehicle.Id) with
+        {
+            Mileage = 1500
+        }; // Lower mileage
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -158,12 +166,17 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Mileage = 2000,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
-            Volume = 50m
+            Volume = 50m,
+            IsPartial = false
         };
+
         Context.EnergyEntries.Add(existingEntry);
         await Context.SaveChangesAsync();
 
-        var command = CreateValidCommand(vehicle.Id) with { Mileage = 2000 }; // Equal mileage
+        var command = CreateValidCommand(vehicle.Id) with
+        {
+            Mileage = 2000
+        }; // Equal mileage
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -190,12 +203,17 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Mileage = 2000,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
-            Volume = 50m
+            Volume = 50m,
+            IsPartial = false
         };
+
         Context.EnergyEntries.Add(existingEntry);
         await Context.SaveChangesAsync();
 
-        var command = CreateValidCommand(vehicle.Id) with { Mileage = 2500 }; // Higher mileage
+        var command = CreateValidCommand(vehicle.Id) with
+        {
+            Mileage = 2500
+        }; // Higher mileage
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -226,14 +244,25 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     {
         // Arrange
         SetupAuthorizedUser();
-        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, AuthorizedUserId, new[] { EnergyType.Gasoline, EnergyType.Electric });
+        var vehicle = await CreateVehicleInDb(EnergyType.Gasoline, AuthorizedUserId, new[]
+        {
+            EnergyType.Gasoline, EnergyType.Electric
+        });
 
         // Test Gasoline
-        var gasolineCommand = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Gasoline, Mileage = 1000 };
+        var gasolineCommand = CreateValidCommand(vehicle.Id) with
+        {
+            Type = EnergyType.Gasoline, Mileage = 1000
+        };
+
         var gasolineResult = await _handler.Handle(gasolineCommand, CancellationToken.None);
 
         // Test Electricity
-        var electricityCommand = CreateValidCommand(vehicle.Id) with { Type = EnergyType.Electric, Mileage = 2000, EnergyUnit = EnergyUnit.kWh };
+        var electricityCommand = CreateValidCommand(vehicle.Id) with
+        {
+            Type = EnergyType.Electric, Mileage = 2000, EnergyUnit = EnergyUnit.kWh
+        };
+
         var electricityResult = await _handler.Handle(electricityCommand, CancellationToken.None);
 
         // Assert
@@ -247,7 +276,10 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
         // Arrange
         SetupAuthorizedUser();
         var vehicle = await CreateVehicleInDb(EnergyType.Gasoline);
-        var command = CreateValidCommand(vehicle.Id) with { Cost = null, PricePerUnit = null };
+        var command = CreateValidCommand(vehicle.Id) with
+        {
+            Cost = null, PricePerUnit = null
+        };
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -271,14 +303,23 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             UserId = userId ?? AuthorizedUserId,
         };
 
-        var energyTypesToAdd = supportedEnergyTypes ?? new[] { energyType };
+        var energyTypesToAdd = supportedEnergyTypes ??
+                               new[]
+                               {
+                                   energyType
+                               };
+
         foreach (var type in energyTypesToAdd)
         {
-            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType { Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = type });
+            vehicle.VehicleEnergyTypes.Add(new VehicleEnergyType
+            {
+                Id = Guid.NewGuid(), VehicleId = vehicle.Id, EnergyType = type
+            });
         }
 
         Context.Vehicles.Add(vehicle);
         await Context.SaveChangesAsync();
+
         return vehicle;
     }
 
@@ -291,6 +332,7 @@ public class CreateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Type: EnergyType.Gasoline,
             EnergyUnit: EnergyUnit.Liter,
             Volume: 50.0m,
+            IsPartial: false,
             Cost: 100.0m,
             PricePerUnit: 2.0m);
     }

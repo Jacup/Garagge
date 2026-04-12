@@ -23,6 +23,7 @@ internal sealed class CreateEnergyEntry : IEndpoint
                         request.Type,
                         request.EnergyUnit,
                         request.Volume,
+                        request.IsPartial,
                         request.Cost,
                         request.PricePerUnit
                     );
@@ -49,5 +50,6 @@ internal sealed record EnergyEntryCreateRequest(
     EnergyType Type,
     EnergyUnit EnergyUnit,
     decimal Volume,
+    bool IsPartial,
     decimal? Cost,
     decimal? PricePerUnit);

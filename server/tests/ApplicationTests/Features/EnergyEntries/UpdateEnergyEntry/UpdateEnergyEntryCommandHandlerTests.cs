@@ -55,7 +55,8 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
             Mileage = mileage ?? 1000,
             Type = EnergyType.Gasoline,
             EnergyUnit = EnergyUnit.Liter,
-            Volume = 10
+            Volume = 10,
+            IsPartial = false,
         };
         Context.EnergyEntries.Add(entry);
         await Context.SaveChangesAsync();
@@ -63,7 +64,7 @@ public class UpdateEnergyEntryCommandHandlerTests : InMemoryDbTestBase
     }
 
     private static UpdateEnergyEntryCommand CreateValidCommand(Guid vehicleId, Guid entryId) =>
-        new(vehicleId, entryId, new DateOnly(2024, 2, 2), 2000, EnergyType.Gasoline, EnergyUnit.Liter, 20, 200, 10);
+        new(vehicleId, entryId, new DateOnly(2024, 2, 2), 2000, EnergyType.Gasoline, EnergyUnit.Liter, 20, false, 200, 10);
 
     [Fact]
     public async Task Handle_ValidCommand_ReturnsSuccessWithEnergyEntryDto()

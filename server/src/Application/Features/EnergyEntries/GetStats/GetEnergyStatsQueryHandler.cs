@@ -68,6 +68,7 @@ internal sealed class GetEnergyStatsQueryHandler(
                 Type: e.Type,
                 EnergyUnit: e.EnergyUnit,
                 Volume: e.Volume,
+                IsPartial: e.IsPartial,
                 Cost: e.Cost,
                 PricePerUnit: e.PricePerUnit,
                 Consumption: 0
